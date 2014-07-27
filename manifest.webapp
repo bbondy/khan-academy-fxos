@@ -1,0 +1,27 @@
+{
+  "version": "0.1",
+  "name": "Khan Academy",
+  "description": "Khan Academy allows you to learn almost anything for free",
+  "launch_path": "/index.html",
+  "icons": {
+    "128": "/img/icons/ka-128.png"
+  },
+  "developer": {
+    "name": "Brian R. Bondy",
+    "url": "http://brianbondy.com"
+  },
+  "installs_allowed_from": [
+    "*"
+  ],
+  "appcache_path": "/cache.manifest",
+  "locales": {
+    "en": {
+      "name": "Khan Academy",
+      "description": "Khan Academy allows you to learn almost anything for free"
+    }
+  },
+  "default_locale": "en",
+  "permissions": {
+    "desktop-notification": {}
+  }
+}
