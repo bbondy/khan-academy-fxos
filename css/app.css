@@ -1,0 +1,47 @@
+
+/* Tip: Use "@import" to add styles instead of adding <link>'s in your
+   HTML, and volo will inline it when building for production */
+
+@import "install-button.css";
+@import "../js/lib/layouts/css/layouts.css";
+
+@import "fonts.css";
+
+/* Your styles here */
+
+html, body {
+    height: 100%;
+}
+
+body {
+    font-family: 'MozTTLight', Verdana, sans-serif;
+}
+
+h1 {
+    font: 2.2rem/4.8rem "Open Sans", Sans-serif;
+}
+
+div .contents {
+    padding: 1em;
+}
+
+div h1 {
+    margin-top: 0;
+}
+
+div.edit .field {
+    margin-top: 1em;
+}
+
+div.list li:before {
+    content: ' ';
+    display: inline-block;
+    width: 15px;
+    height: 15px;
+    background: url(../img/glyphicons-halflings.png) no-repeat -95px -2px;
+    margin-right: 5px;
+    vertical-align: middle;
+}
+
+ul li {
+}
