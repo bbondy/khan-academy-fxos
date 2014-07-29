@@ -6,6 +6,7 @@ require.config({
         "jsx": "../jsx",
         "text": "../text",
         "main": "../main",
+        "oauth": "../auth",
         "models": "../models",
         "underscore": "../underscore-min",
         "jquery": "../jquery",
