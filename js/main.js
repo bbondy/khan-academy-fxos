@@ -4,7 +4,7 @@
 
 "use strict";
 
-define(["react", "models"], function(React, models) {
+define(["react", "models", "ka"], function(React, models, KA) {
 
     function partial( fn /*, args...*/) {
       var aps = Array.prototype.slice;
@@ -71,6 +71,21 @@ define(["react", "models"], function(React, models) {
         }
     });
 
+    var LoginButton = React.createClass({
+        render: function() {
+            var divStyle = {
+                textAlign: "right",
+                marginRight: "15px"
+            };
+                //backgroundColor: domain.color
+            return <div style={divStyle}>
+                <a href="#" onClick={partial(this.props.onClickLogin, this.props.model)}>
+                    LOGIN
+                </a>
+            </div>;
+        }
+    });
+
     var TopicViewer = React.createClass({
         componentDidMount: function() {
         },
@@ -108,13 +123,16 @@ define(["react", "models"], function(React, models) {
                     </header>
                     </section>
                     <section data-type="list" style={listStyle}>
+                        { !KA.isLoggedIn ?
+                        <LoginButton model={this.props.topic}
+                                    onClickLogin={this.props.onClickLogin}/> : null }
                         <ul style={listStyle}>
                         {backButton}
                         {topics}
                         {videos}
                         </ul>
-                    </section>;
-                </div>
+                    </section>
+                </div>;
             return topicList;
         }
     });
@@ -155,12 +173,16 @@ define(["react", "models"], function(React, models) {
             console.log(model);
             this.setState({currentModel: model.get("parent")});
         },
+        onClickLogin: function() {
+            KA.login();
+        },
         render: function() {
             if (this.state.currentModel.isTopic()) {
                 return <TopicViewer topic={this.state.currentModel}
                                     onClickTopic={this.onClickTopic}
                                     onClickVideo={this.onClickVideo}
-                                    onClickBack={this.onClickBack}/>;
+                                    onClickBack={this.onClickBack}
+                                    onClickLogin={this.onClickLogin}/>;
             }
 
             return <VideoViewer  video={this.state.currentModel}
@@ -168,16 +190,25 @@ define(["react", "models"], function(React, models) {
         }
     });
 
-    console.log("Doing jsx!");
-    var mountNode = document.getElementById('example');
+    var mountNode = document.getElementById("app");
     var topic = new models.TopicModel();
+
+    // TODO: remove, just for easy inpsection
     window.topic = topic;
-    topic.fetch({
-        success: function(data) {
-        console.log('ouch!');
+
+    // Init everything
+    var initPromise = KA.init();
+    $.when(topic.fetch(), initPromise).done(function(topicData) {
+        console.log('init proimse: ');
+        console.log(initPromise);
         React.renderComponent(<MainView model={topic}/>, mountNode);
-    }});
+        if (KA.isLoggedIn) {
+            console.log('logged in, getUserVideos!');
+            KA.getUserVideos().done(function(data) {
+                console.log(data[0].video.description);
+            });
+        } else {
+            console.log('No... nhuh uh!');
+        }
+     });
 });
-
-
-
