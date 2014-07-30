@@ -1,4 +1,4 @@
-define(["jquery", "backbone"], function() {
+define([], function() {
     var TopicModel = Backbone.Model.extend({
         url: "/knowledge-map.json",
         initialize: function() {
