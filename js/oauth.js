@@ -770,6 +770,10 @@ try {
 			error: function () { return this.fail.apply(this, arguments); }
 		}, d.promise());
 	};
+    $.getURL = function (options) {
+		var data = addOAuthStuffs(options);
+        return data.url + "?" + data.data
+    };
 
 	function addOAuthStuffs(options) {
 		options = $.extend({ type: 'GET', consumerKey: '', consumerSecret: '', tokenSecret: '', url: '' }, options);
@@ -796,7 +800,15 @@ try {
 		if ( options.token ) {
 			OAuth.setParameter(message, "oauth_token", options.token);
 		}
-		
+
+        if ( options.oauthCallback) {
+			OAuth.setParameter(message, "oauth_callback", options.oauthCallback);
+        }
+
+        if ( options.oauthVerifier) {
+			OAuth.setParameter(message, "oauth_verifier", options.oauthVerifier);
+        }
+
 		if ( data && typeof data !== "string" && options.type === "POST" ) {
 			for ( var prop in data ) {
 				OAuth.setParameter(message, prop, data[ prop ]);
@@ -827,5 +839,6 @@ try {
 		
 		return options;
 	}
+
 })(window, document, jQuery);
 
