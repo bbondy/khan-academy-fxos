@@ -4,9 +4,10 @@ require.config({
         "react": "../react",
         "JSXTransformer": "../JSXTransformer",
         "jsx": "../jsx",
+        "ka": "../ka",
         "text": "../text",
         "main": "../main",
-        "oauth": "../auth",
+        "oauth": "../oauth",
         "models": "../models",
         "underscore": "../underscore-min",
         "jquery": "../jquery",
@@ -14,4 +15,4 @@ require.config({
     }
 });
 
-requirejs(['backbone', 'react', 'jsx!main']);
+requirejs(['underscore', 'backbone', 'react', 'jsx!main']);
