@@ -79,7 +79,7 @@ define(["oauth"], function() {
             }));
             window.location = url;
         },
-        getUserVideos: function() {
+        _basicAPICall: function(url) {
             var d = $.Deferred();
             if (!oauth.token) {
                 return d.reject().promise();
@@ -87,7 +87,7 @@ define(["oauth"], function() {
 
             $.oauth($.extend( {}, oauth, {
                 type: "GET",
-                url: this.API_V1_BASE + "/user/videos",
+                url: url,
                 timeout: 10000,
                 dataType: "json",
                 success: function(data) {
@@ -100,6 +100,12 @@ define(["oauth"], function() {
                 }
             }));
             return d.promise();
+        },
+        getUserVideos: function() {
+            return this._basicAPICall(this.API_V1_BASE + "/user/videos");
+        },
+        getUserInfo: function() {
+            return this._basicAPICall(this.API_V1_BASE + "/user");
         },
         API_BASE: "http://www.khanacademy.org/api",
         API_V1_BASE: "http://www.khanacademy.org/api/v1",

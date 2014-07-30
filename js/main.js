@@ -204,8 +204,8 @@ define(["react", "models", "ka"], function(React, models, KA) {
         React.renderComponent(<MainView model={topic}/>, mountNode);
         if (KA.isLoggedIn) {
             console.log('logged in, getUserVideos!');
-            KA.getUserVideos().done(function(data) {
-                console.log(data[0].video.description);
+            KA.getUserInfo().done(function(data) {
+                console.log(data);
             });
         } else {
             console.log('No... nhuh uh!');
