@@ -34,7 +34,7 @@ define(["oauth"], function() {
         _getAccessToken: function() {
             return $.oauth($.extend( {}, oauth, {
                 type: "GET",
-                url: "http://www.khanacademy.org/api/auth/access_token",
+                url: this.API_BASE + "/auth/access_token",
                 oauthCallback: this._oauthCallback,
                 timeout: 5000,
                 success: function(data) {
@@ -74,7 +74,7 @@ define(["oauth"], function() {
         login: function() {
             // Start the oauth process by redirecting them to the request_token url
             var url = $.getURL($.extend( {}, oauth, {
-                url: "http://www.khanacademy.org/api/auth/request_token",
+                url: this.API_BASE + "/auth/request_token",
                 oauthCallback: this._oauthCallback
             }));
             window.location = url;
@@ -87,7 +87,7 @@ define(["oauth"], function() {
 
             $.oauth($.extend( {}, oauth, {
                 type: "GET",
-                url: "http://www.khanacademy.org/api/v1/user/videos",
+                url: this.API_V1_BASE + "/user/videos",
                 timeout: 10000,
                 dataType: "json",
                 success: function(data) {
@@ -101,6 +101,8 @@ define(["oauth"], function() {
             }));
             return d.promise();
         },
+        API_BASE: "http://www.khanacademy.org/api",
+        API_V1_BASE: "http://www.khanacademy.org/api/v1",
         _oauthCallback: "http://localhost:8092"
     };
 
