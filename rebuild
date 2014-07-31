@@ -1,0 +1,3 @@
+rm -Rf build*
+jsx  --harmony js build
+cp js/react*.js build
