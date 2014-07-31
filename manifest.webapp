@@ -21,7 +21,13 @@
     }
   },
   "default_locale": "en",
+  "type": "privileged",
   "permissions": {
-    "desktop-notification": {}
-  }
+    "desktop-notification": {},
+    "systemXHR": {}
+  },
+  "redirects": [
+    {"from": "http://firefoxos.non-existent-domain-asdfg.com/authenticated.html",
+       "to": "/index.html"}
+  ]
 }
