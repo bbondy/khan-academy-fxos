@@ -50,6 +50,10 @@ define(["oauth"], function() {
         },
         init: function() {
             var d = $.Deferred();
+            this._oauthCallback = window.location.href;
+            if (window.location.protocol === 'app:') {
+                this._oauthCallback = "http://firefoxos.non-existent-domain-asdfg.com/authenticated.html"
+            }
 
             // TODO: Only fetch from secrets.json if we don't have local storage values
             var self = this;
@@ -107,9 +111,10 @@ define(["oauth"], function() {
         getUserInfo: function() {
             return this._basicAPICall(this.API_V1_BASE + "/user");
         },
-        API_BASE: "http://www.khanacademy.org/api",
-        API_V1_BASE: "http://www.khanacademy.org/api/v1",
-        _oauthCallback: "http://localhost:8092"
+        API_BASE: "https://www.khanacademy.org/api",
+        API_V1_BASE: "https://www.khanacademy.org/api/v1",
+        //API_BASE: "http://192.168.1.131:8080/api",
+        //API_V1_BASE: "http://192.168.1.131:8080/api/v1",
     };
 
     return KA;

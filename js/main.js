@@ -91,16 +91,21 @@ define(["react", "models", "ka"], function(React, models, KA) {
         },
         render: function() {
             console.log("rendering!");
-            var topics = _(this.props.topic.get("topics").models).map(function(topic) {
-                return <TopicItem topic={topic}
-                                  onClickTopic={this.props.onClickTopic}
-                                  key={topic.get("slug")}/>;
-            }.bind(this));
-            var videos = _(this.props.topic.get("videos").models).map(function(video) {
-                return <VideoItem video={video}
-                                  onClickVideo={this.props.onClickVideo}
-                                  key={video.get("slug")}/>;
-            }.bind(this));
+            if (this.props.topic.get("topics")) {
+                var topics = _(this.props.topic.get("topics").models).map((topic) => {
+                    return <TopicItem topic={topic}
+                                      onClickTopic={this.props.onClickTopic}
+                                      key={topic.get("slug")}/>;
+                });
+            }
+
+            if (this.props.topic.get("videos")) {
+                var videos = _(this.props.topic.get("videos").models).map((video) => {
+                    return <VideoItem video={video}
+                                      onClickVideo={this.props.onClickVideo}
+                                      key={video.get("slug")}/>;
+                });
+            }
 
             var listStyle = {
                 padding: "0",
@@ -190,11 +195,19 @@ define(["react", "models", "ka"], function(React, models, KA) {
         }
     });
 
+    /*
+    // I thought this was supposed to be needed, but it seems to not be needed
+    $.ajaxSetup({
+        xhr: function() {return new window.XMLHttpRequest({mozSystem: true});}
+    });
+    */
+
     var mountNode = document.getElementById("app");
     var topic = new models.TopicModel();
 
     // TODO: remove, just for easy inpsection
     window.topic = topic;
+    window.KA = KA;
 
     // Init everything
     var initPromise = KA.init();
@@ -203,12 +216,12 @@ define(["react", "models", "ka"], function(React, models, KA) {
         console.log(initPromise);
         React.renderComponent(<MainView model={topic}/>, mountNode);
         if (KA.isLoggedIn) {
-            console.log('logged in, getUserVideos!');
+            console.log('logged in, getUserInfo!');
             KA.getUserInfo().done(function(data) {
                 console.log(data);
             });
         } else {
-            console.log('No... nhuh uh!');
+            console.log('Not logged in!');
         }
      });
 });
