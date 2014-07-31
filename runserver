@@ -1,1 +1,2 @@
- python -m SimpleHTTPServer 8092
+./watchjsx&
+python -m SimpleHTTPServer 8092

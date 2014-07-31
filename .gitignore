@@ -26,3 +26,5 @@ node_modules
 
 # Used to store API keys
 secrets.json
+
+build/
