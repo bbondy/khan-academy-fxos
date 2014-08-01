@@ -13,36 +13,33 @@ define(["oauth"], function() {
         return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
     }
 
-
-    var oauth = {
-        consumerKey: "",
-        consumerSecret: "",
-        token: getParameterByName("oauth_token"),
-        tokenSecret: getParameterByName("oauth_token_secret"),
-        oauthVerifier: getParameterByName("oauth_verifier")
-    };
-
-
     var KA = {
+        oauth: {
+            consumerKey: "",
+            consumerSecret: "",
+            token: getParameterByName("oauth_token"),
+            tokenSecret: getParameterByName("oauth_token_secret"),
+            oauthVerifier: getParameterByName("oauth_verifier")
+        },
         _getSecrets: function() {
             return $.ajax({
-                url: "secrets.json",
+                url: "/secrets.json",
                 timeout: 5000,
                 dataType: "json",
             });
         },
         _getAccessToken: function() {
-            return $.oauth($.extend( {}, oauth, {
+            return $.oauth($.extend( {}, this.oauth, {
                 type: "GET",
                 url: this.API_BASE + "/auth/access_token",
                 oauthCallback: this._oauthCallback,
                 timeout: 5000,
-                success: function(data) {
-                    oauth.token = getParameterByName("oauth_token", data);
-                    oauth.tokenSecret = getParameterByName("oauth_token_secret", data);
-                    oauth.oauthVerifier = undefined;
+                success: (data) => {
+                    this.oauth.token = getParameterByName("oauth_token", data);
+                    this.oauth.tokenSecret = getParameterByName("oauth_token_secret", data);
+                    this.oauth.oauthVerifier = undefined;
                 },
-                error: function(xhr, status) {
+                error: (xhr, status) => {
                     alert("error: " + status);
                     alert(xhr);
                 }
@@ -56,17 +53,16 @@ define(["oauth"], function() {
             }
 
             // TODO: Only fetch from secrets.json if we don't have local storage values
-            var self = this;
-            this._getSecrets().done(function(keyData) {
-                oauth.consumerKey = keyData.key;
-                oauth.consumerSecret = keyData.secret;
-                console.log(oauth);
+            this._getSecrets().done((keyData) => {
+                this.oauth.consumerKey = keyData.key;
+                this.oauth.consumerSecret = keyData.secret;
+                console.log(this.oauth);
 
                 // TODO: Only do access token stuff if we don't have local storage values
-                if (oauth.oauthVerifier) {
+                if (this.oauth.oauthVerifier) {
                     console.log('doing access token fetch!');
-                    self._getAccessToken().done(function() {
-                        self.isLoggedIn = true;
+                    this._getAccessToken().done(() => {
+                        this.isLoggedIn = true;
                         d.resolve();
                     });
                 } else {
@@ -77,7 +73,7 @@ define(["oauth"], function() {
         },
         login: function() {
             // Start the oauth process by redirecting them to the request_token url
-            var url = $.getURL($.extend( {}, oauth, {
+            var url = $.getURL($.extend( {}, this.oauth, {
                 url: this.API_BASE + "/auth/request_token",
                 oauthCallback: this._oauthCallback
             }));
@@ -85,16 +81,16 @@ define(["oauth"], function() {
         },
         _basicAPICall: function(url) {
             var d = $.Deferred();
-            if (!oauth.token) {
+            if (!this.oauth.token) {
                 return d.reject().promise();
             }
 
-            $.oauth($.extend( {}, oauth, {
+            $.oauth($.extend( {}, this.oauth, {
                 type: "GET",
                 url: url,
                 timeout: 10000,
                 dataType: "json",
-                success: function(data) {
+                success: (data) => {
                     d.resolve(data);
                 },
                 error: function( xhr, status ) {

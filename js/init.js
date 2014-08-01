@@ -1,5 +1,5 @@
 require.config({
-    baseUrl: 'build',
+    baseUrl: '/build',
     paths: {
         "react": "react",
         "JSXTransformer": "JSXTransformer",
@@ -11,8 +11,13 @@ require.config({
         "models": "models",
         "underscore": "underscore-min",
         "jquery": "jquery",
-        "backbone": "backbone"
+        "backbone": "backbone",
+        "test": "../test/test"
     }
 });
 
-requirejs(['underscore', 'backbone', 'react', 'main']);
+var initModules = ['underscore', 'backbone', 'react', 'main'];
+if (window.isTest) {
+    initModules.push('test');
+}
+requirejs(initModules);
