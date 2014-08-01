@@ -21,7 +21,7 @@ define(["react", "models", "ka"], function(React, models, KA) {
         render: function() {
             var divStyle = {
                 float: "left;",
-                width: "20px;",
+                width: "0px;",
                 height: "100%",
                 marginRight: "15px"
             };
@@ -71,7 +71,7 @@ define(["react", "models", "ka"], function(React, models, KA) {
         }
     });
 
-    var LoginButton = React.createClass({
+    var SigninButton = React.createClass({
         render: function() {
             var divStyle = {
                 textAlign: "right",
@@ -79,8 +79,8 @@ define(["react", "models", "ka"], function(React, models, KA) {
             };
                 //backgroundColor: domain.color
             return <div style={divStyle}>
-                <a href="#" onClick={partial(this.props.onClickLogin, this.props.model)}>
-                    LOGIN
+                <a href="#" onClick={partial(this.props.onClickSignin, this.props.model)}>
+                    Sign In
                 </a>
             </div>;
         }
@@ -107,38 +107,26 @@ define(["react", "models", "ka"], function(React, models, KA) {
                 });
             }
 
-            var listStyle = {
-                padding: "0",
-                marginTop: "50px"
-            };
-
             var backButton;
             if (this.props.topic.get("parent")) {
                 backButton = <BackButton model={this.props.topic}
                                          onClickBack={this.props.onClickBack}/>;
             }
 
-            var topicList =
-                <div>
-                    <section id="drawer" role="region">
-                    <header className="fixed">
-                        <a href="#"><span className="icon icon-menu">hide sidebar</span></a>
-                        <a href="#drawer"><span className="icon icon-menu">show sidebar</span></a>
-                        <h1>Khan Academy</h1>
-                    </header>
-                    </section>
-                    <section data-type="list" style={listStyle}>
-                        { !KA.isLoggedIn ?
-                        <LoginButton model={this.props.topic}
-                                    onClickLogin={this.props.onClickLogin}/> : null }
-                        <ul style={listStyle}>
-                        {backButton}
-                        {topics}
-                        {videos}
-                        </ul>
-                    </section>
-                </div>;
-            return topicList;
+            var topicList = <section data-type="list">
+                        <header>{this.props.topic.getTitle()}</header>
+                            <ul>
+                            { !KA.isLoggedIn ?
+                                <SigninButton model={this.props.topic}
+                                              onClickSignin={this.props.onClickSignin}/> : null }
+                            {backButton}
+                            {topics}
+                            {videos}
+                            </ul>
+                    </section>;
+            return <div>
+                    {topicList}
+            </div>;
         }
     });
 
@@ -178,20 +166,32 @@ define(["react", "models", "ka"], function(React, models, KA) {
             console.log(model);
             this.setState({currentModel: model.get("parent")});
         },
-        onClickLogin: function() {
+        onClickSignin: function() {
             KA.login();
         },
         render: function() {
+            var control;
             if (this.state.currentModel.isTopic()) {
-                return <TopicViewer topic={this.state.currentModel}
-                                    onClickTopic={this.onClickTopic}
-                                    onClickVideo={this.onClickVideo}
-                                    onClickBack={this.onClickBack}
-                                    onClickLogin={this.onClickLogin}/>;
+                control = <TopicViewer topic={this.state.currentModel}
+                                       onClickTopic={this.onClickTopic}
+                                       onClickVideo={this.onClickVideo}
+                                       onClickBack={this.onClickBack}
+                                       onClickSignin={this.onClickSignin}/>;
+            } else {
+                control = <VideoViewer  video={this.state.currentModel}
+                                        onClickBack={this.onClickBack}/>;
             }
-
-            return <VideoViewer  video={this.state.currentModel}
-                                 onClickBack={this.onClickBack}/>;
+            //return <div>{control}</div>;
+            return <div>
+                <section id="drawer" role="region">
+                    <header className="fixed">
+                        <a href="#"><span className="icon icon-menu">hide sidebar</span></a>
+                        <a href="#drawer"><span className="icon icon-menu">show sidebar</span></a>
+                        <h1>Khan Academy</h1>
+                    </header>
+                </section>
+                {control}
+            </div>;
         }
     });
 
