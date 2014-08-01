@@ -3,6 +3,16 @@ define([], function() {
         url: "/knowledge-map.json",
         initialize: function() {
         },
+        getTitle: function() {
+            if (this.get("render_type") === "Root") {
+                return "Domains";
+            } else if (this.get("render_type") === "Domain") {
+                return "Subjects";
+            } else if (this.get("render_type") === "Subject") {
+                return "Topics";
+            }
+            return this.get("render_type");
+        },
         defaults: {
         },
         /**
