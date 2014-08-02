@@ -116,7 +116,7 @@ define(["react", "models", "ka"], function(React, models, KA) {
             var topicList = <section data-type="list">
                         <header>{this.props.topic.getTitle()}</header>
                             <ul>
-                            { !KA.isLoggedIn ?
+                            { !KA.isLoggedIn() ?
                                 <SigninButton model={this.props.topic}
                                               onClickSignin={this.props.onClickSignin}/> : null }
                             {backButton}
@@ -215,7 +215,7 @@ define(["react", "models", "ka"], function(React, models, KA) {
         console.log('init proimse: ');
         console.log(initPromise);
         React.renderComponent(<MainView model={topic}/>, mountNode);
-        if (KA.isLoggedIn) {
+        if (KA.isLoggedIn()) {
             console.log('logged in, getUserInfo!');
             KA.getUserInfo().done(function(data) {
                 console.log(data);

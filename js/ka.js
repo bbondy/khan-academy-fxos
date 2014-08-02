@@ -21,6 +21,15 @@ define(["oauth"], function() {
             tokenSecret: getParameterByName("oauth_token_secret"),
             oauthVerifier: getParameterByName("oauth_verifier")
         },
+        _load: function() {
+            var oauth = localStorage.getItem("oauth");
+            if (oauth) {
+                this.oauth = JSON.parse(oauth);
+            }
+        },
+        _save: function() {
+            localStorage.setItem("oauth", JSON.stringify(this.oauth));
+        },
         _getSecrets: function() {
             return $.ajax({
                 url: "/secrets.json",
@@ -45,7 +54,14 @@ define(["oauth"], function() {
                 }
             }));
         },
+        isLoggedIn: function() {
+            return this.oauth.consumerKey &&
+                this.oauth.consumerSecret &&
+                this.oauth.token &&
+                this.oauth.tokenSecret;
+        },
         init: function() {
+            this._load();
             var d = $.Deferred();
             this._oauthCallback = window.location.href;
             if (window.location.protocol === 'app:') {
@@ -62,7 +78,7 @@ define(["oauth"], function() {
                 if (this.oauth.oauthVerifier) {
                     console.log('doing access token fetch!');
                     this._getAccessToken().done(() => {
-                        this.isLoggedIn = true;
+                        this._save();
                         d.resolve();
                     });
                 } else {
