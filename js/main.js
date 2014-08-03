@@ -217,7 +217,7 @@ define(["react", "models", "ka"], function(React, models, KA) {
         React.renderComponent(<MainView model={topic}/>, mountNode);
         if (KA.isLoggedIn()) {
             console.log('logged in, getUserInfo!');
-            KA.getUserInfo().done(function(data) {
+            KA.getTopicTree().done(function(data) {
                 console.log(data);
             });
         } else {
