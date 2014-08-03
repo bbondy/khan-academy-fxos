@@ -123,6 +123,9 @@ define(["oauth"], function() {
         getUserInfo: function() {
             return this._basicAPICall(this.API_V1_BASE + "/user");
         },
+        getTopicTree: function() {
+            return this._basicAPICall(this.API_V1_BASE + "/topictree");
+        },
         API_BASE: "https://www.khanacademy.org/api",
         API_V1_BASE: "https://www.khanacademy.org/api/v1",
         //API_BASE: "http://192.168.1.131:8080/api",
