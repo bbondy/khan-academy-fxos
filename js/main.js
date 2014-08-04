@@ -14,6 +14,19 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
       };
     }
 
+    var DomainColorMap = {
+        "new-and-noteworthy": "#ffffff",
+        "math": "#156278",
+        "science": "#822F3D",
+        "economics-finance-domain": "#BB7B31",
+        "humanities": "#C43931",
+        "computing": "#568F3D",
+        "test-prep": "#512D60",
+        "partner-content": "#399B7C",
+        "talks-and-interviews": "#3C5466",
+        "coach-res": "#3C5466"
+    };
+
     var TopicItem = React.createClass({
         getInitialState: function() {
             return {};
@@ -21,11 +34,11 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
         render: function() {
             var divStyle = {
                 float: "left;",
-                width: "0px;",
+                width: "12px;",
                 height: "100%",
-                marginRight: "15px"
+                marginRight: "15px",
+                backgroundColor: DomainColorMap[this.props.topic.get("slug")]
             };
-                //backgroundColor: domain.color
             return <li>
                 <div style={divStyle}/>
                 <a href="#" onClick={partial(this.props.onClickTopic, this.props.topic)}>
@@ -43,7 +56,6 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
                 height: "100%",
                 marginRight: "15px"
             };
-            //backgroundColor: domain.color
             return <li>
                 <div style={divStyle}/>
                 <a href="#" onClick={partial(this.props.onClickVideo, this.props.video)}>
@@ -55,19 +67,11 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
 
     var BackButton = React.createClass({
         render: function() {
-            var divStyle = {
-                float: "left;",
-                width: "20px;",
-                height: "100%",
-                marginRight: "15px"
-            };
-                //backgroundColor: domain.color
-            return <li>
-                <div style={divStyle}/>
-                <a href="#" onClick={partial(this.props.onClickBack, this.props.model)}>
-                    <p>Back</p>
+            return <div>
+                <a className="icon-menu-link " href="#" onClick={partial(this.props.onClickBack, this.props.model)}>
+                    <span className="icon icon-back">Back</span>
                 </a>
-            </li>;
+            </div>;
         }
     });
 
@@ -77,7 +81,6 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
                 textAlign: "right",
                 marginRight: "15px"
             };
-                //backgroundColor: domain.color
             return <div style={divStyle}>
                 <a href="#" onClick={partial(this.props.onClickSignin, this.props.model)}>
                     Sign In
@@ -203,22 +206,28 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
     */
 
     var mountNode = document.getElementById("app");
-    var topic = new models.TopicModel();
-
-    // TODO: remove, just for easy inpsection
-    window.topic = topic;
-    window.KA = KA;
 
     // Init everything
-    $.when(topic.fetch(), Storage.init(), KA.init()).done(function(topicData) {
-        console.log('init proimse: ');
-        React.renderComponent(<MainView model={topic}/>, mountNode);
-        if (KA.isLoggedIn()) {
-            KA.getTopicTree().done(function(data) {
-                console.log(data);
+    $.when(Storage.init(), KA.init()).done(function(topicData) {
+        KA.getTopicTree().done(function(topicTreeData) {
+            var topic = new models.TopicModel(topicTreeData, {parse: true});
+
+            console.log('init proimse: ');
+            React.renderComponent(<MainView model={topic}/>, mountNode);
+            Storage.readText("data.json").done(function(data) {
+                console.log('read: ' + data);
             });
-        } else {
-            console.log('Not logged in!');
-        }
+            if (KA.isLoggedIn()) {
+                KA.getTopicTree().done(function(data) {
+                    console.log(data);
+                });
+            } else {
+                console.log('Not logged in!');
+            }
+
+            // TODO: remove, just for easy inpsection
+            window.topic = topic;
+            window.KA = KA;
+        });
      });
 });
