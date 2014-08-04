@@ -13,6 +13,13 @@ define([], function() {
             }
             return this.get("render_type");
         },
+        getParentDomain: function() {
+            var current = this;
+            while (current && current.get("render_type") !== "Domain") {
+                current = current.get("parent");
+            }
+            return current;
+        },
         defaults: {
         },
         /**
@@ -26,7 +33,7 @@ define([], function() {
                     item.parent = this;//response;
                 }.bind(this));
                 var topics = topic.children.filter(function(item) {
-                    return item.kind === "Topic";
+                    return item.kind === "Topic" && item.slug !== "new-and-noteworthy";
                 });
                 var videos = topic.children.filter(function(item) {
                     return item.kind === "Video";
@@ -51,7 +58,16 @@ define([], function() {
         },
         isTopic: function() {//todo
             return false;
-        }
+        },
+        //todo make a common base object for both topics and videos
+        getParentDomain: function() {
+            var current = this;
+            while (current && current.get("render_type") !== "Domain") {
+                current = current.get("parent");
+            }
+            return current;
+        },
+
     });
 
     var TopicList = Backbone.Collection.extend({
