@@ -4,7 +4,7 @@
 
 "use strict";
 
-define(["react", "models", "ka"], function(React, models, KA) {
+define(["react", "models", "ka", "storage"], function(React, models, KA, Storage) {
 
     function partial( fn /*, args...*/) {
       var aps = Array.prototype.slice;
@@ -210,13 +210,10 @@ define(["react", "models", "ka"], function(React, models, KA) {
     window.KA = KA;
 
     // Init everything
-    var initPromise = KA.init();
-    $.when(topic.fetch(), initPromise).done(function(topicData) {
+    $.when(topic.fetch(), Storage.init(), KA.init()).done(function(topicData) {
         console.log('init proimse: ');
-        console.log(initPromise);
         React.renderComponent(<MainView model={topic}/>, mountNode);
         if (KA.isLoggedIn()) {
-            console.log('logged in, getUserInfo!');
             KA.getTopicTree().done(function(data) {
                 console.log(data);
             });
