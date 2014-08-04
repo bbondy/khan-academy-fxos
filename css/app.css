@@ -12,12 +12,23 @@ section[role="region"] > header:first-child h1 {
 }
 
 section[data-type="list"] {
-    position: absolute;
-    top: 5rem;
+    position: relative;
+    top: 0;
     right: 0px;
     bottom: 0px;
     left: 0px;
     width: 100%;
     height: calc(100% - 5rem);
     overflow-y: scroll;
+}
+
+section[role="region"] > header:first-child h1 {
+    text-align: left;
+}
+[data-type="list"] ul {
+    padding-left: 0;
+}
+
+section[role="region"] > header.fixed:first-child {
+    position: relative;
 }

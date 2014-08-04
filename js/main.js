@@ -110,19 +110,11 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
                 });
             }
 
-            var backButton;
-            if (this.props.topic.get("parent")) {
-                backButton = <BackButton model={this.props.topic}
-                                         onClickBack={this.props.onClickBack}/>;
-            }
-
             var topicList = <section data-type="list">
-                        <header>{this.props.topic.getTitle()}</header>
                             <ul>
                             { !KA.isLoggedIn() ?
                                 <SigninButton model={this.props.topic}
                                               onClickSignin={this.props.onClickSignin}/> : null }
-                            {backButton}
                             {topics}
                             {videos}
                             </ul>
@@ -138,12 +130,56 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
             console.log("props for video viewer: ");
             console.log(this.props);
             return <div>
-                 <BackButton model={this.props.video}
-                             onClickBack={this.props.onClickBack}/>;
                  <video width="320" height="240" controls>
                     <source src={this.props.video.get("download_urls").mp4} type="video/mp4"/>
                  </video>
             </div>;
+        }
+    });
+
+    var AppHeader = React.createClass({
+        render: function() {
+                var backButton;
+                if (this.props.model.get("parent")) {
+                    backButton = <BackButton model={this.props.model}
+                                             onClickBack={this.props.onClickBack}/>;
+                }
+
+                console.log('render title');
+                var parentDomain = this.props.model.getParentDomain();
+                var style;
+                if (parentDomain) {
+                    var domainColor = DomainColorMap[parentDomain.get("slug")];
+                    if (domainColor) {
+                    console.log('render title color found');
+                        style = {
+                            backgroundColor: domainColor
+                        };
+                    }
+                }
+
+                return <section id="drawer" role="region" className="skin-dark">
+                    <header className="fixed" style={style}>
+                        {backButton}
+                        <h1>{this.props.model.get("translated_title")}</h1>
+                    </header>
+                    <Search model={this.props.model}/>
+                </section>;
+        }
+    });
+
+
+    var Search = React.createClass({
+        render: function() {
+            var style = {
+                width: "100%",
+                height: "3em;",
+                position: "relative"
+            };
+            return <div>
+                <input type="text" placeholder="Search..." required="" style={style}/>
+            </div>;
+
         }
     });
 
@@ -178,21 +214,14 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
                 control = <TopicViewer topic={this.state.currentModel}
                                        onClickTopic={this.onClickTopic}
                                        onClickVideo={this.onClickVideo}
-                                       onClickBack={this.onClickBack}
                                        onClickSignin={this.onClickSignin}/>;
             } else {
-                control = <VideoViewer  video={this.state.currentModel}
-                                        onClickBack={this.onClickBack}/>;
+                control = <VideoViewer  video={this.state.currentModel}/>;
             }
             //return <div>{control}</div>;
             return <div>
-                <section id="drawer" role="region">
-                    <header className="fixed">
-                        <a href="#"><span className="icon icon-menu">hide sidebar</span></a>
-                        <a href="#drawer"><span className="icon icon-menu">show sidebar</span></a>
-                        <h1>Khan Academy</h1>
-                    </header>
-                </section>
+                <AppHeader model={this.state.currentModel}
+                           onClickBack={this.onClickBack}/>
                 {control}
             </div>;
         }
