@@ -24,7 +24,9 @@
   "type": "privileged",
   "permissions": {
     "desktop-notification": {},
-    "systemXHR": {}
+    "systemXHR": {},
+    "device-storage:videos":{ "access": "readwrite" },
+    "device-storage:sdcard":{ "access": "readwrite" }
   },
   "redirects": [
     {"from": "http://firefoxos.non-existent-domain-asdfg.com/authenticated.html",
