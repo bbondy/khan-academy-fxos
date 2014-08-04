@@ -2,6 +2,10 @@
 
 define([], function() {
     var Storage = {
+        /**
+         * Initializes the device storage for the sd card.
+         * Must be called before any other API.
+         */
         init: function() {
             if (!navigator.getDeviceStorage) {
                 return $.Deferred().resolve().promise();
@@ -12,7 +16,7 @@ define([], function() {
         /**
          * Returns a promise which when resolved contains a string of data
          */
-        readTextFile: function(filename, data) {
+        readText: function(filename, data) {
             var d = $.Deferred();
             if (!this.sdcard) {
                 return d.reject().promise();
@@ -33,7 +37,11 @@ define([], function() {
 
             return d.promise();
         },
-        deleteFile: function(filename) {
+        /**
+         * Deletes the specified file from sdstorage.
+         * Resolves if the file no longer exists, wehther or not it was deleted.
+         */
+        delete: function(filename) {
             var d = $.Deferred();
             if (!this.sdcard) {
                 return d.reject().promise();
@@ -43,13 +51,20 @@ define([], function() {
                 d.resolve();
             };
             request.onerror = function () {
-                console.warn("Unable to delete the file: " + this.error);
-                d.reject();
+                if (this.error.name === "NotFoundError") {
+                    d.resolve();
+                } else {
+                    console.warn("Unable to delete the file: " + this.error);
+                    d.reject();
+                }
             };
 
             return d.promise();
         },
-        writeTextFile: function(filename, data) {
+        /**
+         * Writes out the specified data as text in the specified file.
+         */
+        writeText: function(filename, data) {
             var d = $.Deferred();
             if (!this.sdcard) {
                 return d.reject().promise();
