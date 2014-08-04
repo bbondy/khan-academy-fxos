@@ -1,7 +1,8 @@
 "use strict";
 
-define(["oauth"], function() {
+define(["oauth", "storage"], function(_oauth, Storage) {
 
+    // TODO: find a better home for this
     function getParameterByName(name, params) {
         if (_.isUndefined(params)) {
             params = window.location.search;
@@ -60,11 +61,14 @@ define(["oauth"], function() {
                 this.oauth.token &&
                 this.oauth.tokenSecret;
         },
+        isFirefoxOS: function() { // TODO: Find a better place for this
+            return window.location.protocol === 'app:';
+        },
         init: function() {
             this._load();
             var d = $.Deferred();
             this._oauthCallback = window.location.href;
-            if (window.location.protocol === 'app:') {
+            if (this.isFirefoxOS()) {
                 this._oauthCallback = "http://firefoxos.non-existent-domain-asdfg.com/authenticated.html"
             }
 
@@ -111,8 +115,8 @@ define(["oauth"], function() {
                 },
                 error: function( xhr, status ) {
                     d.reject();
-                    alert("error: " + status);
-                    alert(xhr);
+                    console.error("error: " + status);
+                    console.error(xhr);
                 }
             }));
             return d.promise();
@@ -124,7 +128,29 @@ define(["oauth"], function() {
             return this._basicAPICall(this.API_V1_BASE + "/user");
         },
         getTopicTree: function() {
-            return this._basicAPICall(this.API_V1_BASE + "/topictree");
+            if (!this.isFirefoxOS()) {
+                return this._basicAPICall("/knowledge-map.json");
+            }
+            var d = $.Deferred();
+
+            console.log(Storage);
+
+            var filename = "topictree1.json";
+            var topicTreePromise = Storage.readText(filename);
+            topicTreePromise.done((data) => {
+                console.log('got topictreedata from storage!!');
+                d.resolve(JSON.parse(data));
+            });
+            topicTreePromise.fail(() => {
+                console.log('topictree read failed! Do a fetch to get the data!');
+                var promise = this._basicAPICall(this.API_V1_BASE + "/topictree");
+                promise.done((data) => {
+                    Storage.writeText(filename, JSON.stringify(data));
+                    d.resolve(data);
+                });
+            });
+
+            return d.promise();
         },
         API_BASE: "https://www.khanacademy.org/api",
         API_V1_BASE: "https://www.khanacademy.org/api/v1",
