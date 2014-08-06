@@ -24,7 +24,8 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
         "test-prep": "#512D60",
         "partner-content": "#399B7C",
         "talks-and-interviews": "#3C5466",
-        "coach-res": "#3C5466"
+        "coach-res": "#3C5466",
+        "::app-search": "#3C5466"
     };
 
     var TopicItem = React.createClass({
@@ -93,7 +94,6 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
         componentDidMount: function() {
         },
         render: function() {
-            console.log("rendering!");
             if (this.props.topic.get("topics")) {
                 var topics = _(this.props.topic.get("topics").models).map((topic) => {
                     return <TopicItem topic={topic}
@@ -125,10 +125,30 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
         }
     });
 
+    var VideoListViewer = React.createClass({
+        render: function() {
+            if (this.props.collection.models) {
+                var videos = _(this.props.collection.models).map((video) => {
+                    return <VideoItem video={video}
+                                      onClickVideo={this.props.onClickVideo}
+                                      key={video.get("slug")}/>;
+                });
+            }
+
+            var topicList = <section data-type="list">
+                <ul>
+                    {videos}
+                </ul>
+            </section>;
+
+            return <div>
+                    {topicList}
+            </div>;
+        }
+    });
+
     var VideoViewer = React.createClass({
         render: function() {
-            console.log("props for video viewer: ");
-            console.log(this.props);
             return <div>
                  <video width="320" height="240" controls>
                     <source src={this.props.video.get("download_urls").mp4} type="video/mp4"/>
@@ -145,39 +165,65 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
                                              onClickBack={this.props.onClickBack}/>;
                 }
 
-                console.log('render title');
                 var parentDomain = this.props.model.getParentDomain();
                 var style;
                 if (parentDomain) {
                     var domainColor = DomainColorMap[parentDomain.get("slug")];
                     if (domainColor) {
-                    console.log('render title color found');
                         style = {
                             backgroundColor: domainColor
                         };
                     }
                 }
 
+                var title = "Khan Academy";
+                if (this.props.model.get("translated_title")) {
+                    title = this.props.model.get("translated_title");
+                } else if (this.props.model.isVideoList()) {
+                    title = "Search";
+                }
+
                 return <section id="drawer" role="region" className="skin-dark">
                     <header className="fixed" style={style}>
                         {backButton}
-                        <h1>{this.props.model.get("translated_title")}</h1>
+                        <h1>{title}</h1>
                     </header>
-                    <Search model={this.props.model}/>
+                    <Search model={this.props.model}
+                            onSearch={this.props.onSearch}/>
                 </section>;
         }
     });
 
 
     var Search = React.createClass({
+        getInitialState: function() {
+            return {value: ''};
+        },
+        componentWillReceiveProps: function() {
+            this.state.value = '';
+        },
+        onChange: function(event) {
+            var search = event.target.value;
+            this.setState({value: search});
+            this.props.onSearch(search);
+        },
         render: function() {
             var style = {
                 width: "100%",
                 height: "3em;",
                 position: "relative"
             };
+            var text = "Search...";
+            if (this.props.model.get("translated_title")) {
+                text = "Search " + this.props.model.get("translated_title");
+            }
             return <div>
-                <input type="text" placeholder="Search..." required="" style={style}/>
+                <input type="text"
+                       placeholder={text}
+                       value={this.state.value}
+                       required=""
+                       style={style}
+                       onChange={this.onChange}/>
             </div>;
 
         }
@@ -190,23 +236,29 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
             };
         },
         onClickVideo: function(model) {
-            console.log("onClickVideo for model: ");
-            console.log(model);
             this.setState({currentModel: model});
         },
         onClickTopic: function(model) {
-            console.log("onClickTopic for model: ");
-            console.log(this);
-            console.log(model);
             this.setState({currentModel: model});
         },
         onClickBack: function(model) {
-            console.log("Click back on model: ");
-            console.log(model);
             this.setState({currentModel: model.get("parent")});
         },
         onClickSignin: function() {
             KA.login();
+        },
+        onSearch: function(search) {
+            if (!search) {
+                this.setState({"currentModel": this.state.searchingModel, searchingModel: null});
+                return;
+            }
+            var searchingModel = this.state.searchingModel;
+            if (!searchingModel) {
+                searchingModel = this.state.currentModel;
+            }
+            var results = searchingModel.findVideos(search);
+            var videoList = new models.VideoList(results);
+            this.setState({"currentModel": videoList, searchingModel: searchingModel});
         },
         render: function() {
             var control;
@@ -215,13 +267,16 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
                                        onClickTopic={this.onClickTopic}
                                        onClickVideo={this.onClickVideo}
                                        onClickSignin={this.onClickSignin}/>;
+            } else if (this.state.currentModel.isVideoList()) {
+                control = <VideoListViewer collection={this.state.currentModel}/>;
             } else {
                 control = <VideoViewer  video={this.state.currentModel}/>;
             }
             //return <div>{control}</div>;
             return <div>
                 <AppHeader model={this.state.currentModel}
-                           onClickBack={this.onClickBack}/>
+                           onClickBack={this.onClickBack}
+                           onSearch={this.onSearch}/>
                 {control}
             </div>;
         }
@@ -240,8 +295,6 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
     $.when(Storage.init(), KA.init()).done(function(topicData) {
         KA.getTopicTree().done(function(topicTreeData) {
             var topic = new models.TopicModel(topicTreeData, {parse: true});
-
-            console.log('init proimse: ');
             React.renderComponent(<MainView model={topic}/>, mountNode);
             Storage.readText("data.json").done(function(data) {
                 console.log('read: ' + data);

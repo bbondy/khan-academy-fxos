@@ -3,6 +3,39 @@ define([], function() {
         url: "/knowledge-map.json",
         initialize: function() {
         },
+        /**
+         * Initiates a recursive search for the term `search`
+         */
+        findVideos: function(search) {
+            // TODO: This needs to go in a worker and have the reuslts sent
+            // back in a callback. Or at least incrementally build the list.
+            var results = [];
+            this._findVideos(search, results);
+            return results;
+        },
+        /**
+         * Recursively calls _findVideos on all children and adds videos with
+         * a matching title to the results array.
+         */
+        _findVideos: function(search, results) {
+            if (this.get("videos")) {
+                this.get("videos").forEach(function(item) {
+                    // TODO: Possibly search descriptions too?
+                    // TODO: Tokenize the `search` string and do an indexOf for each token
+                    // TODO: Allow for OR/AND search term strings
+                    if (item.get("translated_title") &&
+                            item.get("translated_title").toLowerCase().indexOf(search.toLowerCase()) != -1) {
+                        results.push(item);
+                    }
+                }.bind(this));
+            }
+
+            if (this.get("topics")) {
+                this.get("topics").forEach(function(item) {
+                    item._findVideos(search, results);
+                }.bind(this));
+            }
+        },
         getTitle: function() {
             if (this.get("render_type") === "Root") {
                 return "Domains";
@@ -47,6 +80,9 @@ define([], function() {
         },
         isTopic: function() {//todo
             return true;
+        },
+        isVideoList: function() {//todo
+            return false;
         }
     });
 
@@ -57,6 +93,9 @@ define([], function() {
             text: ''
         },
         isTopic: function() {//todo
+            return false;
+        },
+        isVideoList: function() {//todo
             return false;
         },
         //todo make a common base object for both topics and videos
@@ -75,7 +114,16 @@ define([], function() {
     });
 
     var VideoList = Backbone.Collection.extend({
-        model: VideoModel
+        model: VideoModel,
+        isTopic: function() {//todo
+            return false;
+        },
+        isVideoList: function() {//todo
+            return true;
+        },
+        getParentDomain: function() {//todo
+            return null;
+        }
     });
 
     return {
