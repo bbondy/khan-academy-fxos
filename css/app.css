@@ -32,3 +32,10 @@ section[role="region"] > header:first-child h1 {
 section[role="region"] > header.fixed:first-child {
     position: relative;
 }
+
+input {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+}
