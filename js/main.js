@@ -42,17 +42,41 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
             return <li>
                 { this.props.topic.isRootChild() ? <div style={divStyle}/> : null }
                 <a href="#" onClick={partial(this.props.onClickTopic, this.props.topic)}>
-                    <p>{this.props.topic.get("title")}</p>
+                    <p className="topic-title">{this.props.topic.get("title")}</p>
                 </a>
             </li>;
         }
     });
 
     var VideoItem = React.createClass({
+        //console.log('inside video node: ' + this.props.completed);
         render: function() {
-            return <li>
+            var cx = React.addons.classSet;
+            var videoNodeClass = cx({
+              'video-node': true,
+              'completed': this.props.completed
+            });
+            var pipeClassObj = {
+                'pipe': true,
+                'completed': this.props.completed
+            };
+            var subwayIconClassObj = {
+                'subway-icon': true
+            };
+            var parentDomain = this.props.video.getParentDomain();
+            subwayIconClassObj[parentDomain.get("id")] = true;
+            pipeClassObj[parentDomain.get("id")] = true;
+            var subwayIconClass = cx(subwayIconClassObj);
+            var pipeClass = cx(pipeClassObj);
+            console.log('subway icon class;');
+            console.log(subwayIconClass);
+            return <li className="video">
+                <div className={subwayIconClass}>
+                    <div className={videoNodeClass}/>
+                    <div className={pipeClass}/>
+                </div>
                 <a href="#" onClick={partial(this.props.onClickVideo, this.props.video)}>
-                    <p>{this.props.video.get("title")}</p>
+                    <p className="video-title">{this.props.video.get("title")}</p>
                 </a>
             </li>;
         }
@@ -96,9 +120,11 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
 
             if (this.props.topic.get("videos")) {
                 var videos = _(this.props.topic.get("videos").models).map((video) => {
+                    var completed = KA.completedVideos.indexOf(video.get("id")) !== -1;
+                    console.log('is video complete: ' + completed);
                     return <VideoItem video={video}
                                       onClickVideo={this.props.onClickVideo}
-                                      key={video.get("slug")}/>;
+                                      key={video.get("slug")} completed={completed} />;
                 });
             }
 
@@ -292,7 +318,8 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
                 console.log('read: ' + data);
             });
             if (KA.isLoggedIn()) {
-                KA.getTopicTree().done(function(data) {
+                KA.getUserVideos().done(function(data) {
+                    console.log("getUserVideos:");
                     console.log(data);
                 });
             } else {
@@ -302,6 +329,7 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
             // TODO: remove, just for easy inpsection
             window.topic = topic;
             window.KA = KA;
+            window.React = React;
         });
      });
 });

@@ -48,7 +48,7 @@ define([], function() {
         },
         getParentDomain: function() {
             var current = this;
-            while (current && current.get("render_type") !== "Domain") {
+            while (current && !current.isRootChild()) {
                 current = current.get("parent");
             }
             return current;
@@ -107,10 +107,17 @@ define([], function() {
         //todo make a common base object for both topics and videos
         getParentDomain: function() {
             var current = this;
-            while (current && current.get("render_type") !== "Domain") {
+            while (current && !current.isRootChild()) {
                 current = current.get("parent");
             }
             return current;
+        },
+        // todo make a common base object for both topics and videos
+        isRootChild: function() {
+            if (!this.get("parent")) {
+                return false;
+            }
+            return this.get("parent").get("render_type") === "Root";
         },
 
     });
