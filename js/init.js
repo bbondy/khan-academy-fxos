@@ -1,7 +1,7 @@
 require.config({
     baseUrl: '/build',
     paths: {
-        "react": "react",
+        "react": "react-with-addons",
         "JSXTransformer": "JSXTransformer",
         "jsx": "jsx",
         "ka": "ka",
