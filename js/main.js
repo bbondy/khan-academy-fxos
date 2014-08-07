@@ -37,11 +37,10 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
                 float: "left;",
                 width: "12px;",
                 height: "100%",
-                marginRight: "15px",
                 backgroundColor: DomainColorMap[this.props.topic.get("slug")]
             };
             return <li>
-                <div style={divStyle}/>
+                { this.props.topic.isRootChild() ? <div style={divStyle}/> : null }
                 <a href="#" onClick={partial(this.props.onClickTopic, this.props.topic)}>
                     <p>{this.props.topic.get("title")}</p>
                 </a>
@@ -51,14 +50,7 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
 
     var VideoItem = React.createClass({
         render: function() {
-            var divStyle = {
-                float: "left;",
-                width: "20px;",
-                height: "100%",
-                marginRight: "15px"
-            };
             return <li>
-                <div style={divStyle}/>
                 <a href="#" onClick={partial(this.props.onClickVideo, this.props.video)}>
                     <p>{this.props.video.get("title")}</p>
                 </a>
