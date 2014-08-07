@@ -53,6 +53,12 @@ define([], function() {
             }
             return current;
         },
+        isRootChild: function() {
+            if (!this.get("parent")) {
+                return false;
+            }
+            return this.get("parent").get("render_type") === "Root";
+        },
         defaults: {
         },
         /**
