@@ -39,3 +39,175 @@ input {
     width: 100%;
     box-sizing: border-box;
 }
+
+ul {
+    margin-top: 10px;
+}
+
+ul > li.video > a {
+    margin-top: -2px;
+}
+
+
+ul li div.subway-icon {
+    display: block;
+    position: absolute;
+    width: 40px;
+    height: 100%;
+}
+
+
+ul li div.subway-icon div.video-node {
+    background-image: url('/img/progress-icons/subway-sprites-video-default.svg');
+    height: 25px;
+    width: 25px;
+    background-size: 25px 75px;
+    overflow: hidden;
+    position: absolute;
+    top: 50%;
+    right: auto;
+    bottom: auto;
+    left: 8px;
+    margin-top: -12px;
+    z-index: 20;
+}
+
+/**
+ * New and noteworthy x29232c6b (we don't show this on purpose)
+ */
+
+/**
+ * Math "x7a488390"
+ */
+ul li div.subway-icon.x7a488390 div.video-node {
+    background-image: url('/img/progress-icons/subway-sprites-video-math.svg');
+}
+
+ul li div.subway-icon.x7a488390 div.pipe.completed {
+    background-color: #3daccc;
+}
+
+
+/**
+ * Science "xb92336a2"
+ */
+ul li div.subway-icon.xb92336a2 div.video-node {
+    background-image: url('/img/progress-icons/subway-sprites-video-science.svg');
+}
+
+ul li div.subway-icon.xb92336a2 div.pipe.completed {
+    background-color: #b8475f;
+}
+
+/**
+ * Economics and finance "x5ca94af1"
+ */
+ul li div.subway-icon.x5ca94af1 div.video-node {
+    background-image: url('/img/progress-icons/subway-sprites-video-economics.svg');
+}
+
+ul li div.subway-icon.x5ca94af1 div.pipe.completed {
+    background-color: #ec9d46;
+}
+
+/**
+ * Arts and humanities "x905db83d"
+ */
+ul li div.subway-icon.x905db83d div.video-node {
+    background-image: url('/img/progress-icons/subway-sprites-video-humanities.svg');
+}
+ul li div.subway-icon.x905db83d div.pipe.completed {
+    background-color: #fb483f;
+}
+
+/**
+ * Computing "x45aed616"
+ */
+ul li div.subway-icon.x45aed616 div.video-node {
+    background-image: url('/img/progress-icons/subway-sprites-video-cs.svg');
+}
+
+ul li div.subway-icon.x45aed616 div.pipe.completed {
+    background-color: #70b950;
+}
+
+/**
+ * Test Prep "x7626d097"
+ */
+ul li div.subway-icon.x7626d097 div.video-node {
+    background-image: url('/img/progress-icons/subway-sprites-video-testPrep.svg');
+}
+
+ul li div.subway-icon.x7626d097 div.pipe.completed {
+    background-color: #88599e;
+}
+
+/**
+ * Partner content: "x54390c7e"
+ */
+ul li div.subway-icon.x54390c7e div.video-node {
+    background-image: url('/img/progress-icons/subway-sprites-video-partnerContent.svg');
+}
+
+ul li div.subway-icon.x54390c7e div.pipe.completed {
+    background-color: #4ac9a3;
+}
+
+/**
+ * Talks and interviews "xd1039e22"
+ */
+ul li div.subway-icon.xd1039e22 div.video-node {
+    background-image: url('/img/progress-icons/subway-sprites-video-default.svg');
+}
+
+ul li div.subway-icon.xd1039e22 div.pipe.completed {
+    background-color: #577996;
+}
+
+/**
+ * Coach and classroom resources "x6a4a5e33"
+ */
+ul li div.subway-icon.x6a4a5e33 div.video-node {
+    background-image: url('/img/progress-icons/subway-sprites-video-default.svg');
+}
+
+ul li div.subway-icon.x6a4a5e33 div.pipe.completed {
+    background-color: #577996;
+}
+
+ul li div.subway-icon div.video-node.completed {
+    background-position: 50% 100%;
+}
+
+ul li:first-child div div.pipe {
+    height: 50%;
+    top: auto;
+}
+
+ul li:last-child div div.pipe {
+    height: 50%;
+}
+
+ul li:last-child:first-child div div.pipe {
+    display: none;
+}
+
+ul li div div.pipe {
+    background-color: #cdcdcd;
+    position: absolute;
+    right: auto;
+    left: 18px;
+    width: 4px;
+    z-index: 10;
+    bottom: -1px;
+    height: 100%;
+    top: 0;
+}
+
+ul li div div.pipe.completed {
+    background-color: #3daccc;
+}
+
+ul li a p.video-title {
+    padding-left: 45px !important;
+}

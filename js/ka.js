@@ -68,6 +68,7 @@ define(["oauth", "storage"], function(_oauth, Storage) {
             this._load();
             var d = $.Deferred();
             this._oauthCallback = window.location.href;
+            this.completedVideos = [];
             if (this.isFirefoxOS()) {
                 this._oauthCallback = "http://firefoxos.non-existent-domain-asdfg.com/authenticated.html"
             }
@@ -122,7 +123,23 @@ define(["oauth", "storage"], function(_oauth, Storage) {
             return d.promise();
         },
         getUserVideos: function() {
-            return this._basicAPICall(this.API_V1_BASE + "/user/videos");
+            var storageName = "completedVideos";
+            var d = $.Deferred();
+            var cachedWatchedVideos = localStorage.getItem(storageName);
+            if (cachedWatchedVideos) {
+                this.completedVideos = JSON.parse(cachedWatchedVideos);
+                return d.resolve(this.completedVideos).promise();
+            }
+
+            this._basicAPICall(this.API_V1_BASE + "/user/videos").done((data) => {
+                this.completedVideos = [];
+                data.forEach((item) => {
+                    this.completedVideos.push(item.video.id);
+                });
+                localStorage.setItem(storageName, JSON.stringify(this.completedVideos));
+                d.resolve(this.completedVideos);
+            });
+            return d.promise();
         },
         getUserInfo: function() {
             return this._basicAPICall(this.API_V1_BASE + "/user");
