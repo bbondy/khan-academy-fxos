@@ -72,7 +72,9 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
             console.log(subwayIconClass);
             return <li className="video">
                 <div className={subwayIconClass}>
-                    <div className={videoNodeClass}/>
+                    <a href="#" onClick={partial(this.props.onClickVideo, this.props.video)}>
+                        <div className={videoNodeClass}/>
+                    </a>
                     <div className={pipeClass}/>
                 </div>
                 <a href="#" onClick={partial(this.props.onClickVideo, this.props.video)}>
