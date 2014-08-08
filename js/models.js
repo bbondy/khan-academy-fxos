@@ -89,6 +89,9 @@ define([], function() {
         },
         isVideoList: function() {//todo
             return false;
+        },
+        isVideo: function() {//todo
+            return false;
         }
     });
 
@@ -103,6 +106,9 @@ define([], function() {
         },
         isVideoList: function() {//todo
             return false;
+        },
+        isVideo: function() {//todo
+            return true;
         },
         //todo make a common base object for both topics and videos
         getParentDomain: function() {
@@ -133,6 +139,9 @@ define([], function() {
         },
         isVideoList: function() {//todo
             return true;
+        },
+        isVideo: function() {//todo
+            return false;
         },
         getParentDomain: function() {//todo
             return null;

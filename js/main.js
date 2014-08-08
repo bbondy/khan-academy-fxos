@@ -215,13 +215,18 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
                     title = "Search";
                 }
 
+                var search;
+                if (!this.props.model.isVideo()) {
+                    search = <Search model={this.props.model}
+                                     onSearch={this.props.onSearch}/>;
+                }
+
                 return <section id="drawer" role="region" className="skin-dark">
                     <header className="fixed" style={style}>
                         {backButton}
                         <h1>{title}</h1>
                     </header>
-                    <Search model={this.props.model}
-                            onSearch={this.props.onSearch}/>
+                    {search}
                 </section>;
         }
     });
