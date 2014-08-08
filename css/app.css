@@ -260,3 +260,9 @@ ul li div div.pipe.completed {
 ul li a p.video-title {
     padding-left: 45px !important;
 }
+
+
+video {
+    width: 100%;
+    height: auto;
+}
