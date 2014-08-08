@@ -5,6 +5,7 @@
 "use strict";
 
 define(["react", "models", "ka", "storage"], function(React, models, KA, Storage) {
+    var cx = React.addons.classSet;
 
     function partial( fn /*, args...*/) {
       var aps = Array.prototype.slice;
@@ -33,13 +34,20 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
             return {};
         },
         render: function() {
+            var topicClassObj = {
+                'topic-item': true
+            };
+            var parentDomain = this.props.topic.getParentDomain();
+            topicClassObj[parentDomain.get("id")] = true;
+            var topicClass = cx(topicClassObj);
+
             var divStyle = {
                 float: "left;",
                 width: "12px;",
                 height: "100%",
                 backgroundColor: DomainColorMap[this.props.topic.get("slug")]
             };
-            return <li>
+            return <li className={topicClass}>
                 { this.props.topic.isRootChild() ? <div style={divStyle}/> : null }
                 <a href="#" onClick={partial(this.props.onClickTopic, this.props.topic)}>
                     <p className="topic-title">{this.props.topic.get("title")}</p>
@@ -51,7 +59,6 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
     var VideoItem = React.createClass({
         //console.log('inside video node: ' + this.props.completed);
         render: function() {
-            var cx = React.addons.classSet;
             var videoNodeClass = cx({
               'video-node': true,
               'completed': this.props.completed
@@ -63,14 +70,19 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
             var subwayIconClassObj = {
                 'subway-icon': true
             };
+            var videoClassObj = {
+                'video-item': true
+            };
             var parentDomain = this.props.video.getParentDomain();
             subwayIconClassObj[parentDomain.get("id")] = true;
+            videoClassObj[parentDomain.get("id")] = true;
             pipeClassObj[parentDomain.get("id")] = true;
             var subwayIconClass = cx(subwayIconClassObj);
             var pipeClass = cx(pipeClassObj);
+            var videoClass = cx(videoClassObj);
             console.log('subway icon class;');
             console.log(subwayIconClass);
-            return <li className="video">
+            return <li className={videoClass}>
                 <div className={subwayIconClass}>
                     <a href="#" onClick={partial(this.props.onClickVideo, this.props.video)}>
                         <div className={videoNodeClass}/>

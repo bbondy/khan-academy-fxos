@@ -44,7 +44,7 @@ ul {
     margin-top: 10px;
 }
 
-ul > li.video > a {
+ul > li.video-item > a {
     margin-top: -2px;
 }
 
@@ -87,6 +87,11 @@ ul li div.subway-icon.x7a488390 div.pipe.completed {
     background-color: #3daccc;
 }
 
+[data-type="list"] li.x7a488390 > a:active:after {
+    background-color: #3daccc;
+    opacity: 0.3;
+}
+
 
 /**
  * Science "xb92336a2"
@@ -97,6 +102,11 @@ ul li div.subway-icon.xb92336a2 div.video-node {
 
 ul li div.subway-icon.xb92336a2 div.pipe.completed {
     background-color: #b8475f;
+}
+
+[data-type="list"] li.xb92336a2 > a:active:after {
+    background-color: #b8475f;
+    opacity: 0.3;
 }
 
 /**
@@ -110,6 +120,11 @@ ul li div.subway-icon.x5ca94af1 div.pipe.completed {
     background-color: #ec9d46;
 }
 
+[data-type="list"] li.x5ca94af1 > a:active:after {
+    background-color: #ec9d46;
+    opacity: 0.3;
+}
+
 /**
  * Arts and humanities "x905db83d"
  */
@@ -118,6 +133,11 @@ ul li div.subway-icon.x905db83d div.video-node {
 }
 ul li div.subway-icon.x905db83d div.pipe.completed {
     background-color: #fb483f;
+}
+
+[data-type="list"] li.x905db83d > a:active:after {
+    background-color: #fb483f;
+    opacity: 0.3;
 }
 
 /**
@@ -131,6 +151,11 @@ ul li div.subway-icon.x45aed616 div.pipe.completed {
     background-color: #70b950;
 }
 
+[data-type="list"] li.x45aed616 > a:active:after {
+    background-color: #70b950;
+    opacity: 0.3;
+}
+
 /**
  * Test Prep "x7626d097"
  */
@@ -140,6 +165,11 @@ ul li div.subway-icon.x7626d097 div.video-node {
 
 ul li div.subway-icon.x7626d097 div.pipe.completed {
     background-color: #88599e;
+}
+
+[data-type="list"] li.x7626d097 > a:active:after {
+    background-color: #88599e;
+    opacity: 0.3;
 }
 
 /**
@@ -153,6 +183,11 @@ ul li div.subway-icon.x54390c7e div.pipe.completed {
     background-color: #4ac9a3;
 }
 
+[data-type="list"] li.x54390c7e > a:active:after {
+    background-color: #4ac9a3;
+    opacity: 0.3;
+}
+
 /**
  * Talks and interviews "xd1039e22"
  */
@@ -162,6 +197,11 @@ ul li div.subway-icon.xd1039e22 div.video-node {
 
 ul li div.subway-icon.xd1039e22 div.pipe.completed {
     background-color: #577996;
+}
+
+[data-type="list"] li.xd1039e22 > a:active:after {
+    background-color: #577996;
+    opacity: 0.3;
 }
 
 /**
@@ -174,6 +214,15 @@ ul li div.subway-icon.x6a4a5e33 div.video-node {
 ul li div.subway-icon.x6a4a5e33 div.pipe.completed {
     background-color: #577996;
 }
+
+[data-type="list"] li.x6a4a5e33 > a:active:after {
+    background-color: #577996;
+    opacity: 0.3;
+}
+
+/**
+ * Subway icon stuff
+ */
 
 ul li div.subway-icon div.video-node.completed {
     background-position: 50% 100%;
