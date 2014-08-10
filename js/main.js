@@ -179,12 +179,50 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
         }
     });
 
-    var VideoViewer = React.createClass({
+    var TranscriptItem = React.createClass({
         render: function() {
+            var startMinute = this.props.transcriptItem.start_time / 1000 / 60 | 0;
+            var startSecond = this.props.transcriptItem.start_time / 1000 % 60 | 0;
+            startSecond = ("0" + startSecond).slice(-2);
+            return <li><span>{startMinute}:{startSecond}</span><span>{this.props.transcriptItem.text}</span></li>;
+        }
+    });
+    var TranscriptViewer = React.createClass({
+        render: function() {
+            if (!this.props.collection) {
+                return null;
+            }
+            var transcriptItems = _(this.props.collection).map((transcriptItem) => {
+                console.log('transcript item!');
+                return <TranscriptItem transcriptItem={transcriptItem}
+                                       key={transcriptItem.start_time}/>;
+            });
+            return <ul className='transcript'>{transcriptItems}</ul>;
+        }
+    });
+
+    var VideoViewer = React.createClass({
+         componentWillMount: function() {
+            console.log('this.props.video youtube id is: ' + this.props.video.get("youtube_id"));
+            KA.getVideoTranscript(this.props.video.get("youtube_id")).done((transcript) => {
+                console.log("The transcript is: ");
+                console.log(transcript);
+                this.setState({transcript: transcript});
+            });
+        },
+        getInitialState: function() {
+            return { };
+        },
+        render: function() {
+            var transcriptViewer;
+            if (this.state.transcript) {
+                 transcriptViewer = <TranscriptViewer collection={this.state.transcript}/>;
+            }
             return <div>
                  <video width="320" height="240" controls>
                     <source src={this.props.video.get("download_urls").mp4} type="video/mp4"/>
                  </video>
+                {transcriptViewer}
             </div>;
         }
     });
