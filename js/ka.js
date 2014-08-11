@@ -160,7 +160,7 @@ define(["oauth", "storage"], function(_oauth, Storage) {
             });
             topicTreePromise.fail(() => {
                 console.log('topictree read failed! Do a fetch to get the data!');
-                var promise = this._basicAPICall(this.API_V1_BASE + "/topictree");
+                var promise = this._basicAPICall(this.API_V1_BASE + "/fxos/topictree");
                 promise.done((data) => {
                     Storage.writeText(filename, JSON.stringify(data));
                     d.resolve(data);
