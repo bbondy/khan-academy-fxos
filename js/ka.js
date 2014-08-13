@@ -102,10 +102,6 @@ define(["oauth", "storage"], function(_oauth, Storage) {
         },
         _basicAPICall: function(url) {
             var d = $.Deferred();
-            if (!this.oauth.token) {
-                return d.reject().promise();
-            }
-
             $.oauth($.extend( {}, this.oauth, {
                 type: "GET",
                 url: url,
