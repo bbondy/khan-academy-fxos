@@ -1,5 +1,32 @@
 define([], function() {
-    var TopicModel = Backbone.Model.extend({
+    var TopicTreeBase = {
+        isTopic: function() {
+            return false;
+        },
+        isVideoList: function() {
+            return false;
+        },
+        isVideo: function() {
+            return false;
+        },
+        getParentDomain: function() {
+            var current = this;
+            while (current && !current.isRootChild()) {
+                current = current.get("parent");
+            }
+            return current;
+        },
+        isRootChild: function() {
+            if (!this.get("parent")) {
+                return false;
+            }
+            return this.get("parent").get("render_type") === "Root";
+        },
+    };
+    var TopicTreeModel = Backbone.Model.extend(TopicTreeBase);
+    var TopicTreeCollection = Backbone.Collection.extend(TopicTreeBase);
+
+    var TopicModel = TopicTreeModel.extend({
         url: "/knowledge-map.json",
         initialize: function() {
         },
@@ -46,21 +73,6 @@ define([], function() {
             }
             return this.get("render_type");
         },
-        getParentDomain: function() {
-            var current = this;
-            while (current && !current.isRootChild()) {
-                current = current.get("parent");
-            }
-            return current;
-        },
-        isRootChild: function() {
-            if (!this.get("parent")) {
-                return false;
-            }
-            return this.get("parent").get("render_type") === "Root";
-        },
-        defaults: {
-        },
         /**
          * Recursively parses a topic with 2 extra properties:
          *  vidoes: A backbone collection: VideoCollection which contains VideoModel
@@ -84,67 +96,27 @@ define([], function() {
             parseTopicChildren(response);
             return response;
         },
-        isTopic: function() {//todo
+        isTopic: function() {
             return true;
         },
-        isVideoList: function() {//todo
-            return false;
-        },
-        isVideo: function() {//todo
-            return false;
-        }
     });
 
-    var VideoModel = Backbone.Model.extend({
+    var VideoModel = TopicTreeModel.extend({
         initialize: function() {
         },
-        defaults: {
-            text: ''
-        },
-        isTopic: function() {//todo
-            return false;
-        },
-        isVideoList: function() {//todo
-            return false;
-        },
-        isVideo: function() {//todo
+        isVideo: function() {
             return true;
         },
-        //todo make a common base object for both topics and videos
-        getParentDomain: function() {
-            var current = this;
-            while (current && !current.isRootChild()) {
-                current = current.get("parent");
-            }
-            return current;
-        },
-        // todo make a common base object for both topics and videos
-        isRootChild: function() {
-            if (!this.get("parent")) {
-                return false;
-            }
-            return this.get("parent").get("render_type") === "Root";
-        },
-
     });
 
-    var TopicList = Backbone.Collection.extend({
+    var TopicList = TopicTreeCollection.extend({
         model: TopicModel,
     });
 
-    var VideoList = Backbone.Collection.extend({
+    var VideoList = TopicTreeCollection.extend({
         model: VideoModel,
-        isTopic: function() {//todo
-            return false;
-        },
-        isVideoList: function() {//todo
+        isVideoList: function() {
             return true;
-        },
-        isVideo: function() {//todo
-            return false;
-        },
-        getParentDomain: function() {//todo
-            return null;
         }
     });
 

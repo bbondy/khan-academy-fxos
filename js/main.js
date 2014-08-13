@@ -80,8 +80,6 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
             var subwayIconClass = cx(subwayIconClassObj);
             var pipeClass = cx(pipeClassObj);
             var videoClass = cx(videoClassObj);
-            console.log('subway icon class;');
-            console.log(subwayIconClass);
             return <li className={videoClass}>
                 <div className={subwayIconClass}>
                     <a href="#" onClick={partial(this.props.onClickVideo, this.props.video)}>
@@ -135,7 +133,6 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
             if (this.props.topic.get("videos")) {
                 var videos = _(this.props.topic.get("videos").models).map((video) => {
                     var completed = KA.completedVideos.indexOf(video.get("id")) !== -1;
-                    console.log('is video complete: ' + completed);
                     return <VideoItem video={video}
                                       onClickVideo={this.props.onClickVideo}
                                       key={video.get("slug")} completed={completed} />;
@@ -193,7 +190,6 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
                 return null;
             }
             var transcriptItems = _(this.props.collection).map((transcriptItem) => {
-                console.log('transcript item!');
                 return <TranscriptItem transcriptItem={transcriptItem}
                                        key={transcriptItem.start_time}/>;
             });
@@ -347,7 +343,6 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
             } else {
                 control = <VideoViewer  video={this.state.currentModel}/>;
             }
-            //return <div>{control}</div>;
             return <div>
                 <AppHeader model={this.state.currentModel}
                            onClickBack={this.onClickBack}
