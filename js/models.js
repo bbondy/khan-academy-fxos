@@ -23,8 +23,8 @@ define([], function() {
                     // TODO: Possibly search descriptions too?
                     // TODO: Tokenize the `search` string and do an indexOf for each token
                     // TODO: Allow for OR/AND search term strings
-                    if (item.get("translated_title") &&
-                            item.get("translated_title").toLowerCase().indexOf(search.toLowerCase()) != -1) {
+                    if (item.get("title") &&
+                            item.get("title").toLowerCase().indexOf(search.toLowerCase()) !== -1) {
                         results.push(item);
                     }
                 }.bind(this));
