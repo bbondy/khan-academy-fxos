@@ -168,6 +168,9 @@ define(["oauth", "storage"], function(_oauth, Storage) {
         getVideoTranscript: function(youTubeId) {
             return this._basicAPICall(this.API_V1_BASE + "/videos/" + youTubeId + "/transcript");
         },
+        getArticle: function(articleId) {
+            return this._basicAPICall(this.API_V1_BASE + "/articles/" + articleId);
+        },
         API_BASE: "https://www.khanacademy.org/api",
         API_V1_BASE: "https://www.khanacademy.org/api/v1",
         //API_BASE: "http://192.168.1.131:8080/api",
