@@ -181,7 +181,12 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
             var startMinute = this.props.transcriptItem.start_time / 1000 / 60 | 0;
             var startSecond = this.props.transcriptItem.start_time / 1000 % 60 | 0;
             startSecond = ("0" + startSecond).slice(-2);
-            return <li><span>{startMinute}:{startSecond}</span><span>{this.props.transcriptItem.text}</span></li>;
+            return <li>
+                <a href="#" onClick={partial(this.props.onClickTranscript, this.props.transcriptItem)}>
+                    <span>{startMinute}:{startSecond}</span>
+                    <span>{this.props.transcriptItem.text}</span>
+                </a>
+            </li>;
         }
     });
     var TranscriptViewer = React.createClass({
@@ -191,7 +196,8 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
             }
             var transcriptItems = _(this.props.collection).map((transcriptItem) => {
                 return <TranscriptItem transcriptItem={transcriptItem}
-                                       key={transcriptItem.start_time}/>;
+                                       key={transcriptItem.start_time}
+                                       onClickTranscript={this.props.onClickTranscript} />;
             });
             return <ul className='transcript'>{transcriptItems}</ul>;
         }
@@ -201,21 +207,37 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
          componentWillMount: function() {
             console.log('this.props.video youtube id is: ' + this.props.video.get("youtube_id"));
             KA.getVideoTranscript(this.props.video.get("youtube_id")).done((transcript) => {
-                console.log("The transcript is: ");
-                console.log(transcript);
                 this.setState({transcript: transcript});
             });
+        },
+        onClickTranscript: function(obj) {
+            var startSecond = obj.start_time / 1000 % 60 | 0;
+            var video = this.refs.video.getDOMNode();
+            video.currentTime = startSecond;
+            video.play();
         },
         getInitialState: function() {
             return { };
         },
+        componentDidMount: function() {
+            // Add an event listener to track watched time
+            var video = this.refs.video.getDOMNode();
+            video.addEventListener("timeupdate",
+                    function(e) {
+                        var video = e.target;
+                        var currentSecond = video.currentTime | 0;
+                        var totalSeconds = video.duration | 0;
+                        console.log('current second: ' + currentSecond + ' of ' + totalSeconds);
+                    }, true);
+        },
         render: function() {
             var transcriptViewer;
             if (this.state.transcript) {
-                 transcriptViewer = <TranscriptViewer collection={this.state.transcript}/>;
+                 transcriptViewer = <TranscriptViewer collection={this.state.transcript}
+                                                      onClickTranscript={this.onClickTranscript} />;
             }
             return <div>
-                 <video width="320" height="240" controls>
+                 <video ref="video" width="320" height="240" controls>
                     <source src={this.props.video.get("download_urls").mp4} type="video/mp4"/>
                  </video>
                 {transcriptViewer}

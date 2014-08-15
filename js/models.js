@@ -48,6 +48,7 @@ define([], function() {
             if (this.get("videos")) {
                 this.get("videos").forEach(function(item) {
                     // TODO: Possibly search descriptions too?
+                    // TODO: We could potentially index the transcripts for a really good search
                     // TODO: Tokenize the `search` string and do an indexOf for each token
                     // TODO: Allow for OR/AND search term strings
                     if (item.get("title") &&
