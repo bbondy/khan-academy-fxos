@@ -9,6 +9,18 @@ define([], function() {
         isVideo: function() {
             return false;
         },
+        isArticleList: function() {
+            return false;
+        },
+        isArticle: function() {
+            return false;
+        },
+        isContent: function() {
+            return false;
+        },
+        isContentList: function() {
+            return false;
+        },
         getParentDomain: function() {
             var current = this;
             while (current && !current.isRootChild()) {
@@ -33,20 +45,20 @@ define([], function() {
         /**
          * Initiates a recursive search for the term `search`
          */
-        findVideos: function(search) {
+        findContentItems: function(search, onSearchDone) {
             // TODO: This needs to go in a worker and have the reuslts sent
             // back in a callback. Or at least incrementally build the list.
             var results = [];
-            this._findVideos(search, results);
+            this._findContentItems(search, results);
             return results;
         },
         /**
-         * Recursively calls _findVideos on all children and adds videos with
+         * Recursively calls _findContentItems on all children and adds videos and articles with
          * a matching title to the results array.
          */
-        _findVideos: function(search, results) {
-            if (this.get("videos")) {
-                this.get("videos").forEach(function(item) {
+        _findContentItems: function(search, results) {
+            if (this.get("contentItems")) {
+                this.get("contentItems").forEach(function(item) {
                     // TODO: Possibly search descriptions too?
                     // TODO: We could potentially index the transcripts for a really good search
                     // TODO: Tokenize the `search` string and do an indexOf for each token
@@ -60,7 +72,7 @@ define([], function() {
 
             if (this.get("topics")) {
                 this.get("topics").forEach(function(item) {
-                    item._findVideos(search, results);
+                    item._findContentItems(search, results);
                 }.bind(this));
             }
         },
@@ -76,8 +88,8 @@ define([], function() {
         },
         /**
          * Recursively parses a topic with 2 extra properties:
-         *  vidoes: A backbone collection: VideoCollection which contains VideoModel
-         *  topics: A backbone collection: topicCollection which contains TopicModel
+         *  contentItems: A backbone collection: ContentList which contains ContentModel instances
+         *  topics: A backbone collection: TopicList which contains TopicModel instances
          */
         parse: function(response){
             var parseTopicChildren = function(topic) {
@@ -87,11 +99,11 @@ define([], function() {
                 var topics = topic.children.filter(function(item) {
                     return item.kind === "Topic" && item.slug !== "new-and-noteworthy";
                 });
-                var videos = topic.children.filter(function(item) {
-                    return item.kind === "Video";
+                var contentItems = topic.children.filter(function(item) {
+                    return item.kind === "Video" || item.kind === "Article";
                 });
                 response.topics = new TopicList(topics, {parse: true});
-                response.videos= new VideoList(videos, {parse: true});
+                response.contentItems = new ContentList(contentItems, {parse: true});
             }.bind(this);
 
             parseTopicChildren(response);
@@ -102,10 +114,26 @@ define([], function() {
         },
     });
 
-    var VideoModel = TopicTreeModel.extend({
-        initialize: function() {
-        },
+    var ContentModel = TopicTreeModel.extend({
         isVideo: function() {
+            return this.get("kind") === "Video";
+        },
+        isArticle: function() {
+            return this.get("kind") === "Article";
+        },
+        isContent: function() {
+            return true;
+        }
+    });
+
+    var VideoModel = ContentModel.extend({
+        isVideo: function() {
+            return true;
+        },
+    });
+
+    var ArticleModel = ContentModel.extend({
+        isArticle: function() {
             return true;
         },
     });
@@ -114,17 +142,35 @@ define([], function() {
         model: TopicModel,
     });
 
-    var VideoList = TopicTreeCollection.extend({
+    var ContentList = TopicTreeCollection.extend({
+        model: ContentModel,
+        isContentList: function() {
+            return true;
+        }
+    });
+
+    var VideoList = ContentList.extend({
         model: VideoModel,
         isVideoList: function() {
             return true;
         }
     });
 
+    var ArticleList = ContentList.extend({
+        model: ArticleModel,
+        isArticleList: function() {
+            return true;
+        }
+    });
+
     return {
         TopicModel: TopicModel,
+        ContentModel: ContentModel,
         VideoModel: VideoModel,
+        ArticleModel: ArticleModel,
         TopicList: TopicList,
+        ContentList: ContentList,
         VideoList: VideoList,
+        ArticleList: ArticleList,
     };
 });

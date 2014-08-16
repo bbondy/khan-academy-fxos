@@ -94,6 +94,44 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
         }
     });
 
+    var ArticleItem = React.createClass({
+        //console.log('inside article node: ' + this.props.completed);
+        render: function() {
+            var articleNodeClass = cx({
+              'article-node': true,
+              'completed': this.props.completed
+            });
+            var pipeClassObj = {
+                'pipe': true,
+                'completed': this.props.completed
+            };
+            var subwayIconClassObj = {
+                'subway-icon': true
+            };
+            var articleClassObj = {
+                'article-item': true
+            };
+            var parentDomain = this.props.article.getParentDomain();
+            subwayIconClassObj[parentDomain.get("id")] = true;
+            articleClassObj[parentDomain.get("id")] = true;
+            pipeClassObj[parentDomain.get("id")] = true;
+            var subwayIconClass = cx(subwayIconClassObj);
+            var pipeClass = cx(pipeClassObj);
+            var articleClass = cx(articleClassObj);
+            return <li className={articleClass}>
+                <div className={subwayIconClass}>
+                    <a href="#" onClick={partial(this.props.onClickArticle, this.props.article)}>
+                        <div className={articleNodeClass}/>
+                    </a>
+                    <div className={pipeClass}/>
+                </div>
+                <a href="#" onClick={partial(this.props.onClickArticle, this.props.article)}>
+                    <p className="article-title">{this.props.article.get("title")}</p>
+                </a>
+            </li>;
+        }
+    });
+
     var BackButton = React.createClass({
         render: function() {
             return <div>
@@ -130,12 +168,17 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
                 });
             }
 
-            if (this.props.topic.get("videos")) {
-                var videos = _(this.props.topic.get("videos").models).map((video) => {
-                    var completed = KA.completedVideos.indexOf(video.get("id")) !== -1;
-                    return <VideoItem video={video}
-                                      onClickVideo={this.props.onClickVideo}
-                                      key={video.get("slug")} completed={completed} />;
+            if (this.props.topic.get("contentItems")) {
+                var contentItems = _(this.props.topic.get("contentItems").models).map((contentItem) => {
+                    var completed = KA.completedVideos.indexOf(contentItem.get("id")) !== -1;//todo articles
+                    if (contentItem.isVideo()) {
+                        return <VideoItem video={contentItem}
+                                          onClickVideo={this.props.onClickContentItem}
+                                          key={contentItem.get("slug")} completed={completed} />;
+                    }
+                    return <ArticleItem article={contentItem}
+                                      onClickArticle={this.props.onClickContentItem}
+                                      key={contentItem.get("slug")} completed={completed} />;
                 });
             }
 
@@ -145,7 +188,7 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
                                 <SigninButton model={this.props.topic}
                                               onClickSignin={this.props.onClickSignin}/> : null }
                             {topics}
-                            {videos}
+                            {contentItems}
                             </ul>
                     </section>;
             return <div>
@@ -154,19 +197,24 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
         }
     });
 
-    var VideoListViewer = React.createClass({
+    var ContentListViewer = React.createClass({
         render: function() {
             if (this.props.collection.models) {
-                var videos = _(this.props.collection.models).map((video) => {
-                    return <VideoItem video={video}
-                                      onClickVideo={this.props.onClickVideo}
-                                      key={video.get("slug")}/>;
+                var contentItems = _(this.props.collection.models).map((contentItem) => {
+                    if (contentItem.isVideo()) {
+                        return <VideoItem video={contentItem}
+                                          onClickVideo={this.props.onClickContentItem}
+                                          key={contentItem.get("slug")}/>;
+                    }
+                    return <ArticleItem article={contentItem}
+                                      onClickArticle={this.props.onClickContentItem}
+                                      key={contentItem.get("slug")}/>;
                 });
             }
 
             var topicList = <section data-type="list">
                 <ul>
-                    {videos}
+                    {contentItems}
                 </ul>
             </section>;
 
@@ -200,6 +248,14 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
                                        onClickTranscript={this.props.onClickTranscript} />;
             });
             return <ul className='transcript'>{transcriptItems}</ul>;
+        }
+    });
+
+    var ArticleViewer = React.createClass({
+        render: function() {
+            console.log("render article: ");
+            console.log(this.props.article);
+            return <div>Article!!!</div>;
         }
     });
 
@@ -267,7 +323,7 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
                 var title = "Khan Academy";
                 if (this.props.model.get("translated_title")) {
                     title = this.props.model.get("translated_title");
-                } else if (this.props.model.isVideoList()) {
+                } else if (this.props.model.isContentList()) {
                     title = "Search";
                 }
 
@@ -307,8 +363,8 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
                 position: "relative"
             };
             var text = "Search...";
-            if (this.props.model.get("translated_title")) {
-                text = "Search " + this.props.model.get("translated_title");
+            if (this.props.model.get("title")) {
+                text = "Search " + this.props.model.get("title");
             }
             return <div>
                 <input type="text"
@@ -328,7 +384,7 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
                 currentModel: this.props.model
             };
         },
-        onClickVideo: function(model) {
+        onClickContentItem: function(model) {
             this.setState({currentModel: model});
         },
         onClickTopic: function(model) {
@@ -349,21 +405,27 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
             if (!searchingModel) {
                 searchingModel = this.state.currentModel;
             }
-            var results = searchingModel.findVideos(search);
-            var videoList = new models.VideoList(results);
-            this.setState({"currentModel": videoList, searchingModel: searchingModel});
+            var results = searchingModel.findContentItems(search);
+            var contentList = new models.ContentList(results);
+            //contentList.set("parent", searchingModel);
+            this.setState({"currentModel": contentList, searchingModel: searchingModel});
         },
         render: function() {
             var control;
             if (this.state.currentModel.isTopic()) {
                 control = <TopicViewer topic={this.state.currentModel}
                                        onClickTopic={this.onClickTopic}
-                                       onClickVideo={this.onClickVideo}
+                                       onClickContentItem={this.onClickContentItem}
                                        onClickSignin={this.onClickSignin}/>;
-            } else if (this.state.currentModel.isVideoList()) {
-                control = <VideoListViewer collection={this.state.currentModel}/>;
-            } else {
+            } else if (this.state.currentModel.isContentList()) {
+                control = <ContentListViewer collection={this.state.currentModel}
+                                             onClickContentItem={this.onClickContentItem} />;
+            } else if (this.state.currentModel.isVideo()) {
                 control = <VideoViewer  video={this.state.currentModel}/>;
+            } else if (this.state.currentModel.isArticle()) {
+                control = <ArticleViewer  article={this.state.currentModel}/>;
+            } else {
+                console.error("Unrecognized content item!");
             }
             return <div>
                 <AppHeader model={this.state.currentModel}
