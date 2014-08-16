@@ -304,7 +304,8 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
     var AppHeader = React.createClass({
         render: function() {
                 var backButton;
-                if (this.props.model.get("parent")) {
+                if (this.props.model.get("parent") ||
+                        this.props.model.isContentList()) {
                     backButton = <BackButton model={this.props.model}
                                              onClickBack={this.props.onClickBack}/>;
                 }
@@ -391,6 +392,9 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
             this.setState({currentModel: model});
         },
         onClickBack: function(model) {
+            if (this.state.currentModel.isContentList()) {
+                return this.onSearch("");
+            }
             this.setState({currentModel: model.get("parent")});
         },
         onClickSignin: function() {
@@ -407,7 +411,6 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
             }
             var results = searchingModel.findContentItems(search);
             var contentList = new models.ContentList(results);
-            //contentList.set("parent", searchingModel);
             this.setState({"currentModel": contentList, searchingModel: searchingModel});
         },
         render: function() {
