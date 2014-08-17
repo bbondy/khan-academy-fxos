@@ -77,11 +77,9 @@ define(["oauth", "storage"], function(_oauth, Storage) {
             this._getSecrets().done((keyData) => {
                 this.oauth.consumerKey = keyData.key;
                 this.oauth.consumerSecret = keyData.secret;
-                console.log(this.oauth);
 
                 // TODO: Only do access token stuff if we don't have local storage values
                 if (this.oauth.oauthVerifier) {
-                    console.log('doing access token fetch!');
                     this._getAccessToken().done(() => {
                         this._save();
                         d.resolve();
@@ -146,16 +144,12 @@ define(["oauth", "storage"], function(_oauth, Storage) {
             }
             var d = $.Deferred();
 
-            console.log(Storage);
-
             var filename = "topictree1.json";
             var topicTreePromise = Storage.readText(filename);
             topicTreePromise.done((data) => {
-                console.log('got topictreedata from storage!!');
                 d.resolve(JSON.parse(data));
             });
             topicTreePromise.fail(() => {
-                console.log('topictree read failed! Do a fetch to get the data!');
                 var promise = this._basicAPICall(this.API_V1_BASE + "/fxos/topictree");
                 promise.done((data) => {
                     Storage.writeText(filename, JSON.stringify(data));

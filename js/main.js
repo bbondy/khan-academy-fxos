@@ -95,7 +95,6 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
     });
 
     var ArticleItem = React.createClass({
-        //console.log('inside article node: ' + this.props.completed);
         render: function() {
             var articleNodeClass = cx({
               'article-node': true,
@@ -261,7 +260,6 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
 
     var VideoViewer = React.createClass({
          componentWillMount: function() {
-            console.log('this.props.video youtube id is: ' + this.props.video.get("youtube_id"));
             KA.getVideoTranscript(this.props.video.get("youtube_id")).done((transcript) => {
                 this.setState({transcript: transcript});
             });
