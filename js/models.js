@@ -45,18 +45,24 @@ define([], function() {
         /**
          * Initiates a recursive search for the term `search`
          */
-        findContentItems: function(search, onSearchDone) {
+        findContentItems: function(search, maxResults) {
+            if (_.isUndefined(maxResults)) {
+                maxResults = 100;
+            }
+            window.searchit = this;
             // TODO: This needs to go in a worker and have the reuslts sent
             // back in a callback. Or at least incrementally build the list.
             var results = [];
             this._findContentItems(search, results);
-            return results;
+            return results.slice(0, maxResults);
         },
         /**
          * Recursively calls _findContentItems on all children and adds videos and articles with
          * a matching title to the results array.
          */
-        _findContentItems: function(search, results) {
+        _findContentItems: function(search, results, maxResults) {
+            if (results.length > maxResults)
+                return;
             if (this.get("contentItems")) {
                 this.get("contentItems").forEach(function(item) {
                     // TODO: Possibly search descriptions too?
@@ -72,7 +78,7 @@ define([], function() {
 
             if (this.get("topics")) {
                 this.get("topics").forEach(function(item) {
-                    item._findContentItems(search, results);
+                    item._findContentItems(search, results, maxResults);
                 }.bind(this));
             }
         },
