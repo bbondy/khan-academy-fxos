@@ -331,3 +331,13 @@ video {
     width: 3rem;
     margin-right: 0.5rem;
 }
+
+article {
+    overflow-y: scroll !important;
+    overflow-x: scroll !important;
+    position: absolute;
+    height: calc(100% - 8rem);
+    padding-left: 1rem;
+    padding-right: 1rem;
+    width: calc(100% - 2rem);
+}
