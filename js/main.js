@@ -251,10 +251,26 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
     });
 
     var ArticleViewer = React.createClass({
+        componentWillMount: function() {
+            KA.getArticle(this.props.article.id).done((result) => {
+                console.log('we got a result:');
+                console.log(result);
+                this.setState({content: result.translated_html_content});
+            });
+        },
+        getInitialState: function() {
+            return {};
+        },
         render: function() {
             console.log("render article: ");
             console.log(this.props.article);
-            return <div>Article!!!</div>;
+            if (this.state.content) {
+                return <article dangerouslySetInnerHTML={{
+                    __html: this.state.content
+                }}/>
+
+            }
+            return null;
         }
     });
 
@@ -320,14 +336,14 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
                 }
 
                 var title = "Khan Academy";
-                if (this.props.model.get("translated_title")) {
-                    title = this.props.model.get("translated_title");
+                if (this.props.model.get("title")) {
+                    title = this.props.model.get("title");
                 } else if (this.props.model.isContentList()) {
                     title = "Search";
                 }
 
                 var search;
-                if (!this.props.model.isVideo()) {
+                if (!this.props.model.isContent()) {
                     search = <Search model={this.props.model}
                                      onSearch={this.props.onSearch}/>;
                 }
