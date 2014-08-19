@@ -2,10 +2,20 @@ body {
     margin: 0;
 }
 
-.icon-menu-link {
+.icon-back-link {
     /* Default styles has Icon menu offseting title */
     min-width: 0 !important;
 }
+
+.icon-menu {
+    float: right;
+}
+
+/*
+.header-title {
+    display: inline;
+}
+*/
 
 section[role="region"] > header:first-child h1 {
     margin-right: 1.5em;

@@ -134,9 +134,21 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
     var BackButton = React.createClass({
         render: function() {
             return <div>
-                <a className="icon-menu-link " href="#" onClick={partial(this.props.onClickBack, this.props.model)}>
+                <a className="icon-back-link " href="#" onClick={partial(this.props.onClickBack, this.props.model)}>
                     <span className="icon icon-back">Back</span>
                 </a>
+            </div>;
+        }
+    });
+
+    var MenuButton = React.createClass({
+        render: function() {
+            return <div>
+                <menu type="toolbar" className="icon-menu-link ">
+                    <a href="#" onClick={partial(this.props.onClickMenu)}>
+                        <span className="icon icon-menu">Menu</span>
+                    </a>
+                </menu>
             </div>;
         }
     });
@@ -351,7 +363,8 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
                 return <section id="drawer" role="region" className="skin-dark">
                     <header className="fixed" style={style}>
                         {backButton}
-                        <h1>{title}</h1>
+                        <MenuButton onClickMenu={this.props.onClickMenu}/>
+                        <h1 className="header-title">{title}</h1>
                     </header>
                     {search}
                 </section>;
@@ -411,6 +424,9 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
             }
             this.setState({currentModel: model.get("parent")});
         },
+        onClickMenu: function(model) {
+            console.log("onClickMenu!!!!");
+        },
         onClickSignin: function() {
             KA.login();
         },
@@ -444,12 +460,13 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
             } else {
                 console.error("Unrecognized content item!");
             }
-            return <div>
+            return <section className="current" id="index" data-position="current">
                 <AppHeader model={this.state.currentModel}
                            onClickBack={this.onClickBack}
+                           onClickMenu={this.onClickMenu}
                            onSearch={this.onSearch}/>
                 {control}
-            </div>;
+            </section>;
         }
     });
 
