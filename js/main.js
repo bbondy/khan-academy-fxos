@@ -145,7 +145,7 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
         render: function() {
             return <div>
                 <menu type="toolbar" className="icon-menu-link ">
-                    <a href="#" onClick={partial(this.props.onClickMenu)}>
+                    <a href="#main-content">
                         <span className="icon icon-menu">Menu</span>
                     </a>
                 </menu>
@@ -354,20 +354,11 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
                     title = "Search";
                 }
 
-                var search;
-                if (!this.props.model.isContent()) {
-                    search = <Search model={this.props.model}
-                                     onSearch={this.props.onSearch}/>;
-                }
-
-                return <section id="drawer" role="region" className="skin-dark">
-                    <header className="fixed" style={style}>
+                return <header className="fixed" style={style}>
                         {backButton}
-                        <MenuButton onClickMenu={this.props.onClickMenu}/>
+                        <MenuButton/>
                         <h1 className="header-title">{title}</h1>
-                    </header>
-                    {search}
-                </section>;
+                    </header>;
         }
     });
 
@@ -406,6 +397,25 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
         }
     });
 
+    var Sidebar = React.createClass({
+        render: function() {
+            return <section data-type="sidebar">
+                <header>
+                    <menu type="toolbar">
+                        <a href="#">Done</a>
+                    </menu>
+                    <h1>Options</h1>
+                </header>
+                <nav>
+                    <ul>
+                        <li><a href="#">Profile</a></li>
+                        <li><a href="#">Log out</a></li>
+                    </ul>
+                </nav>
+            </section>;
+        }
+    });
+
     var MainView = React.createClass({
         getInitialState: function() {
             return {
@@ -423,9 +433,6 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
                 return this.onSearch("");
             }
             this.setState({currentModel: model.get("parent")});
-        },
-        onClickMenu: function(model) {
-            console.log("onClickMenu!!!!");
         },
         onClickSignin: function() {
             KA.login();
@@ -460,12 +467,22 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
             } else {
                 console.error("Unrecognized content item!");
             }
+
+            var search;
+            if (!this.state.currentModel.isContent()) {
+                search = <Search model={this.state.currentModel}
+                                 onSearch={this.onSearch}/>;
+            }
+
             return <section className="current" id="index" data-position="current">
-                <AppHeader model={this.state.currentModel}
-                           onClickBack={this.onClickBack}
-                           onClickMenu={this.onClickMenu}
-                           onSearch={this.onSearch}/>
-                {control}
+                <Sidebar/>
+                <section id="main-content" role="region" className="skin-dark">
+                    <AppHeader model={this.state.currentModel}
+                               onClickBack={this.onClickBack}
+                               onSearch={this.onSearch}/>
+                        {search}
+                        {control}
+                </section>
             </section>;
         }
     });
