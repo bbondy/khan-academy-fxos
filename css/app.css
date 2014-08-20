@@ -2,6 +2,10 @@ body {
     margin: 0;
 }
 
+#app, #index {
+    height: 100%;
+}
+
 .icon-back-link {
     /* Default styles has Icon menu offseting title */
     min-width: 0 !important;
@@ -22,7 +26,7 @@ section[role="region"] > header:first-child h1 {
 }
 
 section[data-type="list"] {
-    top: 8rem;
+    top: 8.4rem;
     right: 0px;
     bottom: 0px;
     left: 0px;
@@ -30,6 +34,7 @@ section[data-type="list"] {
     overflow-y: scroll !important;
     position: absolute;
     height: calc(100% - 8rem);
+    background-color: white;
 }
 
 section[role="region"] > header:first-child h1 {
