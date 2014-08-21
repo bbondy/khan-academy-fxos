@@ -418,7 +418,9 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
 
     var DownloadsViewer = React.createClass({
         render: function() {
-            return <div>Downloads!</div>;
+            return <div className="downloads">
+                <h1>You have no downloads yet!</h1>
+            </div>;
         }
     });
 

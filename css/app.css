@@ -357,7 +357,7 @@ article {
     width: calc(100% - 2rem);
 }
 
-.profile {
+.profile, .downloads {
     margin-left: 1rem;
     margin-top: 1rem;
 }
