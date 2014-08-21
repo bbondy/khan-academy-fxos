@@ -153,20 +153,6 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
         }
     });
 
-    var SigninButton = React.createClass({
-        render: function() {
-            var divStyle = {
-                textAlign: "right",
-                marginRight: "15px"
-            };
-            return <div style={divStyle}>
-                <a href="#" onClick={partial(this.props.onClickSignin, this.props.model)}>
-                    Sign In
-                </a>
-            </div>;
-        }
-    });
-
     var TopicViewer = React.createClass({
         componentDidMount: function() {
         },
@@ -195,9 +181,6 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
 
             var topicList = <section data-type="list">
                             <ul>
-                            { !KA.isLoggedIn() ?
-                                <SigninButton model={this.props.topic}
-                                              onClickSignin={this.props.onClickSignin}/> : null }
                             {topics}
                             {contentItems}
                             </ul>
@@ -399,6 +382,15 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
 
     var Sidebar = React.createClass({
         render: function() {
+            var items = [];
+            if (KA.isLoggedIn()) {
+                items.push(<li><a href="#" onClick={this.props.onClickProfile}>Profile</a></li>);
+                items.push(<li><a href="#" onClick={this.props.onClickSignout}>Sign out</a></li>);
+            } else {
+                items.push(<li><a href="#" onClick={this.props.onClickSignin}>Sign in</a></li>);
+            }
+            items.push(<li><a href="#" onClick={this.props.onClickDownloads}>Downloads</a></li>);
+
             return <section data-type="sidebar">
                 <header>
                     <menu type="toolbar">
@@ -408,8 +400,7 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
                 </header>
                 <nav>
                     <ul>
-                        <li><a href="#">Profile</a></li>
-                        <li><a href="#">Log out</a></li>
+                        {items}
                     </ul>
                 </nav>
             </section>;
@@ -436,6 +427,17 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
         },
         onClickSignin: function() {
             KA.login();
+            this.forceUpdate();
+        },
+        onClickSignout: function() {
+            KA.logout();
+            this.forceUpdate();
+        },
+        onClickProfile: function() {
+            console.log('Click profile');
+        },
+        onClickDownloads: function() {
+            console.log('Click downloads');
         },
         onSearch: function(search) {
             if (!search) {
@@ -455,8 +457,7 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
             if (this.state.currentModel.isTopic()) {
                 control = <TopicViewer topic={this.state.currentModel}
                                        onClickTopic={this.onClickTopic}
-                                       onClickContentItem={this.onClickContentItem}
-                                       onClickSignin={this.onClickSignin}/>;
+                                       onClickContentItem={this.onClickContentItem}/>;
             } else if (this.state.currentModel.isContentList()) {
                 control = <ContentListViewer collection={this.state.currentModel}
                                              onClickContentItem={this.onClickContentItem} />;
@@ -475,7 +476,10 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
             }
 
             return <section className="current" id="index" data-position="current">
-                <Sidebar/>
+                <Sidebar onClickSignin={this.onClickSignin}
+                         onClickSignout={this.onClickSignout}
+                         onClickProfile={this.onClickProfile}
+                         onClickDownloads={this.onClickDownloads}/>
                 <section id="main-content" role="region" className="skin-dark">
                     <AppHeader model={this.state.currentModel}
                                onClickBack={this.onClickBack}
