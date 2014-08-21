@@ -313,7 +313,8 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
     var AppHeader = React.createClass({
         render: function() {
                 var backButton;
-                if (this.props.model.get("parent") ||
+                if (this.props.isPaneShowing ||
+                        this.props.model.get("parent") ||
                         this.props.model.isContentList()) {
                     backButton = <BackButton model={this.props.model}
                                              onClickBack={this.props.onClickBack}/>;
@@ -346,7 +347,7 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
     });
 
 
-    var Search = React.createClass({
+    var TopicSearch = React.createClass({
         getInitialState: function() {
             return {value: ''};
         },
@@ -354,9 +355,9 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
             this.state.value = '';
         },
         onChange: function(event) {
-            var search = event.target.value;
-            this.setState({value: search});
-            this.props.onSearch(search);
+            var topicSearch = event.target.value;
+            this.setState({value: topicSearch});
+            this.props.onTopicSearch(topicSearch);
         },
         render: function() {
             var style = {
@@ -383,13 +384,21 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
     var Sidebar = React.createClass({
         render: function() {
             var items = [];
+
             if (KA.isLoggedIn()) {
+                // User is signed in, add all the signed in options here
                 items.push(<li><a href="#" onClick={this.props.onClickProfile}>Profile</a></li>);
-                items.push(<li><a href="#" onClick={this.props.onClickSignout}>Sign out</a></li>);
             } else {
+                // If the user is not signed in, add that option first
                 items.push(<li><a href="#" onClick={this.props.onClickSignin}>Sign in</a></li>);
             }
             items.push(<li><a href="#" onClick={this.props.onClickDownloads}>Downloads</a></li>);
+
+
+            // Add the signout button last
+            if (KA.isLoggedIn()) {
+                items.push(<li><a href="#" onClick={this.props.onClickSignout}>Sign out</a></li>);
+            }
 
             return <section data-type="sidebar">
                 <header>
@@ -407,6 +416,18 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
         }
     });
 
+    var DownloadsViewer = React.createClass({
+        render: function() {
+            return <div>Downloads!</div>;
+        }
+    });
+
+    var ProfileViewer = React.createClass({
+        render: function() {
+            return <div>Profile!</div>;
+        }
+    });
+
     var MainView = React.createClass({
         getInitialState: function() {
             return {
@@ -414,16 +435,39 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
             };
         },
         onClickContentItem: function(model) {
-            this.setState({currentModel: model});
+            this.setState({
+                currentModel: model,
+                showProfile: false,
+                 showDownloads: false
+            });
         },
         onClickTopic: function(model) {
-            this.setState({currentModel: model});
+            this.setState({
+                currentModel: model,
+                showProfile: false,
+                showDownloads: false
+            });
         },
         onClickBack: function(model) {
-            if (this.state.currentModel.isContentList()) {
-                return this.onSearch("");
+            if (this.isPaneShowing()) {
+                this.setState({
+                    showDownloads: false,
+                    showProfile: false
+                });
+                if (this.state.currentModel.isContentList()) {
+                    this.onTopicSearch("");
+                }
+                return;
             }
-            this.setState({currentModel: model.get("parent")});
+
+            if (this.state.currentModel.isContentList()) {
+                return this.onTopicSearch("");
+            }
+            this.setState({
+                currentModel: model.get("parent"),
+                showProfile: false,
+                showDownloads: false
+            });
         },
         onClickSignin: function() {
             KA.login();
@@ -435,26 +479,38 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
         },
         onClickProfile: function() {
             console.log('Click profile');
+            this.setState({showProfile: true, showDownloads: false});
         },
         onClickDownloads: function() {
             console.log('Click downloads');
+            this.setState({showDownloads: true, showProfile: false});
         },
-        onSearch: function(search) {
-            if (!search) {
-                this.setState({"currentModel": this.state.searchingModel, searchingModel: null});
+        isPaneShowing: function() {
+            return this.state.showDownloads ||
+                this.state.showProfile;
+        },
+        onTopicSearch: function(topicSearch) {
+            if (!topicSearch) {
+                this.setState({currentModel: this.state.searchingModel, searchingModel: null});
                 return;
             }
             var searchingModel = this.state.searchingModel;
             if (!searchingModel) {
                 searchingModel = this.state.currentModel;
             }
-            var results = searchingModel.findContentItems(search);
+            var results = searchingModel.findContentItems(topicSearch);
             var contentList = new models.ContentList(results);
-            this.setState({"currentModel": contentList, searchingModel: searchingModel});
+            this.setState({currentModel: contentList, searchingModel: searchingModel});
         },
         render: function() {
             var control;
-            if (this.state.currentModel.isTopic()) {
+            if (this.state.showProfile) {
+                control = <ProfileViewer/>;
+            }
+            else if (this.state.showDownloads) {
+                control = <DownloadsViewer/>;
+            }
+            else if (this.state.currentModel.isTopic()) {
                 control = <TopicViewer topic={this.state.currentModel}
                                        onClickTopic={this.onClickTopic}
                                        onClickContentItem={this.onClickContentItem}/>;
@@ -469,10 +525,10 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
                 console.error("Unrecognized content item!");
             }
 
-            var search;
-            if (!this.state.currentModel.isContent()) {
-                search = <Search model={this.state.currentModel}
-                                 onSearch={this.onSearch}/>;
+            var topicSearch;
+            if (!this.isPaneShowing() && !this.state.currentModel.isContent()) {
+                topicSearch = <TopicSearch model={this.state.currentModel}
+                                 onTopicSearch={this.onTopicSearch}/>;
             }
 
             return <section className="current" id="index" data-position="current">
@@ -483,8 +539,9 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
                 <section id="main-content" role="region" className="skin-dark">
                     <AppHeader model={this.state.currentModel}
                                onClickBack={this.onClickBack}
-                               onSearch={this.onSearch}/>
-                        {search}
+                               onTopicSearch={this.onTopicSearch}
+                               isPaneShowing={this.isPaneShowing()}/>
+                        {topicSearch}
                         {control}
                 </section>
             </section>;
