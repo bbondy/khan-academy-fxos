@@ -22,13 +22,13 @@ define(["oauth", "storage"], function(_oauth, Storage) {
             tokenSecret: getParameterByName("oauth_token_secret"),
             oauthVerifier: getParameterByName("oauth_verifier")
         },
-        _load: function() {
+        _loadAuth: function() {
             var oauth = localStorage.getItem("oauth");
             if (oauth) {
                 this.oauth = JSON.parse(oauth);
             }
         },
-        _save: function() {
+        _saveAuth: function() {
             localStorage.setItem("oauth", JSON.stringify(this.oauth));
         },
         _getSecrets: function() {
@@ -51,7 +51,7 @@ define(["oauth", "storage"], function(_oauth, Storage) {
                 },
                 error: (xhr, status) => {
                     alert("error: " + status);
-                    alert(xhr);
+                    console.log(xhr);
                 }
             }));
         },
@@ -65,9 +65,13 @@ define(["oauth", "storage"], function(_oauth, Storage) {
             return window.location.protocol === 'app:';
         },
         init: function() {
-            this._load();
+            // If a login is not in progress, then load the auth info
+            var oauthVerifier = getParameterByName("oauth_token");
+            if (!oauthVerifier) {
+                this._loadAuth();
+            }
             var d = $.Deferred();
-            this._oauthCallback = window.location.href;
+            this._oauthCallback = window.location.href.split("#")[0].split('?')[0];
             this.completedVideos = [];
             if (this.isFirefoxOS()) {
                 this._oauthCallback = "http://firefoxos.non-existent-domain-asdfg.com/authenticated.html"
@@ -81,7 +85,7 @@ define(["oauth", "storage"], function(_oauth, Storage) {
                 // TODO: Only do access token stuff if we don't have local storage values
                 if (this.oauth.oauthVerifier) {
                     this._getAccessToken().done(() => {
-                        this._save();
+                        this._saveAuth();
                         d.resolve();
                     });
                 } else {
@@ -97,6 +101,11 @@ define(["oauth", "storage"], function(_oauth, Storage) {
                 oauthCallback: this._oauthCallback
             }));
             window.location = url;
+        },
+        logout: function() {
+            this.oauth.token = "";
+            this.oauth.tokenSecret = "";
+            this._saveAuth();
         },
         _basicAPICall: function(url) {
             var d = $.Deferred();
