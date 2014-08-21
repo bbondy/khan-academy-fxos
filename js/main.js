@@ -422,9 +422,40 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
         }
     });
 
+
+    // TODO: put this somewhere better
+    // http://stackoverflow.com/a/2901298/3153
+    function numberWithCommas(x) {
+        if (_.isUndefined(x)) {
+            return 0;
+        }
+        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
     var ProfileViewer = React.createClass({
+        componentWillMount: function() {
+            KA.getUserInfo().done((result) => {
+                //this.setState({content: result.translated_html_content});
+                this.setState({
+                    avatarUrl: result.avatar_url,
+                    joined: result.joined,
+                    nickname: result.nickname,
+                    username: result.username,
+                    points: result.points
+                });
+                console.log('user info result:');
+                console.log(result);
+            });
+        },
+        getInitialState: function() {
+            return {};
+        },
         render: function() {
-            return <div>Profile!</div>;
+            return <div className="profile">
+                <img src={this.state.avatarUrl}/>
+                <h1>{this.state.nickname || this.state.username}</h1>
+                <h2>Points: {numberWithCommas(this.state.points)}</h2>
+            </div>;
         }
     });
 
