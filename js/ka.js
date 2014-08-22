@@ -14,6 +14,14 @@ define(["oauth", "storage"], function(_oauth, Storage) {
         return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
     }
 
+    // TODO: find a better home for this
+    function appendQueryParam(url, name, value) {
+        if (url.indexOf("?") == -1) {
+            url += "?";
+        }
+        return `${url}${name}=${value}`;
+    }
+
     var KA = {
         oauth: {
             consumerKey: "",
@@ -107,7 +115,12 @@ define(["oauth", "storage"], function(_oauth, Storage) {
             this.oauth.tokenSecret = "";
             this._saveAuth();
         },
-        _basicAPICall: function(url) {
+        _basicAPICall: function(url, extraParams) {
+            if (extraParams) {
+                for (p in extraParams) {
+                    appendParam(url, p, extraParams[p]);
+                }
+            }
             var d = $.Deferred();
             $.oauth($.extend( {}, this.oauth, {
                 type: "GET",
@@ -169,10 +182,17 @@ define(["oauth", "storage"], function(_oauth, Storage) {
             return d.promise();
         },
         getVideoTranscript: function(youTubeId) {
-            return this._basicAPICall(this.API_V1_BASE + "/videos/" + youTubeId + "/transcript");
+            return this._basicAPICall(this.API_V1_BASE + `/videos/${youTubeId}/transcript`);
         },
         getArticle: function(articleId) {
             return this._basicAPICall(this.API_V1_BASE + "/articles/" + articleId);
+        },
+        reportVideoProgress: function(youTubeId, secondsWatched, lastSecondWatched) {
+            var extraParams = {
+                seconds_watched: secondsWatched.toString(),
+                last_second_watched: lastSecondWatched.toString()
+            };
+            return this._basicAPICall(this.API_V1_BASE + `/user/videos/${youTubeId}/log`);
         },
         API_BASE: "https://www.khanacademy.org/api",
         API_V1_BASE: "https://www.khanacademy.org/api/v1",
