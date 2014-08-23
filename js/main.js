@@ -61,11 +61,13 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
         render: function() {
             var videoNodeClass = cx({
               'video-node': true,
-              'completed': this.props.completed
+              'completed': this.props.completed,
+              'in-progress': this.props.inProgress
             });
             var pipeClassObj = {
                 'pipe': true,
-                'completed': this.props.completed
+                'completed': this.props.completed,
+                'in-progress': this.props.inProgress
             };
             var subwayIconClassObj = {
                 'subway-icon': true
@@ -98,11 +100,13 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
         render: function() {
             var articleNodeClass = cx({
               'article-node': true,
-              'completed': this.props.completed
+              'completed': this.props.completed,
+              'in-progress': this.props.inProgress
             });
             var pipeClassObj = {
                 'pipe': true,
-                'completed': this.props.completed
+                'completed': this.props.completed,
+                'in-progress': this.props.inProgress
             };
             var subwayIconClassObj = {
                 'subway-icon': true
@@ -168,14 +172,19 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
             if (this.props.topic.get("contentItems")) {
                 var contentItems = _(this.props.topic.get("contentItems").models).map((contentItem) => {
                     var completed = KA.completedVideos.indexOf(contentItem.get("youtube_id")) !== -1;//todo articles
+                    var inProgress = !completed && KA.progressVideos.indexOf(contentItem.get("youtube_id")) !== -1;//todo articles
                     if (contentItem.isVideo()) {
                         return <VideoItem video={contentItem}
                                           onClickVideo={this.props.onClickContentItem}
-                                          key={contentItem.get("slug")} completed={completed} />;
+                                          key={contentItem.get("slug")}
+                                          completed={completed}
+                                          inProgress={inProgress} />;
                     }
                     return <ArticleItem article={contentItem}
                                       onClickArticle={this.props.onClickContentItem}
-                                      key={contentItem.get("slug")} completed={completed} />;
+                                      key={contentItem.get("slug")}
+                                      completed={completed}
+                                      inProgress={inProgress}/>;
                 });
             }
 
@@ -331,6 +340,10 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
         // or if the lastSecondWatched is at the end of the video.
         reportSecondsWatched: function() {
             if (!KA.isLoggedIn()) {
+                return;
+            }
+
+            if (!this.refs.video) {
                 return;
             }
 
@@ -652,9 +665,10 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
                 console.log('read: ' + data);
             });
             if (KA.isLoggedIn()) {
-                KA.getUserVideos().done(function(data) {
+                KA.getUserVideos().done(function(completedVideos, progressVideos) {
                     console.log("getUserVideos:");
-                    console.log(data);
+                    console.log(completedVideos);
+                    console.log(progressVideos);
                 });
             } else {
                 console.log('Not logged in!');
