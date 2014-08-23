@@ -18,8 +18,10 @@ define(["oauth", "storage"], function(_oauth, Storage) {
     function appendQueryParam(url, name, value) {
         if (url.indexOf("?") == -1) {
             url += "?";
+        } else {
+            url += "&";
         }
-        return `${url}${name}=${value}`;
+        return url + name + "=" + value;
     }
 
     var KA = {
@@ -36,8 +38,17 @@ define(["oauth", "storage"], function(_oauth, Storage) {
                 this.oauth = JSON.parse(oauth);
             }
         },
+        _loadCompletedVideos: function() {
+            this.completedVideos = localStorage.getItem("completedVideos");
+            if (this.completedVideos) {
+                this.completedVideos = JSON.parse(this.completedVideos);
+            }
+        },
         _saveAuth: function() {
             localStorage.setItem("oauth", JSON.stringify(this.oauth));
+        },
+        _saveCompletedVideos: function() {
+            localStorage.setItem("completedVideos", JSON.stringify(this.completedVideos));
         },
         _getSecrets: function() {
             return $.ajax({
@@ -115,15 +126,18 @@ define(["oauth", "storage"], function(_oauth, Storage) {
             this.oauth.tokenSecret = "";
             this._saveAuth();
         },
-        _basicAPICall: function(url, extraParams) {
+        _basicAPICall: function(url, extraParams, method) {
+            if (_.isUndefined(method)) {
+                method = "GET";
+            }
             if (extraParams) {
-                for (p in extraParams) {
-                    appendParam(url, p, extraParams[p]);
+                for (var p in extraParams) {
+                    url = appendQueryParam(url, p, extraParams[p]);
                 }
             }
             var d = $.Deferred();
             $.oauth($.extend( {}, this.oauth, {
-                type: "GET",
+                type: method,
                 url: url,
                 timeout: 10000,
                 dataType: "json",
@@ -141,18 +155,17 @@ define(["oauth", "storage"], function(_oauth, Storage) {
         getUserVideos: function() {
             var storageName = "completedVideos";
             var d = $.Deferred();
-            var cachedWatchedVideos = localStorage.getItem(storageName);
-            if (cachedWatchedVideos) {
-                this.completedVideos = JSON.parse(cachedWatchedVideos);
+            this._loadCompletedVideos();
+            if (this.completedVideos) {
                 return d.resolve(this.completedVideos).promise();
             }
 
             this._basicAPICall(this.API_V1_BASE + "/user/videos").done((data) => {
                 this.completedVideos = [];
                 data.forEach((item) => {
-                    this.completedVideos.push(item.video.id);
+                    this.completedVideos.push(item.video.youtube_id);
                 });
-                localStorage.setItem(storageName, JSON.stringify(this.completedVideos));
+                this._saveCompletedVideos();
                 d.resolve(this.completedVideos);
             });
             return d.promise();
@@ -192,12 +205,33 @@ define(["oauth", "storage"], function(_oauth, Storage) {
                 seconds_watched: secondsWatched.toString(),
                 last_second_watched: lastSecondWatched.toString()
             };
-            return this._basicAPICall(this.API_V1_BASE + `/user/videos/${youTubeId}/log`);
+            var d = $.Deferred();
+
+            var promise = this._basicAPICall(this.API_V1_BASE + `/user/videos/${youTubeId}/log`, extraParams, "POST");
+            promise.done((data) => {
+                console.log('result!');
+                console.log(data);
+                if (data.is_video_completed &&
+                        this.completedVideos.indexOf(youTubeId) === -1) {
+                    this.completedVideos.push(youTubeId);
+                    this._saveCompletedVideos();
+                }
+                d.resolve({
+                    completed: data.is_video_completed,
+                    lastSecondWatched: data.last_second_watched,
+                    pointsEarned: data.points_earned,
+                    youtubeID: data.youtube_id,
+                    id: data.id
+                });
+            });
+            return d.promise();
         },
         API_BASE: "https://www.khanacademy.org/api",
         API_V1_BASE: "https://www.khanacademy.org/api/v1",
         //API_BASE: "http://192.168.1.131:8080/api",
         //API_V1_BASE: "http://192.168.1.131:8080/api/v1",
+        //API_BASE: "http://stable.ka.local:8080/api",
+        //API_V1_BASE: "http://stable.ka.local:8080/api/v1",
     };
 
     return KA;
