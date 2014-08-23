@@ -167,7 +167,7 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
 
             if (this.props.topic.get("contentItems")) {
                 var contentItems = _(this.props.topic.get("contentItems").models).map((contentItem) => {
-                    var completed = KA.completedVideos.indexOf(contentItem.get("id")) !== -1;//todo articles
+                    var completed = KA.completedVideos.indexOf(contentItem.get("youtube_id")) !== -1;//todo articles
                     if (contentItem.isVideo()) {
                         return <VideoItem video={contentItem}
                                           onClickVideo={this.props.onClickContentItem}
@@ -274,6 +274,11 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
             KA.getVideoTranscript(this.props.video.get("youtube_id")).done((transcript) => {
                 this.setState({transcript: transcript});
             });
+
+            this.lastSecondWatched = 0;
+            this.secondsWatched = 0;
+            this.lastReportedTime = new Date();
+            this.lastWatchedTimeSinceLastUpdate = new Date();
         },
         onClickTranscript: function(obj) {
             var startSecond = obj.start_time / 1000 % 60 | 0;
@@ -287,14 +292,61 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
         componentDidMount: function() {
             // Add an event listener to track watched time
             var video = this.refs.video.getDOMNode();
-            video.addEventListener("timeupdate",
-                    function(e) {
-                        var video = e.target;
-                        var currentSecond = video.currentTime | 0;
-                        var totalSeconds = video.duration | 0;
-                        console.log('current second: ' + currentSecond + ' of ' + totalSeconds);
-                    }, true);
+
+            video.addEventListener("timeupdate", (e) => {
+                var video = e.target;
+                var currentSecond = video.currentTime | 0;
+                var totalSeconds = video.duration | 0;
+
+                // Sometimes a 'timeupdate' event will come before a 'play' event when
+                // resuming a paused video. We need to get the play event before reporting
+                // seconds watched to properly update the secondsWatched though.
+                if (this.isPlaying) {
+                    this.reportSecondsWatched();
+                }
+            }, true);
+
+            video.addEventListener("play", (e) => {
+                // Update lastWatchedTimeSinceLastUpdate so that we
+                // don't count paused time towards secondsWatched
+                this.lastWatchedTimeSinceLastUpdate = new Date();
+                this.isPlaying = true;
+            }, true);
+
+            video.addEventListener("pause", (e) => {
+                this.updateSecondsWatched();
+                this.isPlaying = false;
+            }, true);
         },
+
+        // Updates the secondsWatched variable with the difference between the current
+        // time and the time stamp stored in lastWatchedTimeSinceLastUpdate.
+        updateSecondsWatched: function() {
+            var currentTime = new Date();
+            this.secondsWatched += (currentTime.getTime() - this.lastWatchedTimeSinceLastUpdate.getTime()) / 1000;
+            this.lastWatchedTimeSinceLastUpdate = currentTime;
+        },
+
+        // Reports the seconds watched to the server if it hasn't been reported recently
+        // or if the lastSecondWatched is at the end of the video.
+        reportSecondsWatched: function() {
+            if (!KA.isLoggedIn()) {
+                return;
+            }
+
+            // Report watched time to the server
+            var video = this.refs.video.getDOMNode();
+            this.lastSecondWatched = Math.round(video.currentTime);
+            this.updateSecondsWatched();
+            var currentTime = new Date();
+            var secondsSinceLastReport = (currentTime.getTime() - this.lastReportedTime.getTime()) / 1000;
+            if (secondsSinceLastReport >= this.MIN_SECONDS_BETWEEN_REPORTS || this.lastSecondWatched >= (video.duration | 0)) {
+                this.lastReportedTime = new Date();
+                KA.reportVideoProgress(this.props.video.get("youtube_id"), this.secondsWatched, this.lastSecondWatched);
+                this.secondsWatched = 0;
+            }
+        },
+
         render: function() {
             var transcriptViewer;
             if (this.state.transcript) {
@@ -307,7 +359,8 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
                  </video>
                 {transcriptViewer}
             </div>;
-        }
+        },
+        MIN_SECONDS_BETWEEN_REPORTS: 15
     });
 
     var AppHeader = React.createClass({
