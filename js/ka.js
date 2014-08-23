@@ -38,17 +38,22 @@ define(["oauth", "storage"], function(_oauth, Storage) {
                 this.oauth = JSON.parse(oauth);
             }
         },
-        _loadCompletedVideos: function() {
+        _loadCompletedAndProgressVideos: function() {
             this.completedVideos = localStorage.getItem("completedVideos");
             if (this.completedVideos) {
                 this.completedVideos = JSON.parse(this.completedVideos);
+            }
+            this.progressVideos = localStorage.getItem("progressVideos");
+            if (this.progressVideos) {
+                this.progressVideos = JSON.parse(this.progressVideos);
             }
         },
         _saveAuth: function() {
             localStorage.setItem("oauth", JSON.stringify(this.oauth));
         },
-        _saveCompletedVideos: function() {
+        _saveCompletedAndProgressVideos: function() {
             localStorage.setItem("completedVideos", JSON.stringify(this.completedVideos));
+            localStorage.setItem("progressVideos", JSON.stringify(this.progressVideos));
         },
         _getSecrets: function() {
             return $.ajax({
@@ -92,6 +97,7 @@ define(["oauth", "storage"], function(_oauth, Storage) {
             var d = $.Deferred();
             this._oauthCallback = window.location.href.split("#")[0].split('?')[0];
             this.completedVideos = [];
+            this.progressVideos = [];
             if (this.isFirefoxOS()) {
                 this._oauthCallback = "http://firefoxos.non-existent-domain-asdfg.com/authenticated.html"
             }
@@ -153,20 +159,27 @@ define(["oauth", "storage"], function(_oauth, Storage) {
             return d.promise();
         },
         getUserVideos: function() {
-            var storageName = "completedVideos";
             var d = $.Deferred();
-            this._loadCompletedVideos();
-            if (this.completedVideos) {
-                return d.resolve(this.completedVideos).promise();
+            //this._loadCompletedAndProgressVideos();
+            if (this.completedVideos.length || this.progressVideos.length) {
+                console.log('no back!');
+                return d.resolve(this.completedVideos, this.progressVideos).promise();
             }
 
             this._basicAPICall(this.API_V1_BASE + "/user/videos").done((data) => {
                 this.completedVideos = [];
+                this.progressVideos = [];
+                console.log('back!');
                 data.forEach((item) => {
-                    this.completedVideos.push(item.video.youtube_id);
+                    console.log(item);
+                    if (item.completed) {
+                        this.completedVideos.push(item.video.youtube_id);
+                    } else {
+                        this.progressVideos.push(item.video.youtube_id);
+                    }
                 });
-                this._saveCompletedVideos();
-                d.resolve(this.completedVideos);
+                this._saveCompletedAndProgressVideos();
+                d.resolve(this.completedVideos, this.progressVideos);
             });
             return d.promise();
         },
@@ -214,7 +227,16 @@ define(["oauth", "storage"], function(_oauth, Storage) {
                 if (data.is_video_completed &&
                         this.completedVideos.indexOf(youTubeId) === -1) {
                     this.completedVideos.push(youTubeId);
-                    this._saveCompletedVideos();
+                    // If it exisets in the progress videos, remove it now
+                    var index = this.progressVideos.indexOf(youTubeId);
+                    if (index !== -1) {
+                        this.progressVideos.splice(index, 1);
+                    }
+                    this._saveCompletedAndProgressVideos();
+                } else if (this.progressVideos.indexOf(youTubeId) === -1 &&
+                        this.completedVideos.indexOf(youTubeId) === -1) {
+                    this.progressVideos.push(youTubeId);
+                    this._saveCompletedAndProgressVideos();
                 }
                 d.resolve({
                     completed: data.is_video_completed,
