@@ -213,6 +213,16 @@ define(["oauth", "storage"], function(_oauth, Storage) {
         getArticle: function(articleId) {
             return this._basicAPICall(this.API_V1_BASE + "/articles/" + articleId);
         },
+        reportArticleRead: function(articleId) {
+            var d = $.Deferred();
+            var promise = this._basicAPICall(this.API_V1_BASE + `/user/article/${articleId}/log`, undefined, "POST");
+            promise.done((data) => {
+                console.log('reported article complete!');
+                console.log(data);
+                d.resolve(data);
+            });
+            return d.promise();
+        },
         reportVideoProgress: function(youTubeId, secondsWatched, lastSecondWatched) {
             var extraParams = {
                 seconds_watched: secondsWatched.toString(),

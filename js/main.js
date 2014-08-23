@@ -262,6 +262,15 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
                 this.setState({content: result.translated_html_content});
             });
         },
+        componentDidMount: function() {
+            this.timerId = setTimeout(this.onReportComplete.bind(this), 5000);
+        },
+        onReportComplete: function() {
+            KA.reportArticleRead(this.props.article.id);
+        },
+        componentWillUnmount: function() {
+            clearTimeout(this.timerId);
+        },
         getInitialState: function() {
             return {};
         },
