@@ -2,35 +2,44 @@
 
 define(["oauth", "storage"], function(_oauth, Storage) {
 
-    // TODO: find a better home for this
-    function getParameterByName(name, params) {
-        if (_.isUndefined(params)) {
-            params = window.location.search;
+    var Util = {
+        isFirefoxOS: function() {
+            return window.location.protocol === 'app:';
+        },
+        getParameterByName: function(name, params) {
+            if (_.isUndefined(params)) {
+                params = window.location.search;
+            }
+            if (params.length && params[0] != "?") {
+                params = "?" + params;
+            }
+            var match = RegExp('[?&]' + name + '=([^&]*)').exec(params);
+            return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+        },
+        appendQueryParam: function(url, name, value) {
+            if (url.indexOf("?") == -1) {
+                url += "?";
+            } else {
+                url += "&";
+            }
+            return url + name + "=" + value;
+        },
+        // http://stackoverflow.com/a/2901298/3153
+        numberWithCommas: function(x) {
+            if (_.isUndefined(x)) {
+                return 0;
+            }
+            return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         }
-        if (params.length && params[0] != "?") {
-            params = "?" + params;
-        }
-        var match = RegExp('[?&]' + name + '=([^&]*)').exec(params);
-        return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
-    }
+    };
 
-    // TODO: find a better home for this
-    function appendQueryParam(url, name, value) {
-        if (url.indexOf("?") == -1) {
-            url += "?";
-        } else {
-            url += "&";
-        }
-        return url + name + "=" + value;
-    }
-
-    var KA = {
+    var APIClient = {
         oauth: {
             consumerKey: "",
             consumerSecret: "",
-            token: getParameterByName("oauth_token"),
-            tokenSecret: getParameterByName("oauth_token_secret"),
-            oauthVerifier: getParameterByName("oauth_verifier")
+            token: Util.getParameterByName("oauth_token"),
+            tokenSecret: Util.getParameterByName("oauth_token_secret"),
+            oauthVerifier: Util.getParameterByName("oauth_verifier")
         },
         _loadAuth: function() {
             var oauth = localStorage.getItem("oauth");
@@ -69,8 +78,8 @@ define(["oauth", "storage"], function(_oauth, Storage) {
                 oauthCallback: this._oauthCallback,
                 timeout: 5000,
                 success: (data) => {
-                    this.oauth.token = getParameterByName("oauth_token", data);
-                    this.oauth.tokenSecret = getParameterByName("oauth_token_secret", data);
+                    this.oauth.token = Util.getParameterByName("oauth_token", data);
+                    this.oauth.tokenSecret = Util.getParameterByName("oauth_token_secret", data);
                     this.oauth.oauthVerifier = undefined;
                 },
                 error: (xhr, status) => {
@@ -85,12 +94,9 @@ define(["oauth", "storage"], function(_oauth, Storage) {
                 this.oauth.token &&
                 this.oauth.tokenSecret;
         },
-        isFirefoxOS: function() { // TODO: Find a better place for this
-            return window.location.protocol === 'app:';
-        },
         init: function() {
             // If a login is not in progress, then load the auth info
-            var oauthVerifier = getParameterByName("oauth_token");
+            var oauthVerifier = Util.getParameterByName("oauth_token");
             if (!oauthVerifier) {
                 this._loadAuth();
             }
@@ -98,7 +104,7 @@ define(["oauth", "storage"], function(_oauth, Storage) {
             this._oauthCallback = window.location.href.split("#")[0].split('?')[0];
             this.completedEntities = [];
             this.startedEntities = [];
-            if (this.isFirefoxOS()) {
+            if (Util.isFirefoxOS()) {
                 this._oauthCallback = "http://firefoxos.non-existent-domain-asdfg.com/authenticated.html"
             }
 
@@ -138,7 +144,7 @@ define(["oauth", "storage"], function(_oauth, Storage) {
             }
             if (extraParams) {
                 for (var p in extraParams) {
-                    url = appendQueryParam(url, p, extraParams[p]);
+                    url = Util.appendQueryParam(url, p, extraParams[p]);
                 }
             }
             var d = $.Deferred();
@@ -191,7 +197,7 @@ define(["oauth", "storage"], function(_oauth, Storage) {
             return this._basicAPICall(this.API_V1_BASE + "/user");
         },
         getTopicTree: function() {
-            if (!this.isFirefoxOS()) {
+            if (!Util.isFirefoxOS()) {
                 return this._basicAPICall("/knowledge-map.json");
             }
             var d = $.Deferred();
@@ -270,6 +276,11 @@ define(["oauth", "storage"], function(_oauth, Storage) {
         //API_V1_BASE: "http://192.168.1.131:8080/api/v1",
         //API_BASE: "http://stable.ka.local:8080/api",
         //API_V1_BASE: "http://stable.ka.local:8080/api/v1",
+    };
+
+    var KA = {
+        Util: Util,
+        APIClient: APIClient
     };
 
     return KA;

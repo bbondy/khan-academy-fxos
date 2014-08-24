@@ -171,8 +171,8 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
 
             if (this.props.topic.get("contentItems")) {
                 var contentItems = _(this.props.topic.get("contentItems").models).map((contentItem) => {
-                    var completed = KA.completedEntities.indexOf(contentItem.get("id")) !== -1;
-                    var inProgress = !completed && KA.startedEntities.indexOf(contentItem.get("id")) !== -1;
+                    var completed = KA.APIClient.completedEntities.indexOf(contentItem.get("id")) !== -1;
+                    var inProgress = !completed && KA.APIClient.startedEntities.indexOf(contentItem.get("id")) !== -1;
                     if (contentItem.isVideo()) {
                         return <VideoItem video={contentItem}
                                           onClickVideo={this.props.onClickContentItem}
@@ -256,7 +256,7 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
 
     var ArticleViewer = React.createClass({
         componentWillMount: function() {
-            KA.getArticle(this.props.article.id).done((result) => {
+            KA.APIClient.getArticle(this.props.article.id).done((result) => {
                 console.log('we got a result:');
                 console.log(result);
                 this.setState({content: result.translated_html_content});
@@ -266,7 +266,7 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
             this.timerId = setTimeout(this.onReportComplete.bind(this), 5000);
         },
         onReportComplete: function() {
-            KA.reportArticleRead(this.props.article.id);
+            KA.APIClient.reportArticleRead(this.props.article.id);
         },
         componentWillUnmount: function() {
             clearTimeout(this.timerId);
@@ -289,7 +289,7 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
 
     var VideoViewer = React.createClass({
          componentWillMount: function() {
-            KA.getVideoTranscript(this.props.video.get("youtube_id")).done((transcript) => {
+            KA.APIClient.getVideoTranscript(this.props.video.get("youtube_id")).done((transcript) => {
                 this.setState({transcript: transcript});
             });
 
@@ -348,7 +348,7 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
         // Reports the seconds watched to the server if it hasn't been reported recently
         // or if the lastSecondWatched is at the end of the video.
         reportSecondsWatched: function() {
-            if (!KA.isLoggedIn()) {
+            if (!KA.APIClient.isLoggedIn()) {
                 return;
             }
 
@@ -364,7 +364,7 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
             var secondsSinceLastReport = (currentTime.getTime() - this.lastReportedTime.getTime()) / 1000;
             if (secondsSinceLastReport >= this.MIN_SECONDS_BETWEEN_REPORTS || this.lastSecondWatched >= (video.duration | 0)) {
                 this.lastReportedTime = new Date();
-                KA.reportVideoProgress(this.props.video.get("id"), this.props.video.get("youtube_id"), this.secondsWatched, this.lastSecondWatched);
+                KA.APIClient.reportVideoProgress(this.props.video.get("id"), this.props.video.get("youtube_id"), this.secondsWatched, this.lastSecondWatched);
                 this.secondsWatched = 0;
             }
         },
@@ -460,7 +460,7 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
         render: function() {
             var items = [];
 
-            if (KA.isLoggedIn()) {
+            if (KA.APIClient.isLoggedIn()) {
                 // User is signed in, add all the signed in options here
                 items.push(<li><a href="#" onClick={this.props.onClickProfile}>Profile</a></li>);
             } else {
@@ -471,7 +471,7 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
 
 
             // Add the signout button last
-            if (KA.isLoggedIn()) {
+            if (KA.APIClient.isLoggedIn()) {
                 items.push(<li><a href="#" onClick={this.props.onClickSignout}>Sign out</a></li>);
             }
 
@@ -499,19 +499,9 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
         }
     });
 
-
-    // TODO: put this somewhere better
-    // http://stackoverflow.com/a/2901298/3153
-    function numberWithCommas(x) {
-        if (_.isUndefined(x)) {
-            return 0;
-        }
-        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    }
-
     var ProfileViewer = React.createClass({
         componentWillMount: function() {
-            KA.getUserInfo().done((result) => {
+            KA.APIClient.getUserInfo().done((result) => {
                 //this.setState({content: result.translated_html_content});
                 this.setState({
                     avatarUrl: result.avatar_url,
@@ -531,7 +521,7 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
             return <div className="profile">
                 <img src={this.state.avatarUrl}/>
                 <h1>{this.state.nickname || this.state.username}</h1>
-                <h2>Points: {numberWithCommas(this.state.points)}</h2>
+                <h2>Points: {KA.Util.numberWithCommas(this.state.points)}</h2>
             </div>;
         }
     });
@@ -578,11 +568,11 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
             });
         },
         onClickSignin: function() {
-            KA.login();
+            KA.APIClient.login();
             this.forceUpdate();
         },
         onClickSignout: function() {
-            KA.logout();
+            KA.APIClient.logout();
             this.forceUpdate();
         },
         onClickProfile: function() {
@@ -666,15 +656,15 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
     var mountNode = document.getElementById("app");
 
     // Init everything
-    $.when(Storage.init(), KA.init()).done(function(topicData) {
-        KA.getTopicTree().done(function(topicTreeData) {
+    $.when(Storage.init(), KA.APIClient.init()).done(function(topicData) {
+        KA.APIClient.getTopicTree().done(function(topicTreeData) {
             var topic = new models.TopicModel(topicTreeData, {parse: true});
             React.renderComponent(<MainView model={topic}/>, mountNode);
             Storage.readText("data.json").done(function(data) {
                 console.log('read: ' + data);
             });
-            if (KA.isLoggedIn()) {
-                KA.getUserProgress().done(function(completedEntities, startedEntities) {
+            if (KA.APIClient.isLoggedIn()) {
+                KA.APIClient.getUserProgress().done(function(completedEntities, startedEntities) {
                     console.log("getUserProgress:");
                     console.log(completedEntities);
                     console.log(startedEntities);
