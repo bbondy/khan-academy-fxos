@@ -171,8 +171,8 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
 
             if (this.props.topic.get("contentItems")) {
                 var contentItems = _(this.props.topic.get("contentItems").models).map((contentItem) => {
-                    var completed = KA.completedVideos.indexOf(contentItem.get("youtube_id")) !== -1;//todo articles
-                    var inProgress = !completed && KA.progressVideos.indexOf(contentItem.get("youtube_id")) !== -1;//todo articles
+                    var completed = KA.completedEntities.indexOf(contentItem.get("id")) !== -1;
+                    var inProgress = !completed && KA.startedEntities.indexOf(contentItem.get("id")) !== -1;
                     if (contentItem.isVideo()) {
                         return <VideoItem video={contentItem}
                                           onClickVideo={this.props.onClickContentItem}
@@ -364,7 +364,7 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
             var secondsSinceLastReport = (currentTime.getTime() - this.lastReportedTime.getTime()) / 1000;
             if (secondsSinceLastReport >= this.MIN_SECONDS_BETWEEN_REPORTS || this.lastSecondWatched >= (video.duration | 0)) {
                 this.lastReportedTime = new Date();
-                KA.reportVideoProgress(this.props.video.get("youtube_id"), this.secondsWatched, this.lastSecondWatched);
+                KA.reportVideoProgress(this.props.video.get("id"), this.props.video.get("youtube_id"), this.secondsWatched, this.lastSecondWatched);
                 this.secondsWatched = 0;
             }
         },
@@ -674,10 +674,10 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
                 console.log('read: ' + data);
             });
             if (KA.isLoggedIn()) {
-                KA.getUserVideos().done(function(completedVideos, progressVideos) {
-                    console.log("getUserVideos:");
-                    console.log(completedVideos);
-                    console.log(progressVideos);
+                KA.getUserProgress().done(function(completedEntities, startedEntities) {
+                    console.log("getUserProgress:");
+                    console.log(completedEntities);
+                    console.log(startedEntities);
                 });
             } else {
                 console.log('Not logged in!');
