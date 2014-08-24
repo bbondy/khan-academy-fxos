@@ -38,22 +38,22 @@ define(["oauth", "storage"], function(_oauth, Storage) {
                 this.oauth = JSON.parse(oauth);
             }
         },
-        _loadCompletedAndProgressVideos: function() {
-            this.completedVideos = localStorage.getItem("completedVideos");
-            if (this.completedVideos) {
-                this.completedVideos = JSON.parse(this.completedVideos);
+        _loadCompletedAndProgress: function() {
+            this.completedEntities = localStorage.getItem("completed");
+            if (this.completedEntities) {
+                this.completedEntities = JSON.parse(this.completedEntities);
             }
-            this.progressVideos = localStorage.getItem("progressVideos");
-            if (this.progressVideos) {
-                this.progressVideos = JSON.parse(this.progressVideos);
+            this.startedEntities = localStorage.getItem("progress");
+            if (this.startedEntities) {
+                this.startedEntities = JSON.parse(this.startedEntities);
             }
         },
         _saveAuth: function() {
             localStorage.setItem("oauth", JSON.stringify(this.oauth));
         },
-        _saveCompletedAndProgressVideos: function() {
-            localStorage.setItem("completedVideos", JSON.stringify(this.completedVideos));
-            localStorage.setItem("progressVideos", JSON.stringify(this.progressVideos));
+        _saveCompletedAndProgress: function() {
+            localStorage.setItem("completed", JSON.stringify(this.completedEntities));
+            localStorage.setItem("progress", JSON.stringify(this.startedEntities));
         },
         _getSecrets: function() {
             return $.ajax({
@@ -96,8 +96,8 @@ define(["oauth", "storage"], function(_oauth, Storage) {
             }
             var d = $.Deferred();
             this._oauthCallback = window.location.href.split("#")[0].split('?')[0];
-            this.completedVideos = [];
-            this.progressVideos = [];
+            this.completedEntities = [];
+            this.startedEntities = [];
             if (this.isFirefoxOS()) {
                 this._oauthCallback = "http://firefoxos.non-existent-domain-asdfg.com/authenticated.html"
             }
@@ -158,28 +158,32 @@ define(["oauth", "storage"], function(_oauth, Storage) {
             }));
             return d.promise();
         },
-        getUserVideos: function() {
+        getUserProgress: function() {
             var d = $.Deferred();
-            //this._loadCompletedAndProgressVideos();
-            if (this.completedVideos.length || this.progressVideos.length) {
+            //this._loadCompletedAndProgress();
+            if (this.completedEntities.length || this.startedEntities.length) {
                 console.log('no back!');
-                return d.resolve(this.completedVideos, this.progressVideos).promise();
+                return d.resolve(this.completedEntities, this.startedEntities).promise();
             }
 
-            this._basicAPICall(this.API_V1_BASE + "/user/videos").done((data) => {
-                this.completedVideos = [];
-                this.progressVideos = [];
-                console.log('back!');
-                data.forEach((item) => {
-                    console.log(item);
-                    if (item.completed) {
-                        this.completedVideos.push(item.video.youtube_id);
-                    } else {
-                        this.progressVideos.push(item.video.youtube_id);
-                    }
+            var extraParams = {
+                kind: "Video,Article"
+            };
+
+            this._basicAPICall(this.API_V1_BASE + "/user/progress_summary", extraParams).done((data) => {
+                console.log('user progress summary: ');
+                console.log(data);
+                this.completedEntities = data.complete;
+                this.startedEntities = data.started;
+                // Get rid of the 'a' and 'v' prefixes
+                this.completedEntities = _.map(this.completedEntities, function(e) {
+                    return e.substring(1);
                 });
-                this._saveCompletedAndProgressVideos();
-                d.resolve(this.completedVideos, this.progressVideos);
+                this.startedEntities = _.map(this.completedEntities, function(e) {
+                    return e.substring(1);
+                });
+                this._saveCompletedAndProgress();
+                d.resolve(this.completedEntities, this.startedEntities);
             });
             return d.promise();
         },
@@ -220,10 +224,11 @@ define(["oauth", "storage"], function(_oauth, Storage) {
                 console.log('reported article complete!');
                 console.log(data);
                 d.resolve(data);
+                this.completedEntities.push(articleId);
             });
             return d.promise();
         },
-        reportVideoProgress: function(youTubeId, secondsWatched, lastSecondWatched) {
+        reportVideoProgress: function(videoId, youTubeId, secondsWatched, lastSecondWatched) {
             var extraParams = {
                 seconds_watched: secondsWatched.toString(),
                 last_second_watched: lastSecondWatched.toString()
@@ -235,24 +240,25 @@ define(["oauth", "storage"], function(_oauth, Storage) {
                 console.log('result!');
                 console.log(data);
                 if (data.is_video_completed &&
-                        this.completedVideos.indexOf(youTubeId) === -1) {
-                    this.completedVideos.push(youTubeId);
-                    // If it exisets in the progress videos, remove it now
-                    var index = this.progressVideos.indexOf(youTubeId);
+                        this.completedEntities.indexOf(videoId) === -1) {
+                    this.completedEntities.push(videoId);
+                    // If it exists in the progress videos, remove it now
+                    var index = this.startedEntities.indexOf(videoId);
                     if (index !== -1) {
-                        this.progressVideos.splice(index, 1);
+                        this.startedEntities.splice(index, 1);
                     }
-                    this._saveCompletedAndProgressVideos();
-                } else if (this.progressVideos.indexOf(youTubeId) === -1 &&
-                        this.completedVideos.indexOf(youTubeId) === -1) {
-                    this.progressVideos.push(youTubeId);
-                    this._saveCompletedAndProgressVideos();
+                    this._saveCompletedAndProgress();
+                } else if (this.startedEntities.indexOf(videoId) === -1 &&
+                        this.completedEntities.indexOf(videoId) === -1) {
+                    this.startedEntities.push(videoId);
+                    this._saveCompletedAndProgress();
                 }
                 d.resolve({
                     completed: data.is_video_completed,
                     lastSecondWatched: data.last_second_watched,
                     pointsEarned: data.points_earned,
-                    youtubeID: data.youtube_id,
+                    youtubeId: data.youtube_id,
+                    videoId: videoId,
                     id: data.id
                 });
             });
