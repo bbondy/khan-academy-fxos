@@ -104,6 +104,7 @@ define(["oauth", "storage"], function(_oauth, Storage) {
             this._oauthCallback = window.location.href.split("#")[0].split('?')[0];
             this.completedEntities = [];
             this.startedEntities = [];
+            this.videosProgress = {};
             if (Util.isFirefoxOS()) {
                 this._oauthCallback = "http://firefoxos.non-existent-domain-asdfg.com/authenticated.html"
             }
@@ -234,7 +235,24 @@ define(["oauth", "storage"], function(_oauth, Storage) {
             });
             return d.promise();
         },
-        reportVideoProgress: function(videoId, youTubeId, secondsWatched, lastSecondWatched) {
+        getUserVideos: function() {
+            var d = $.Deferred();
+            var promise = this._basicAPICall(this.API_V1_BASE + "/user/videos");
+            promise.done((results) => {
+                _(results).each((result) => {
+                    // If they've watched some part of the video, and it's not almost the end
+                    if (result.last_second_watched > 10 &&
+                            result.duration - result.last_second_watched > 10) {
+                        this.videosProgress[result.video.id] = result.last_second_watched
+                    }
+                });
+                console.log('videos progress:');
+                console.log(this.videosProgress);
+                d.resolve(results);
+            });
+            return d.promise();
+        },
+        reportVideoProgress: function(videoId, youTubeId, duration, secondsWatched, lastSecondWatched) {
             var extraParams = {
                 seconds_watched: secondsWatched.toString(),
                 last_second_watched: lastSecondWatched.toString()
@@ -242,10 +260,21 @@ define(["oauth", "storage"], function(_oauth, Storage) {
             var d = $.Deferred();
 
             var promise = this._basicAPICall(this.API_V1_BASE + `/user/videos/${youTubeId}/log`, extraParams, "POST");
-            promise.done((data) => {
+            promise.done((result) => {
                 console.log('result!');
-                console.log(data);
-                if (data.is_video_completed &&
+                console.log(result);
+
+                // If they've watched some part of the video, and it's not almost the end
+                if (result.last_second_watched > 10 &&
+                        duration - result.last_second_watched > 10) {
+                    this.videosProgress[videoId] = result.last_second_watched
+                // Otherwise check if we already have video progress for this item and we
+                // therefore no longer need it.  Remove it to save memory.
+                } else if(this.videosProgress[videoId]) {
+                    delete this.videosProgress[videoId];
+                }
+
+                if (result.is_video_completed &&
                         this.completedEntities.indexOf(videoId) === -1) {
                     this.completedEntities.push(videoId);
                     // If it exists in the progress videos, remove it now
@@ -260,12 +289,12 @@ define(["oauth", "storage"], function(_oauth, Storage) {
                     this._saveCompletedAndProgress();
                 }
                 d.resolve({
-                    completed: data.is_video_completed,
-                    lastSecondWatched: data.last_second_watched,
-                    pointsEarned: data.points_earned,
-                    youtubeId: data.youtube_id,
+                    completed: result.is_video_completed,
+                    lastSecondWatched: result.last_second_watched,
+                    pointsEarned: result.points_earned,
+                    youtubeId: result.youtube_id,
                     videoId: videoId,
-                    id: data.id
+                    id: result.id
                 });
             });
             return d.promise();

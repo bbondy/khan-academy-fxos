@@ -293,7 +293,8 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
                 this.setState({transcript: transcript});
             });
 
-            this.lastSecondWatched = 0;
+            this.videoId = this.props.video.get("id");
+            this.lastSecondWatched = KA.APIClient.videosProgress[this.videoId] || 0;
             this.secondsWatched = 0;
             this.lastReportedTime = new Date();
             this.lastWatchedTimeSinceLastUpdate = new Date();
@@ -310,6 +311,13 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
         componentDidMount: function() {
             // Add an event listener to track watched time
             var video = this.refs.video.getDOMNode();
+
+            video.addEventListener("canplay", (e) => {
+                if (this.lastSecondWatched) {
+                    video.currentTime = this.lastSecondWatched;
+                    console.log('set current time to: ' + video.currentTime);
+                }
+            });
 
             video.addEventListener("timeupdate", (e) => {
                 var video = e.target;
@@ -364,7 +372,12 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
             var secondsSinceLastReport = (currentTime.getTime() - this.lastReportedTime.getTime()) / 1000;
             if (secondsSinceLastReport >= this.MIN_SECONDS_BETWEEN_REPORTS || this.lastSecondWatched >= (video.duration | 0)) {
                 this.lastReportedTime = new Date();
-                KA.APIClient.reportVideoProgress(this.props.video.get("id"), this.props.video.get("youtube_id"), this.secondsWatched, this.lastSecondWatched);
+                console.log('report video progress duration: ' + this.props.video.get("duration"));
+                KA.APIClient.reportVideoProgress(this.props.video.get("id"),
+                        this.props.video.get("youtube_id"),
+                        this.props.video.get("duration"),
+                        this.secondsWatched,
+                        this.lastSecondWatched);
                 this.secondsWatched = 0;
             }
         },
@@ -664,6 +677,11 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
                 console.log('read: ' + data);
             });
             if (KA.APIClient.isLoggedIn()) {
+
+                // TODO: This should be called, but will eventually be moved into
+                // some sort of cache update part of the code.
+                // The call is needed so we get KA.APIClient.videoProgress
+                KA.APIClient.getUserVideos();
                 KA.APIClient.getUserProgress().done(function(completedEntities, startedEntities) {
                     console.log("getUserProgress:");
                     console.log(completedEntities);
