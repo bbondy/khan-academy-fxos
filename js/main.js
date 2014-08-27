@@ -521,7 +521,8 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
                     joined: result.joined,
                     nickname: result.nickname,
                     username: result.username,
-                    points: result.points
+                    points: result.points,
+                    badgeCounts: result.badge_counts
                 });
                 console.log('user info result:');
                 console.log(result);
@@ -532,9 +533,37 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
         },
         render: function() {
             return <div className="profile">
-                <img src={this.state.avatarUrl}/>
+                <img className="avatar" src={this.state.avatarUrl}/>
                 <h1>{this.state.nickname || this.state.username}</h1>
                 <h2>Points: {KA.Util.numberWithCommas(this.state.points)}</h2>
+
+                { this.state.badgeCounts ?
+                    <div>
+                    <span className="span2">
+                        <div className="badge-category-count">{this.state.badgeCounts[5]}</div>
+                        <img className="badge-category-icon" title="Challenge Patches" src="img/badges/master-challenge-blue-60x60.png"/>
+                    </span>
+                    <span className="span2">
+                        <div className="badge-category-count">{this.state.badgeCounts[4]}</div>
+                        <img className="badge-category-icon" title="Black Hole Badges" src="img/badges/eclipse-60x60.png"/>
+                    </span>
+                    <span className="span2">
+                        <div className="badge-category-count">{this.state.badgeCounts[3]}</div>
+                        <img className="badge-category-icon" title="Sun Badges" src="img/badges/sun-60x60.png"/>
+                    </span>
+                    <span className="span2">
+                        <div className="badge-category-count">{this.state.badgeCounts[2]}</div>
+                        <img className="badge-category-icon" title="Earth Badges" src="img/badges/earth-60x60.png"/>
+                    </span>
+                    <span className="span2">
+                        <div className="badge-category-count">{this.state.badgeCounts[1]}</div>
+                        <img className="badge-category-icon" title="Moon Badges" src="img/badges/moon-60x60.png"/>
+                    </span>
+                    <span className="span2">
+                        <div className="badge-category-count">{this.state.badgeCounts[0]}</div>
+                        <img className="badge-category-icon" title="Meteorite Badges" src="img/badges/meteorite-60x60.png"/>
+                    </span>
+                    </div> : null }
             </div>;
         }
     });
