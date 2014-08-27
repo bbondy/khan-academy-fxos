@@ -232,10 +232,10 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
             var startMinute = this.props.transcriptItem.start_time / 1000 / 60 | 0;
             var startSecond = this.props.transcriptItem.start_time / 1000 % 60 | 0;
             startSecond = ("0" + startSecond).slice(-2);
-            return <li>
+            return <li className="transcript-item">
                 <a href="#" onClick={partial(this.props.onClickTranscript, this.props.transcriptItem)}>
-                    <span>{startMinute}:{startSecond}</span>
-                    <span>{this.props.transcriptItem.text}</span>
+                    <div>{startMinute}:{startSecond}</div>
+                    <div>{this.props.transcriptItem.text}</div>
                 </a>
             </li>;
         }

@@ -410,3 +410,17 @@ article {
     display: inline-block;
     margin-right: 0.5rem;
 }
+
+.transcript a {
+    text-decoration: none;
+    color: black;
+}
+
+.transcript-item div {
+    display: inline;
+}
+
+.transcript-item div:first-child {
+    color: #999;
+    margin-right: 1rem;
+}
