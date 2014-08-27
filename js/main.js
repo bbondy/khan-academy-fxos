@@ -300,7 +300,7 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
             this.lastWatchedTimeSinceLastUpdate = new Date();
         },
         onClickTranscript: function(obj) {
-            var startSecond = obj.start_time / 1000 % 60 | 0;
+            var startSecond = obj.start_time / 1000 | 0;
             var video = this.refs.video.getDOMNode();
             video.currentTime = startSecond;
             video.play();
