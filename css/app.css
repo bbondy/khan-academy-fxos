@@ -376,3 +376,37 @@ article {
     margin-left: 1rem;
     margin-top: 1rem;
 }
+
+.profile .badge-category-icon {
+    width: 30px;
+    height: 30px;
+    display: block;
+    position: relative;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    left: auto;
+    margin: -20px auto 0;
+}
+
+.profile .avatar {
+    width: 200px;
+    height: 200px;
+}
+
+.profile .badge-category-count {
+    background: #eee;
+    border-radius: 5px;
+    color: #999;
+    font-size: 18px;
+    height: 45px;
+    padding-top: 15px;
+    position: relative;
+    text-align: center;
+}
+
+.profile span.span2 {
+    width: 30px;
+    display: inline-block;
+    margin-right: 0.5rem;
+}
