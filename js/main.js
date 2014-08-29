@@ -4,7 +4,7 @@
 
 "use strict";
 
-define(["react", "models", "ka", "storage"], function(React, models, KA, Storage) {
+define(["react", "models", "ka", "storage", "downloads"], function(React, models, KA, Storage, Downloads) {
     var cx = React.addons.classSet;
 
     function partial( fn /*, args...*/) {
@@ -58,6 +58,9 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
 
     var VideoItem = React.createClass({
         //console.log('inside video node: ' + this.props.completed);
+        componentDidMount: function() {
+            Downloads.downloadFile('test');
+        },
         render: function() {
             var videoNodeClass = cx({
               'video-node': true,
@@ -292,6 +295,8 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
             KA.APIClient.getVideoTranscript(this.props.video.get("youtube_id")).done((transcript) => {
                 this.setState({transcript: transcript});
             });
+            console.log('video:');
+            console.log(this.props.video);
 
             this.videoId = this.props.video.get("id");
             this.lastSecondWatched = KA.APIClient.videosProgress[this.videoId] || 0;
@@ -698,7 +703,7 @@ define(["react", "models", "ka", "storage"], function(React, models, KA, Storage
     var mountNode = document.getElementById("app");
 
     // Init everything
-    $.when(Storage.init(), KA.APIClient.init()).done(function(topicData) {
+    $.when(Storage.init(), KA.APIClient.init(), Downloads.init()).done(function(topicData) {
         KA.APIClient.getTopicTree().done(function(topicTreeData) {
             var topic = new models.TopicModel(topicTreeData, {parse: true});
             React.renderComponent(<MainView model={topic}/>, mountNode);
