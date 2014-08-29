@@ -65,20 +65,28 @@ define([], function() {
          * Writes out the specified data as text in the specified file.
          */
         writeText: function(filename, data) {
+            var blob = new Blob([data], {type: "text/plain"});
+            return this.writeBlob(filename, blob);
+        },
+        /**
+         * Writes out the specified blob in the specified file.
+         */
+        writeBlob: function(filename, blob) {
             var d = $.Deferred();
             if (!this.sdcard) {
                 return d.reject().promise();
             }
 
-            var file = new Blob([data], {type: "text/plain"});
-            var request = this.sdcard.addNamed(file, filename);
+            var request = this.sdcard.addNamed(blob, filename);
             request.onsuccess = function () {
+                console.log(filename + ' was written successfully!');
                 var name = this.result;
                 d.resolve();
             };
             // An error typically occur if a file with the same name already exist
             request.onerror = function () {
-                console.warn('Unable to write the file: ' + this.error);
+                console.warn('Unable to write the file: ');
+                console.warn(this.error);
                 d.reject();
             };
             return d.promise();
