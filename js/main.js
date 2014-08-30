@@ -59,7 +59,10 @@ define(["react", "models", "ka", "storage", "downloads"], function(React, models
     var VideoItem = React.createClass({
         //console.log('inside video node: ' + this.props.completed);
         componentDidMount: function() {
-            Downloads.downloadFile('test');
+            console.log('vide here:')
+            console.log(this.props.video)
+            Downloads.downloadFile(this.props.video.get("id"),
+                this.props.video.get("download_urls").mp4);
         },
         render: function() {
             var videoNodeClass = cx({

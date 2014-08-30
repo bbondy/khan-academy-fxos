@@ -73,22 +73,24 @@ define([], function() {
          */
         writeBlob: function(filename, blob) {
             var d = $.Deferred();
-            if (!this.sdcard) {
-                return d.reject().promise();
-            }
+            this.delete(filename).always(() => {
+                if (!this.sdcard) {
+                    return d.reject().promise();
+                }
 
-            var request = this.sdcard.addNamed(blob, filename);
-            request.onsuccess = function () {
-                console.log(filename + ' was written successfully!');
-                var name = this.result;
-                d.resolve();
-            };
-            // An error typically occur if a file with the same name already exist
-            request.onerror = function () {
-                console.warn('Unable to write the file: ');
-                console.warn(this.error);
-                d.reject();
-            };
+                var request = this.sdcard.addNamed(blob, filename);
+                request.onsuccess = function () {
+                    console.log(filename + ' was written successfully!');
+                    var name = this.result;
+                    d.resolve();
+                };
+                // An error typically occur if a file with the same name already exist
+                request.onerror = function () {
+                    console.warn('Unable to write the file: ');
+                    console.warn(this.error);
+                    d.reject();
+                };
+            });
             return d.promise();
         }
     };
