@@ -14,9 +14,29 @@ define([], function() {
             return $.Deferred().resolve().promise();
         },
         /**
+         * Returns a promise which when resolved contains an array of binary data
+         */
+        readAsBlob: function(filename) {
+            var d = $.Deferred();
+            if (!this.sdcard) {
+                return d.reject().promise();
+            }
+            var request = this.sdcard.get(filename);
+            request.onsuccess = function () {
+                var file = this.result;
+                d.resolve(file);
+            };
+            request.onerror = function () {
+                console.warn("Unable to get the file: " + this.error);
+                d.reject();
+            };
+
+            return d.promise();
+        },
+        /**
          * Returns a promise which when resolved contains a string of data
          */
-        readText: function(filename, data) {
+        readText: function(filename) {
             var d = $.Deferred();
             if (!this.sdcard) {
                 return d.reject().promise();

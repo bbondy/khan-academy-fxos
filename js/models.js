@@ -34,6 +34,9 @@ define([], function() {
             }
             return this.get("parent").get("render_type") === "Root";
         },
+        isRoot: function() {
+            return this.get("render_type") === "Root";
+        }
     };
     var TopicTreeModel = Backbone.Model.extend(TopicTreeBase);
     var TopicTreeCollection = Backbone.Collection.extend(TopicTreeBase);
