@@ -636,8 +636,10 @@ define(["react", "models", "ka", "storage", "downloads"], function(React, models
             if (this.state.currentModel.isContentList()) {
                 return this.onTopicSearch("");
             }
+
             this.setState({
-                currentModel: model.get("parent"),
+                // The || condition is used when there's no parent for downlaods
+                currentModel: model.get("parent") || this.props.model,
                 showProfile: false,
                 showDownloads: false
             });
