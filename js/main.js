@@ -56,13 +56,18 @@ define(["react", "models", "ka", "storage", "downloads"], function(React, models
         }
     });
 
-    var VideoItem = React.createClass({
-        //console.log('inside video node: ' + this.props.completed);
+    var VideoListItem = React.createClass({
         componentDidMount: function() {
-            console.log('vide here:')
-            console.log(this.props.video)
-            Downloads.downloadFile(this.props.video.get("id"),
-                this.props.video.get("download_urls").mp4);
+            /*
+             * TODO: Implement this when clicking on a known downloaded video
+            Storage.readAsBlob('xb19b2406').done((result) => {
+                var download_url = URL.createObjectURL(result);
+                console.log('download url is: ');
+                console.log(download_url);
+                //this.setState({testVideo: download_url});
+                //video.src = URL.createObjectURL(new Blob([this.result]));
+            });
+            */
         },
         render: function() {
             var videoNodeClass = cx({
@@ -82,9 +87,11 @@ define(["react", "models", "ka", "storage", "downloads"], function(React, models
                 'video-item': true
             };
             var parentDomain = this.props.video.getParentDomain();
-            subwayIconClassObj[parentDomain.get("id")] = true;
-            videoClassObj[parentDomain.get("id")] = true;
-            pipeClassObj[parentDomain.get("id")] = true;
+            if (parentDomain) {
+                subwayIconClassObj[parentDomain.get("id")] = true;
+                videoClassObj[parentDomain.get("id")] = true;
+                pipeClassObj[parentDomain.get("id")] = true;
+            }
             var subwayIconClass = cx(subwayIconClassObj);
             var pipeClass = cx(pipeClassObj);
             var videoClass = cx(videoClassObj);
@@ -102,7 +109,7 @@ define(["react", "models", "ka", "storage", "downloads"], function(React, models
         }
     });
 
-    var ArticleItem = React.createClass({
+    var ArticleListItem = React.createClass({
         render: function() {
             var articleNodeClass = cx({
               'article-node': true,
@@ -180,17 +187,17 @@ define(["react", "models", "ka", "storage", "downloads"], function(React, models
                     var completed = KA.APIClient.completedEntities.indexOf(contentItem.get("id")) !== -1;
                     var inProgress = !completed && KA.APIClient.startedEntities.indexOf(contentItem.get("id")) !== -1;
                     if (contentItem.isVideo()) {
-                        return <VideoItem video={contentItem}
-                                          onClickVideo={this.props.onClickContentItem}
-                                          key={contentItem.get("slug")}
-                                          completed={completed}
-                                          inProgress={inProgress} />;
+                        return <VideoListItem video={contentItem}
+                                              onClickVideo={this.props.onClickContentItem}
+                                              key={contentItem.get("slug")}
+                                              completed={completed}
+                                              inProgress={inProgress} />;
                     }
-                    return <ArticleItem article={contentItem}
-                                      onClickArticle={this.props.onClickContentItem}
-                                      key={contentItem.get("slug")}
-                                      completed={completed}
-                                      inProgress={inProgress}/>;
+                    return <ArticleListItem article={contentItem}
+                                            onClickArticle={this.props.onClickContentItem}
+                                            key={contentItem.get("slug")}
+                                            completed={completed}
+                                            inProgress={inProgress}/>;
                 });
             }
 
@@ -211,11 +218,11 @@ define(["react", "models", "ka", "storage", "downloads"], function(React, models
             if (this.props.collection.models) {
                 var contentItems = _(this.props.collection.models).map((contentItem) => {
                     if (contentItem.isVideo()) {
-                        return <VideoItem video={contentItem}
-                                          onClickVideo={this.props.onClickContentItem}
-                                          key={contentItem.get("slug")}/>;
+                        return <VideoListItem video={contentItem}
+                                              onClickVideo={this.props.onClickContentItem}
+                                              key={contentItem.get("slug")}/>;
                     }
-                    return <ArticleItem article={contentItem}
+                    return <ArticleListItem article={contentItem}
                                       onClickArticle={this.props.onClickContentItem}
                                       key={contentItem.get("slug")}/>;
                 });
@@ -263,8 +270,6 @@ define(["react", "models", "ka", "storage", "downloads"], function(React, models
     var ArticleViewer = React.createClass({
         componentWillMount: function() {
             KA.APIClient.getArticle(this.props.article.id).done((result) => {
-                console.log('we got a result:');
-                console.log(result);
                 this.setState({content: result.translated_html_content});
             });
         },
@@ -410,14 +415,15 @@ define(["react", "models", "ka", "storage", "downloads"], function(React, models
         render: function() {
                 var backButton;
                 if (this.props.isPaneShowing ||
-                        this.props.model.get("parent") ||
+                        this.props.model.isContent() ||
+                        this.props.model.isTopic() && !this.props.model.isRoot() ||
                         this.props.model.isContentList()) {
                     backButton = <BackButton model={this.props.model}
                                              onClickBack={this.props.onClickBack}/>;
                 }
 
-                var parentDomain = this.props.model.getParentDomain();
                 var style;
+                var parentDomain = this.props.model.getParentDomain();
                 if (parentDomain) {
                     var domainColor = DomainColorMap[parentDomain.get("slug")];
                     if (domainColor) {
@@ -428,7 +434,11 @@ define(["react", "models", "ka", "storage", "downloads"], function(React, models
                 }
 
                 var title = "Khan Academy";
-                if (this.props.model.get("title")) {
+                if (this.props.isDownloadsShowing) {
+                    title = "Downloads";
+                } else if (this.props.isProfileShowing) {
+                    title = "Profile";
+                } else if (this.props.model.get("title")) {
                     title = this.props.model.get("title");
                 } else if (this.props.model.isContentList()) {
                     title = "Search";
@@ -477,18 +487,28 @@ define(["react", "models", "ka", "storage", "downloads"], function(React, models
         }
     });
 
+    /**
+     * The sidebar drawer that comes up when you click on the menu from
+     * the top header.
+     */
     var Sidebar = React.createClass({
         render: function() {
             var items = [];
 
+            if (this.props.currentModel && this.props.currentModel.isVideo()) {
+                items.push(<li className="hot-item">
+                        <a href="#" onClick={partial(this.props.onClickDownloadVideo, this.props.currentModel)}>Download video</a>
+                    </li>);
+            }
+
             if (KA.APIClient.isLoggedIn()) {
                 // User is signed in, add all the signed in options here
-                items.push(<li><a href="#" onClick={this.props.onClickProfile}>Profile</a></li>);
+                items.push(<li><a href="#" onClick={this.props.onClickProfile}>View profile</a></li>);
             } else {
                 // If the user is not signed in, add that option first
                 items.push(<li><a href="#" onClick={this.props.onClickSignin}>Sign in</a></li>);
             }
-            items.push(<li><a href="#" onClick={this.props.onClickDownloads}>Downloads</a></li>);
+            items.push(<li><a href="#" onClick={this.props.onClickDownloads}>View downloads</a></li>);
 
 
             // Add the signout button last
@@ -496,7 +516,7 @@ define(["react", "models", "ka", "storage", "downloads"], function(React, models
                 items.push(<li><a href="#" onClick={this.props.onClickSignout}>Sign out</a></li>);
             }
 
-            return <section data-type="sidebar">
+            return <section className="sidebar" data-type="sidebar">
                 <header>
                     <menu type="toolbar">
                         <a href="#">Done</a>
@@ -514,8 +534,10 @@ define(["react", "models", "ka", "storage", "downloads"], function(React, models
 
     var DownloadsViewer = React.createClass({
         render: function() {
+            var control = <ContentListViewer collection={Downloads.contentList}
+                                             onClickContentItem={this.props.onClickContentItem} />;
             return <div className="downloads">
-                <h1>You have no downloads yet!</h1>
+                {control}
             </div>;
         }
     });
@@ -577,6 +599,8 @@ define(["react", "models", "ka", "storage", "downloads"], function(React, models
     });
 
     var MainView = React.createClass({
+        componentWillMount: function() {
+        },
         getInitialState: function() {
             return {
                 currentModel: this.props.model
@@ -597,6 +621,7 @@ define(["react", "models", "ka", "storage", "downloads"], function(React, models
             });
         },
         onClickBack: function(model) {
+            console.log('onClickBack');
             if (this.isPaneShowing()) {
                 this.setState({
                     showDownloads: false,
@@ -627,11 +652,22 @@ define(["react", "models", "ka", "storage", "downloads"], function(React, models
         },
         onClickProfile: function() {
             console.log('Click profile');
-            this.setState({showProfile: true, showDownloads: false});
+            this.setState({
+                showProfile: true,
+                showDownloads: false
+            });
         },
-        onClickDownloads: function() {
+        onClickDownloads: function(model) {
             console.log('Click downloads');
-            this.setState({showDownloads: true, showProfile: false});
+            this.setState({
+                showDownloads: true,
+                showProfile: false
+            });
+        },
+        onClickDownloadVideo: function(video) {
+            var videoAttributes = jQuery.extend(true, {}, video.attributes);
+            delete videoAttributes.parent;
+            Downloads.downloadVideo(video);
         },
         isPaneShowing: function() {
             return this.state.showDownloads ||
@@ -656,7 +692,7 @@ define(["react", "models", "ka", "storage", "downloads"], function(React, models
                 control = <ProfileViewer/>;
             }
             else if (this.state.showDownloads) {
-                control = <DownloadsViewer/>;
+                control = <DownloadsViewer onClickContentItem={this.onClickContentItem} />;
             }
             else if (this.state.currentModel.isTopic()) {
                 control = <TopicViewer topic={this.state.currentModel}
@@ -676,19 +712,25 @@ define(["react", "models", "ka", "storage", "downloads"], function(React, models
             var topicSearch;
             if (!this.isPaneShowing() && !this.state.currentModel.isContent()) {
                 topicSearch = <TopicSearch model={this.state.currentModel}
-                                 onTopicSearch={this.onTopicSearch}/>;
+                                           onTopicSearch={this.onTopicSearch}/>;
             }
 
             return <section className="current" id="index" data-position="current">
-                <Sidebar onClickSignin={this.onClickSignin}
+                <Sidebar currentModel={this.state.currentModel}
+                         onClickSignin={this.onClickSignin}
                          onClickSignout={this.onClickSignout}
                          onClickProfile={this.onClickProfile}
-                         onClickDownloads={this.onClickDownloads}/>
+                         onClickDownloads={this.onClickDownloads}
+                         onClickDownloadVideo={this.onClickDownloadVideo}
+                         />
                 <section id="main-content" role="region" className="skin-dark">
                     <AppHeader model={this.state.currentModel}
                                onClickBack={this.onClickBack}
                                onTopicSearch={this.onTopicSearch}
-                               isPaneShowing={this.isPaneShowing()}/>
+                               isPaneShowing={this.isPaneShowing()}
+                               isDownloadsShowing={this.state.showDownloads}
+                               isProfileShowing={this.state.showProfile}
+                               />
                         {topicSearch}
                         {control}
                 </section>

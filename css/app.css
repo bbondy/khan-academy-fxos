@@ -377,6 +377,10 @@ article {
     margin-top: 1rem;
 }
 
+.sidebar .hot-item {
+    font-weight: bold;
+}
+
 .profile .badge-category-icon {
     width: 30px;
     height: 30px;
