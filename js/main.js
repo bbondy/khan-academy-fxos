@@ -4,7 +4,8 @@
 
 "use strict";
 
-define(["react", "models", "ka", "storage", "downloads"], function(React, models, KA, Storage, Downloads) {
+define(["react", "models", "ka", "storage", "downloads"],
+        function(React, models, KA, Storage, Downloads) {
     var cx = React.addons.classSet;
 
     function partial( fn /*, args...*/) {
@@ -58,16 +59,6 @@ define(["react", "models", "ka", "storage", "downloads"], function(React, models
 
     var VideoListItem = React.createClass({
         componentDidMount: function() {
-            /*
-             * TODO: Implement this when clicking on a known downloaded video
-            Storage.readAsBlob('xb19b2406').done((result) => {
-                var download_url = URL.createObjectURL(result);
-                console.log('download url is: ');
-                console.log(download_url);
-                //this.setState({testVideo: download_url});
-                //video.src = URL.createObjectURL(new Blob([this.result]));
-            });
-            */
         },
         render: function() {
             var videoNodeClass = cx({
@@ -303,6 +294,16 @@ define(["react", "models", "ka", "storage", "downloads"], function(React, models
             KA.APIClient.getVideoTranscript(this.props.video.get("youtube_id")).done((transcript) => {
                 this.setState({transcript: transcript});
             });
+
+            if (this.props.video.isDownloaded()) {
+                Storage.readAsBlob('xb19b2406').done((result) => {
+                    var download_url = URL.createObjectURL(result);
+                    console.log('download url is: ');
+                    console.log(download_url);
+                    this.setState({downloadedUrl: download_url});
+                });
+            }
+
             console.log('video:');
             console.log(this.props.video);
 
@@ -401,9 +402,14 @@ define(["react", "models", "ka", "storage", "downloads"], function(React, models
                  transcriptViewer = <TranscriptViewer collection={this.state.transcript}
                                                       onClickTranscript={this.onClickTranscript} />;
             }
+            var videoSrc = this.props.video.get("download_urls").mp4;
+            if (this.state.downloadedUrl) {
+                videoSrc = this.state.downloadedUrl;
+            }
+            console.log('video rendered with url: ' + videoSrc);
             return <div>
                  <video ref="video" width="320" height="240" controls>
-                    <source src={this.props.video.get("download_urls").mp4} type="video/mp4"/>
+                    <source src={videoSrc} type="video/mp4"/>
                  </video>
                 {transcriptViewer}
             </div>;
