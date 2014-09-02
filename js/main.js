@@ -296,7 +296,7 @@ define(["react", "models", "ka", "storage", "downloads"],
             });
 
             if (this.props.video.isDownloaded()) {
-                Storage.readAsBlob('xb19b2406').done((result) => {
+                Storage.readAsBlob(this.props.video.get("id")).done((result) => {
                     var download_url = URL.createObjectURL(result);
                     console.log('download url is: ');
                     console.log(download_url);
