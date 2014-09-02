@@ -502,9 +502,15 @@ define(["react", "models", "ka", "storage", "downloads"],
             var items = [];
 
             if (this.props.currentModel && this.props.currentModel.isVideo()) {
-                items.push(<li className="hot-item">
-                        <a href="#" onClick={partial(this.props.onClickDownloadVideo, this.props.currentModel)}>Download video</a>
-                    </li>);
+                if (this.props.currentModel.isDownloaded()) {
+                    items.push(<li className="hot-item">
+                            <a href="#" onClick={partial(this.props.onClickDeleteDownloadedVideo, this.props.currentModel)}>Delete downloaded video</a>
+                        </li>);
+                } else {
+                    items.push(<li className="hot-item">
+                            <a href="#" onClick={partial(this.props.onClickDownloadVideo, this.props.currentModel)}>Download video</a>
+                        </li>);
+                }
             }
 
             if (KA.APIClient.isLoggedIn()) {
@@ -683,6 +689,9 @@ define(["react", "models", "ka", "storage", "downloads"],
             delete videoAttributes.parent;
             Downloads.downloadVideo(video);
         },
+        onClickDeleteDownloadedVideo: function(video) {
+            console.log('click delete downloaded video');
+        },
         isPaneShowing: function() {
             return this.state.showDownloads ||
                 this.state.showProfile;
@@ -736,6 +745,7 @@ define(["react", "models", "ka", "storage", "downloads"],
                          onClickProfile={this.onClickProfile}
                          onClickDownloads={this.onClickDownloads}
                          onClickDownloadVideo={this.onClickDownloadVideo}
+                         onClickDeleteDownloadedVideo={this.onClickDeleteDownloadedVideo}
                          />
                 <section id="main-content" role="region" className="skin-dark">
                     <AppHeader model={this.state.currentModel}
