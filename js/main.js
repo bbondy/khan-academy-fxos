@@ -691,6 +691,7 @@ define(["react", "models", "ka", "storage", "downloads"],
         },
         onClickDeleteDownloadedVideo: function(video) {
             console.log('click delete downloaded video');
+            Downloads.deleteVideo(video);
         },
         isPaneShowing: function() {
             return this.state.showDownloads ||

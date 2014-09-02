@@ -58,19 +58,40 @@ define(["storage", "models"], function(Storage, models) {
             req.onload = (event) => {
                 var blob = new Blob([req.response], {type: "video/mp4"});
                 Storage.writeBlob(filename, blob).done(() => {
-                    this._addDownload(video);
+                    this._addDownloadToManifest(video);
                 });
             };
             req.send();
         },
         /**
+         * Removes a download from the list of downloaded files and
+         * removes the file on disk.
+         */
+        deleteVideo: function(video) {
+            var d = $.Deferred();
+            var filename = video.get("id");
+            Storage.delete(filename).done(() => {
+                this._removeDownloadFromManifest(video);
+                d.resolve();
+            });
+            return d.promise();
+        },
+        /**
          * Adds the specified model to the list of downloaded files
          */
-        _addDownload: function(model) {
+        _addDownloadToManifest: function(model) {
             console.log('adding model to manifest: ');
             console.log(model);
-            window.model1 = model;
             this.contentList.push(model);
+            this._writeManifest();
+        },
+        /**
+         * Remove the specified model from the list of downloaded files
+         */
+        _removeDownloadFromManifest: function(model) {
+            console.log('removing model from manifest: ');
+            console.log(model);
+            this.contentList.remove(model);
             this._writeManifest();
         },
         manifestFilename: "downloads-manifest.json"
