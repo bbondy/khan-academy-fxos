@@ -132,6 +132,9 @@ define([], function() {
         },
         isContent: function() {
             return true;
+        },
+        isDownloaded: function() {
+            return !!this.get("downloaded");
         }
     });
 

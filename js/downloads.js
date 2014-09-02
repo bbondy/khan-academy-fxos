@@ -21,6 +21,7 @@ define(["storage", "models"], function(Storage, models) {
             var contentListCopy = _(this.contentList.models).map((model) => {
                 var modelCopy = jQuery.extend(true, {}, model.attributes);
                 delete modelCopy.parent;
+                modelCopy.downloaded = true;
                 return modelCopy;
             });
             var jsonManifest = JSON.stringify(contentListCopy);

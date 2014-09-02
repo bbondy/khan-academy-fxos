@@ -637,9 +637,15 @@ define(["react", "models", "ka", "storage", "downloads"], function(React, models
                 return this.onTopicSearch("");
             }
 
+            var currentModel = model.get("parent");
+            // If we have a download, reset back to root which
+            // is stored in this.props.model.
+            if (model.isContent() && model.isDownloaded()) {
+                currentModel = this.props.model;
+            }
+
             this.setState({
-                // The || condition is used when there's no parent for downlaods
-                currentModel: model.get("parent") || this.props.model,
+                currentModel: currentModel,
                 showProfile: false,
                 showDownloads: false
             });
