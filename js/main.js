@@ -30,7 +30,14 @@ define(["react", "models", "ka", "storage", "downloads"],
         "::app-search": "#3C5466"
     };
 
-    var TopicItem = React.createClass({
+    /**
+     * Represents a single root, domain, subject, topic, or tutorial
+     * item in the topic list.
+     * This is represented as a single list item, and when clicked, the
+     * list view will be replaced with a bunch of different TopicListItem
+     * which are the children of the clicked item.
+     */
+    var TopicListItem = React.createClass({
         getInitialState: function() {
             return {};
         },
@@ -57,6 +64,11 @@ define(["react", "models", "ka", "storage", "downloads"],
         }
     });
 
+    /**
+     * Represents a single video item in the topic list.
+     * This renders the list item and not the actual video.
+     * When clicked, it will render the video corresponding to this list item.
+     */
     var VideoListItem = React.createClass({
         componentDidMount: function() {
         },
@@ -100,6 +112,11 @@ define(["react", "models", "ka", "storage", "downloads"],
         }
     });
 
+    /**
+     * Represents a single article item in the topic list.
+     * This renders the list item and not the actual article.
+     * When clicked, it will render the article corresponding to this list item.
+     */
     var ArticleListItem = React.createClass({
         render: function() {
             var articleNodeClass = cx({
@@ -139,6 +156,12 @@ define(["react", "models", "ka", "storage", "downloads"],
         }
     });
 
+    /**
+     * Represents the back button which is found on the top left of the header
+     * on all screens except when the Root topic is displayed.
+     * In general, when clicked it will take the user to the last view they were
+     * at before.
+     */
     var BackButton = React.createClass({
         render: function() {
             return <div>
@@ -149,6 +172,11 @@ define(["react", "models", "ka", "storage", "downloads"],
         }
     });
 
+    /**
+     * Represents the menu button which is found on the top right of the header
+     * on all screens.
+     * When clicked it will expand a drawer with context sensitive options.
+     */
     var MenuButton = React.createClass({
         render: function() {
             return <div>
@@ -161,13 +189,17 @@ define(["react", "models", "ka", "storage", "downloads"],
         }
     });
 
+    /**
+     * Represents a single topic and it displays a list of all of its children.
+     * Each child of the list is a TopicListItem, VideoListItem, or ArticleListItem.
+     */
     var TopicViewer = React.createClass({
         componentDidMount: function() {
         },
         render: function() {
             if (this.props.topic.get("topics")) {
                 var topics = _(this.props.topic.get("topics").models).map((topic) => {
-                    return <TopicItem topic={topic}
+                    return <TopicListItem topic={topic}
                                       onClickTopic={this.props.onClickTopic}
                                       key={topic.get("slug")}/>;
                 });
@@ -204,6 +236,11 @@ define(["react", "models", "ka", "storage", "downloads"],
         }
     });
 
+    /**
+     * Represents a list of content items.
+     * This is used for displaying search results and download lists.
+     * This always contains only a list of VideoListItems, or ARticleListItems.
+     */
     var ContentListViewer = React.createClass({
         render: function() {
             if (this.props.collection.models) {
@@ -231,6 +268,10 @@ define(["react", "models", "ka", "storage", "downloads"],
         }
     });
 
+    /**
+     * Represents a single transcript item for the list of transcript items.
+     * When clicekd, it willl fast forward the video to that transcript item.
+     */
     var TranscriptItem = React.createClass({
         render: function() {
             var startMinute = this.props.transcriptItem.start_time / 1000 / 60 | 0;
@@ -244,6 +285,10 @@ define(["react", "models", "ka", "storage", "downloads"],
             </li>;
         }
     });
+
+    /**
+     * Represents the entire transcript, which is a list of TranscriptItems.
+     */
     var TranscriptViewer = React.createClass({
         render: function() {
             if (!this.props.collection) {
@@ -258,6 +303,10 @@ define(["react", "models", "ka", "storage", "downloads"],
         }
     });
 
+    /**
+     * Represents a single article, it will load the article dynamically and
+     * display it to the user.
+     */
     var ArticleViewer = React.createClass({
         componentWillMount: function() {
             KA.APIClient.getArticle(this.props.article.id).done((result) => {
@@ -289,6 +338,10 @@ define(["react", "models", "ka", "storage", "downloads"],
         }
     });
 
+    /**
+     * Represents a single video, it will load the video dynamically and
+     * display it to the user.
+     */
     var VideoViewer = React.createClass({
          componentWillMount: function() {
             KA.APIClient.getVideoTranscript(this.props.video.get("youtube_id")).done((transcript) => {
@@ -417,6 +470,10 @@ define(["react", "models", "ka", "storage", "downloads"],
         MIN_SECONDS_BETWEEN_REPORTS: 15
     });
 
+    /**
+     * Represents the app header, it contains the back button, the menu button,
+     * and a title.
+     */
     var AppHeader = React.createClass({
         render: function() {
                 var backButton;
@@ -459,6 +516,9 @@ define(["react", "models", "ka", "storage", "downloads"],
     });
 
 
+    /**
+     * Represents the topic search input item which is right below the header.
+     */
     var TopicSearch = React.createClass({
         getInitialState: function() {
             return {value: ''};
@@ -494,8 +554,8 @@ define(["react", "models", "ka", "storage", "downloads"],
     });
 
     /**
-     * The sidebar drawer that comes up when you click on the menu from
-     * the top header.
+     * Represents the sidebar drawer.
+     * The sidebar drawer comes up when you click on the menu from the top header.
      */
     var Sidebar = React.createClass({
         render: function() {
@@ -544,6 +604,10 @@ define(["react", "models", "ka", "storage", "downloads"],
         }
     });
 
+    /**
+     * Represents a downloads list which is basically just a wrapper around a
+     * ContentListViewer for now.
+     */
     var DownloadsViewer = React.createClass({
         render: function() {
             var control = <ContentListViewer collection={Downloads.contentList}
@@ -554,6 +618,10 @@ define(["react", "models", "ka", "storage", "downloads"],
         }
     });
 
+    /**
+     * Represents a user's profile. It gives the user information about their
+     * username, badges, and points.
+     */
     var ProfileViewer = React.createClass({
         componentWillMount: function() {
             KA.APIClient.getUserInfo().done((result) => {
@@ -610,6 +678,13 @@ define(["react", "models", "ka", "storage", "downloads"],
         }
     });
 
+    /**
+     * This is the main app container itself.
+     * It implements most of the view based functionality for the rest of the views
+     * which call back up to it. It is responsible for re-rendering the appropriate
+     * things when certain page actions change.  No other part of the code is repsonsible
+     * for the overall top level view (which is nice and clean ;)).
+     */
     var MainView = React.createClass({
         componentWillMount: function() {
         },
@@ -765,6 +840,7 @@ define(["react", "models", "ka", "storage", "downloads"],
 
     /*
     // I thought this was supposed to be needed, but it seems to not be needed
+    // I think the manifest permissions implies this for us.
     $.ajaxSetup({
         xhr: function() {return new window.XMLHttpRequest({mozSystem: true});}
     });
