@@ -13,12 +13,14 @@ require.config({
         "underscore": "underscore-min",
         "jquery": "jquery",
         "backbone": "backbone",
-        "test": "../test/test"
+        "test": "../test/test",
+        "notifications": "notifications"
     }
 });
 
-var initModules = ['underscore', 'backbone', 'react', 'main'];
+var initModules = ['main'];
 if (window.isTest) {
     initModules.push('test');
 }
 requirejs(initModules);
+
