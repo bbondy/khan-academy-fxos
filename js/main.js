@@ -785,7 +785,16 @@ define(["react", "models", "ka", "storage", "downloads"],
             var contentList = new models.ContentList(results);
             this.setState({currentModel: contentList, searchingModel: searchingModel});
         },
+        /**
+         * Most of the time returns this.state.currentModel,
+         * but will return a donwloaded copy if it's available.
+         */
+        getCurrentModel: function() {
+            return Downloads.findVideo(this.state.currentModel) ||
+                this.state.currentModel;
+        },
         render: function() {
+            var currentModel = this.getCurrentModel();
             var control;
             if (this.state.showProfile) {
                 control = <ProfileViewer/>;
@@ -793,29 +802,29 @@ define(["react", "models", "ka", "storage", "downloads"],
             else if (this.state.showDownloads) {
                 control = <DownloadsViewer onClickContentItem={this.onClickContentItem} />;
             }
-            else if (this.state.currentModel.isTopic()) {
-                control = <TopicViewer topic={this.state.currentModel}
+            else if (currentModel.isTopic()) {
+                control = <TopicViewer topic={currentModel}
                                        onClickTopic={this.onClickTopic}
                                        onClickContentItem={this.onClickContentItem}/>;
-            } else if (this.state.currentModel.isContentList()) {
-                control = <ContentListViewer collection={this.state.currentModel}
+            } else if (currentModel.isContentList()) {
+                control = <ContentListViewer collection={currentModel}
                                              onClickContentItem={this.onClickContentItem} />;
-            } else if (this.state.currentModel.isVideo()) {
-                control = <VideoViewer  video={this.state.currentModel}/>;
-            } else if (this.state.currentModel.isArticle()) {
-                control = <ArticleViewer  article={this.state.currentModel}/>;
+            } else if (currentModel.isVideo()) {
+                control = <VideoViewer  video={this.getCurrentModel()}/>;
+            } else if (currentModel.isArticle()) {
+                control = <ArticleViewer  article={currentModel}/>;
             } else {
                 console.error("Unrecognized content item!");
             }
 
             var topicSearch;
-            if (!this.isPaneShowing() && !this.state.currentModel.isContent()) {
-                topicSearch = <TopicSearch model={this.state.currentModel}
+            if (!this.isPaneShowing() && !currentModel.isContent()) {
+                topicSearch = <TopicSearch model={currentModel}
                                            onTopicSearch={this.onTopicSearch}/>;
             }
 
             return <section className="current" id="index" data-position="current">
-                <Sidebar currentModel={this.state.currentModel}
+                <Sidebar currentModel={currentModel}
                          onClickSignin={this.onClickSignin}
                          onClickSignout={this.onClickSignout}
                          onClickProfile={this.onClickProfile}
@@ -824,7 +833,7 @@ define(["react", "models", "ka", "storage", "downloads"],
                          onClickDeleteDownloadedVideo={this.onClickDeleteDownloadedVideo}
                          />
                 <section id="main-content" role="region" className="skin-dark">
-                    <AppHeader model={this.state.currentModel}
+                    <AppHeader model={currentModel}
                                onClickBack={this.onClickBack}
                                onTopicSearch={this.onTopicSearch}
                                isPaneShowing={this.isPaneShowing()}
