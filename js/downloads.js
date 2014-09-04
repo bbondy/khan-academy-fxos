@@ -1,6 +1,7 @@
 "use strict";
 
-define(["storage", "models"], function(Storage, models) {
+define(["storage", "models", "notifications"],
+        function(Storage, models, Notifications) {
 
     var Downloads = {
         /**
@@ -65,6 +66,10 @@ define(["storage", "models"], function(Storage, models) {
                 var blob = new Blob([req.response], {type: "video/mp4"});
                 Storage.writeBlob(filename, blob).done(() => {
                     this._addDownloadToManifest(video);
+                    var videoTitle = video.get("title");
+                    var title = "Download complete";
+                    var message = `The video: ${videoTitle} was downloaded successfully`;
+                    Notifications.info(title, message);
                 });
             };
             req.send();
