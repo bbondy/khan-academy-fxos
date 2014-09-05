@@ -1,5 +1,12 @@
 "use strict";
 
+/**
+ * Responsible for keeping of downloaded videos
+ *   - Maintains a manifest of what's downloaded
+ *   - Actually performs downloads
+ *   - Provides the ability to delete those downloads
+ */
+
 define(["storage", "models", "notifications"],
         function(Storage, models, Notifications) {
 
