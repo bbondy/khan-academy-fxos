@@ -14,7 +14,8 @@ require.config({
         "jquery": "jquery",
         "backbone": "backbone",
         "test": "../test/test",
-        "notifications": "notifications"
+        "notifications": "notifications",
+        "cache": "cache"
     }
 });
 
