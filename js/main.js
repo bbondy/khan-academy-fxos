@@ -220,7 +220,7 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
                                             onClickArticle={this.props.onClickContentItem}
                                             key={contentItem.get("slug")}
                                             completed={completed}
-                                            inProgress={inProgress}/>;
+                                            inProgress={inProgress} />;
                 });
             }
 
@@ -245,14 +245,20 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
         render: function() {
             if (this.props.collection.models) {
                 var contentItems = _(this.props.collection.models).map((contentItem) => {
+                    var completed = KA.APIClient.completedEntities.indexOf(contentItem.get("id")) !== -1;
+                    var inProgress = !completed && KA.APIClient.startedEntities.indexOf(contentItem.get("id")) !== -1;
                     if (contentItem.isVideo()) {
                         return <VideoListItem video={contentItem}
                                               onClickVideo={this.props.onClickContentItem}
-                                              key={contentItem.get("slug")}/>;
+                                              key={contentItem.get("slug")}
+                                              completed={completed}
+                                              inProgress={inProgress} />;
                     }
                     return <ArticleListItem article={contentItem}
-                                      onClickArticle={this.props.onClickContentItem}
-                                      key={contentItem.get("slug")}/>;
+                                            onClickArticle={this.props.onClickContentItem}
+                                            key={contentItem.get("slug")}
+                                            completed={completed}
+                                            inProgress={inProgress} />;
                 });
             }
 
