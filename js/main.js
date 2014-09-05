@@ -4,8 +4,8 @@
 
 "use strict";
 
-define(["react", "models", "ka", "storage", "downloads"],
-        function(React, models, KA, Storage, Downloads) {
+define(["react", "models", "ka", "cache", "storage", "downloads"],
+        function(React, models, KA, Cache, Storage, Downloads) {
     var cx = React.addons.classSet;
 
     function partial( fn /*, args...*/) {
@@ -858,32 +858,17 @@ define(["react", "models", "ka", "storage", "downloads"],
     var mountNode = document.getElementById("app");
 
     // Init everything
-    $.when(Storage.init(), KA.APIClient.init(), Downloads.init()).done(function(topicData) {
+    $.when(Storage.init(), KA.APIClient.init(), Downloads.init(), Cache.init()).done(function(topicData) {
         KA.APIClient.getTopicTree().done(function(topicTreeData) {
             var topic = new models.TopicModel(topicTreeData, {parse: true});
             React.renderComponent(<MainView model={topic}/>, mountNode);
             Storage.readText("data.json").done(function(data) {
                 console.log('read: ' + data);
             });
-            if (KA.APIClient.isLoggedIn()) {
-
-                // TODO: This should be called, but will eventually be moved into
-                // some sort of cache update part of the code.
-                // The call is needed so we get KA.APIClient.videoProgress
-                KA.APIClient.getUserVideos();
-                KA.APIClient.getUserProgress().done(function(completedEntities, startedEntities) {
-                    console.log("getUserProgress:");
-                    console.log(completedEntities);
-                    console.log(startedEntities);
-                });
-            } else {
-                console.log('Not logged in!');
-            }
 
             // TODO: remove, just for easy inpsection
-            window.topic = topic;
+            window.rootTopic = topic;
             window.KA = KA;
-            window.React = React;
         });
      });
 });
