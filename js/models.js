@@ -1,4 +1,4 @@
-define([], function() {
+define(["ka"], function(KA) {
     var TopicTreeBase = {
         isTopic: function() {
             return false;
@@ -41,6 +41,48 @@ define([], function() {
     var TopicTreeModel = Backbone.Model.extend(TopicTreeBase);
     var TopicTreeCollection = Backbone.Collection.extend(TopicTreeBase);
 
+
+    /**
+     * Provides a fast lookup for an individual content item
+     * This is used for downloads manager so we don't have to have multiple
+     * models representing a single entity.
+     * It's not used for search just because the root of search isn't always
+     * equal to 'all' items.
+     * This isn't an actual backbone model (yet)
+     */
+    var TopicTree = {
+        init: function() {
+            var d = $.Deferred();
+            KA.APIClient.getTopicTree().done((topicTreeData) => {
+                this.root = new TopicModel(topicTreeData, {parse: true});
+                d.resolve();
+            });
+            return d.promise();
+        },
+        allContentItems: [],
+
+        /**
+         * Given an id, returns the model corresponding to that id
+         */
+        getContentItemById: function(id) {
+            return _(this.allContentItems).find(function(model) {
+                return model.get("id") === id;
+            });
+        },
+        /**
+         * Much more efficient version of the above if you needs multiple ID
+         * lookup, such as what download manager does.
+         * It will only iterate over all of the content items once, but will
+         * iterate over the passed in ids multiple times.
+         */
+        getContentItemsByIds: function(ids) {
+            return _(this.allContentItems).filter(function(model) {
+                return ids.indexOf(model.get("id")) != -1;
+            });
+        }
+    };
+
+
     var TopicModel = TopicTreeModel.extend({
         url: "/knowledge-map.json",
         initialize: function() {
@@ -52,9 +94,6 @@ define([], function() {
             if (_.isUndefined(maxResults)) {
                 maxResults = 100;
             }
-            window.searchit = this;
-            // TODO: This needs to go in a worker and have the reuslts sent
-            // back in a callback. Or at least incrementally build the list.
             var results = [];
             this._findContentItems(search, results);
             return results.slice(0, maxResults);
@@ -113,6 +152,7 @@ define([], function() {
                 });
                 response.topics = new TopicList(topics, {parse: true});
                 response.contentItems = new ContentList(contentItems, {parse: true});
+                TopicTree.allContentItems.push.apply(TopicTree.allContentItems, response.contentItems.models);
             }.bind(this);
 
             parseTopicChildren(response);
@@ -176,13 +216,15 @@ define([], function() {
     });
 
     return {
-        TopicModel: TopicModel,
-        ContentModel: ContentModel,
-        VideoModel: VideoModel,
-        ArticleModel: ArticleModel,
-        TopicList: TopicList,
-        ContentList: ContentList,
-        VideoList: VideoList,
-        ArticleList: ArticleList,
+        TopicModel,
+        ContentModel,
+        VideoModel,
+        ArticleModel,
+        TopicList,
+        ContentList,
+        VideoList,
+        ArticleList,
+        TopicTree,
+        CurrentUser: new UserModel()
     };
 });

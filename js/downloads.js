@@ -26,13 +26,10 @@ define(["storage", "models", "notifications"],
          * Writes out the manifest file, which keeps track of downloaded data
          */
         _writeManifest: function() {
-            var contentListCopy = _(this.contentList.models).map((model) => {
-                var modelCopy = jQuery.extend(true, {}, model.attributes);
-                delete modelCopy.parent;
-                modelCopy.downloaded = true;
-                return modelCopy;
+            var contentListIds = this.contentList.models.map(function(model) {
+                return model.get("id");
             });
-            var jsonManifest = JSON.stringify(contentListCopy);
+            var jsonManifest = JSON.stringify(contentListIds);
             return Storage.writeText(this.manifestFilename, jsonManifest);
         },
         /**
@@ -41,11 +38,15 @@ define(["storage", "models", "notifications"],
         _readManifest: function() {
             var d = $.Deferred();
             Storage.readText(this.manifestFilename).done((data) => {
-                var videoList;
+                var videoListIds;
                 if (data) {
-                    videoList = JSON.parse(data);
+                    videoListIds = JSON.parse(data);
                 }
-                this.contentList = new models.ContentList(videoList);
+                var contentListModels = models.TopicTree.getContentItemsByIds(videoListIds);
+                _(contentListModels).each(function(model) {
+                    model.set("downloaded", true);
+                });
+                this.contentList = new models.ContentList(contentListModels);
                 d.resolve();
             }).fail(() => {
                 d.reject();
@@ -98,6 +99,7 @@ define(["storage", "models", "notifications"],
          * Adds the specified model to the list of downloaded files
          */
         _addDownloadToManifest: function(model) {
+            model.set("isDownloaded", true);
             console.log('adding model to manifest: ');
             console.log(model);
             this.contentList.push(model);
@@ -112,7 +114,7 @@ define(["storage", "models", "notifications"],
             this.contentList.remove(model);
             this._writeManifest();
         },
-        manifestFilename: "downloads-manifest.json"
+        manifestFilename: "download-manifest.json"
     }
 
     return Downloads;
