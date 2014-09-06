@@ -224,7 +224,6 @@ define(["ka"], function(KA) {
         ContentList,
         VideoList,
         ArticleList,
-        TopicTree,
-        CurrentUser: new UserModel()
+        TopicTree
     };
 });

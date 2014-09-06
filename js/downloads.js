@@ -99,7 +99,7 @@ define(["storage", "models", "notifications"],
          * Adds the specified model to the list of downloaded files
          */
         _addDownloadToManifest: function(model) {
-            model.set("isDownloaded", true);
+            model.set("downloaded", true);
             console.log('adding model to manifest: ');
             console.log(model);
             this.contentList.push(model);

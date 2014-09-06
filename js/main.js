@@ -735,7 +735,7 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
             }
 
             this.setState({
-                currentModel: model.get("parent")
+                currentModel: model.get("parent"),
                 showProfile: false,
                 showDownloads: false
             });
@@ -763,8 +763,6 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
             });
         },
         onClickDownloadVideo: function(video) {
-            var videoAttributes = jQuery.extend(true, {}, video.attributes);
-            delete videoAttributes.parent;
             Downloads.downloadVideo(video);
         },
         onClickDeleteDownloadedVideo: function(video) {
