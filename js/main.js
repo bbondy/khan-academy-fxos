@@ -8,6 +8,10 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
         function(React, models, KA, Cache, Storage, Downloads) {
     var cx = React.addons.classSet;
 
+    // TODO: remove, just for easy inpsection
+    window.KA = KA;
+    window.models = models;
+
     function partial( fn /*, args...*/) {
       var aps = Array.prototype.slice;
       var args = aps.call(arguments, 1);
@@ -730,15 +734,8 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
                 return this.onTopicSearch("");
             }
 
-            var currentModel = model.get("parent");
-            // If we have a download, reset back to root which
-            // is stored in this.props.model.
-            if (model.isContent() && model.isDownloaded()) {
-                currentModel = this.props.model;
-            }
-
             this.setState({
-                currentModel: currentModel,
+                currentModel: model.get("parent")
                 showProfile: false,
                 showDownloads: false
             });
@@ -864,17 +861,18 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
     var mountNode = document.getElementById("app");
 
     // Init everything
-    $.when(Storage.init(), KA.APIClient.init(), Downloads.init(), Cache.init()).done(function(topicData) {
-        KA.APIClient.getTopicTree().done(function(topicTreeData) {
-            var topic = new models.TopicModel(topicTreeData, {parse: true});
-            React.renderComponent(<MainView model={topic}/>, mountNode);
-            Storage.readText("data.json").done(function(data) {
-                console.log('read: ' + data);
-            });
+    Storage.init().then(function(){
+      return KA.APIClient.init();
+    }).then(function() {
+        return models.TopicTree.init();
+    }).then(function() {
+        return $.when(Downloads.init(), Cache.init());
+    }).then(function() {
+        React.renderComponent(<MainView model={models.TopicTree.root}/>, mountNode);
 
-            // TODO: remove, just for easy inpsection
-            window.rootTopic = topic;
-            window.KA = KA;
+        // TODO: Remove or move ???
+        Storage.readText("data.json").done(function(data) {
+            console.log('read: ' + data);
         });
-     });
+    });
 });
