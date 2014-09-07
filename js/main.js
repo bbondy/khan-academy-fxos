@@ -12,14 +12,6 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
     window.KA = KA;
     window.models = models;
 
-    function partial( fn /*, args...*/) {
-      var aps = Array.prototype.slice;
-      var args = aps.call(arguments, 1);
-      return function() {
-        return fn.apply(this, args.concat(aps.call(arguments)));
-      };
-    }
-
     /**
      * Represents a single root, domain, subject, topic, or tutorial
      * item in the topic list.
@@ -41,7 +33,7 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
 
             return <li className={topicClass}>
                 { this.props.topic.isRootChild() ? <div className="color-block"/> : null }
-                <a href="#" onClick={partial(this.props.onClickTopic, this.props.topic)}>
+                <a href="#" onClick={KA.Util.partial(this.props.onClickTopic, this.props.topic)}>
                     <p className="topic-title">{this.props.topic.get("title")}</p>
                 </a>
             </li>;
@@ -84,12 +76,12 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
             var videoClass = cx(videoClassObj);
             return <li className={videoClass}>
                 <div className={subwayIconClass}>
-                    <a href="#" onClick={partial(this.props.onClickVideo, this.props.video)}>
+                    <a href="#" onClick={KA.Util.partial(this.props.onClickVideo, this.props.video)}>
                         <div className={videoNodeClass}/>
                     </a>
                     <div className={pipeClass}/>
                 </div>
-                <a href="#" onClick={partial(this.props.onClickVideo, this.props.video)}>
+                <a href="#" onClick={KA.Util.partial(this.props.onClickVideo, this.props.video)}>
                     <p className="video-title">{this.props.video.get("title")}</p>
                 </a>
             </li>;
@@ -128,12 +120,12 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
             var articleClass = cx(articleClassObj);
             return <li className={articleClass}>
                 <div className={subwayIconClass}>
-                    <a href="#" onClick={partial(this.props.onClickArticle, this.props.article)}>
+                    <a href="#" onClick={KA.Util.partial(this.props.onClickArticle, this.props.article)}>
                         <div className={articleNodeClass}/>
                     </a>
                     <div className={pipeClass}/>
                 </div>
-                <a href="#" onClick={partial(this.props.onClickArticle, this.props.article)}>
+                <a href="#" onClick={KA.Util.partial(this.props.onClickArticle, this.props.article)}>
                     <p className="article-title">{this.props.article.get("title")}</p>
                 </a>
             </li>;
@@ -149,7 +141,7 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
     var BackButton = React.createClass({
         render: function() {
             return <div>
-                <a className="icon-back-link " href="#" onClick={partial(this.props.onClickBack, this.props.model)}>
+                <a className="icon-back-link " href="#" onClick={KA.Util.partial(this.props.onClickBack, this.props.model)}>
                     <span className="icon icon-back">Back</span>
                 </a>
             </div>;
@@ -268,7 +260,7 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
             var startSecond = this.props.transcriptItem.start_time / 1000 % 60 | 0;
             startSecond = ("0" + startSecond).slice(-2);
             return <li className="transcript-item">
-                <a href="#" onClick={partial(this.props.onClickTranscript, this.props.transcriptItem)}>
+                <a href="#" onClick={KA.Util.partial(this.props.onClickTranscript, this.props.transcriptItem)}>
                     <div>{startMinute}:{startSecond}</div>
                     <div>{this.props.transcriptItem.text}</div>
                 </a>
@@ -554,11 +546,11 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
             if (this.props.currentModel && this.props.currentModel.isVideo()) {
                 if (this.props.currentModel.isDownloaded()) {
                     items.push(<li className="hot-item">
-                            <a href="#" onClick={partial(this.props.onClickDeleteDownloadedVideo, this.props.currentModel)}>Delete downloaded video</a>
+                            <a href="#" onClick={KA.Util.partial(this.props.onClickDeleteDownloadedVideo, this.props.currentModel)}>Delete downloaded video</a>
                         </li>);
                 } else {
                     items.push(<li className="hot-item">
-                            <a href="#" onClick={partial(this.props.onClickDownloadVideo, this.props.currentModel)}>Download video</a>
+                            <a href="#" onClick={KA.Util.partial(this.props.onClickDownloadVideo, this.props.currentModel)}>Download video</a>
                         </li>);
                 }
             }
