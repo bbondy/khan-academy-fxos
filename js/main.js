@@ -20,20 +20,6 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
       };
     }
 
-    var DomainColorMap = {
-        "new-and-noteworthy": "#ffffff",
-        "math": "#156278",
-        "science": "#822F3D",
-        "economics-finance-domain": "#BB7B31",
-        "humanities": "#C43931",
-        "computing": "#568F3D",
-        "test-prep": "#512D60",
-        "partner-content": "#399B7C",
-        "talks-and-interviews": "#3C5466",
-        "coach-res": "#3C5466",
-        "::app-search": "#3C5466"
-    };
-
     /**
      * Represents a single root, domain, subject, topic, or tutorial
      * item in the topic list.
@@ -53,14 +39,8 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
             topicClassObj[parentDomain.get("id")] = true;
             var topicClass = cx(topicClassObj);
 
-            var divStyle = {
-                float: "left;",
-                width: "12px;",
-                height: "100%",
-                backgroundColor: DomainColorMap[this.props.topic.get("slug")]
-            };
             return <li className={topicClass}>
-                { this.props.topic.isRootChild() ? <div style={divStyle}/> : null }
+                { this.props.topic.isRootChild() ? <div className="color-block"/> : null }
                 <a href="#" onClick={partial(this.props.onClickTopic, this.props.topic)}>
                     <p className="topic-title">{this.props.topic.get("title")}</p>
                 </a>
@@ -495,16 +475,16 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
                                              onClickBack={this.props.onClickBack}/>;
                 }
 
-                var style;
+                var styleObj = { fixed: true };
                 var parentDomain = this.props.model.getParentDomain();
+                console.log('parentDomain: ');
+                console.log(parentDomain);
                 if (parentDomain) {
-                    var domainColor = DomainColorMap[parentDomain.get("slug")];
-                    if (domainColor) {
-                        style = {
-                            backgroundColor: domainColor
-                        };
-                    }
+                    styleObj[parentDomain.get("id")] = true;
                 }
+                var styleClass = cx(styleObj);
+                console.log('styleClass!');
+                console.log(styleClass);
 
                 var title = "Khan Academy";
                 if (this.props.isDownloadsShowing) {
@@ -517,7 +497,7 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
                     title = "Search";
                 }
 
-                return <header className="fixed" style={style}>
+                return <header className={styleClass}>
                         {backButton}
                         <MenuButton/>
                         <h1 className="header-title">{title}</h1>
