@@ -5,6 +5,9 @@
  * This includes:
  *   - Keeping the topic tree up to date
  *   - Keeping watched videos up to date
+ *
+ * Nothing in this module should be required to run.
+ * init will not wait for the result.
  */
 
 define(["ka"],
