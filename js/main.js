@@ -539,14 +539,14 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
         render: function() {
             var items = [];
 
-            if (this.props.currentModel && this.props.currentModel.isVideo()) {
-                if (this.props.currentModel.isDownloaded()) {
+            if (this.props.model && this.props.model.isVideo()) {
+                if (this.props.model.isDownloaded()) {
                     items.push(<li className="hot-item">
-                            <a href="#" onClick={KA.Util.partial(this.props.onClickDeleteDownloadedVideo, this.props.currentModel)}>Delete downloaded video</a>
+                            <a href="#" onClick={KA.Util.partial(this.props.onClickDeleteDownloadedVideo, this.props.model)}>Delete downloaded video</a>
                         </li>);
                 } else {
                     items.push(<li className="hot-item">
-                            <a href="#" onClick={KA.Util.partial(this.props.onClickDownloadVideo, this.props.currentModel)}>Download video</a>
+                            <a href="#" onClick={KA.Util.partial(this.props.onClickDownloadVideo, this.props.model)}>Download video</a>
                         </li>);
                 }
             }
@@ -684,6 +684,10 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
      * for the overall top level view (which is nice and clean ;)).
      */
     var MainView = React.createClass({
+        mixins: [KA.Util.BackboneMixin],
+        getBackboneModels: function() {
+            return [new models.ContentList(models.TopicTree.allContentItems)];
+        },
         componentWillMount: function() {
         },
         getInitialState: function() {
@@ -813,7 +817,7 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
             }
 
             return <section className="current" id="index" data-position="current">
-                <Sidebar currentModel={currentModel}
+                <Sidebar model={currentModel}
                          onClickSignin={this.onClickSignin}
                          onClickSignout={this.onClickSignout}
                          onClickProfile={this.onClickProfile}
