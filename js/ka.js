@@ -67,7 +67,7 @@ define(["oauth", "storage"], function(_oauth, Storage) {
         _getSecrets: function() {
             return $.ajax({
                 url: "/secrets.json",
-                timeout: 5000,
+                timeout: 15000,
                 dataType: "json",
             });
         },
@@ -76,7 +76,7 @@ define(["oauth", "storage"], function(_oauth, Storage) {
                 type: "GET",
                 url: this.API_BASE + "/auth/access_token",
                 oauthCallback: this._oauthCallback,
-                timeout: 5000,
+                timeout: 15000,
                 success: (data) => {
                     this.oauth.token = Util.getParameterByName("oauth_token", data);
                     this.oauth.tokenSecret = Util.getParameterByName("oauth_token_secret", data);
@@ -152,7 +152,7 @@ define(["oauth", "storage"], function(_oauth, Storage) {
             $.oauth($.extend( {}, this.oauth, {
                 type: method,
                 url: url,
-                timeout: 10000,
+                timeout: 15000,
                 dataType: "json",
                 success: (data) => {
                     d.resolve(data);
