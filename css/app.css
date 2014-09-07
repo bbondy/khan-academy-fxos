@@ -467,3 +467,15 @@ article {
 .topic-list-container {
     height: 100% !important;
 }
+
+.energy-points {
+    display: inline;
+    background: #005a88;
+    line-height: 18px;
+    text-align: center;
+    padding: 2px 5px 3px;
+    color: white;
+    font-family: 'Proxima Nova',sans-serif;
+    text-shadow: none;
+    border-radius: 5px;
+}
