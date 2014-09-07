@@ -469,14 +469,10 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
 
                 var styleObj = { fixed: true };
                 var parentDomain = this.props.model.getParentDomain();
-                console.log('parentDomain: ');
-                console.log(parentDomain);
                 if (parentDomain) {
                     styleObj[parentDomain.get("id")] = true;
                 }
                 var styleClass = cx(styleObj);
-                console.log('styleClass!');
-                console.log(styleClass);
 
                 var title = "Khan Academy";
                 if (this.props.isDownloadsShowing) {
@@ -592,6 +588,12 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
      */
     var DownloadsViewer = React.createClass({
         render: function() {
+            if (!Downloads.contentList.length) {
+                return <div className="downloads">
+                    <h1>You have no downloads yet!</h1>
+                </div>;
+            }
+
             var control = <ContentListViewer collection={Downloads.contentList}
                                              onClickContentItem={this.props.onClickContentItem} />;
             return <div className="downloads">
