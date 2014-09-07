@@ -30,6 +30,13 @@ define(["oauth", "storage"], function(_oauth, Storage) {
                 return 0;
             }
             return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        },
+        partial: function( fn /*, args...*/) {
+          var aps = Array.prototype.slice;
+          var args = aps.call(arguments, 1);
+          return function() {
+              return fn.apply(this, args.concat(aps.call(arguments)));
+          }
         }
     };
 
