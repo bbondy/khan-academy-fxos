@@ -109,6 +109,7 @@ define(["storage", "models", "notifications"],
          * Remove the specified model from the list of downloaded files
          */
         _removeDownloadFromManifest: function(model) {
+            model.set("downloaded", false);
             console.log('removing model from manifest: ');
             console.log(model);
             this.contentList.remove(model);
