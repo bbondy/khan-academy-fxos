@@ -206,7 +206,7 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
                             {contentItems}
                             </ul>
                     </section>;
-            return <div>
+            return <div className="topic-list-container">
                     {topicList}
             </div>;
         }
@@ -244,7 +244,7 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
                 </ul>
             </section>;
 
-            return <div>
+            return <div className="topic-list-container">
                     {topicList}
             </div>;
         }
@@ -596,7 +596,21 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
 
             var control = <ContentListViewer collection={Downloads.contentList}
                                              onClickContentItem={this.props.onClickContentItem} />;
-            return <div className="downloads">
+            return <div className="downloads topic-list-container">
+                {control}
+            </div>;
+        }
+    });
+
+    /**
+     * Represents a search result list which is basically just a wrapper around a
+     * ContentListViewer for now.
+     */
+    var SearchResultsViewer = React.createClass({
+        render: function() {
+            var control = <ContentListViewer collection={this.props.collection}
+                                             onClickContentItem={this.props.onClickContentItem} />;
+            return <div className="topic-list-container">
                 {control}
             </div>;
         }
@@ -782,8 +796,8 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
                                        onClickTopic={this.onClickTopic}
                                        onClickContentItem={this.onClickContentItem}/>;
             } else if (currentModel.isContentList()) {
-                control = <ContentListViewer collection={currentModel}
-                                             onClickContentItem={this.onClickContentItem} />;
+                control = <SearchResultsViewer collection={currentModel}
+                                               onClickContentItem={this.onClickContentItem} />;
             } else if (currentModel.isVideo()) {
                 control = <VideoViewer  video={this.getCurrentModel()}/>;
             } else if (currentModel.isArticle()) {
