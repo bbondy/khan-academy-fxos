@@ -2,10 +2,19 @@
 
 define(["oauth", "storage"], function(_oauth, Storage) {
 
+    /**
+     * Various utility functions
+     */
     var Util = {
+        /**
+         * Returns true when run within a gaia environment
+         */
         isFirefoxOS: function() {
             return window.location.protocol === 'app:';
         },
+        /**
+         * Obtains a URL query parameter
+         */
         getParameterByName: function(name, params) {
             if (_.isUndefined(params)) {
                 params = window.location.search;
@@ -16,6 +25,9 @@ define(["oauth", "storage"], function(_oauth, Storage) {
             var match = RegExp('[?&]' + name + '=([^&]*)').exec(params);
             return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
         },
+        /**
+         * Adds a query parameter to the specified url
+         */
         appendQueryParam: function(url, name, value) {
             if (url.indexOf("?") == -1) {
                 url += "?";
@@ -24,13 +36,19 @@ define(["oauth", "storage"], function(_oauth, Storage) {
             }
             return url + name + "=" + value;
         },
-        // http://stackoverflow.com/a/2901298/3153
+        /**
+         * Formats a number with thousand separators
+         * http://stackoverflow.com/a/2901298/3153
+         */
         numberWithCommas: function(x) {
             if (_.isUndefined(x)) {
                 return 0;
             }
             return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         },
+        /**
+         * Binds a set of arguments to a function without modifying the bound `this`
+         */
         partial: function( fn /*, args...*/) {
           var aps = Array.prototype.slice;
           var args = aps.call(arguments, 1);
@@ -40,6 +58,9 @@ define(["oauth", "storage"], function(_oauth, Storage) {
         }
     };
 
+    /**
+     * Client side library for the KA API
+     */
     var APIClient = {
         oauth: {
             consumerKey: "",
