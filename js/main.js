@@ -643,7 +643,7 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
             return <div className="profile">
                 <img className="avatar" src={this.state.avatarUrl}/>
                 <h1>{this.state.nickname || this.state.username}</h1>
-                <h2>Points: {KA.Util.numberWithCommas(this.state.points)}</h2>
+                <h2>Points: <div className="energy-points">{KA.Util.numberWithCommas(this.state.points)}</div></h2>
 
                 { this.state.badgeCounts ?
                     <div>
