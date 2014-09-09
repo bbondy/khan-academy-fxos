@@ -141,11 +141,11 @@ define(["oauth", "storage"], function(_oauth, Storage) {
                 }
             }));
         },
-        isLoggedIn: function() {
-            return this.oauth.consumerKey &&
+        isSignedIn: function() {
+            return !!(this.oauth.consumerKey &&
                 this.oauth.consumerSecret &&
                 this.oauth.token &&
-                this.oauth.tokenSecret;
+                this.oauth.tokenSecret);
         },
         init: function() {
             // If a login is not in progress, then load the auth info
@@ -179,7 +179,7 @@ define(["oauth", "storage"], function(_oauth, Storage) {
             });
             return d.promise();
         },
-        login: function() {
+        signIn: function() {
             // Start the oauth process by redirecting them to the request_token url
             var url = $.getURL($.extend( {}, this.oauth, {
                 url: this.API_BASE + "/auth/request_token",
@@ -187,7 +187,7 @@ define(["oauth", "storage"], function(_oauth, Storage) {
             }));
             window.location = url;
         },
-        logout: function() {
+        signOut: function() {
             this.oauth.token = "";
             this.oauth.tokenSecret = "";
             this._saveAuth();
