@@ -215,6 +215,18 @@ define(["ka"], function(KA) {
         }
     });
 
+    var UserModel = Backbone.Model.extend({
+        signIn: function() {
+            return KA.APIClient.signIn();
+        },
+        signOut: function() {
+            return KA.APIClient.signOut();
+        },
+        isSignedIn: function() {
+            return KA.APIClient.isSignedIn();
+        }
+    });
+
     return {
         TopicModel,
         ContentModel,
@@ -224,6 +236,7 @@ define(["ka"], function(KA) {
         ContentList,
         VideoList,
         ArticleList,
-        TopicTree
+        TopicTree,
+        CurrentUser: new UserModel()
     };
 });

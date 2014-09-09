@@ -26,7 +26,7 @@ define(["ka"],
         },
         heartbeat: function() {
             console.log('heartbeat!');
-            if (KA.APIClient.isLoggedIn()) {
+            if (KA.APIClient.isSignedIn()) {
                 console.log('user is logged in, getting usr videos and entity progress');
                 // The call is needed so we get KA.APIClient.videoProgress
                 // which tells us the duration of each watched item.
