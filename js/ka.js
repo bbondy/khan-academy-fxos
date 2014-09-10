@@ -299,8 +299,6 @@ define(["oauth", "storage"], function(_oauth, Storage) {
                         this.videosProgress[result.video.id] = result.last_second_watched
                     }
                 });
-                console.log('videos progress:');
-                console.log(this.videosProgress);
                 d.resolve(results);
             });
             return d.promise();

@@ -10,8 +10,8 @@
  * init will not wait for the result.
  */
 
-define(["ka"],
-        function(KA) {
+define(["ka", "models"],
+        function(KA, models) {
 
     var Cache = {
         /**
@@ -26,22 +26,7 @@ define(["ka"],
         },
         heartbeat: function() {
             console.log('heartbeat!');
-            if (KA.APIClient.isSignedIn()) {
-                console.log('user is logged in, getting usr videos and entity progress');
-                // The call is needed so we get KA.APIClient.videoProgress
-                // which tells us the duration of each watched item.
-                KA.APIClient.getUserVideos();
-
-                // The calli s needed so we get KA.APIClient.completedEntities
-                // Which is used for completed/in progress tatus of content items
-                KA.APIClient.getUserProgress().done(function(completedEntities, startedEntities) {
-                       console.log("getUserProgress:");
-                       console.log(completedEntities);
-                       console.log(startedEntities);
-                });
-            } else {
-                console.log('user is not logged in');
-            }
+            models.CurrentUser.refreshLoggedInInfo();
         }
     }
 

@@ -217,13 +217,43 @@ define(["ka"], function(KA) {
 
     var UserModel = Backbone.Model.extend({
         signIn: function() {
-            return KA.APIClient.signIn();
+            var d = $.Deferred();
+            return KA.APIClient.signIn().done(() => {
+                this.refreshLoggedInInfo();
+                // We don't need to wait for the result of the
+                // refreshLoggedInInfo promise, just resolve right away.
+                d.resolve();
+            });
+            return d.promise();
         },
         signOut: function() {
             return KA.APIClient.signOut();
         },
         isSignedIn: function() {
             return KA.APIClient.isSignedIn();
+        },
+        refreshLoggedInInfo: function() {
+            var d = $.Deferred();
+            if (!this.isSignedIn()) {
+                return d.resolve().promise();
+            }
+
+            // The calli s needed so we get KA.APIClient.completedEntities
+            // Which is used for completed/in progress tatus of content items
+            KA.APIClient.getUserProgress().done(function(completedEntities, startedEntities) {
+                console.log("getUserProgress:");
+                console.log(completedEntities);
+                console.log(startedEntities);
+
+                // The call is needed so we get KA.APIClient.videoProgress
+                // which tells us the duration of each watched item.
+                KA.APIClient.getUserVideos().done(function(results) {
+                    console.log('getUserVideos')
+                    console.log(results);
+                    d.resolve();
+                });
+            });
+            return d.promise();
         }
     });
 
