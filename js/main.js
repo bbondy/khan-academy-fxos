@@ -405,7 +405,7 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
         // Reports the seconds watched to the server if it hasn't been reported recently
         // or if the lastSecondWatched is at the end of the video.
         reportSecondsWatched: function() {
-            if (!KA.APIClient.isSignedIn()) {
+            if (!models.CurrentUser.isSignedIn()) {
                 return;
             }
 
@@ -551,7 +551,7 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
                 }
             }
 
-            if (KA.APIClient.isSignedIn()) {
+            if (models.CurrentUser.isSignedIn()) {
                 // User is signed in, add all the signed in options here
                 items.push(<li><a href="#" onClick={this.props.onClickProfile}>View profile</a></li>);
             } else {
@@ -562,7 +562,7 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
 
 
             // Add the signout button last
-            if (KA.APIClient.isSignedIn()) {
+            if (models.CurrentUser.isSignedIn()) {
                 items.push(<li><a href="#" onClick={this.props.onClickSignout}>Sign out</a></li>);
             }
 
