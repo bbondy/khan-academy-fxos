@@ -257,6 +257,27 @@ define(["ka"], function(KA) {
         }
     });
 
+    /**
+     * Stores app level options in local storage
+     */
+    var AppOptionsModel = Backbone.Model.extend({
+        defaults: {
+            showDownloadsOnly: false
+        },
+        sync: function(method, model, options) {
+            if (method === "create" || method === "update") {
+                localStorage.setItem(this._name, JSON.stringify(this.toJSON()));
+            } else if (method === "read") {
+                var result = localStorage.getItem(this._name);
+                this.attributes = this.parse(JSON.parse(result));
+            } else if (method === "delete") {
+                // You can't delete options!
+            }
+            return $.Deferred().resolve().promise();
+        },
+        _name: "appOptions.json"
+    });
+
     return {
         TopicModel,
         ContentModel,
@@ -267,6 +288,7 @@ define(["ka"], function(KA) {
         VideoList,
         ArticleList,
         TopicTree,
+        AppOptions: new AppOptionsModel(),
         CurrentUser: new UserModel()
     };
 });
