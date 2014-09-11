@@ -553,12 +553,13 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
 
             if (models.CurrentUser.isSignedIn()) {
                 // User is signed in, add all the signed in options here
-                items.push(<li><a href="#" onClick={this.props.onClickProfile}>View profile</a></li>);
+                items.push(<li><a href="#" onClick={this.props.onClickProfile}>Profile</a></li>);
             } else {
                 // If the user is not signed in, add that option first
                 items.push(<li><a href="#" onClick={this.props.onClickSignin}>Sign in</a></li>);
             }
-            items.push(<li><a href="#" onClick={this.props.onClickDownloads}>View downloads</a></li>);
+            items.push(<li><a href="#" onClick={this.props.onClickSettings}>Settings</a></li>);
+            items.push(<li><a href="#" onClick={this.props.onClickDownloads}>Downloads</a></li>);
 
 
             // Add the signout button last
@@ -598,6 +599,26 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
                                              onClickContentItem={this.props.onClickContentItem} />;
             return <div className="downloads topic-list-container">
                 {control}
+            </div>;
+        }
+    });
+
+    /**
+     * Represents a list of settings which can be modified which affect
+     * global state.
+     */
+    var SettingsViewer = React.createClass({
+        handleChange: function(event) {
+            this.props.options.set("showDownloadsOnly", event.target.checked);
+            this.props.options.save();
+        },
+        render: function() {
+            console.log('rendering for value of: ' + this.props.options.get("showDownloadsOnly"));
+            return <div className="settings topic-list-container">
+                <input title="hello" ref="showDownloadsOnly"
+                       type="checkbox"
+                       checked={this.props.options.get("showDownloadsOnly")}
+                       onChange={this.handleChange}>Show downloads only</input>
             </div>;
         }
     });
@@ -686,7 +707,8 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
     var MainView = React.createClass({
         mixins: [KA.Util.BackboneMixin],
         getBackboneModels: function() {
-            return [new models.ContentList(models.TopicTree.allContentItems)];
+            return [new models.ContentList(models.TopicTree.allContentItems),
+                models.AppOptions, models.CurrentUser];
         },
         componentWillMount: function() {
         },
@@ -699,14 +721,16 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
             this.setState({
                 currentModel: model,
                 showProfile: false,
-                 showDownloads: false
+                showDownloads: false,
+                showSettings: false
             });
         },
         onClickTopic: function(model) {
             this.setState({
                 currentModel: model,
                 showProfile: false,
-                showDownloads: false
+                showDownloads: false,
+                showSettings: false
             });
         },
         onClickBack: function(model) {
@@ -714,7 +738,8 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
             if (this.isPaneShowing()) {
                 this.setState({
                     showDownloads: false,
-                    showProfile: false
+                    showProfile: false,
+                    showSettings: false
                 });
                 if (this.state.currentModel.isContentList()) {
                     this.onTopicSearch("");
@@ -729,7 +754,8 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
             this.setState({
                 currentModel: model.get("parent"),
                 showProfile: false,
-                showDownloads: false
+                showDownloads: false,
+                showSettings: false
             });
         },
         onClickSignin: function() {
@@ -744,14 +770,24 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
             console.log('Click profile');
             this.setState({
                 showProfile: true,
-                showDownloads: false
+                showDownloads: false,
+                showSettings: false
             });
         },
         onClickDownloads: function(model) {
             console.log('Click downloads');
             this.setState({
                 showDownloads: true,
-                showProfile: false
+                showProfile: false,
+                showSettings: false
+            });
+        },
+        onClickSettings: function(model) {
+            console.log('Click settings');
+            this.setState({
+                showDownloads: false,
+                showProfile: false,
+                showSettings: true
             });
         },
         onClickDownloadVideo: function(video) {
@@ -763,7 +799,8 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
         },
         isPaneShowing: function() {
             return this.state.showDownloads ||
-                this.state.showProfile;
+                this.state.showProfile ||
+                this.state.showSettings;
         },
         onTopicSearch: function(topicSearch) {
             if (!topicSearch) {
@@ -795,6 +832,9 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
             else if (this.state.showDownloads) {
                 control = <DownloadsViewer onClickContentItem={this.onClickContentItem} />;
             }
+            else if (this.state.showSettings) {
+                control = <SettingsViewer options={models.AppOptions }/>;
+            }
             else if (currentModel.isTopic()) {
                 control = <TopicViewer topic={currentModel}
                                        onClickTopic={this.onClickTopic}
@@ -822,6 +862,7 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
                          onClickSignout={this.onClickSignout}
                          onClickProfile={this.onClickProfile}
                          onClickDownloads={this.onClickDownloads}
+                         onClickSettings={this.onClickSettings}
                          onClickDownloadVideo={this.onClickDownloadVideo}
                          onClickDeleteDownloadedVideo={this.onClickDeleteDownloadedVideo}
                          />
@@ -856,7 +897,7 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
     }).then(function() {
         return models.TopicTree.init();
     }).then(function() {
-        return $.when(Downloads.init(), Cache.init());
+        return $.when(Downloads.init(), Cache.init(), models.AppOptions.fetch());
     }).then(function() {
         React.renderComponent(<MainView model={models.TopicTree.root}/>, mountNode);
 
