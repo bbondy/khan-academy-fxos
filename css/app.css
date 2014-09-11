@@ -50,6 +50,10 @@ input {
     box-sizing: border-box;
 }
 
+input[type="checkbox"] {
+    width: auto;
+}
+
 ul {
     margin-top: 10px;
 }
@@ -407,7 +411,7 @@ article {
     width: calc(100% - 2rem);
 }
 
-.profile, .downloads {
+.profile, .downloads, .settings {
     margin-left: 1rem;
     margin-top: 1rem;
 }
