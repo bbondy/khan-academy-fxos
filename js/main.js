@@ -25,7 +25,9 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
         },
         render: function() {
             var topicClassObj = {
-                'topic-item': true
+                'topic-item': true,
+                'faded': models.AppOptions.get("showDownloadsOnly") &&
+                    this.props.topic.get("downloadCount") === 0
             };
             var parentDomain = this.props.topic.getParentDomain();
             topicClassObj[parentDomain.get("id")] = true;
@@ -63,7 +65,9 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
                 'subway-icon': true
             };
             var videoClassObj = {
-                'video-item': true
+                'video-item': true,
+                'faded': models.AppOptions.get("showDownloadsOnly") &&
+                    !this.props.video.isDownloaded()
             };
             var parentDomain = this.props.video.getParentDomain();
             if (parentDomain) {
@@ -109,7 +113,9 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
                 'subway-icon': true
             };
             var articleClassObj = {
-                'article-item': true
+                'article-item': true,
+                'faded': models.AppOptions.get("showDownloadsOnly") &&
+                    !this.props.article.isDownloaded()
             };
             var parentDomain = this.props.article.getParentDomain();
             subwayIconClassObj[parentDomain.get("id")] = true;
