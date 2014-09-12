@@ -43,8 +43,8 @@ define(["storage", "models", "notifications"],
                     videoListIds = JSON.parse(data);
                 }
                 var contentListModels = models.TopicTree.getContentItemsByIds(videoListIds);
-                _(contentListModels).each(function(model) {
-                    model.set("downloaded", true);
+                _(contentListModels).each((model) => {
+                    this._setDownloaded(model, true);
                 });
                 this.contentList = new models.ContentList(contentListModels);
                 d.resolve();
@@ -52,6 +52,18 @@ define(["storage", "models", "notifications"],
                 d.reject();
             });
             return d.promise();
+        },
+        _setDownloaded: function(model, downloaded) {
+            model.set("downloaded", true);
+            while (model = model.get("parent")) {
+                var downloadCount = model.get("downloadCount");
+                if (downloaded) {
+                    downloadCount++;
+                } else {
+                    downloadCount--;
+                }
+                model.set("downloadCount", downloadCount);
+            }
         },
         findVideo: function(video) {
             var foundVideo = _(this.contentList.models).find(function(model) {
@@ -99,7 +111,7 @@ define(["storage", "models", "notifications"],
          * Adds the specified model to the list of downloaded files
          */
         _addDownloadToManifest: function(model) {
-            model.set("downloaded", true);
+            this._setDownloaded(model, true);
             console.log('adding model to manifest: ');
             console.log(model);
             this.contentList.push(model);
@@ -109,7 +121,7 @@ define(["storage", "models", "notifications"],
          * Remove the specified model from the list of downloaded files
          */
         _removeDownloadFromManifest: function(model) {
-            model.set("downloaded", false);
+            this._setDownloaded(model, false);
             console.log('removing model from manifest: ');
             console.log(model);
             this.contentList.remove(model);

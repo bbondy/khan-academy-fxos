@@ -487,3 +487,9 @@ article {
 label.pack-switch {
     margin-left: 1em;
 }
+
+li.faded p.topic-title,
+li.faded p.video-title,
+li.faded p.article-title {
+    color: #ccc;
+}

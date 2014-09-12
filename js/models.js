@@ -150,6 +150,7 @@ define(["ka"], function(KA) {
                 var contentItems = topic.children.filter(function(item) {
                     return item.kind === "Video" || item.kind === "Article";
                 });
+                response.downloadCount = 0;
                 response.topics = new TopicList(topics, {parse: true});
                 response.contentItems = new ContentList(contentItems, {parse: true});
                 TopicTree.allContentItems.push.apply(TopicTree.allContentItems, response.contentItems.models);
@@ -269,7 +270,10 @@ define(["ka"], function(KA) {
                 localStorage.setItem(this._name, JSON.stringify(this.toJSON()));
             } else if (method === "read") {
                 var result = localStorage.getItem(this._name);
-                this.attributes = this.parse(JSON.parse(result));
+                var attributes = this.parse(JSON.parse(result));
+                if (attributes) {
+                    this.attributes = attributes;
+                }
             } else if (method === "delete") {
                 // You can't delete options!
             }
