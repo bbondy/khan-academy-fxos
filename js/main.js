@@ -615,10 +615,15 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
         render: function() {
             console.log('rendering for value of: ' + this.props.options.get("showDownloadsOnly"));
             return <div className="settings topic-list-container">
+
+                <div>Show downloads only</div>
+                <label className="pack-switch">
                 <input title="hello" ref="showDownloadsOnly"
                        type="checkbox"
                        checked={this.props.options.get("showDownloadsOnly")}
-                       onChange={this.handleChange}>Show downloads only</input>
+                       onChange={this.handleChange}></input>
+                <span></span>
+                </label>
             </div>;
         }
     });

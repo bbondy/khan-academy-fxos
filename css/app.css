@@ -483,3 +483,7 @@ article {
     text-shadow: none;
     border-radius: 5px;
 }
+
+label.pack-switch {
+    margin-left: 1em;
+}
