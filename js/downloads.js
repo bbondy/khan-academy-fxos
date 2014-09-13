@@ -54,7 +54,7 @@ define(["storage", "models", "notifications"],
             return d.promise();
         },
         _setDownloaded: function(model, downloaded) {
-            model.set("downloaded", true);
+            model.set("downloaded", downloaded);
             while (model = model.get("parent")) {
                 var downloadCount = model.get("downloadCount");
                 if (downloaded) {
