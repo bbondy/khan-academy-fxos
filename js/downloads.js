@@ -65,12 +65,6 @@ define(["storage", "models", "notifications"],
                 model.set("downloadCount", downloadCount);
             }
         },
-        findVideo: function(video) {
-            var foundVideo = _(this.contentList.models).find(function(model) {
-                return model.get("id") === video.get("id");
-            });
-            return foundVideo;
-        },
         /**
          * Downloads the file at the specified URL and stores it to the
          * specified filename.

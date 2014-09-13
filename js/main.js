@@ -826,13 +826,8 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
             var contentList = new models.ContentList(results);
             this.setState({currentModel: contentList, searchingModel: searchingModel});
         },
-        /**
-         * Most of the time returns this.state.currentModel,
-         * but will return a donwloaded copy if it's available.
-         */
         getCurrentModel: function() {
-            return Downloads.findVideo(this.state.currentModel) ||
-                this.state.currentModel;
+            return this.state.currentModel;
         },
         render: function() {
             var currentModel = this.getCurrentModel();
