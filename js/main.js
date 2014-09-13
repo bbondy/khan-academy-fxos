@@ -301,9 +301,17 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
             return [this.props.article];
         },
         componentWillMount: function() {
-            KA.APIClient.getArticle(this.props.article.id).done((result) => {
-                this.props.article.set("content", result.translated_html_content);
-            });
+            if (this.props.article.isDownloaded()) {
+                Storage.readText(this.props.article.get("id")).done((result) => {
+                    console.log("rendered article from storage");
+                    this.props.article.set("content", result);
+                });
+            } else {
+                KA.APIClient.getArticle(this.props.article.id).done((result) => {
+                    console.log("rendered article from web");
+                    this.props.article.set("content", result.translated_html_content);
+                });
+            }
         },
         componentDidMount: function() {
             this.timerId = setTimeout(this.onReportComplete.bind(this), 5000);
