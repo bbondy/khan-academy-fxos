@@ -176,19 +176,22 @@ define(["ka"], function(KA) {
         },
         isDownloaded: function() {
             return !!this.get("downloaded");
+        },
+        getContentMimeType: function() {
+            return this.isVideo ? "video/mp4" : "text/html";
         }
     });
 
     var VideoModel = ContentModel.extend({
         isVideo: function() {
             return true;
-        },
+        }
     });
 
     var ArticleModel = ContentModel.extend({
         isArticle: function() {
             return true;
-        },
+        }
     });
 
     var TopicList = TopicTreeCollection.extend({

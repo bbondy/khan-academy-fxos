@@ -296,9 +296,13 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
      * display it to the user.
      */
     var ArticleViewer = React.createClass({
+        mixins: [KA.Util.BackboneMixin],
+        getBackboneModels: function() {
+            return [this.props.article];
+        },
         componentWillMount: function() {
             KA.APIClient.getArticle(this.props.article.id).done((result) => {
-                this.setState({content: result.translated_html_content});
+                this.props.article.set("content", result.translated_html_content);
             });
         },
         componentDidMount: function() {
@@ -310,15 +314,12 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
         componentWillUnmount: function() {
             clearTimeout(this.timerId);
         },
-        getInitialState: function() {
-            return {};
-        },
         render: function() {
             console.log("render article: ");
             console.log(this.props.article);
-            if (this.state.content) {
+            if (this.props.article.get("content")) {
                 return <article dangerouslySetInnerHTML={{
-                    __html: this.state.content
+                    __html: this.props.article.get("content")
                 }}/>
 
             }
@@ -545,14 +546,16 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
         render: function() {
             var items = [];
 
-            if (this.props.model && this.props.model.isVideo()) {
+            if (this.props.model && this.props.model.isContent()) {
                 if (this.props.model.isDownloaded()) {
+                    var text = this.props.model.isVideo() ? "Delete downloaded video" : "Delete downloaded article";
                     items.push(<li className="hot-item">
-                            <a href="#" onClick={KA.Util.partial(this.props.onClickDeleteDownloadedVideo, this.props.model)}>Delete downloaded video</a>
+                            <a href="#" onClick={KA.Util.partial(this.props.onClickDeleteDownloadedVideo, this.props.model)}>{{text}}</a>
                         </li>);
                 } else {
+                    var text = this.props.model.isVideo() ? "Download video" : "Download article";
                     items.push(<li className="hot-item">
-                            <a href="#" onClick={KA.Util.partial(this.props.onClickDownloadVideo, this.props.model)}>Download video</a>
+                            <a href="#" onClick={KA.Util.partial(this.props.onClickDownloadContent, this.props.model)}>{{text}}</a>
                         </li>);
                 }
             }
@@ -801,12 +804,12 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
                 showSettings: true
             });
         },
-        onClickDownloadVideo: function(video) {
-            Downloads.downloadVideo(video);
+        onClickDownloadContent: function(video) {
+            Downloads.downloadContent(video);
         },
         onClickDeleteDownloadedVideo: function(video) {
             console.log('click delete downloaded video');
-            Downloads.deleteVideo(video);
+            Downloads.deleteContent(video);
         },
         isPaneShowing: function() {
             return this.state.showDownloads ||
@@ -869,7 +872,7 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
                          onClickProfile={this.onClickProfile}
                          onClickDownloads={this.onClickDownloads}
                          onClickSettings={this.onClickSettings}
-                         onClickDownloadVideo={this.onClickDownloadVideo}
+                         onClickDownloadContent={this.onClickDownloadContent}
                          onClickDeleteDownloadedVideo={this.onClickDeleteDownloadedVideo}
                          />
                 <section id="main-content" role="region" className="skin-dark">

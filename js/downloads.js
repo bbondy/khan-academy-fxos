@@ -1,7 +1,7 @@
 "use strict";
 
 /**
- * Responsible for keeping of downloaded videos
+ * Responsible for keeping track of downloaded content.
  *   - Maintains a manifest of what's downloaded
  *   - Actually performs downloads
  *   - Provides the ability to delete those downloads
@@ -38,11 +38,11 @@ define(["storage", "models", "notifications"],
         _readManifest: function() {
             var d = $.Deferred();
             Storage.readText(this.manifestFilename).done((data) => {
-                var videoListIds;
+                var contentListIds;
                 if (data) {
-                    videoListIds = JSON.parse(data);
+                    contentListIds = JSON.parse(data);
                 }
-                var contentListModels = models.TopicTree.getContentItemsByIds(videoListIds);
+                var contentListModels = models.TopicTree.getContentItemsByIds(contentListIds);
                 _(contentListModels).each((model) => {
                     this._setDownloaded(model, true);
                 });
@@ -69,34 +69,45 @@ define(["storage", "models", "notifications"],
          * Downloads the file at the specified URL and stores it to the
          * specified filename.
          */
-        downloadVideo: function(video) {
-            var filename = video.get("id");
-            var url = video.get("download_urls").mp4;
-
-            var req = new XMLHttpRequest({mozSystem: true});
-            req.open("GET", url, true);
-            req.responseType = "arraybuffer";
-            req.onload = (event) => {
-                var blob = new Blob([req.response], {type: "video/mp4"});
+        downloadContent: function(contentItem) {
+            var filename = contentItem.get("id");
+            var handleContentLoaded = (contentData) => {
+                var blob = new Blob([contentData], {type: contentItem.getContentMimeType()});
                 Storage.writeBlob(filename, blob).done(() => {
-                    this._addDownloadToManifest(video);
-                    var videoTitle = video.get("title");
+                    this._addDownloadToManifest(contentItem);
+                    var contentTitle = contentItem.get("title");
                     var title = "Download complete";
-                    var message = `The video: ${videoTitle} was downloaded successfully`;
+                    var message;
+                    if (contentItem.isVideo()) {
+                        message = `The video: ${contentTitle} was downloaded successfully`;
+                    } else {
+                        message = `The article: ${contentTitle} was downloaded successfully`;
+                    }
                     Notifications.info(title, message);
                 });
             };
-            req.send();
+            if (contentItem.isVideo()) {
+                var url = contentItem.get("download_urls").mp4;
+                var req = new XMLHttpRequest({mozSystem: true});
+                req.open("GET", url, true);
+                req.responseType = "arraybuffer";
+                req.onload = () => {
+                    handleContentLoaded(req.response);
+                }
+                req.send();
+            } else {
+                handleContentLoaded(contentItem.get("content"));
+            }
         },
         /**
          * Removes a download from the list of downloaded files and
          * removes the file on disk.
          */
-        deleteVideo: function(video) {
+        deleteContent: function(contentItem) {
             var d = $.Deferred();
-            var filename = video.get("id");
+            var filename = contentItem.get("id");
             Storage.delete(filename).done(() => {
-                this._removeDownloadFromManifest(video);
+                this._removeDownloadFromManifest(contentItem);
                 d.resolve();
             });
             return d.promise();
