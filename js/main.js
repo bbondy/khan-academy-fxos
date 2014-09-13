@@ -482,7 +482,11 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
                                              onClickBack={this.props.onClickBack}/>;
                 }
 
-                var styleObj = { fixed: true };
+                var styleObj = {
+                    fixed: true,
+                    "topic-header": !this.props.model.isRoot() &&
+                        (this.props.model.isTopic() || this.props.model.isContent())
+                };
                 var parentDomain = this.props.model.getParentDomain();
                 if (parentDomain) {
                     styleObj[parentDomain.get("id")] = true;
