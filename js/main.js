@@ -485,10 +485,11 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
                 var styleObj = {
                     fixed: true,
                     "topic-header": !this.props.model.isRoot() &&
+                        !this.props.isPaneShowing &&
                         (this.props.model.isTopic() || this.props.model.isContent())
                 };
                 var parentDomain = this.props.model.getParentDomain();
-                if (parentDomain) {
+                if (parentDomain && !this.props.isPaneShowing) {
                     styleObj[parentDomain.get("id")] = true;
                 }
                 var styleClass = cx(styleObj);
