@@ -743,6 +743,19 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
                 currentModel: this.props.model
             };
         },
+        onClickContentItemFromDownloads: function(model) {
+            // We need to keep track of the currentModel here because
+            // we're changing the currentModel, so going back from the
+            // downloads pane would be impossible otherwise.
+            this.setState({
+                currentModel: model,
+                showProfile: false,
+                showDownloads: false,
+                showSettings: false,
+                wasLastDownloads: true,
+                lastModel: this.state.currentModel
+            });
+        },
         onClickContentItem: function(model) {
             this.setState({
                 currentModel: model,
@@ -756,16 +769,48 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
                 currentModel: model,
                 showProfile: false,
                 showDownloads: false,
-                showSettings: false
+                showSettings: false,
+                wasLastDownloads: false
             });
         },
+        /**
+         * Performs the action users expect when pressing the back button.
+         */
         onClickBack: function(model) {
             console.log('onClickBack');
+
+            // If we were on a content item from downloads,
+            // then go back to downloads.
+            if (this.state.wasLastDownloads) {
+                this.onClickDownloads();
+                return;
+            }
+
+            // If we have a last model set, then we're effectively
+            // presisng back from the downloads screen itself.
+            // The lastModel is needed because the downloads pane is the
+            // only pane where clicking on it can change the currentModel.
+            if (this.state.lastModel) {
+                this.setState({
+                    currentModel: this.state.lastModel,
+                    lastModel: undefined,
+                    showDownloads: false,
+                    showProfile: false,
+                    showSettings: false,
+                    wasLastDownloads: false
+                });
+            }
+
+            /**
+             * If settings or profile or ... is set, then don't show it anymore.
+             * This effectively makes the currentModel be in use again.
+             */
             if (this.isPaneShowing()) {
                 this.setState({
                     showDownloads: false,
                     showProfile: false,
-                    showSettings: false
+                    showSettings: false,
+                    wasLastDownloads: false
                 });
                 if (this.state.currentModel.isContentList()) {
                     this.onTopicSearch("");
@@ -781,7 +826,8 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
                 currentModel: model.get("parent"),
                 showProfile: false,
                 showDownloads: false,
-                showSettings: false
+                showSettings: false,
+                wasLastDownloads: false
             });
         },
         onClickSignin: function() {
@@ -797,15 +843,17 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
             this.setState({
                 showProfile: true,
                 showDownloads: false,
-                showSettings: false
+                showSettings: false,
+                wasLastDownloads: false
             });
         },
-        onClickDownloads: function(model) {
+        onClickDownloads: function() {
             console.log('Click downloads');
             this.setState({
                 showDownloads: true,
                 showProfile: false,
-                showSettings: false
+                showSettings: false,
+                wasLastDownloads: false
             });
         },
         onClickSettings: function(model) {
@@ -813,7 +861,8 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
             this.setState({
                 showDownloads: false,
                 showProfile: false,
-                showSettings: true
+                showSettings: true,
+                wasLastDownloads: false
             });
         },
         onClickDownloadContent: function(video) {
@@ -851,7 +900,7 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
                 control = <ProfileViewer/>;
             }
             else if (this.state.showDownloads) {
-                control = <DownloadsViewer onClickContentItem={this.onClickContentItem} />;
+                control = <DownloadsViewer onClickContentItem={this.onClickContentItemFromDownloads} />;
             }
             else if (this.state.showSettings) {
                 control = <SettingsViewer options={models.AppOptions }/>;
