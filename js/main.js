@@ -778,6 +778,8 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
         },
         /**
          * Performs the action users expect when pressing the back button.
+         * TODO: This works fine as is, but the logic can be simplified and
+         * be less ugly by simply using a stack of current pane views.
          */
         onClickBack: function(model) {
             console.log('onClickBack');
