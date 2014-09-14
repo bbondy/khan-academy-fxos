@@ -4,7 +4,7 @@
   "description": "Khan Academy allows you to learn almost anything for free",
   "launch_path": "/index.html",
   "icons": {
-    "128": "/img/icons/ka-128.png"
+    "60": "/img/icons/ka-60.png"
   },
   "developer": {
     "name": "Brian R. Bondy",
