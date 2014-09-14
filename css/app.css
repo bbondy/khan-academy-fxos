@@ -48,6 +48,7 @@ input {
     padding-right: 1rem;
     width: 100%;
     box-sizing: border-box;
+    font-size: 1.5rem;
 }
 
 input[type="checkbox"] {
@@ -461,7 +462,7 @@ article {
 
 .transcript-item div {
     display: inline;
-    font-size: 1rem;
+    font-size: 1.5rem;
 }
 
 .transcript-item div:first-child {
@@ -493,4 +494,12 @@ li.faded p.topic-title,
 li.faded p.video-title,
 li.faded p.article-title {
     color: #ccc;
+}
+
+.video-info-bar {
+}
+
+.pull-right {
+    float: right;
+    margin-right: 1rem;
 }
