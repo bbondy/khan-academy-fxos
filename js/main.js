@@ -498,6 +498,8 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
                     title = "Downloads";
                 } else if (this.props.isProfileShowing) {
                     title = "Profile";
+                } else if (this.props.isSettingsShowing) {
+                    title = "Settings";
                 } else if (this.props.model.get("title")) {
                     title = this.props.model.get("title");
                 } else if (this.props.model.isContentList()) {
@@ -943,6 +945,7 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
                                isPaneShowing={this.isPaneShowing()}
                                isDownloadsShowing={this.state.showDownloads}
                                isProfileShowing={this.state.showProfile}
+                               isSettingsShowing={this.state.showSettings}
                                />
                         {topicSearch}
                         {control}
