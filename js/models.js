@@ -63,9 +63,14 @@ define(["ka"], function(KA) {
 
         /**
          * Given an id, returns the model corresponding to that id
+         * @param id The id of the content item to search for
+         * @param filteredList a list of filtered items to look through.
+         *   If not specified all content items will be searched
+         * filteredList is usually the return value of getContentItemsByIds to speed
+         * up lookups.
          */
-        getContentItemById: function(id) {
-            return _(this.allContentItems).find(function(model) {
+        getContentItemById: function(id, filteredList) {
+            return _(filteredList || this.allContentItems).find(function(model) {
                 return model.get("id") === id;
             });
         },
@@ -74,8 +79,11 @@ define(["ka"], function(KA) {
          * lookup, such as what download manager does.
          * It will only iterate over all of the content items once, but will
          * iterate over the passed in ids multiple times.
+         * @param ids An array of content item ids to look for
+         * @param filteredList a list of filtered items to look through.
+         *   If not specified all content items will be searched
          */
-        getContentItemsByIds: function(ids) {
+        getContentItemsByIds: function(ids, filteredList) {
             return _(this.allContentItems).filter(function(model) {
                 return ids.indexOf(model.get("id")) != -1;
             });
@@ -242,19 +250,107 @@ define(["ka"], function(KA) {
                 return d.resolve().promise();
             }
 
-            // The calli s needed so we get KA.APIClient.completedEntities
-            // Which is used for completed/in progress tatus of content items
-            KA.APIClient.getUserProgress().done(function(completedEntities, startedEntities) {
-                console.log("getUserProgress:");
-                console.log(completedEntities);
-                console.log(startedEntities);
+            // The call is needed for completed/in progress status of content items
+            // Unlike getUserVideos, this includes both articles and videos.
+            KA.APIClient.getUserProgress().done(function(data) {
+                console.log('user progress summary: ');
+                console.log(data);
+                this.completedEntityIds = data.complete;
+                this.startedEntityIds = data.started;
 
-                // The call is needed so we get KA.APIClient.videoProgress
-                // which tells us the duration of each watched item.
+                // Get rid of the 'a' and 'v' prefixes, and set the completed / started
+                // attributes accordingly.
+                this.completedEntityIds = _.map(this.completedEntityIds, function(e) {
+                    return e.substring(1);
+                });
+                this.startedEntityIds = _.map(this.startedEntityIds, function(e) {
+                    return e.substring(1);
+                });
+
+                // Get the entities corresponding to the ids
+                this.completedEntities = TopicTree.getContentItemsByIds(this.completedEntityIds);
+                this.startedEntities = TopicTree.getContentItemsByIds(this.startedEntityIds);
+
+                // Mark the entities as completed and started
+                this.completedEntities = _.each(this.completedEntities, function(contentItem) {
+                    contentItem.set("completed", true);
+                });
+                this.startedEntities = _.map(this.startedEntities, function(contentItem) {
+                    contentItem.set("started", true);
+                });
+
+                console.log("completed entities:");
+                console.log(this.completedEntities);
+                console.log("started entities:");
+                console.log(this.startedEntities);
+
+                // The call is needed for the last second watched and points of each watched item.
                 KA.APIClient.getUserVideos().done(function(results) {
-                    console.log('getUserVideos')
+                    console.log('getUserVideos:')
                     console.log(results);
+
+                    // Get a list of the Ids we'll be searching for in TopicTree models
+                    // This is only being done for a fast lookup so we don't need to later
+                    // search through all o the models
+                    var filteredContentItemIds = _(results).map((result) => {
+                        return result.video.id;
+                    });
+                    var filteredContentItems = TopicTree.getContentItemsByIds(filteredContentItemIds);
+
+                    _(results).each((result) => {
+                        // By passing filteredContentItems here we don't need to search through all
+                        // of the content item models! :D
+                        var video = TopicTree.getContentItemById(result.video.id, filteredContentItems);
+                        if (result.last_second_watched > 10 &&
+                                result.duration - result.last_second_watched > 10) {
+                            video.set("lastSecondWatched", result.last_second_watched);
+                            video.set("points", result.points);
+                        }
+                    });
                     d.resolve();
+                });
+            });
+            return d.promise();
+        },
+        reportVideoProgress: function(video, youTubeId, secondsWatched, lastSecondWatched) {
+            var d = $.Deferred();
+            var videoId = video.get("id");
+            var duration = video.get("duration");
+            KA.APIClient.reportVideoProgress(videoId, youTubeId, duration, secondsWatched, lastSecondWatched).done((result) => {
+                console.log('reportVideoProgress result:');
+                console.log(result);
+
+                var lastPoints = video.get("points") || 0;
+                var newPoints = lastPoints + result.points_earned;
+                if (newPoints > 750) {
+                    newPoints = 750;
+                }
+                video.set("points", newPoints);
+
+                // If they've watched some part of the video, and it's not almost the end
+                if (result.last_second_watched > 10 &&
+                        duration - result.last_second_watched > 10) {
+                    video.set("lastSecondWatched", result.last_second_watched);
+                // Otherwise check if we already have video progress for this item and we
+                // therefore no longer need it.  Remove it to save memory.
+                } else {
+                    video.unset("lastSecondWatched");
+                }
+
+                if (result.is_video_completed) {
+                    video.set("completed", true);
+                    video.unset("started");
+                } else {
+                    video.set("started", true);
+                }
+
+                d.resolve({
+                    completed: result.is_video_completed,
+                    lastSecondWatched: result.last_second_watched,
+                    pointsEarned: result.points_earned,
+                    youtubeId: result.youtube_id,
+                    videoId: videoId,
+                    id: result.id
                 });
             });
             return d.promise();

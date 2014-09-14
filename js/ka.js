@@ -113,10 +113,6 @@ define(["oauth", "storage"], function(_oauth, Storage) {
         _saveAuth: function() {
             localStorage.setItem("oauth", JSON.stringify(this.oauth));
         },
-        _saveCompletedAndProgress: function() {
-            localStorage.setItem("completed", JSON.stringify(this.completedEntities));
-            localStorage.setItem("progress", JSON.stringify(this.startedEntities));
-        },
         _getSecrets: function() {
             return $.ajax({
                 url: "/secrets.json",
@@ -210,7 +206,7 @@ define(["oauth", "storage"], function(_oauth, Storage) {
                 success: (data) => {
                     d.resolve(data);
                 },
-                error: function( xhr, status ) {
+                error: function(xhr, status) {
                     d.reject();
                     console.error("error: " + status);
                     console.error(xhr);
@@ -219,33 +215,10 @@ define(["oauth", "storage"], function(_oauth, Storage) {
             return d.promise();
         },
         getUserProgress: function() {
-            var d = $.Deferred();
-            //this._loadCompletedAndProgress();
-            if (this.completedEntities.length || this.startedEntities.length) {
-                console.log('no back!');
-                return d.resolve(this.completedEntities, this.startedEntities).promise();
-            }
-
             var extraParams = {
                 kind: "Video,Article"
             };
-
-            this._basicAPICall(this.API_V1_BASE + "/user/progress_summary", extraParams).done((data) => {
-                console.log('user progress summary: ');
-                console.log(data);
-                this.completedEntities = data.complete;
-                this.startedEntities = data.started;
-                // Get rid of the 'a' and 'v' prefixes
-                this.completedEntities = _.map(this.completedEntities, function(e) {
-                    return e.substring(1);
-                });
-                this.startedEntities = _.map(this.completedEntities, function(e) {
-                    return e.substring(1);
-                });
-                this._saveCompletedAndProgress();
-                d.resolve(this.completedEntities, this.startedEntities);
-            });
-            return d.promise();
+            return this._basicAPICall(this.API_V1_BASE + "/user/progress_summary", extraParams);
         },
         getUserInfo: function() {
             return this._basicAPICall(this.API_V1_BASE + "/user");
@@ -289,66 +262,14 @@ define(["oauth", "storage"], function(_oauth, Storage) {
             return d.promise();
         },
         getUserVideos: function() {
-            var d = $.Deferred();
-            var promise = this._basicAPICall(this.API_V1_BASE + "/user/videos");
-            promise.done((results) => {
-                _(results).each((result) => {
-                    // If they've watched some part of the video, and it's not almost the end
-                    if (result.last_second_watched > 10 &&
-                            result.duration - result.last_second_watched > 10) {
-                        this.videosProgress[result.video.id] = result.last_second_watched
-                    }
-                });
-                d.resolve(results);
-            });
-            return d.promise();
+            return this._basicAPICall(this.API_V1_BASE + "/user/videos");
         },
         reportVideoProgress: function(videoId, youTubeId, duration, secondsWatched, lastSecondWatched) {
             var extraParams = {
                 seconds_watched: secondsWatched.toString(),
                 last_second_watched: lastSecondWatched.toString()
             };
-            var d = $.Deferred();
-
-            var promise = this._basicAPICall(this.API_V1_BASE + `/user/videos/${youTubeId}/log`, extraParams, "POST");
-            promise.done((result) => {
-                console.log('result!');
-                console.log(result);
-
-                // If they've watched some part of the video, and it's not almost the end
-                if (result.last_second_watched > 10 &&
-                        duration - result.last_second_watched > 10) {
-                    this.videosProgress[videoId] = result.last_second_watched
-                // Otherwise check if we already have video progress for this item and we
-                // therefore no longer need it.  Remove it to save memory.
-                } else if(this.videosProgress[videoId]) {
-                    delete this.videosProgress[videoId];
-                }
-
-                if (result.is_video_completed &&
-                        this.completedEntities.indexOf(videoId) === -1) {
-                    this.completedEntities.push(videoId);
-                    // If it exists in the progress videos, remove it now
-                    var index = this.startedEntities.indexOf(videoId);
-                    if (index !== -1) {
-                        this.startedEntities.splice(index, 1);
-                    }
-                    this._saveCompletedAndProgress();
-                } else if (this.startedEntities.indexOf(videoId) === -1 &&
-                        this.completedEntities.indexOf(videoId) === -1) {
-                    this.startedEntities.push(videoId);
-                    this._saveCompletedAndProgress();
-                }
-                d.resolve({
-                    completed: result.is_video_completed,
-                    lastSecondWatched: result.last_second_watched,
-                    pointsEarned: result.points_earned,
-                    youtubeId: result.youtube_id,
-                    videoId: videoId,
-                    id: result.id
-                });
-            });
-            return d.promise();
+            return this._basicAPICall(this.API_V1_BASE + `/user/videos/${youTubeId}/log`, extraParams, "POST");
         },
         API_BASE: "https://www.khanacademy.org/api",
         API_V1_BASE: "https://www.khanacademy.org/api/v1",

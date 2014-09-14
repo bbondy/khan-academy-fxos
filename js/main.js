@@ -53,13 +53,13 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
         render: function() {
             var videoNodeClass = cx({
               'video-node': true,
-              'completed': this.props.completed,
-              'in-progress': this.props.inProgress
+              'completed': this.props.video.get("completed"),
+              'in-progress': this.props.video.get("started")
             });
             var pipeClassObj = {
                 'pipe': true,
-                'completed': this.props.completed,
-                'in-progress': this.props.inProgress
+                'completed': this.props.video.get("completed"),
+                'in-progress': this.props.video.get("started")
             };
             var subwayIconClassObj = {
                 'subway-icon': true
@@ -101,13 +101,13 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
         render: function() {
             var articleNodeClass = cx({
               'article-node': true,
-              'completed': this.props.completed,
-              'in-progress': this.props.inProgress
+              'completed': this.props.article.get("completed"),
+              'in-progress': this.props.article.get("started")
             });
             var pipeClassObj = {
                 'pipe': true,
-                'completed': this.props.completed,
-                'in-progress': this.props.inProgress
+                'completed': this.props.articles.get("completed"),
+                'in-progress': this.props.article.get("started")
             };
             var subwayIconClassObj = {
                 'subway-icon': true
@@ -189,20 +189,14 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
 
             if (this.props.topic.get("contentItems")) {
                 var contentItems = _(this.props.topic.get("contentItems").models).map((contentItem) => {
-                    var completed = KA.APIClient.completedEntities.indexOf(contentItem.get("id")) !== -1;
-                    var inProgress = !completed && KA.APIClient.startedEntities.indexOf(contentItem.get("id")) !== -1;
                     if (contentItem.isVideo()) {
                         return <VideoListItem video={contentItem}
                                               onClickVideo={this.props.onClickContentItem}
-                                              key={contentItem.get("slug")}
-                                              completed={completed}
-                                              inProgress={inProgress} />;
+                                              key={contentItem.get("slug")} />;
                     }
                     return <ArticleListItem article={contentItem}
                                             onClickArticle={this.props.onClickContentItem}
-                                            key={contentItem.get("slug")}
-                                            completed={completed}
-                                            inProgress={inProgress} />;
+                                            key={contentItem.get("slug")} />;
                 });
             }
 
@@ -227,20 +221,14 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
         render: function() {
             if (this.props.collection.models) {
                 var contentItems = _(this.props.collection.models).map((contentItem) => {
-                    var completed = KA.APIClient.completedEntities.indexOf(contentItem.get("id")) !== -1;
-                    var inProgress = !completed && KA.APIClient.startedEntities.indexOf(contentItem.get("id")) !== -1;
                     if (contentItem.isVideo()) {
                         return <VideoListItem video={contentItem}
                                               onClickVideo={this.props.onClickContentItem}
-                                              key={contentItem.get("slug")}
-                                              completed={completed}
-                                              inProgress={inProgress} />;
+                                              key={contentItem.get("slug")} />;
                     }
                     return <ArticleListItem article={contentItem}
                                             onClickArticle={this.props.onClickContentItem}
-                                            key={contentItem.get("slug")}
-                                            completed={completed}
-                                            inProgress={inProgress} />;
+                                            key={contentItem.get("slug")} />;
                 });
             }
 
@@ -340,7 +328,11 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
      * display it to the user.
      */
     var VideoViewer = React.createClass({
-         componentWillMount: function() {
+        mixins: [KA.Util.BackboneMixin],
+        getBackboneModels: function() {
+            return [this.props.video];
+        },
+        componentWillMount: function() {
             KA.APIClient.getVideoTranscript(this.props.video.get("youtube_id")).done((transcript) => {
                 this.setState({transcript: transcript});
             });
@@ -358,7 +350,10 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
             console.log(this.props.video);
 
             this.videoId = this.props.video.get("id");
-            this.lastSecondWatched = KA.APIClient.videosProgress[this.videoId] || 0;
+            this.lastSecondWatched = 0;
+            if (this.props.video.get("lastSecondWatched") && this.props.video.get("lastSecondWatched") + 10 < this.props.video.get("duration")) {
+                this.lastSecondWatched = this.props.video.get("lastSecondWatched");
+            }
             this.secondsWatched = 0;
             this.lastReportedTime = new Date();
             this.lastWatchedTimeSinceLastUpdate = new Date();
@@ -436,10 +431,11 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
             var secondsSinceLastReport = (currentTime.getTime() - this.lastReportedTime.getTime()) / 1000;
             if (secondsSinceLastReport >= this.MIN_SECONDS_BETWEEN_REPORTS || this.lastSecondWatched >= (video.duration | 0)) {
                 this.lastReportedTime = new Date();
-                console.log('report video progress duration: ' + this.props.video.get("duration"));
-                KA.APIClient.reportVideoProgress(this.props.video.get("id"),
+                // Note that this call will asynchronously report progress.
+                // And once that is done the video model that this class refers to will
+                // re-render itself with the new points.
+                models.CurrentUser.reportVideoProgress(this.props.video,
                         this.props.video.get("youtube_id"),
-                        this.props.video.get("duration"),
                         this.secondsWatched,
                         this.lastSecondWatched);
                 this.secondsWatched = 0;
@@ -457,14 +453,16 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
                 videoSrc = this.state.downloadedUrl;
             }
             console.log('video rendered with url: ' + videoSrc);
-            return <div>
-                 <video ref="video" width="320" height="240" controls>
-                    <source src={videoSrc} type="video/mp4"/>
+            var points = this.props.video.get("points") || 0;
+            return <div className="video-viewer-container">
+                 <video ref="video" controls>
+                    <source src={videoSrc} type={this.props.video.getContentMimeType()}/>
                  </video>
+                 <div className="video-info-bar"><div className="energy-points pull-right">{{points}} of 750 points</div></div>
                 {transcriptViewer}
             </div>;
         },
-        MIN_SECONDS_BETWEEN_REPORTS: 15
+        MIN_SECONDS_BETWEEN_REPORTS: 10
     });
 
     /**
@@ -542,7 +540,8 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
                 text = "Search " + this.props.model.get("title");
             }
             return <div>
-                <input type="text"
+                <input className="search"
+                       type="text"
                        placeholder={text}
                        value={this.state.value}
                        required=""
