@@ -386,7 +386,6 @@ video {
     padding-left: 1rem;
     padding-right: 1rem;
     overflow-y: scroll !important;
-    position: absolute;
     width: 100%;
 }
 
@@ -502,4 +501,8 @@ li.faded p.article-title {
 .pull-right {
     float: right;
     margin-right: 1rem;
+}
+
+.video-viewer-container {
+    height: 100%;
 }
