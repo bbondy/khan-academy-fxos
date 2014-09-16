@@ -13,6 +13,26 @@ define(["oauth", "storage"], function(_oauth, Storage) {
             return window.location.protocol === 'app:';
         },
         /**
+         * Determines if the connection is metered (pay per use)
+         */
+        isMeteredConnection: function() {
+            var connection = navigator.connection || navigator.mozConnection;
+            if (!connection) {
+                return false;
+            }
+            return connection.metered;
+        },
+        /**
+         * Determines if there's a cap on the bandwidth
+         */
+        isBandwidthCapped: function() {
+            var connection = navigator.connection || navigator.mozConnection;
+            if (!connection) {
+                return false;
+            }
+            return connection.bandwidth == "Infinity";
+        },
+        /**
          * Obtains a URL query parameter
          */
         getParameterByName: function(name, params) {
