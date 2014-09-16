@@ -870,6 +870,15 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
             });
         },
         onClickDownloadContent: function(video) {
+            if (KA.Util.isMeteredConnection()) {
+                if (!confirm("It looks like your connection is metered (pay per use). Are you sure you'd like to continue?")) {
+                    return;
+                }
+            } else if (KA.Util.isBandwidthCapped()) {
+                if (!confirm("It looks like you don't have unlimited bandwidth. Are you sure you'd like to continue?")) {
+                    return;
+                }
+            }
             Downloads.downloadContent(video);
         },
         onClickDeleteDownloadedVideo: function(video) {
