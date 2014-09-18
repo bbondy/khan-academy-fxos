@@ -75,9 +75,18 @@ define(["storage", "models", "notifications"],
             } else if (model.isTopic()) {
                 // TODO: It would be better to show a single notification for all content items
                 // downloaded instead of one for each downloaded.
-                model.enumChildren((contentItem) => {
-                    this.downloadContent(contentItem);
-                });
+                var seq = model.enumChildrenGenerator();
+                var downloadOneAtATime = () => {
+                    try {
+                        var contentItem = seq.next().value;
+                        // Allow at most one download at a time.
+                        this.downloadContent(contentItem).done(() => {
+                            setTimeout(downloadOneAtATime, 1000);
+                        });
+                    } catch (e) {
+                    }
+                };
+                downloadOneAtATime();
             }
         },
         /**
@@ -85,6 +94,7 @@ define(["storage", "models", "notifications"],
          * specified filename.
          */
         downloadContent: function(contentItem) {
+            var d = $.Deferred();
             var filename = contentItem.get("id");
             var handleContentLoaded = (contentData) => {
                 var blob = new Blob([contentData], {type: contentItem.getContentMimeType()});
@@ -100,6 +110,7 @@ define(["storage", "models", "notifications"],
                         message = `The article: ${contentTitle} was downloaded successfully`;
                     }
                     Notifications.info(title, message);
+                    d.resolve();
                 });
             };
             if (contentItem.isVideo()) {
@@ -112,8 +123,12 @@ define(["storage", "models", "notifications"],
                 }
                 req.send();
             } else {
+                // Articles have a content property with the html we want to
+                // download already. It's not loaded in by the topic tree but
+                // when the article is actually loaded.
                 handleContentLoaded(contentItem.get("content"));
             }
+            return d.promise();
         },
         /**
          * Removes a download from the list of downloaded files and

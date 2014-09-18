@@ -90,7 +90,6 @@ define(["ka"], function(KA) {
         }
     };
 
-
     var TopicModel = TopicTreeModel.extend({
         url: "/knowledge-map.json",
         initialize: function() {
@@ -107,6 +106,19 @@ define(["ka"], function(KA) {
             _(this.get("topics").models).each(function(topic) {
                 topic.enumChildren(callback);
             });
+        },
+        /**
+         * Provides a generator which can be used to iterate through
+         * the content items incrementally.
+         */
+        enumChildrenGenerator: function*() {
+            for (var i = 0; i < this.get("contentItems").models.length; i++) {
+                yield this.get("contentItems").models[i];
+            }
+
+            for (var i = 0; i < this.get("topics").models.length; i++) {
+                yield* this.get("topics").models[i].enumChildrenGenerator();
+            }
         },
         /**
          * Returns the total count of content items underneath the specified topic
