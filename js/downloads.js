@@ -66,6 +66,21 @@ define(["storage", "models", "notifications"],
             }
         },
         /**
+         * Used to download either a single content item for all content
+         * items underneath the specified topic.
+         */
+        download: function(model) {
+            if (model.isContent()) {
+                return this.downloadContent(model);
+            } else if (model.isTopic()) {
+                // TODO: It would be better to show a single notification for all content items
+                // downloaded instead of one for each downloaded.
+                model.enumChildren((contentItem) => {
+                    this.downloadContent(contentItem);
+                });
+            }
+        },
+        /**
          * Downloads the file at the specified URL and stores it to the
          * specified filename.
          */
@@ -78,6 +93,7 @@ define(["storage", "models", "notifications"],
                     var contentTitle = contentItem.get("title");
                     var title = "Download complete";
                     var message;
+                    // TODO: Move these notifications out as a callback or a promise
                     if (contentItem.isVideo()) {
                         message = `The video: ${contentTitle} was downloaded successfully`;
                     } else {
