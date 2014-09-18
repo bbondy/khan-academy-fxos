@@ -95,6 +95,42 @@ define(["ka"], function(KA) {
         url: "/knowledge-map.json",
         initialize: function() {
         },
+
+        /**
+         * Recursively traverses the topic tree and calls a
+         * callback for each found content item.
+         */
+        enumChildren: function(callback) {
+            _(this.get("contentItems").models).each(function(model) {
+                callback(model);
+            });
+            _(this.get("topics").models).each(function(topic) {
+                topic.enumChildren(callback);
+            });
+        },
+        /**
+         * Returns the total count of content items underneath the specified topic
+         */
+        getChildCount: function() {
+            var count = 0;
+            this.enumChildren((model) => {
+                count++;
+            });
+            return count;
+        },
+        /**
+         * Returns the total count of content items underneath the specified topic
+         * that is not downloaded
+         */
+        getChildNotDownloadedCount: function() {
+            var count = 0;
+            this.enumChildren((model) => {
+                if (!model.isDownloaded()) {
+                    count++;
+                }
+            });
+            return count;
+        },
         /**
          * Initiates a recursive search for the term `search`
          */
@@ -114,7 +150,7 @@ define(["ka"], function(KA) {
             if (results.length > maxResults)
                 return;
             if (this.get("contentItems")) {
-                this.get("contentItems").forEach(function(item) {
+                this.get("contentItems").forEach((item) => {
                     // TODO: Possibly search descriptions too?
                     // TODO: We could potentially index the transcripts for a really good search
                     // TODO: Tokenize the `search` string and do an indexOf for each token
@@ -123,13 +159,13 @@ define(["ka"], function(KA) {
                             item.get("title").toLowerCase().indexOf(search.toLowerCase()) !== -1) {
                         results.push(item);
                     }
-                }.bind(this));
+                });
             }
 
             if (this.get("topics")) {
-                this.get("topics").forEach(function(item) {
+                this.get("topics").forEach((item) => {
                     item._findContentItems(search, results, maxResults);
-                }.bind(this));
+                });
             }
         },
         getTitle: function() {
@@ -148,10 +184,10 @@ define(["ka"], function(KA) {
          *  topics: A backbone collection: TopicList which contains TopicModel instances
          */
         parse: function(response){
-            var parseTopicChildren = function(topic) {
-                topic.children.forEach(function(item) {
+            var parseTopicChildren = (topic) => {
+                topic.children.forEach((item) => {
                     item.parent = this;//response;
-                }.bind(this));
+                });
                 var topics = topic.children.filter(function(item) {
                     return item.kind === "Topic" && item.slug !== "new-and-noteworthy";
                 });
@@ -162,7 +198,7 @@ define(["ka"], function(KA) {
                 response.topics = new TopicList(topics, {parse: true});
                 response.contentItems = new ContentList(contentItems, {parse: true});
                 TopicTree.allContentItems.push.apply(TopicTree.allContentItems, response.contentItems.models);
-            }.bind(this);
+            };
 
             parseTopicChildren(response);
             return response;

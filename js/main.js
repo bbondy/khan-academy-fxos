@@ -572,6 +572,11 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
                             <a href="#" onClick={KA.Util.partial(this.props.onClickDownloadContent, this.props.model)}>{{text}}</a>
                         </li>);
                 }
+            } else if(this.props.model && this.props.model.isTopic()) {
+                var text = "Download full topic content";
+                items.push(<li className="hot-item">
+                        <a href="#" onClick={KA.Util.partial(this.props.onClickDownloadContent, this.props.model)}>{{text}}</a>
+                    </li>);
             }
 
             if (models.CurrentUser.isSignedIn()) {
@@ -869,7 +874,7 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
                 wasLastDownloads: false
             });
         },
-        onClickDownloadContent: function(video) {
+        onClickDownloadContent: function(model) {
             if (KA.Util.isMeteredConnection()) {
                 if (!confirm("It looks like your connection is metered (pay per use). Are you sure you'd like to continue?")) {
                     return;
@@ -878,8 +883,19 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
                 if (!confirm("It looks like you don't have unlimited bandwidth. Are you sure you'd like to continue?")) {
                     return;
                 }
+            } else if (model.isTopic()) {
+                var count = model.getChildNotDownloadedCount();
+                if (count === 0) {
+                    alert("All content items under this topic are already downloaded!");
+                    return;
+                }
+
+                if (!confirm(`Are you sure you'd like to download all remaining ${count} content item(s)?`)) {
+                    return;
+                }
             }
-            Downloads.downloadContent(video);
+
+            Downloads.download(model);
         },
         onClickDeleteDownloadedVideo: function(video) {
             console.log('click delete downloaded video');
