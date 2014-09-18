@@ -30,7 +30,7 @@ define(["oauth", "storage"], function(_oauth, Storage) {
             if (!connection) {
                 return false;
             }
-            return connection.bandwidth == "Infinity";
+            return connection.bandwidth !== Infinity;
         },
         /**
          * Obtains a URL query parameter
