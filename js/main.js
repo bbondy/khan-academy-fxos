@@ -875,7 +875,10 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
             });
         },
         onClickDownloadContent: function(model) {
-            if (KA.Util.isMeteredConnection()) {
+            if (Downloads.isDownloadingTopic) {
+                alert("Please wait until the current list of content items are downloaded.");
+                return;
+            } else if (KA.Util.isMeteredConnection()) {
                 if (!confirm("It looks like your connection is metered (pay per use). Are you sure you'd like to continue?")) {
                     return;
                 }
@@ -894,6 +897,7 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
                     return;
                 }
             }
+
 
             Downloads.download(model);
         },
