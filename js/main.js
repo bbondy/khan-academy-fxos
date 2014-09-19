@@ -106,7 +106,7 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
             });
             var pipeClassObj = {
                 'pipe': true,
-                'completed': this.props.articles.get("completed"),
+                'completed': this.props.article.get("completed"),
                 'in-progress': this.props.article.get("started")
             };
             var subwayIconClassObj = {
@@ -572,11 +572,6 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
                             <a href="#" onClick={KA.Util.partial(this.props.onClickDownloadContent, this.props.model)}>{{text}}</a>
                         </li>);
                 }
-            } else if(this.props.model && this.props.model.isTopic()) {
-                var text = "Download full topic content";
-                items.push(<li className="hot-item">
-                        <a href="#" onClick={KA.Util.partial(this.props.onClickDownloadContent, this.props.model)}>{{text}}</a>
-                    </li>);
             }
 
             if (models.CurrentUser.isSignedIn()) {
@@ -588,6 +583,18 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
             }
             items.push(<li><a href="#" onClick={this.props.onClickSettings}>Settings</a></li>);
             items.push(<li><a href="#" onClick={this.props.onClickDownloads}>Downloads</a></li>);
+
+            if (models.TempAppState.get("isDownloadingTopic")) {
+                var text = "Cancel topic downloading";
+                items.push(<li className="hot-item">
+                        <a href="#" onClick={KA.Util.partial(this.props.onClickCancelDownloadContent, this.props.model)}>{{text}}</a>
+                    </li>);
+            } else if(this.props.model && this.props.model.isTopic()) {
+                var text = "Download full topic content";
+                items.push(<li className="hot-item">
+                        <a href="#" onClick={KA.Util.partial(this.props.onClickDownloadContent, this.props.model)}>{{text}}</a>
+                    </li>);
+            }
 
 
             // Add the signout button last
@@ -741,7 +748,7 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
         mixins: [KA.Util.BackboneMixin],
         getBackboneModels: function() {
             return [new models.ContentList(models.TopicTree.allContentItems),
-                models.AppOptions, models.CurrentUser];
+                models.AppOptions, models.TempAppState, models.CurrentUser];
         },
         componentWillMount: function() {
         },
@@ -875,7 +882,7 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
             });
         },
         onClickDownloadContent: function(model) {
-            if (Downloads.isDownloadingTopic) {
+            if (models.TempAppState.get("isDownloadingTopic")) {
                 alert("Please wait until the current list of content items are downloaded.");
                 return;
             } else if (KA.Util.isMeteredConnection()) {
@@ -892,14 +899,15 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
                     alert("All content items under this topic are already downloaded!");
                     return;
                 }
-
+                count = KA.Util.numberWithCommas(count);
                 if (!confirm(`Are you sure you'd like to download all remaining ${count} content item(s)?`)) {
                     return;
                 }
             }
-
-
             Downloads.download(model);
+        },
+        onClickCancelDownloadContent: function(model) {
+            Downloads.cancelDownloading();
         },
         onClickDeleteDownloadedVideo: function(video) {
             console.log('click delete downloaded video');
@@ -967,6 +975,7 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
                          onClickDownloads={this.onClickDownloads}
                          onClickSettings={this.onClickSettings}
                          onClickDownloadContent={this.onClickDownloadContent}
+                         onClickCancelDownloadContent={this.onClickCancelDownloadContent}
                          onClickDeleteDownloadedVideo={this.onClickDeleteDownloadedVideo}
                          />
                 <section id="main-content" role="region" className="skin-dark">

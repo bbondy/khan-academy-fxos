@@ -99,25 +99,30 @@ define(["ka"], function(KA) {
          * Recursively traverses the topic tree and calls a
          * callback for each found content item.
          */
-        enumChildren: function(callback) {
+        enumChildren: function(callback, predicate) {
             _(this.get("contentItems").models).each(function(model) {
-                callback(model);
+                if (!predicate || predicate(model)) {
+                    callback(model);
+                }
             });
             _(this.get("topics").models).each(function(topic) {
-                topic.enumChildren(callback);
+                topic.enumChildren(callback, predicate);
             });
         },
         /**
          * Provides a generator which can be used to iterate through
          * the content items incrementally.
          */
-        enumChildrenGenerator: function*() {
+        enumChildrenGenerator: function*(predicate) {
             for (var i = 0; i < this.get("contentItems").models.length; i++) {
-                yield this.get("contentItems").models[i];
+                var model = this.get("contentItems").models[i];
+                if (!predicate || predicate(model)) {
+                    yield model;
+                }
             }
 
             for (var i = 0; i < this.get("topics").models.length; i++) {
-                yield* this.get("topics").models[i].enumChildrenGenerator();
+                yield* this.get("topics").models[i].enumChildrenGenerator(predicate);
             }
         },
         /**
@@ -136,11 +141,7 @@ define(["ka"], function(KA) {
          */
         getChildNotDownloadedCount: function() {
             var count = 0;
-            this.enumChildren((model) => {
-                if (!model.isDownloaded()) {
-                    count++;
-                }
-            });
+            this.enumChildren((model) => count++, (model) => !model.isDownloaded());
             return count;
         },
         /**
@@ -405,6 +406,18 @@ define(["ka"], function(KA) {
         }
     });
 
+    // Just really a model to hold temporary app state
+    // that should not persist after it is changed on app
+    // restarts.
+    // For example we use this for isDownloadingTopic from
+    // Downloads so we can easily adjust views based on that state
+    // changing.
+    var TempAppStateModel = Backbone.Model.extend({
+        defaults: {
+            isTopicDownloading: false
+        }
+    });
+
     /**
      * Stores app level options in local storage
      */
@@ -440,6 +453,7 @@ define(["ka"], function(KA) {
         ArticleList,
         TopicTree,
         AppOptions: new AppOptionsModel(),
+        TempAppState: new TempAppStateModel(),
         CurrentUser: new UserModel()
     };
 });

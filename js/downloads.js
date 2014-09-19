@@ -17,7 +17,6 @@ define(["storage", "models", "notifications"],
         init: function() {
             var d = $.Deferred();
             this.contentList = new models.ContentList();
-            this.isDownloadingTopic = false;
             this._readManifest().always(() => {
                 d.resolve();
             });
@@ -67,6 +66,12 @@ define(["storage", "models", "notifications"],
             }
         },
         /**
+         * Cancels downloading if it's in progress.
+         */
+        cancelDownloading: function() {
+            models.TempAppState.set("isDownloadingTopic", false);
+        },
+        /**
          * Used to download either a single content item for all content
          * items underneath the specified topic.
          */
@@ -82,21 +87,26 @@ define(["storage", "models", "notifications"],
          * the current topic
          */
         downloadTopic: function(topic) {
-            this.isDownloadingTopic = true;
+            models.TempAppState.set("isDownloadingTopic", true);
 
             // TODO: It would be better to show a single notification for all content items
             // downloaded instead of one for each downloaded.
-            var seq = topic.enumChildrenGenerator();
+            var predicate = (model) => !model.isDownloaded();
+            var seq = topic.enumChildrenGenerator(predicate);
             var downloadOneAtATime = () => {
                 try {
                     var contentItem = seq.next().value;
                     // Allow at most one download at a time.
                     this.downloadContent(contentItem).done(() => {
+                        // Check for cancel
+                        if (!models.TempAppState.get("isDownloadingTopic")) {
+                            return;
+                        }
                         setTimeout(downloadOneAtATime, 1000);
                     });
                 } catch (e) {
                     // done, no more items in the generator
-                    this.isDownloadingTopic = false;
+                    models.TempAppState.set("isDownloadingTopic", false);
                 }
             };
             downloadOneAtATime();
