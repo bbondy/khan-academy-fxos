@@ -17,6 +17,7 @@ define(["storage", "models", "notifications"],
         init: function() {
             var d = $.Deferred();
             this.contentList = new models.ContentList();
+            this.isDownloadingTopic = false;
             this._readManifest().always(() => {
                 d.resolve();
             });
@@ -73,21 +74,32 @@ define(["storage", "models", "notifications"],
             if (model.isContent()) {
                 return this.downloadContent(model);
             } else if (model.isTopic()) {
-                // TODO: It would be better to show a single notification for all content items
-                // downloaded instead of one for each downloaded.
-                var seq = model.enumChildrenGenerator();
-                var downloadOneAtATime = () => {
-                    try {
-                        var contentItem = seq.next().value;
-                        // Allow at most one download at a time.
-                        this.downloadContent(contentItem).done(() => {
-                            setTimeout(downloadOneAtATime, 1000);
-                        });
-                    } catch (e) {
-                    }
-                };
-                downloadOneAtATime();
+                return this.downloadTopic(model);
             }
+        },
+        /**
+         * Downloads all content items recursively one at a time for
+         * the current topic
+         */
+        downloadTopic: function(topic) {
+            this.isDownloadingTopic = true;
+
+            // TODO: It would be better to show a single notification for all content items
+            // downloaded instead of one for each downloaded.
+            var seq = topic.enumChildrenGenerator();
+            var downloadOneAtATime = () => {
+                try {
+                    var contentItem = seq.next().value;
+                    // Allow at most one download at a time.
+                    this.downloadContent(contentItem).done(() => {
+                        setTimeout(downloadOneAtATime, 1000);
+                    });
+                } catch (e) {
+                    // done, no more items in the generator
+                    this.isDownloadingTopic = false;
+                }
+            };
+            downloadOneAtATime();
         },
         /**
          * Downloads the file at the specified URL and stores it to the
