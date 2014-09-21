@@ -70,16 +70,21 @@ define(["storage", "models"],
          */
         cancelDownloading: function() {
             models.TempAppState.set("isDownloadingTopic", false);
+            if (this.currentProgress) {
+                this.currentProgress(undefined, undefined, true);
+            }
         },
         /**
          * Used to download either a single content item for all content
          * items underneath the specified topic.
+         * onProgress callback is only used for topics and is called for
+         * each content item.
          */
-        download: function(model) {
+        download: function(model, onProgress) {
             if (model.isContent()) {
                 return this.downloadContent(model);
             } else if (model.isTopic()) {
-                return this.downloadTopic(model);
+                return this.downloadTopic(model, onProgress);
             }
             return $.Deferred().resolve().pormise();
         },
@@ -87,11 +92,14 @@ define(["storage", "models"],
          * Downloads all content items recursively one at a time for
          * the current topic
          */
-        downloadTopic: function(topic) {
+        downloadTopic: function(topic, onProgress) {
+            this.currentProgress = onProgress;
             var d = $.Deferred();
             var downloadedCount = 0;
             models.TempAppState.set("isDownloadingTopic", true);
-
+            if (onProgress) {
+                onProgress(null, 0);
+            }
             // TODO: It would be better to show a single notification for all content items
             // downloaded instead of one for each downloaded.
             var predicate = (model) => !model.isDownloaded();
@@ -102,9 +110,13 @@ define(["storage", "models"],
                     // Allow at most one download at a time.
                     this.downloadContent(contentItem).done(() => {
                         downloadedCount++;
+                        if (onProgress) {
+                            onProgress(contentItem, downloadedCount);
+                        }
                         // Check for cancel
                         if (!models.TempAppState.get("isDownloadingTopic")) {
                             d.resolve(topic, downloadedCount);
+                            delete this.currentProgress;
                             return;
                         }
                         setTimeout(downloadOneAtATime, 1000);
@@ -113,6 +125,7 @@ define(["storage", "models"],
                     // done, no more items in the generator
                     models.TempAppState.set("isDownloadingTopic", false);
                     d.resolve(topic, downloadedCount);
+                    delete this.currentProgress;
                 }
             };
             downloadOneAtATime();

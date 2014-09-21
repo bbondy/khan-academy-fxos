@@ -506,3 +506,16 @@ li.faded p.article-title {
 .video-viewer-container {
     height: 100%;
 }
+
+.status-bar {
+    background-color: #363F48;
+    border-top: 2px solid #EEE;
+    bottom: 0;
+    color: #FFF;
+    font-size: 1.5rem;
+    opacity: 0.8;
+    padding: 1.5em;
+    position: absolute;
+    width: calc(100% - 3rem);
+    z-index: 100;
+}
