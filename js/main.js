@@ -4,8 +4,8 @@
 
 "use strict";
 
-define(["react", "models", "ka", "cache", "storage", "downloads"],
-        function(React, models, KA, Cache, Storage, Downloads) {
+define(["react", "models", "ka", "cache", "storage", "downloads", "notifications"],
+        function(React, models, KA, Cache, Storage, Downloads, Notifications) {
     var cx = React.addons.classSet;
 
     // TODO: remove, just for easy inpsection
@@ -904,7 +904,21 @@ define(["react", "models", "ka", "cache", "storage", "downloads"],
                     return;
                 }
             }
-            Downloads.download(model);
+            Downloads.download(model).done(function(model, count) {
+                var title = "Download complete";
+                var contentTitle = model.get("title");
+                var message;
+                if (model.isContent()) {
+                    if (model.isVideo()) {
+                        message = `The video "${contentTitle}" was downloaded successfully`;
+                    } else {
+                        message = `The article "${contentTitle}" was downloaded successfully`;
+                    }
+                } else {
+                    message = `${count} content item(s) were downloaded from "${title}" successfully!`;
+                }
+                Notifications.info(title, message);
+            });
         },
         onClickCancelDownloadContent: function(model) {
             Downloads.cancelDownloading();
