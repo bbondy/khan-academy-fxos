@@ -7,8 +7,8 @@
  *   - Provides the ability to delete those downloads
  */
 
-define(["storage", "models", "notifications"],
-        function(Storage, models, Notifications) {
+define(["storage", "models"],
+        function(Storage, models) {
 
     var Downloads = {
         /**
@@ -81,12 +81,15 @@ define(["storage", "models", "notifications"],
             } else if (model.isTopic()) {
                 return this.downloadTopic(model);
             }
+            return $.Deferred().resolve().pormise();
         },
         /**
          * Downloads all content items recursively one at a time for
          * the current topic
          */
         downloadTopic: function(topic) {
+            var d = $.Deferred();
+            var downloadedCount = 0;
             models.TempAppState.set("isDownloadingTopic", true);
 
             // TODO: It would be better to show a single notification for all content items
@@ -98,8 +101,10 @@ define(["storage", "models", "notifications"],
                     var contentItem = seq.next().value;
                     // Allow at most one download at a time.
                     this.downloadContent(contentItem).done(() => {
+                        downloadedCount++;
                         // Check for cancel
                         if (!models.TempAppState.get("isDownloadingTopic")) {
+                            d.resolve(topic, downloadedCount);
                             return;
                         }
                         setTimeout(downloadOneAtATime, 1000);
@@ -107,9 +112,11 @@ define(["storage", "models", "notifications"],
                 } catch (e) {
                     // done, no more items in the generator
                     models.TempAppState.set("isDownloadingTopic", false);
+                    d.resolve(topic, downloadedCount);
                 }
             };
             downloadOneAtATime();
+            return d.promise();
         },
         /**
          * Downloads the file at the specified URL and stores it to the
@@ -122,17 +129,7 @@ define(["storage", "models", "notifications"],
                 var blob = new Blob([contentData], {type: contentItem.getContentMimeType()});
                 Storage.writeBlob(filename, blob).done(() => {
                     this._addDownloadToManifest(contentItem);
-                    var contentTitle = contentItem.get("title");
-                    var title = "Download complete";
-                    var message;
-                    // TODO: Move these notifications out as a callback or a promise
-                    if (contentItem.isVideo()) {
-                        message = `The video: ${contentTitle} was downloaded successfully`;
-                    } else {
-                        message = `The article: ${contentTitle} was downloaded successfully`;
-                    }
-                    Notifications.info(title, message);
-                    d.resolve();
+                    d.resolve(contentItem, 1);
                 });
             };
             if (contentItem.isVideo()) {
