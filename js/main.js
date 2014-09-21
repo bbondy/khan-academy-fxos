@@ -4,8 +4,8 @@
 
 "use strict";
 
-define(["react", "models", "ka", "cache", "storage", "downloads", "notifications"],
-        function(React, models, KA, Cache, Storage, Downloads, Notifications) {
+define(["react", "models", "ka", "cache", "storage", "downloads", "notifications", "status"],
+        function(React, models, KA, Cache, Storage, Downloads, Notifications, Status) {
     var cx = React.addons.classSet;
 
     // TODO: remove, just for easy inpsection
@@ -552,6 +552,15 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
         }
     });
 
+    var StatusBarViewer = React.createClass({
+        render: function() {
+            if (!models.TempAppState.get("status")) {
+                return <div/>;
+            }
+            return <div className="status-bar">{models.TempAppState.get("status")}</div>
+        }
+    });
+
     /**
      * Represents the sidebar drawer.
      * The sidebar drawer comes up when you click on the menu from the top header.
@@ -894,17 +903,29 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
                     return;
                 }
             } else if (model.isTopic()) {
-                var count = model.getChildNotDownloadedCount();
-                if (count === 0) {
+                var totalCount = model.getChildNotDownloadedCount();
+                if (totalCount === 0) {
                     alert("All content items under this topic are already downloaded!");
                     return;
                 }
-                count = KA.Util.numberWithCommas(count);
-                if (!confirm(`Are you sure you'd like to download all remaining ${count} content item(s)?`)) {
+                totalCount = KA.Util.numberWithCommas(totalCount);
+                if (!confirm(`Are you sure you'd like to download all remaining ${totalCount} content item(s)?`)) {
                     return;
                 }
             }
-            Downloads.download(model).done(function(model, count) {
+
+            var onProgress = (model, count, cancelling) => {
+                if (cancelling) {
+                    Status.update(`Canceling downloading...`);
+                    return;
+                }
+                count = KA.Util.numberWithCommas(count);
+                Status.update(`Downloading: ${count} of ${totalCount} topic items...`);
+            };
+            if (model.isTopic()) {
+                Status.start();
+            }
+            Downloads.download(model, onProgress).done(function(model, count) {
                 var title = "Download complete";
                 var contentTitle = model.get("title");
                 var message;
@@ -916,6 +937,9 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
                     }
                 } else {
                     message = `${count} content item(s) were downloaded from "${title}" successfully!`;
+                }
+                if (model.isTopic()) {
+                    Status.stop();
                 }
                 Notifications.info(title, message);
             });
@@ -1003,6 +1027,7 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
                                />
                         {topicSearch}
                         {control}
+                        <StatusBarViewer/>
                 </section>
             </section>;
         }
