@@ -106,7 +106,7 @@ define(["oauth", "storage"], function(_oauth, Storage) {
             componentDidMount: function() {
                 window.document.webL10n.translate(this.getDOMNode());
             },
-            componentWillUpdate: function(nextProps, nextState) {
+            componentDidUpdate: function() {
                 window.document.webL10n.translate(this.getDOMNode());
             }
         }
