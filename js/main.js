@@ -936,7 +936,8 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
                         message = `The article "${contentTitle}" was downloaded successfully`;
                     }
                 } else {
-                    message = `${count} content item(s) were downloaded from "${title}" successfully!`;
+                    message = window.document.webL10n.get("content-items-downloaded-succesfully",
+                        {"count" : count, "title": contentTitle});
                 }
                 if (model.isTopic()) {
                     Status.stop();
