@@ -19,6 +19,10 @@ require.config({
     }
 });
 
+// Uncomment to visually test localization.
+// Replaces all localized strings with boxes.
+//window.translateToBoxes = true;
+
 var initModules = ['main'];
 if (window.isTest) {
     initModules.push('test');

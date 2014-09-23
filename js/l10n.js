@@ -821,7 +821,11 @@ document.webL10n = (function(window, document, undefined) {
       var str = data[prop];
       str = substIndexes(str, args, key, prop);
       str = substArguments(str, args, key);
+      if (window.translateToBoxes) {
+          str = str.replace(/./g,'□');
+      }
       rv[prop] = str;
+
     }
     return rv;
   }
