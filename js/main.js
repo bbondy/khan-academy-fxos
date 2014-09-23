@@ -591,7 +591,7 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
                 items.push(<li><a href="#" onClick={this.props.onClickSignin}>Sign in</a></li>);
             }
             items.push(<li><a href="#" onClick={this.props.onClickSettings}>Settings</a></li>);
-            items.push(<li><a href="#" onClick={this.props.onClickDownloads}>Downloads</a></li>);
+            items.push(<li><a data-l10n-id="downloads" href="#" onClick={this.props.onClickDownloads}>Downloads</a></li>);
 
             if (models.TempAppState.get("isDownloadingTopic")) {
                 var text = "Cancel topic downloading";
@@ -754,7 +754,7 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
      * for the overall top level view (which is nice and clean ;)).
      */
     var MainView = React.createClass({
-        mixins: [KA.Util.BackboneMixin],
+        mixins: [KA.Util.BackboneMixin, KA.Util.LocalizationMixin],
         getBackboneModels: function() {
             return [new models.ContentList(models.TopicTree.allContentItems),
                 models.AppOptions, models.TempAppState, models.CurrentUser];
