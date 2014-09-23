@@ -100,6 +100,15 @@ define(["oauth", "storage"], function(_oauth, Storage) {
               model.off(null, null, this);
             }, this);
           }
+        },
+
+        LocalizationMixin: {
+            componentDidMount: function() {
+                window.document.webL10n.translate(this.getDOMNode());
+            },
+            componentWillUpdate: function(nextProps, nextState) {
+                window.document.webL10n.translate(this.getDOMNode());
+            }
         }
     };
 
