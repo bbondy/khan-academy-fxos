@@ -571,7 +571,7 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
 
             if (this.props.model && this.props.model.isContent()) {
                 if (this.props.model.isDownloaded()) {
-                    var text = this.props.model.isVideo() ? "Delete downloaded video" : "Delete downloaded article";
+                    var text = window.document.webL10n.get(this.props.model.isVideo() ? "delete-downloaded-video" : "delete-downloaded-article");
                     items.push(<li className="hot-item">
                             <a href="#" onClick={KA.Util.partial(this.props.onClickDeleteDownloadedVideo, this.props.model)}>{{text}}</a>
                         </li>);
