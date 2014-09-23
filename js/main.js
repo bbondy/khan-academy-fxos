@@ -576,7 +576,7 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
                             <a href="#" onClick={KA.Util.partial(this.props.onClickDeleteDownloadedVideo, this.props.model)}>{{text}}</a>
                         </li>);
                 } else {
-                    var text = this.props.model.isVideo() ? "Download video" : "Download article";
+                    var text =  window.document.webL10n.get(this.props.model.isVideo() ? "download-video" : "download-article");
                     items.push(<li className="hot-item">
                             <a href="#" onClick={KA.Util.partial(this.props.onClickDownloadContent, this.props.model)}>{{text}}</a>
                         </li>);
@@ -585,30 +585,28 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
 
             if (models.CurrentUser.isSignedIn()) {
                 // User is signed in, add all the signed in options here
-                items.push(<li><a href="#" onClick={this.props.onClickProfile}>Profile</a></li>);
+                items.push(<li><a  data-l10n-id="profile" href="#" onClick={this.props.onClickProfile}>Profile</a></li>);
             } else {
                 // If the user is not signed in, add that option first
-                items.push(<li><a href="#" onClick={this.props.onClickSignin}>Sign in</a></li>);
+                items.push(<li><a data-l10n-id="sign-in" href="#" onClick={this.props.onClickSignin}>Sign in</a></li>);
             }
-            items.push(<li><a href="#" onClick={this.props.onClickSettings}>Settings</a></li>);
+            items.push(<li><a data-l10n-id="settings" href="#" onClick={this.props.onClickSettings}>Settings</a></li>);
             items.push(<li><a data-l10n-id="downloads" href="#" onClick={this.props.onClickDownloads}>Downloads</a></li>);
 
             if (models.TempAppState.get("isDownloadingTopic")) {
-                var text = "Cancel topic downloading";
                 items.push(<li className="hot-item">
-                        <a href="#" onClick={KA.Util.partial(this.props.onClickCancelDownloadContent, this.props.model)}>{{text}}</a>
+                        <a href="#" data-l10n-id="cancel-topic-downloading" onClick={KA.Util.partial(this.props.onClickCancelDownloadContent, this.props.model)}>Cancel topic downloading</a>
                     </li>);
             } else if(this.props.model && this.props.model.isTopic()) {
-                var text = "Download full topic content";
                 items.push(<li className="hot-item">
-                        <a href="#" onClick={KA.Util.partial(this.props.onClickDownloadContent, this.props.model)}>{{text}}</a>
+                        <a href="#" data-l10n-id="download-full-topic-content" onClick={KA.Util.partial(this.props.onClickDownloadContent, this.props.model)}>Download full topic content</a>
                     </li>);
             }
 
 
             // Add the signout button last
             if (models.CurrentUser.isSignedIn()) {
-                items.push(<li><a href="#" onClick={this.props.onClickSignout}>Sign out</a></li>);
+                items.push(<li><a data-l10n-id="sign-out" href="#" onClick={this.props.onClickSignout}>Sign out</a></li>);
             }
 
             return <section className="sidebar" data-type="sidebar">
