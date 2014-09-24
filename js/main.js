@@ -930,14 +930,16 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
                 Status.start();
             }
             Downloads.download(model, onProgress).done(function(model, count) {
-                var title = "Download complete";
+                var title = window.document.webL10n.get("download-complete");
                 var contentTitle = model.get("title");
                 var message;
                 if (model.isContent()) {
                     if (model.isVideo()) {
-                        message = `The video "${contentTitle}" was downloaded successfully`;
+                        message = window.document.webL10n.get("video-complete-body",
+                            {"title" : contentTitle});
                     } else {
-                        message = `The article "${contentTitle}" was downloaded successfully`;
+                        message = window.document.webL10n.get("article-complete-body",
+                            {"title" : contentTitle});
                     }
                 } else {
                     message = window.document.webL10n.get("content-items-downloaded-succesfully",
