@@ -351,7 +351,8 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
 
             this.videoId = this.props.video.get("id");
             this.lastSecondWatched = 0;
-            if (this.props.video.get("lastSecondWatched") && this.props.video.get("lastSecondWatched") + 10 < this.props.video.get("duration")) {
+            if (this.props.video.get("lastSecondWatched") &&
+                    this.props.video.get("lastSecondWatched") + 10 < this.props.video.get("duration")) {
                 this.lastSecondWatched = this.props.video.get("lastSecondWatched");
             }
             this.secondsWatched = 0;
@@ -454,11 +455,14 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
             }
             console.log('video rendered with url: ' + videoSrc);
             var points = this.props.video.get("points") || 0;
+            var availablePoints = 750;
+            var pointsString = window.document.webL10n.get("points-so-far",
+                        {"earned" : points, "available": availablePoints});
             return <div className="video-viewer-container">
                  <video ref="video" controls>
                     <source src={videoSrc} type={this.props.video.getContentMimeType()}/>
                  </video>
-                 <div className="video-info-bar"><div className="energy-points pull-right">{{points}} of 750 points</div></div>
+                 <div className="video-info-bar"><div className="energy-points pull-right">{{pointsString}}</div></div>
                 {transcriptViewer}
             </div>;
         },
@@ -494,15 +498,15 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
 
                 var title = "Khan Academy";
                 if (this.props.isDownloadsShowing) {
-                    title = "Downloads";
+                    title = window.document.webL10n.get("downloads");
                 } else if (this.props.isProfileShowing) {
-                    title = "Profile";
+                    title = window.document.webL10n.get("profile");
                 } else if (this.props.isSettingsShowing) {
-                    title = "Settings";
+                    title = window.document.webL10n.get("settings");
                 } else if (this.props.model.get("title")) {
                     title = this.props.model.get("title");
                 } else if (this.props.model.isContentList()) {
-                    title = "Search";
+                    title = window.document.webL10n.get("search");
                 }
 
                 return <header className={styleClass}>
@@ -535,9 +539,10 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
                 height: "3em;",
                 position: "relative"
             };
-            var text = "Search...";
+            var text = window.document.webL10n.get("search");
             if (this.props.model.get("title")) {
-                text = "Search " + this.props.model.get("title");
+                text = window.document.webL10n.get("search-topic",
+                        {"topic": this.props.model.get("title")});
             }
             return <div>
                 <input className="search"
@@ -612,9 +617,9 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
             return <section className="sidebar" data-type="sidebar">
                 <header>
                     <menu type="toolbar">
-                        <a href="#">Done</a>
+                        <a data-l10n-id="done" href="#">Done</a>
                     </menu>
-                    <h1>Options</h1>
+                    <h1 data-l10n-id="options">Options</h1>
                 </header>
                 <nav>
                     <ul>
@@ -633,7 +638,7 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
         render: function() {
             if (!Downloads.contentList.length) {
                 return <div className="downloads">
-                    <h1>You have no downloads yet!</h1>
+                    <h1 data-l10n-id="no-downloads">You have no downloads yet!</h1>
                 </div>;
             }
 
@@ -658,7 +663,7 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
             console.log('rendering for value of: ' + this.props.options.get("showDownloadsOnly"));
             return <div className="settings topic-list-container">
 
-                <div>Show downloads only</div>
+                <div data-l10n-id="show-downloads-only">Show downloads only</div>
                 <label className="pack-switch">
                 <input title="hello" ref="showDownloadsOnly"
                        type="checkbox"
@@ -708,10 +713,11 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
             return {};
         },
         render: function() {
+            var pointsString = window.document.webL10n.get("points");
             return <div className="profile">
                 <img className="avatar" src={this.state.avatarUrl}/>
                 <h1>{this.state.nickname || this.state.username}</h1>
-                <h2>Points: <div className="energy-points">{KA.Util.numberWithCommas(this.state.points)}</div></h2>
+                <h2>{{pointsString}}: <div className="energy-points">{KA.Util.numberWithCommas(this.state.points)}</div></h2>
 
                 { this.state.badgeCounts ?
                     <div>
