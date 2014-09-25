@@ -899,11 +899,11 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
                 alert(window.document.webL10n.get("already-downloading"));
                 return;
             } else if (KA.Util.isMeteredConnection()) {
-                if (!confirm("It looks like your connection is metered (pay per use). Are you sure you'd like to continue?")) {
+                if (!confirm(window.document.webL10n.get("metered-connection-warning"))) {
                     return;
                 }
             } else if (KA.Util.isBandwidthCapped()) {
-                if (!confirm("It looks like you don't have unlimited bandwidth. Are you sure you'd like to continue?")) {
+                if (!confirm(window.document.webL10n.get("limited-bandwidth-warning"))) {
                     return;
                 }
             } else if (model.isTopic()) {
@@ -913,7 +913,8 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
                     return;
                 }
                 totalCount = KA.Util.numberWithCommas(totalCount);
-                if (!confirm(`Are you sure you'd like to download all remaining ${totalCount} content item(s)?`)) {
+                if (!confirm(window.document.webL10n.get("download-remaining",
+                            {"totalCount": totalCount}))) {
                     return;
                 }
             }
