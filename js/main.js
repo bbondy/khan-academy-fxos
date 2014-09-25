@@ -920,11 +920,13 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
 
             var onProgress = (model, count, cancelling) => {
                 if (cancelling) {
-                    Status.update(`Canceling downloading...`);
+                    Status.update(window.document.webL10n.get("canceling-download"));
                     return;
                 }
                 count = KA.Util.numberWithCommas(count);
-                Status.update(`Downloading: ${count} of ${totalCount} topic items...`);
+                var progressMessage = window.document.webL10n.get("downloading-progress",
+                            {"count" : count, "totalCount": totalCount});
+                Status.update(progressMessage);
             };
             if (model.isTopic()) {
                 Status.start();
