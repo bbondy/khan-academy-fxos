@@ -896,7 +896,7 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
         },
         onClickDownloadContent: function(model) {
             if (models.TempAppState.get("isDownloadingTopic")) {
-                alert("Please wait until the current list of content items are downloaded.");
+                alert(window.document.webL10n.get("already-downloading"));
                 return;
             } else if (KA.Util.isMeteredConnection()) {
                 if (!confirm("It looks like your connection is metered (pay per use). Are you sure you'd like to continue?")) {
@@ -909,7 +909,7 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
             } else if (model.isTopic()) {
                 var totalCount = model.getChildNotDownloadedCount();
                 if (totalCount === 0) {
-                    alert("All content items under this topic are already downloaded!");
+                    alert(window.document.webL10n.get("already-downloaded"));
                     return;
                 }
                 totalCount = KA.Util.numberWithCommas(totalCount);
