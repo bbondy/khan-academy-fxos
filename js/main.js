@@ -590,6 +590,8 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
                 if (this.props.model.get("ka_url")) {
                     var viewOnKAMessage = window.document.webL10n.get("view-on-ka");
                     items.push(<li><a href="#" onClick={KA.Util.partial(this.props.onClickViewOnKA, this.props.model)}>{{viewOnKAMessage}}</a></li>);
+                    var shareMessage = window.document.webL10n.get("share");
+                    items.push(<li><a href="#" onClick={KA.Util.partial(this.props.onClickShare, this.props.model)}>{{shareMessage}}</a></li>);
                 }
             }
 
@@ -908,6 +910,15 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
                 }
             });
         },
+        onClickShare: function(model) {
+            var activity = new MozActivity({
+                name: "share",
+                data: {
+                    type: "url",
+                    url: model.get("ka_url")
+                }
+            });
+        },
         onClickDownloadContent: function(model) {
             if (models.TempAppState.get("isDownloadingTopic")) {
                 alert(window.document.webL10n.get("already-downloading"));
@@ -1038,6 +1049,7 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
                          onClickSettings={this.onClickSettings}
                          onClickDownloadContent={this.onClickDownloadContent}
                          onClickViewOnKA={this.onClickViewOnKA}
+                         onClickShare={this.onClickShare}
                          onClickCancelDownloadContent={this.onClickCancelDownloadContent}
                          onClickDeleteDownloadedVideo={this.onClickDeleteDownloadedVideo}
                          />
