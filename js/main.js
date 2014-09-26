@@ -586,6 +586,11 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
                             <a href="#" onClick={KA.Util.partial(this.props.onClickDownloadContent, this.props.model)}>{{text}}</a>
                         </li>);
                 }
+
+                if (this.props.model.get("ka_url")) {
+                    var viewOnKAMessage = window.document.webL10n.get("view-on-ka");
+                    items.push(<li><a href="#" onClick={KA.Util.partial(this.props.onClickViewOnKA, this.props.model)}>{{viewOnKAMessage}}</a></li>);
+                }
             }
 
             if (models.CurrentUser.isSignedIn()) {
@@ -894,6 +899,15 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
                 wasLastDownloads: false
             });
         },
+        onClickViewOnKA: function(model) {
+            var activity = new MozActivity({
+                name: "view",
+                data: {
+                    type: "url",
+                    url: model.get("ka_url")
+                }
+            });
+        },
         onClickDownloadContent: function(model) {
             if (models.TempAppState.get("isDownloadingTopic")) {
                 alert(window.document.webL10n.get("already-downloading"));
@@ -1023,6 +1037,7 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
                          onClickDownloads={this.onClickDownloads}
                          onClickSettings={this.onClickSettings}
                          onClickDownloadContent={this.onClickDownloadContent}
+                         onClickViewOnKA={this.onClickViewOnKA}
                          onClickCancelDownloadContent={this.onClickCancelDownloadContent}
                          onClickDeleteDownloadedVideo={this.onClickDeleteDownloadedVideo}
                          />
