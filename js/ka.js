@@ -7,6 +7,29 @@ define(["oauth", "storage"], function(_oauth, Storage) {
      */
     var Util = {
         /**
+         * We don't need to list en here since that is the default
+         */
+        supportedLocales: ["boxes", "es", "fr", "pt"],
+        /**
+         * Returns the phone's locale or null for the default locale (en-US)
+         */
+        getLang: function() {
+            if (!this.isFirefoxOS()) {
+                return null;
+            }
+
+            // If we're testing via boxes, let that override the current setting
+            if (window.translateToBoxes) {
+                return "boxes";
+            }
+
+            var lang = document.webL10n.getLanguage().substring(0, 2);
+            if (this.supportedLocales.indexOf(lang) === -1) {
+                return null;
+            }
+            return lang;
+        },
+        /**
          * Returns true when run within a gaia environment
          */
         isFirefoxOS: function() {
@@ -218,13 +241,19 @@ define(["oauth", "storage"], function(_oauth, Storage) {
             this._saveAuth();
         },
         _basicAPICall: function(url, extraParams, method) {
+            extraParams = extraParams || {};
             if (_.isUndefined(method)) {
                 method = "GET";
             }
-            if (extraParams) {
-                for (var p in extraParams) {
-                    url = Util.appendQueryParam(url, p, extraParams[p]);
-                }
+
+            // Add a lang parameter to tell the KA API which langauge we want
+            var lang = KA.Util.getLang();
+            if (lang) {
+                extraParams["lang"] = lang;
+            }
+
+            for (var p in extraParams) {
+                url = Util.appendQueryParam(url, p, extraParams[p]);
             }
             var d = $.Deferred();
             $.oauth($.extend( {}, this.oauth, {
@@ -254,11 +283,18 @@ define(["oauth", "storage"], function(_oauth, Storage) {
         },
         getTopicTree: function() {
             if (!Util.isFirefoxOS()) {
-                return this._basicAPICall("/knowledge-map.json");
+                var filename = "/data/topic-tree";
+                var lang = KA.Util.getLang();
+                if (lang) {
+                    filename += "-" + lang;
+                }
+                filename += ".json";
+                return this._basicAPICall(filename);
             }
             var d = $.Deferred();
 
-            var filename = "topictree1.json";
+            var lang = KA.Util.getLang();
+            var filename = `topictree1-${lang}.json`;
             var topicTreePromise = Storage.readText(filename);
             topicTreePromise.done((data) => {
                 d.resolve(JSON.parse(data));
