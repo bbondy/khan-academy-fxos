@@ -301,11 +301,11 @@ define(["oauth", "storage"], function(_oauth, Storage) {
             return this._basicAPICall(this.API_V1_BASE + `/user/videos/${youTubeId}/log`, extraParams, "POST");
         },
         API_BASE: "https://www.khanacademy.org/api",
-        API_V1_BASE: "https://www.khanacademy.org/api/v1",
+        API_V1_BASE: "https://www.khanacademy.org/api/v1"
         //API_BASE: "http://192.168.1.131:8080/api",
         //API_V1_BASE: "http://192.168.1.131:8080/api/v1",
         //API_BASE: "http://stable.ka.local:8080/api",
-        //API_V1_BASE: "http://stable.ka.local:8080/api/v1",
+        //API_V1_BASE: "http://stable.ka.local:8080/api/v1"
     };
 
     var KA = {
