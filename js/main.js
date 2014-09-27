@@ -36,7 +36,7 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
             return <li className={topicClass}>
                 { this.props.topic.isRootChild() ? <div className="color-block"/> : null }
                 <a href="#" onClick={KA.Util.partial(this.props.onClickTopic, this.props.topic)}>
-                    <p className="topic-title">{this.props.topic.get("title")}</p>
+                    <p className="topic-title">{this.props.topic.get("translated_title")}</p>
                 </a>
             </li>;
         }
@@ -86,7 +86,7 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
                     <div className={pipeClass}/>
                 </div>
                 <a href="#" onClick={KA.Util.partial(this.props.onClickVideo, this.props.video)}>
-                    <p className="video-title">{this.props.video.get("title")}</p>
+                    <p className="video-title">{this.props.video.get("translated_title")}</p>
                 </a>
             </li>;
         }
@@ -132,7 +132,7 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
                     <div className={pipeClass}/>
                 </div>
                 <a href="#" onClick={KA.Util.partial(this.props.onClickArticle, this.props.article)}>
-                    <p className="article-title">{this.props.article.get("title")}</p>
+                    <p className="article-title">{this.props.article.get("translated_title")}</p>
                 </a>
             </li>;
         }
@@ -503,8 +503,8 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
                     title = window.document.webL10n.get("profile");
                 } else if (this.props.isSettingsShowing) {
                     title = window.document.webL10n.get("settings");
-                } else if (this.props.model.get("title")) {
-                    title = this.props.model.get("title");
+                } else if (this.props.model.get("translated_title")) {
+                    title = this.props.model.get("translated_title");
                 } else if (this.props.model.isContentList()) {
                     title = window.document.webL10n.get("search");
                 }
@@ -540,13 +540,13 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
                 position: "relative"
             };
             var text = window.document.webL10n.get("search");
-            if (this.props.model.get("title")) {
+            if (this.props.model.get("translated_title")) {
                 text = window.document.webL10n.get("search-topic",
-                        {"topic": this.props.model.get("title")});
+                        {"topic": this.props.model.get("translated_title")});
             }
             return <div>
                 <input className="search"
-                       type="text"
+                       type="searh"
                        placeholder={text}
                        value={this.state.value}
                        required=""
@@ -959,7 +959,7 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
             }
             Downloads.download(model, onProgress).done(function(model, count) {
                 var title = window.document.webL10n.get("download-complete");
-                var contentTitle = model.get("title");
+                var contentTitle = model.get("translated_title");
                 var message;
                 if (model.isContent()) {
                     if (model.isVideo()) {
