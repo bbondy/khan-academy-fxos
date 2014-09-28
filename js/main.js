@@ -660,7 +660,7 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
         render: function() {
             if (!Downloads.contentList.length) {
                 return <div className="downloads">
-                    <h1 data-l10n-id="no-downloads">You have no downloads yet!</h1>
+                    <div data-l10n-id="no-downloads">You have no downloads yet!</div>
                 </div>;
             }
 
