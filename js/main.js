@@ -498,11 +498,11 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
 
                 var title = "Khan Academy";
                 if (this.props.isDownloadsShowing) {
-                    title = window.document.webL10n.get("downloads");
+                    title = window.document.webL10n.get("view-downloads");
                 } else if (this.props.isProfileShowing) {
-                    title = window.document.webL10n.get("profile");
+                    title = window.document.webL10n.get("view-profile");
                 } else if (this.props.isSettingsShowing) {
-                    title = window.document.webL10n.get("settings");
+                    title = window.document.webL10n.get("view-settings");
                 } else if (this.props.model.get("translated_title")) {
                     title = this.props.model.get("translated_title");
                 } else if (this.props.model.isContentList()) {
@@ -574,6 +574,8 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
         render: function() {
             var items = [];
 
+            ////////////////////
+            // Context sensitive actions first
             if (!this.props.isPaneShowing &&
                     this.props.model && this.props.model.isContent()) {
                 if (this.props.model.isDownloaded()) {
@@ -587,27 +589,15 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
                             <a href="#" onClick={KA.Util.partial(this.props.onClickDownloadContent, this.props.model)}>{{text}}</a>
                         </li>);
                 }
-
-                if (this.props.model.get("ka_url")) {
-                    var viewOnKAMessage = window.document.webL10n.get("view-on-ka");
-                    items.push(<li><a href="#" onClick={KA.Util.partial(this.props.onClickViewOnKA, this.props.model)}>{{viewOnKAMessage}}</a></li>);
-                    var shareMessage = window.document.webL10n.get("share");
-                    items.push(<li><a href="#" onClick={KA.Util.partial(this.props.onClickShare, this.props.model)}>{{shareMessage}}</a></li>);
-                }
             }
-
-            if (models.CurrentUser.isSignedIn() && !this.props.isProfileShowing) {
-                // User is signed in, add all the signed in options here
-                items.push(<li><a  data-l10n-id="profile" href="#" onClick={this.props.onClickProfile}>Profile</a></li>);
-            } else {
-                // If the user is not signed in, add that option first
-                items.push(<li><a data-l10n-id="sign-in" href="#" onClick={this.props.onClickSignin}>Sign in</a></li>);
-            }
-            if (!this.props.isSettingsShowing) {
-                items.push(<li><a data-l10n-id="settings" href="#" onClick={this.props.onClickSettings}>Settings</a></li>);
-            }
-            if (!this.props.isDownloadsShowing) {
-                items.push(<li><a data-l10n-id="downloads" href="#" onClick={this.props.onClickDownloads}>Downloads</a></li>);
+            if (!this.props.isPaneShowing &&
+                    this.props.model &&
+                    this.props.model.isContent() &&
+                    this.props.model.get("ka_url")) {
+                var viewOnKAMessage = window.document.webL10n.get("open-in-website");
+                items.push(<li><a href="#" onClick={KA.Util.partial(this.props.onClickViewOnKA, this.props.model)}>{{viewOnKAMessage}}</a></li>);
+                var shareMessage = window.document.webL10n.get("share");
+                items.push(<li><a href="#" onClick={KA.Util.partial(this.props.onClickShare, this.props.model)}>{{shareMessage}}</a></li>);
             }
 
             if (models.TempAppState.get("isDownloadingTopic")) {
@@ -619,6 +609,26 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
                 items.push(<li className="hot-item">
                         <a href="#" data-l10n-id="download-full-topic-content" onClick={KA.Util.partial(this.props.onClickDownloadContent, this.props.model)}>Download full topic content</a>
                     </li>);
+            }
+
+            ////////////////////
+            // Followed by sign in
+            if (!models.CurrentUser.isSignedIn() || this.props.isProfileShowing) {
+                // If the user is not signed in, add that option first
+                items.push(<li><a data-l10n-id="sign-in" href="#" onClick={this.props.onClickSignin}>Sign in</a></li>);
+            }
+
+            ////////////////////
+            // Followed by view pane items
+            if (models.CurrentUser.isSignedIn() && !this.props.isProfileShowing) {
+                // User is signed in, add all the signed in options here
+                items.push(<li><a  data-l10n-id="view-profile" href="#" onClick={this.props.onClickProfile}>Profile</a></li>);
+            }
+            if (!this.props.isSettingsShowing) {
+                items.push(<li><a data-l10n-id="view-settings" href="#" onClick={this.props.onClickSettings}>Settings</a></li>);
+            }
+            if (!this.props.isDownloadsShowing) {
+                items.push(<li><a data-l10n-id="view-downloads" href="#" onClick={this.props.onClickDownloads}>Downloads</a></li>);
             }
 
             // Add the signout button last
