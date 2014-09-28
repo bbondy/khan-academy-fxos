@@ -19,6 +19,15 @@
     "en": {
       "name": "Khan Academy",
       "description": "Khan Academy allows you to learn almost anything for free"
+    },
+    "fr": {
+      "name": "Khan Academy"
+    },
+    "es": {
+      "name": "Khan Academy"
+    },
+    "pt": {
+      "name": "Khan Academy"
     }
   },
   "default_locale": "en",
