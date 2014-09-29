@@ -1,8 +1,9 @@
 require.config({
     baseUrl: '/build',
     paths: {
+        "util": "util",
         "downloads": "downloads",
-        "ka": "ka",
+        "apiclient": "apiclient",
         "main": "main",
         "oauth": "oauth",
         "models": "models",

@@ -4,12 +4,13 @@
 
 "use strict";
 
-define(["react", "models", "ka", "cache", "storage", "downloads", "notifications", "status"],
-        function(React, models, KA, Cache, Storage, Downloads, Notifications, Status) {
+define(["react", "util", "models", "apiclient", "cache", "storage", "downloads", "notifications", "status"],
+        function(React, Util, models, APIClient, Cache, Storage, Downloads, Notifications, Status) {
     var cx = React.addons.classSet;
 
     // TODO: remove, just for easy inpsection
-    window.KA = KA;
+    window.APIClient = APIClient;
+    window.Util = Util;
     window.models = models;
 
     /**
@@ -35,7 +36,7 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
 
             return <li className={topicClass}>
                 { this.props.topic.isRootChild() ? <div className="color-block"/> : null }
-                <a href="#" onClick={KA.Util.partial(this.props.onClickTopic, this.props.topic)}>
+                <a href="#" onClick={Util.partial(this.props.onClickTopic, this.props.topic)}>
                     <p className="topic-title">{this.props.topic.get("translated_title")}</p>
                 </a>
             </li>;
@@ -80,12 +81,12 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
             var videoClass = cx(videoClassObj);
             return <li className={videoClass}>
                 <div className={subwayIconClass}>
-                    <a href="#" onClick={KA.Util.partial(this.props.onClickVideo, this.props.video)}>
+                    <a href="#" onClick={Util.partial(this.props.onClickVideo, this.props.video)}>
                         <div className={videoNodeClass}/>
                     </a>
                     <div className={pipeClass}/>
                 </div>
-                <a href="#" onClick={KA.Util.partial(this.props.onClickVideo, this.props.video)}>
+                <a href="#" onClick={Util.partial(this.props.onClickVideo, this.props.video)}>
                     <p className="video-title">{this.props.video.get("translated_title")}</p>
                 </a>
             </li>;
@@ -126,12 +127,12 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
             var articleClass = cx(articleClassObj);
             return <li className={articleClass}>
                 <div className={subwayIconClass}>
-                    <a href="#" onClick={KA.Util.partial(this.props.onClickArticle, this.props.article)}>
+                    <a href="#" onClick={Util.partial(this.props.onClickArticle, this.props.article)}>
                         <div className={articleNodeClass}/>
                     </a>
                     <div className={pipeClass}/>
                 </div>
-                <a href="#" onClick={KA.Util.partial(this.props.onClickArticle, this.props.article)}>
+                <a href="#" onClick={Util.partial(this.props.onClickArticle, this.props.article)}>
                     <p className="article-title">{this.props.article.get("translated_title")}</p>
                 </a>
             </li>;
@@ -147,7 +148,7 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
     var BackButton = React.createClass({
         render: function() {
             return <div>
-                <a className="icon-back-link " href="#" onClick={KA.Util.partial(this.props.onClickBack, this.props.model)}>
+                <a className="icon-back-link " href="#" onClick={Util.partial(this.props.onClickBack, this.props.model)}>
                     <span className="icon icon-back">Back</span>
                 </a>
             </div>;
@@ -254,7 +255,7 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
             var startSecond = this.props.transcriptItem.start_time / 1000 % 60 | 0;
             startSecond = ("0" + startSecond).slice(-2);
             return <li className="transcript-item">
-                <a href="#" onClick={KA.Util.partial(this.props.onClickTranscript, this.props.transcriptItem)}>
+                <a href="#" onClick={Util.partial(this.props.onClickTranscript, this.props.transcriptItem)}>
                     <div>{startMinute}:{startSecond}</div>
                     <div>{this.props.transcriptItem.text}</div>
                 </a>
@@ -284,7 +285,7 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
      * display it to the user.
      */
     var ArticleViewer = React.createClass({
-        mixins: [KA.Util.BackboneMixin],
+        mixins: [Util.BackboneMixin],
         getBackboneModels: function() {
             return [this.props.article];
         },
@@ -295,7 +296,7 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
                     this.props.article.set("content", result);
                 });
             } else {
-                KA.APIClient.getArticle(this.props.article.id).done((result) => {
+                APIClient.getArticle(this.props.article.id).done((result) => {
                     console.log("rendered article from web");
                     this.props.article.set("content", result.translated_html_content);
                 });
@@ -305,7 +306,7 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
             this.timerId = setTimeout(this.onReportComplete.bind(this), 5000);
         },
         onReportComplete: function() {
-            KA.APIClient.reportArticleRead(this.props.article.id);
+            APIClient.reportArticleRead(this.props.article.id);
         },
         componentWillUnmount: function() {
             clearTimeout(this.timerId);
@@ -328,12 +329,12 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
      * display it to the user.
      */
     var VideoViewer = React.createClass({
-        mixins: [KA.Util.BackboneMixin],
+        mixins: [Util.BackboneMixin],
         getBackboneModels: function() {
             return [this.props.video];
         },
         componentWillMount: function() {
-            KA.APIClient.getVideoTranscript(this.props.video.get("youtube_id")).done((transcript) => {
+            APIClient.getVideoTranscript(this.props.video.get("youtube_id")).done((transcript) => {
                 this.setState({transcript: transcript});
             });
 
@@ -581,12 +582,12 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
                 if (this.props.model.isDownloaded()) {
                     var text = window.document.webL10n.get(this.props.model.isVideo() ? "delete-downloaded-video" : "delete-downloaded-article");
                     items.push(<li className="hot-item">
-                            <a href="#" onClick={KA.Util.partial(this.props.onClickDeleteDownloadedVideo, this.props.model)}>{{text}}</a>
+                            <a href="#" onClick={Util.partial(this.props.onClickDeleteDownloadedVideo, this.props.model)}>{{text}}</a>
                         </li>);
                 } else {
                     var text =  window.document.webL10n.get(this.props.model.isVideo() ? "download-video" : "download-article");
                     items.push(<li className="hot-item">
-                            <a href="#" onClick={KA.Util.partial(this.props.onClickDownloadContent, this.props.model)}>{{text}}</a>
+                            <a href="#" onClick={Util.partial(this.props.onClickDownloadContent, this.props.model)}>{{text}}</a>
                         </li>);
                 }
             }
@@ -595,19 +596,19 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
                     this.props.model.isContent() &&
                     this.props.model.get("ka_url")) {
                 var viewOnKAMessage = window.document.webL10n.get("open-in-website");
-                items.push(<li><a href="#" onClick={KA.Util.partial(this.props.onClickViewOnKA, this.props.model)}>{{viewOnKAMessage}}</a></li>);
+                items.push(<li><a href="#" onClick={Util.partial(this.props.onClickViewOnKA, this.props.model)}>{{viewOnKAMessage}}</a></li>);
                 var shareMessage = window.document.webL10n.get("share");
-                items.push(<li><a href="#" onClick={KA.Util.partial(this.props.onClickShare, this.props.model)}>{{shareMessage}}</a></li>);
+                items.push(<li><a href="#" onClick={Util.partial(this.props.onClickShare, this.props.model)}>{{shareMessage}}</a></li>);
             }
 
             if (models.TempAppState.get("isDownloadingTopic")) {
                 items.push(<li className="hot-item">
-                        <a href="#" data-l10n-id="cancel-topic-downloading" onClick={KA.Util.partial(this.props.onClickCancelDownloadContent, this.props.model)}>Cancel topic downloading</a>
+                        <a href="#" data-l10n-id="cancel-topic-downloading" onClick={Util.partial(this.props.onClickCancelDownloadContent, this.props.model)}>Cancel topic downloading</a>
                     </li>);
             } else if(!this.props.isPaneShowing &&
                         this.props.model && this.props.model.isTopic()) {
                 items.push(<li className="hot-item">
-                        <a href="#" data-l10n-id="download-full-topic-content" onClick={KA.Util.partial(this.props.onClickDownloadContent, this.props.model)}>Download full topic content</a>
+                        <a href="#" data-l10n-id="download-full-topic-content" onClick={Util.partial(this.props.onClickDownloadContent, this.props.model)}>Download full topic content</a>
                     </li>);
             }
 
@@ -717,7 +718,7 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
      */
     var ProfileViewer = React.createClass({
         componentWillMount: function() {
-            KA.APIClient.getUserInfo().done((result) => {
+            APIClient.getUserInfo().done((result) => {
                 //this.setState({content: result.translated_html_content});
                 this.setState({
                     avatarUrl: result.avatar_url,
@@ -739,7 +740,7 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
             return <div className="profile">
                 <img className="avatar" src={this.state.avatarUrl}/>
                 <h1>{this.state.nickname || this.state.username}</h1>
-                <h2>{{pointsString}}: <div className="energy-points">{KA.Util.numberWithCommas(this.state.points)}</div></h2>
+                <h2>{{pointsString}}: <div className="energy-points">{Util.numberWithCommas(this.state.points)}</div></h2>
 
                 { this.state.badgeCounts ?
                     <div>
@@ -780,7 +781,7 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
      * for the overall top level view (which is nice and clean ;)).
      */
     var MainView = React.createClass({
-        mixins: [KA.Util.BackboneMixin, KA.Util.LocalizationMixin],
+        mixins: [Util.BackboneMixin, Util.LocalizationMixin],
         getBackboneModels: function() {
             return [new models.ContentList(models.TopicTree.allContentItems),
                 models.AppOptions, models.TempAppState, models.CurrentUser];
@@ -882,11 +883,11 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
             });
         },
         onClickSignin: function() {
-            KA.APIClient.signIn();
+            APIClient.signIn();
             this.forceUpdate();
         },
         onClickSignout: function() {
-            KA.APIClient.signOut();
+            APIClient.signOut();
             this.forceUpdate();
         },
         onClickProfile: function() {
@@ -938,11 +939,11 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
             if (models.TempAppState.get("isDownloadingTopic")) {
                 alert(window.document.webL10n.get("already-downloading"));
                 return;
-            } else if (KA.Util.isMeteredConnection()) {
+            } else if (Util.isMeteredConnection()) {
                 if (!confirm(window.document.webL10n.get("metered-connection-warning"))) {
                     return;
                 }
-            } else if (KA.Util.isBandwidthCapped()) {
+            } else if (Util.isBandwidthCapped()) {
                 if (!confirm(window.document.webL10n.get("limited-bandwidth-warning"))) {
                     return;
                 }
@@ -952,7 +953,7 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
                     alert(window.document.webL10n.get("already-downloaded"));
                     return;
                 }
-                totalCount = KA.Util.numberWithCommas(totalCount);
+                totalCount = Util.numberWithCommas(totalCount);
                 if (!confirm(window.document.webL10n.get("download-remaining",
                             {"totalCount": totalCount}))) {
                     return;
@@ -964,7 +965,7 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
                     Status.update(window.document.webL10n.get("canceling-download"));
                     return;
                 }
-                count = KA.Util.numberWithCommas(count);
+                count = Util.numberWithCommas(count);
                 var progressMessage = window.document.webL10n.get("downloading-progress",
                             {"count" : count, "totalCount": totalCount});
                 Status.update(progressMessage);
@@ -1101,7 +1102,7 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
 
     // Init everything
     Storage.init().then(function(){
-      return KA.APIClient.init();
+      return APIClient.init();
     }).then(function() {
         return models.TopicTree.init();
     }).then(function() {
@@ -1115,10 +1116,6 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
         });
     }).fail((error) => {
         alert(error);
-        if (KA.Util) {
-            KA.Util.quit();
-        } else {
-            window.close();
-        }
+        Util.quit();
     });
 });

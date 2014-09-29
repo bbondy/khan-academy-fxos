@@ -10,8 +10,8 @@
  * init will not wait for the result.
  */
 
-define(["ka", "models"],
-        function(KA, models) {
+define(["util", "models"],
+        function(Util, models) {
 
     var Cache = {
         /**
@@ -25,12 +25,12 @@ define(["ka", "models"],
             return d.resolve().promise();
         },
         heartbeat: function() {
-            if (KA.Util.isMeteredConnection()) {
+            if (Util.isMeteredConnection()) {
                 console.log('skipping heartbeat due to metered connection!');
                 return;
             }
 
-            if (KA.Util.isBandwidthCapped()) {
+            if (Util.isBandwidthCapped()) {
                 console.log('skipping heartbeat due to capped bandwidth!');
             }
 
