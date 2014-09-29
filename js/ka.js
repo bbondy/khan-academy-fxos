@@ -29,6 +29,9 @@ define(["oauth", "storage"], function(_oauth, Storage) {
             }
             return lang;
         },
+        quit: function() {
+            window.close();
+        },
         /**
          * Returns true when run within a gaia environment
          */
@@ -281,33 +284,17 @@ define(["oauth", "storage"], function(_oauth, Storage) {
         getUserInfo: function() {
             return this._basicAPICall(this.API_V1_BASE + "/user");
         },
-        getTopicTree: function() {
-            if (!Util.isFirefoxOS()) {
-                var filename = "/data/topic-tree";
-                var lang = KA.Util.getLang();
-                if (lang) {
-                    filename += "-" + lang;
-                }
-                filename += ".json";
-                return this._basicAPICall(filename);
-            }
-            var d = $.Deferred();
-
+        getInstalledTopicTree: function() {
+            var filename = `data/topic-tree`;
             var lang = KA.Util.getLang();
-            var filename = `topictree1-${lang}.json`;
-            var topicTreePromise = Storage.readText(filename);
-            topicTreePromise.done((data) => {
-                d.resolve(JSON.parse(data));
-            });
-            topicTreePromise.fail(() => {
-                var promise = this._basicAPICall(this.API_V1_BASE + "/fxos/topictree");
-                promise.done((data) => {
-                    Storage.writeText(filename, JSON.stringify(data));
-                    d.resolve(data);
-                });
-            });
-
-            return d.promise();
+            if (lang) {
+                filename += "-" + lang;
+            }
+            filename += ".json";
+            return this._basicAPICall(filename);
+        },
+        getTopicTree: function() {
+            return this._basicAPICall(this.API_V1_BASE + "/fxos/topictree");
         },
         getVideoTranscript: function(youTubeId) {
             return this._basicAPICall(this.API_V1_BASE + `/videos/${youTubeId}/transcript`);

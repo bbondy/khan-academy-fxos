@@ -1,4 +1,4 @@
-define(["ka"], function(KA) {
+define(["ka", "storage"], function(KA, Storage) {
     var TopicTreeBase = {
         isTopic: function() {
             return false;
@@ -53,12 +53,50 @@ define(["ka"], function(KA) {
     var TopicTree = {
         init: function() {
             var d = $.Deferred();
-            KA.APIClient.getTopicTree().done((topicTreeData) => {
+
+            // Check if we have a local downloaded copy of the topic tree
+            var topicTreePromise = Storage.readText(this.getTopicTreeFilename());
+            topicTreePromise.done((data) => {
+                console.log("Loaded topic tree from local copy");
+                var topicTreeData = JSON.parse(data);
                 this.root = new TopicModel(topicTreeData, {parse: true});
                 d.resolve();
             });
+
+            // If we don't have a local downloaded copy, load in the
+            // one we shipped with for the instaled app.
+            topicTreePromise.fail(() => {
+                var defaultTreeLoadPromise = KA.APIClient.getInstalledTopicTree();
+                defaultTreeLoadPromise.done((topicTreeData) => {
+                    console.log("Loaded topic tree from installed default");
+                    this.root = new TopicModel(topicTreeData, {parse: true});
+                    d.resolve();
+                });
+                defaultTreeLoadPromise.fail(() => {
+                    console.log('init topic tree 4');
+                    d.reject("Fatal error! Could not load topic tree!");
+                });
+            });
             return d.promise();
         },
+        refreshTopicTreeInfo: function() {
+            var d = $.Deferred();
+            var getTopicTreePromise = KA.APIClient.getTopicTree();
+            getTopicTreePromise.done((data) => {
+                Storage.writeText(this.getTopicTreeFilename(), JSON.stringify(data));
+                d.resolve(data);
+            });
+
+            getTopicTreePromise.fail(() => {
+                d.reject();
+            });
+            return d.promise();
+        },
+        getTopicTreeFilename: function() {
+            var lang = KA.Util.getLang();
+            return `topictree2-${lang}.json`;
+        },
+
         allContentItems: [],
 
         /**
