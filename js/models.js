@@ -1,4 +1,4 @@
-define(["ka", "storage"], function(KA, Storage) {
+define(["util", "apiclient", "storage"], function(Util, APIClient, Storage) {
     var TopicTreeBase = {
         isTopic: function() {
             return false;
@@ -66,7 +66,7 @@ define(["ka", "storage"], function(KA, Storage) {
             // If we don't have a local downloaded copy, load in the
             // one we shipped with for the instaled app.
             topicTreePromise.fail(() => {
-                var defaultTreeLoadPromise = KA.APIClient.getInstalledTopicTree();
+                var defaultTreeLoadPromise = APIClient.getInstalledTopicTree();
                 defaultTreeLoadPromise.done((topicTreeData) => {
                     console.log("Loaded topic tree from installed default");
                     this.root = new TopicModel(topicTreeData, {parse: true});
@@ -81,7 +81,7 @@ define(["ka", "storage"], function(KA, Storage) {
         },
         refreshTopicTreeInfo: function() {
             var d = $.Deferred();
-            var getTopicTreePromise = KA.APIClient.getTopicTree();
+            var getTopicTreePromise = APIClient.getTopicTree();
             getTopicTreePromise.done((data) => {
                 Storage.writeText(this.getTopicTreeFilename(), JSON.stringify(data));
                 d.resolve(data);
@@ -93,8 +93,8 @@ define(["ka", "storage"], function(KA, Storage) {
             return d.promise();
         },
         getTopicTreeFilename: function() {
-            var lang = KA.Util.getLang();
-            return `topictree2-${lang}.json`;
+            var lang = Util.getLang();
+            return `topictree3-${lang}.json`;
         },
 
         allContentItems: [],
@@ -317,7 +317,7 @@ define(["ka", "storage"], function(KA, Storage) {
     var UserModel = Backbone.Model.extend({
         signIn: function() {
             var d = $.Deferred();
-            return KA.APIClient.signIn().done(() => {
+            return APIClient.signIn().done(() => {
                 this.refreshLoggedInInfo();
                 // We don't need to wait for the result of the
                 // refreshLoggedInInfo promise, just resolve right away.
@@ -326,10 +326,10 @@ define(["ka", "storage"], function(KA, Storage) {
             return d.promise();
         },
         signOut: function() {
-            return KA.APIClient.signOut();
+            return APIClient.signOut();
         },
         isSignedIn: function() {
-            return KA.APIClient.isSignedIn();
+            return APIClient.isSignedIn();
         },
         refreshLoggedInInfo: function() {
             var d = $.Deferred();
@@ -339,7 +339,7 @@ define(["ka", "storage"], function(KA, Storage) {
 
             // The call is needed for completed/in progress status of content items
             // Unlike getUserVideos, this includes both articles and videos.
-            KA.APIClient.getUserProgress().done(function(data) {
+            APIClient.getUserProgress().done(function(data) {
                 console.log('user progress summary: ');
                 console.log(data);
                 this.completedEntityIds = data.complete;
@@ -372,7 +372,7 @@ define(["ka", "storage"], function(KA, Storage) {
                 console.log(this.startedEntities);
 
                 // The call is needed for the last second watched and points of each watched item.
-                KA.APIClient.getUserVideos().done(function(results) {
+                APIClient.getUserVideos().done(function(results) {
                     console.log('getUserVideos:')
                     console.log(results);
 
@@ -403,7 +403,7 @@ define(["ka", "storage"], function(KA, Storage) {
             var d = $.Deferred();
             var videoId = video.get("id");
             var duration = video.get("duration");
-            KA.APIClient.reportVideoProgress(videoId, youTubeId, duration, secondsWatched, lastSecondWatched).done((result) => {
+            APIClient.reportVideoProgress(videoId, youTubeId, duration, secondsWatched, lastSecondWatched).done((result) => {
                 console.log('reportVideoProgress result:');
                 console.log(result);
 
