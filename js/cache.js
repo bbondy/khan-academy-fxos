@@ -25,7 +25,16 @@ define(["ka", "models"],
             return d.resolve().promise();
         },
         heartbeat: function() {
-            console.log('heartbeat!');
+            if (KA.Util.isMeteredConnection()) {
+                console.log('skipping heartbeat due to metered connection!');
+                return;
+            }
+
+            if (KA.Util.isBandwidthCapped()) {
+                console.log('skipping heartbeat due to capped bandwidth!');
+            }
+
+            console.log('heartbeat! Refreshing logged in info!');
             models.CurrentUser.refreshLoggedInInfo();
         }
     }
