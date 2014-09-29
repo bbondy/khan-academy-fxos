@@ -34,8 +34,11 @@ define(["ka", "models"],
                 console.log('skipping heartbeat due to capped bandwidth!');
             }
 
-            console.log('heartbeat! Refreshing logged in info!');
+            console.log('heartbeat: Refreshing logged in info!');
             models.CurrentUser.refreshLoggedInInfo();
+
+            console.log('heartbeat: Refreshing topic tree!');
+            models.TopicTree.refreshTopicTreeInfo();
         }
     }
 

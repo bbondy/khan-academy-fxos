@@ -1113,5 +1113,12 @@ define(["react", "models", "ka", "cache", "storage", "downloads", "notifications
         Storage.readText("data.json").done(function(data) {
             console.log('read: ' + data);
         });
+    }).fail((error) => {
+        alert(error);
+        if (KA.Util) {
+            KA.Util.quit();
+        } else {
+            window.close();
+        }
     });
 });
