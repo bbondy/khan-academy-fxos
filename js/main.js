@@ -184,7 +184,7 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
                 var topics = _(this.props.topic.get("topics").models).map((topic) => {
                     return <TopicListItem topic={topic}
                                       onClickTopic={this.props.onClickTopic}
-                                      key={topic.get("slug")}/>;
+                                      key={topic.get("id")}/>;
                 });
             }
 
@@ -193,11 +193,11 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
                     if (contentItem.isVideo()) {
                         return <VideoListItem video={contentItem}
                                               onClickVideo={this.props.onClickContentItem}
-                                              key={contentItem.get("slug")} />;
+                                              key={contentItem.get("id")} />;
                     }
                     return <ArticleListItem article={contentItem}
                                             onClickArticle={this.props.onClickContentItem}
-                                            key={contentItem.get("slug")} />;
+                                            key={contentItem.get("id")} />;
                 });
             }
 
@@ -225,11 +225,11 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
                     if (contentItem.isVideo()) {
                         return <VideoListItem video={contentItem}
                                               onClickVideo={this.props.onClickContentItem}
-                                              key={contentItem.get("slug")} />;
+                                              key={contentItem.get("id")} />;
                     }
                     return <ArticleListItem article={contentItem}
                                             onClickArticle={this.props.onClickContentItem}
-                                            key={contentItem.get("slug")} />;
+                                            key={contentItem.get("id")} />;
                 });
             }
 
