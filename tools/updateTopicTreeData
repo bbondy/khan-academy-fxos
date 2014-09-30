@@ -1,0 +1,4 @@
+curl 'ka.dev:8080/api/v1/fxos/topictree' > data/topic-tree.json
+curl 'ka.dev:8080/api/v1/fxos/topictree?lang=fr' > data/topic-tree-fr.json
+curl 'ka.dev:8080/api/v1/fxos/topictree?lang=es' > data/topic-tree-es.json
+curl 'ka.dev:8080/api/v1/fxos/topictree?lang=pt' > data/topic-tree-pt.json
