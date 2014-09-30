@@ -41,7 +41,7 @@ var propertyValueMap = [
 
 // Things specified in the endpoint that I may need eventually
 // but don't need now
-var uneededProps = ["sha", "date_added", "readable_id", "slug"];
+var uneededProps = ["sha", "date_added", "readable_id", "slug", "render_type"];
 
 function stripKnownUrls(node) {
     var urlPrefix = "http://www.khanacademy.org/video/";
@@ -58,6 +58,11 @@ function stripKnownUrls(node) {
 }
 
 function removeUneededProps(node) {
+    // We only use the id on domains and for content items
+    if (node.kind !== "Video" && node.kind !== "Article" &&
+            node.render_type !== "Domain") {
+        delete node.id;
+    }
     for (var x in node) {
         uneededProps.forEach(function(uneededProp) {
             if (x === uneededProp) {
@@ -105,8 +110,10 @@ function translateNodePropertyNames(node) {
     propertyNameMap.forEach(function(map) {
         var name = map[0];
         var value = map[1];
-        node[name] = node[value];
-        delete node[value];
+        if (typeof node[value] !== 'undefined') {
+            node[name] = node[value];
+            delete node[value];
+        }
     });
 }
 
@@ -133,11 +140,31 @@ function minify(node) {
     translateNodePropertyNames(node);
 }
 
+function getOutput(node) {
+    var output = "{";
+
+    for (var p in node) {
+        if (p === 'c') {
+            output += "c:[";
+            node.c.forEach(function(child) {
+                output += getOutput(child);
+            });
+            output += "],";
+        } else {
+            output += p + ":\"" + node[p] + "\",";
+        }
+    }
+    // Remove trailing comma
+    output = output.substring(0, output.length - 1);
+    output += "}";
+    return output;
+}
+
 fs.readFile("data/topic-tree.json", "utf8", function (err,data) {
     var topicTree = JSON.parse(data);
 
     minify(topicTree);
 
-    var outputData = JSON.stringify(topicTree);
+    var outputData = getOutput(topicTree);//*/JSON.stringify(topicTree);
     fs.writeFile("data/topic-tree.min.json", outputData);
 });
