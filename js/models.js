@@ -240,7 +240,8 @@ define(["util", "apiclient", "storage"], function(Util, APIClient, Storage) {
                     item.parent = this;//response;
                 });
                 var topics = topic.children.filter(function(item) {
-                    return item.kind === "Topic" && item.slug !== "new-and-noteworthy";
+                    // Not new and noteworthy (x29232c6b)
+                    return item.kind === "Topic" && item.id !== "x29232c6b";
                 });
                 var contentItems = topic.children.filter(function(item) {
                     return item.kind === "Video" || item.kind === "Article";
