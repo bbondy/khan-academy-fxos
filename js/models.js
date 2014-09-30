@@ -1,5 +1,14 @@
 define(["util", "apiclient", "storage"], function(Util, APIClient, Storage) {
     var TopicTreeBase = {
+        getId: function() {
+            return this.get("id");
+        },
+        getKind: function() {
+            return this.get("kind");
+        },
+        getTitle: function() {
+            return this.get("translated_title");
+        },
         isTopic: function() {
             return false;
         },
@@ -7,16 +16,16 @@ define(["util", "apiclient", "storage"], function(Util, APIClient, Storage) {
             return false;
         },
         isVideo: function() {
-            return false;
+            return this.getKind() === "Video";
         },
         isArticleList: function() {
             return false;
         },
         isArticle: function() {
-            return false;
+            return this.getKind() === "Article";
         },
         isContent: function() {
-            return false;
+            return this.isVideo() || this.isArticle();
         },
         isContentList: function() {
             return false;
@@ -24,18 +33,18 @@ define(["util", "apiclient", "storage"], function(Util, APIClient, Storage) {
         getParentDomain: function() {
             var current = this;
             while (current && !current.isRootChild()) {
-                current = current.get("parent");
+                current = current.getParent();
             }
             return current;
         },
         isRootChild: function() {
-            if (!this.get("parent")) {
-                return false;
-            }
-            return this.get("parent").get("render_type") === "Root";
+            return this.getParent() && this.getParent().isRoot();
         },
         isRoot: function() {
-            return this.get("render_type") === "Root";
+            return !this.getParent();
+        },
+        getParent: function() {
+            return this.get("parent");
         }
     };
     var TopicTreeModel = Backbone.Model.extend(TopicTreeBase);
@@ -109,7 +118,7 @@ define(["util", "apiclient", "storage"], function(Util, APIClient, Storage) {
          */
         getContentItemById: function(id, filteredList) {
             return _(filteredList || this.allContentItems).find(function(model) {
-                return model.get("id") === id;
+                return model.getId() === id;
             });
         },
         /**
@@ -123,7 +132,7 @@ define(["util", "apiclient", "storage"], function(Util, APIClient, Storage) {
          */
         getContentItemsByIds: function(ids, filteredList) {
             return _(this.allContentItems).filter(function(model) {
-                return ids.indexOf(model.get("id")) != -1;
+                return ids.indexOf(model.getId()) != -1;
             });
         }
     };
@@ -206,8 +215,8 @@ define(["util", "apiclient", "storage"], function(Util, APIClient, Storage) {
                     // TODO: We could potentially index the transcripts for a really good search
                     // TODO: Tokenize the `search` string and do an indexOf for each token
                     // TODO: Allow for OR/AND search term strings
-                    if (item.get("title") &&
-                            item.get("title").toLowerCase().indexOf(search.toLowerCase()) !== -1) {
+                    if (item.getTitle() &&
+                            item.getTitle().toLowerCase().indexOf(search.toLowerCase()) !== -1) {
                         results.push(item);
                     }
                 });
@@ -218,16 +227,6 @@ define(["util", "apiclient", "storage"], function(Util, APIClient, Storage) {
                     item._findContentItems(search, results, maxResults);
                 });
             }
-        },
-        getTitle: function() {
-            if (this.get("render_type") === "Root") {
-                return "Domains";
-            } else if (this.get("render_type") === "Domain") {
-                return "Subjects";
-            } else if (this.get("render_type") === "Subject") {
-                return "Topics";
-            }
-            return this.get("render_type");
         },
         /**
          * Recursively parses a topic with 2 extra properties:
@@ -261,12 +260,6 @@ define(["util", "apiclient", "storage"], function(Util, APIClient, Storage) {
     });
 
     var ContentModel = TopicTreeModel.extend({
-        isVideo: function() {
-            return this.get("kind") === "Video";
-        },
-        isArticle: function() {
-            return this.get("kind") === "Article";
-        },
         isContent: function() {
             return true;
         },
@@ -275,20 +268,36 @@ define(["util", "apiclient", "storage"], function(Util, APIClient, Storage) {
         },
         getContentMimeType: function() {
             return this.isVideo ? "video/mp4" : "text/html";
+        },
+        isCompleted: function() {
+            return this.get("completed");
+        },
+        isStarted: function() {
+            return this.get("started");
+        },
+        getYoutubeId: function() {
+            return this.get("youtube_id");
+        },
+        getPoints: function() {
+            return this.get("points");
+        },
+        getKAUrl: function() {
+            return this.get("ka_url");
+        },
+        getDownloadUrl: function() {
+            if (!this.get("download_urls")) {
+                return null;
+            }
+            return this.get("download_urls").mp4;
+        },
+        getDuration: function() {
+            return this.get("duration");
         }
     });
 
-    var VideoModel = ContentModel.extend({
-        isVideo: function() {
-            return true;
-        }
-    });
+    var VideoModel = ContentModel.extend({});
 
-    var ArticleModel = ContentModel.extend({
-        isArticle: function() {
-            return true;
-        }
-    });
+    var ArticleModel = ContentModel.extend({});
 
     var TopicList = TopicTreeCollection.extend({
         model: TopicModel,
@@ -402,13 +411,13 @@ define(["util", "apiclient", "storage"], function(Util, APIClient, Storage) {
         },
         reportVideoProgress: function(video, youTubeId, secondsWatched, lastSecondWatched) {
             var d = $.Deferred();
-            var videoId = video.get("id");
-            var duration = video.get("duration");
+            var videoId = video.getId();
+            var duration = video.getDuration();
             APIClient.reportVideoProgress(videoId, youTubeId, duration, secondsWatched, lastSecondWatched).done((result) => {
                 console.log('reportVideoProgress result:');
                 console.log(result);
 
-                var lastPoints = video.get("points") || 0;
+                var lastPoints = video.getPoints() || 0;
                 var newPoints = lastPoints + result.points_earned;
                 if (newPoints > 750) {
                     newPoints = 750;

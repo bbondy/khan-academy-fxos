@@ -31,13 +31,13 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
                     this.props.topic.get("downloadCount") === 0
             };
             var parentDomain = this.props.topic.getParentDomain();
-            topicClassObj[parentDomain.get("id")] = true;
+            topicClassObj[parentDomain.getId()] = true;
             var topicClass = cx(topicClassObj);
 
             return <li className={topicClass}>
                 { this.props.topic.isRootChild() ? <div className="color-block"/> : null }
                 <a href="#" onClick={Util.partial(this.props.onClickTopic, this.props.topic)}>
-                    <p className="topic-title">{this.props.topic.get("translated_title")}</p>
+                    <p className="topic-title">{this.props.topic.getTitle()}</p>
                 </a>
             </li>;
         }
@@ -54,13 +54,13 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
         render: function() {
             var videoNodeClass = cx({
               'video-node': true,
-              'completed': this.props.video.get("completed"),
-              'in-progress': this.props.video.get("started")
+              'completed': this.props.video.isCompleted(),
+              'in-progress': this.props.video.isStarted()
             });
             var pipeClassObj = {
                 'pipe': true,
-                'completed': this.props.video.get("completed"),
-                'in-progress': this.props.video.get("started")
+                'completed': this.props.video.isCompleted(),
+                'in-progress': this.props.video.isStarted()
             };
             var subwayIconClassObj = {
                 'subway-icon': true
@@ -72,9 +72,9 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
             };
             var parentDomain = this.props.video.getParentDomain();
             if (parentDomain) {
-                subwayIconClassObj[parentDomain.get("id")] = true;
-                videoClassObj[parentDomain.get("id")] = true;
-                pipeClassObj[parentDomain.get("id")] = true;
+                subwayIconClassObj[parentDomain.getId()] = true;
+                videoClassObj[parentDomain.getId()] = true;
+                pipeClassObj[parentDomain.getId()] = true;
             }
             var subwayIconClass = cx(subwayIconClassObj);
             var pipeClass = cx(pipeClassObj);
@@ -87,7 +87,7 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
                     <div className={pipeClass}/>
                 </div>
                 <a href="#" onClick={Util.partial(this.props.onClickVideo, this.props.video)}>
-                    <p className="video-title">{this.props.video.get("translated_title")}</p>
+                    <p className="video-title">{this.props.video.getTitle()}</p>
                 </a>
             </li>;
         }
@@ -102,13 +102,13 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
         render: function() {
             var articleNodeClass = cx({
               'article-node': true,
-              'completed': this.props.article.get("completed"),
-              'in-progress': this.props.article.get("started")
+              'completed': this.props.article.isCompleted(),
+              'in-progress': this.props.article.isStarted()
             });
             var pipeClassObj = {
                 'pipe': true,
-                'completed': this.props.article.get("completed"),
-                'in-progress': this.props.article.get("started")
+                'completed': this.props.article.isCompleted(),
+                'in-progress': this.props.article.isStarted()
             };
             var subwayIconClassObj = {
                 'subway-icon': true
@@ -119,9 +119,9 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
                     !this.props.article.isDownloaded()
             };
             var parentDomain = this.props.article.getParentDomain();
-            subwayIconClassObj[parentDomain.get("id")] = true;
-            articleClassObj[parentDomain.get("id")] = true;
-            pipeClassObj[parentDomain.get("id")] = true;
+            subwayIconClassObj[parentDomain.getId()] = true;
+            articleClassObj[parentDomain.getId()] = true;
+            pipeClassObj[parentDomain.getId()] = true;
             var subwayIconClass = cx(subwayIconClassObj);
             var pipeClass = cx(pipeClassObj);
             var articleClass = cx(articleClassObj);
@@ -133,7 +133,7 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
                     <div className={pipeClass}/>
                 </div>
                 <a href="#" onClick={Util.partial(this.props.onClickArticle, this.props.article)}>
-                    <p className="article-title">{this.props.article.get("translated_title")}</p>
+                    <p className="article-title">{this.props.article.getTitle()}</p>
                 </a>
             </li>;
         }
@@ -184,7 +184,7 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
                 var topics = _(this.props.topic.get("topics").models).map((topic) => {
                     return <TopicListItem topic={topic}
                                       onClickTopic={this.props.onClickTopic}
-                                      key={topic.get("id")}/>;
+                                      key={topic.getId()}/>;
                 });
             }
 
@@ -193,11 +193,11 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
                     if (contentItem.isVideo()) {
                         return <VideoListItem video={contentItem}
                                               onClickVideo={this.props.onClickContentItem}
-                                              key={contentItem.get("id")} />;
+                                              key={contentItem.getId()} />;
                     }
                     return <ArticleListItem article={contentItem}
                                             onClickArticle={this.props.onClickContentItem}
-                                            key={contentItem.get("id")} />;
+                                            key={contentItem.getId()} />;
                 });
             }
 
@@ -225,11 +225,11 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
                     if (contentItem.isVideo()) {
                         return <VideoListItem video={contentItem}
                                               onClickVideo={this.props.onClickContentItem}
-                                              key={contentItem.get("id")} />;
+                                              key={contentItem.getId()} />;
                     }
                     return <ArticleListItem article={contentItem}
                                             onClickArticle={this.props.onClickContentItem}
-                                            key={contentItem.get("id")} />;
+                                            key={contentItem.getId()} />;
                 });
             }
 
@@ -291,7 +291,7 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
         },
         componentWillMount: function() {
             if (this.props.article.isDownloaded()) {
-                Storage.readText(this.props.article.get("id")).done((result) => {
+                Storage.readText(this.props.article.getId()).done((result) => {
                     console.log("rendered article from storage");
                     this.props.article.set("content", result);
                 });
@@ -334,12 +334,12 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
             return [this.props.video];
         },
         componentWillMount: function() {
-            APIClient.getVideoTranscript(this.props.video.get("youtube_id")).done((transcript) => {
+            APIClient.getVideoTranscript(this.props.video.getYoutubeId()).done((transcript) => {
                 this.setState({transcript: transcript});
             });
 
             if (this.props.video.isDownloaded()) {
-                Storage.readAsBlob(this.props.video.get("id")).done((result) => {
+                Storage.readAsBlob(this.props.video.getId()).done((result) => {
                     var download_url = URL.createObjectURL(result);
                     console.log('download url is: ');
                     console.log(download_url);
@@ -350,10 +350,10 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
             console.log('video:');
             console.log(this.props.video);
 
-            this.videoId = this.props.video.get("id");
+            this.videoId = this.props.video.getId();
             this.lastSecondWatched = 0;
             if (this.props.video.get("lastSecondWatched") &&
-                    this.props.video.get("lastSecondWatched") + 10 < this.props.video.get("duration")) {
+                    this.props.video.get("lastSecondWatched") + 10 < this.props.video.getDuration()) {
                 this.lastSecondWatched = this.props.video.get("lastSecondWatched");
             }
             this.secondsWatched = 0;
@@ -437,7 +437,7 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
                 // And once that is done the video model that this class refers to will
                 // re-render itself with the new points.
                 models.CurrentUser.reportVideoProgress(this.props.video,
-                        this.props.video.get("youtube_id"),
+                        this.props.video.getYoutubeId(),
                         this.secondsWatched,
                         this.lastSecondWatched);
                 this.secondsWatched = 0;
@@ -450,14 +450,14 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
                  transcriptViewer = <TranscriptViewer collection={this.state.transcript}
                                                       onClickTranscript={this.onClickTranscript} />;
             }
-            var videoSrc = this.props.video.get("download_urls").mp4;
+            var videoSrc = this.props.video.getDownloadUrl();
             if (this.state.downloadedUrl) {
                 videoSrc = this.state.downloadedUrl;
             }
             console.log('video rendered with url: ' + videoSrc);
-            var points = this.props.video.get("points") || 0;
+            var points = this.props.video.getPoints() || 0;
             var availablePoints = 750;
-            var pointsString = window.document.webL10n.get("points-so-far",
+            var pointsString = document.webL10n.get("points-so-far",
                         {"earned" : points, "available": availablePoints});
             return <div className="video-viewer-container">
                  <video ref="video" controls>
@@ -493,21 +493,21 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
                 };
                 var parentDomain = this.props.model.getParentDomain();
                 if (parentDomain && !this.props.isPaneShowing) {
-                    styleObj[parentDomain.get("id")] = true;
+                    styleObj[parentDomain.getId()] = true;
                 }
                 var styleClass = cx(styleObj);
 
                 var title = "Khan Academy";
                 if (this.props.isDownloadsShowing) {
-                    title = window.document.webL10n.get("view-downloads");
+                    title = document.webL10n.get("view-downloads");
                 } else if (this.props.isProfileShowing) {
-                    title = window.document.webL10n.get("view-profile");
+                    title = document.webL10n.get("view-profile");
                 } else if (this.props.isSettingsShowing) {
-                    title = window.document.webL10n.get("view-settings");
-                } else if (this.props.model.get("translated_title")) {
-                    title = this.props.model.get("translated_title");
+                    title = document.webL10n.get("view-settings");
+                } else if (this.props.model.getTitle()) {
+                    title = this.props.model.getTitle();
                 } else if (this.props.model.isContentList()) {
-                    title = window.document.webL10n.get("search");
+                    title = document.webL10n.get("search");
                 }
 
                 return <header className={styleClass}>
@@ -540,10 +540,10 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
                 height: "3em;",
                 position: "relative"
             };
-            var text = window.document.webL10n.get("search");
-            if (this.props.model.get("translated_title")) {
-                text = window.document.webL10n.get("search-topic",
-                        {"topic": this.props.model.get("translated_title")});
+            var text = document.webL10n.get("search");
+            if (this.props.model.getTitle()) {
+                text = document.webL10n.get("search-topic",
+                        {"topic": this.props.model.getTitle()});
             }
             return <div>
                 <input className="search"
@@ -580,12 +580,12 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
             if (!this.props.isPaneShowing &&
                     this.props.model && this.props.model.isContent()) {
                 if (this.props.model.isDownloaded()) {
-                    var text = window.document.webL10n.get(this.props.model.isVideo() ? "delete-downloaded-video" : "delete-downloaded-article");
+                    var text = document.webL10n.get(this.props.model.isVideo() ? "delete-downloaded-video" : "delete-downloaded-article");
                     items.push(<li className="hot-item">
                             <a href="#" onClick={Util.partial(this.props.onClickDeleteDownloadedVideo, this.props.model)}>{{text}}</a>
                         </li>);
                 } else {
-                    var text =  window.document.webL10n.get(this.props.model.isVideo() ? "download-video" : "download-article");
+                    var text = document.webL10n.get(this.props.model.isVideo() ? "download-video" : "download-article");
                     items.push(<li className="hot-item">
                             <a href="#" onClick={Util.partial(this.props.onClickDownloadContent, this.props.model)}>{{text}}</a>
                         </li>);
@@ -594,10 +594,10 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
             if (!this.props.isPaneShowing &&
                     this.props.model &&
                     this.props.model.isContent() &&
-                    this.props.model.get("ka_url")) {
-                var viewOnKAMessage = window.document.webL10n.get("open-in-website");
+                    this.props.model.getKAUrl()) {
+                var viewOnKAMessage = document.webL10n.get("open-in-website");
                 items.push(<li><a href="#" onClick={Util.partial(this.props.onClickViewOnKA, this.props.model)}>{{viewOnKAMessage}}</a></li>);
-                var shareMessage = window.document.webL10n.get("share");
+                var shareMessage = document.webL10n.get("share");
                 items.push(<li><a href="#" onClick={Util.partial(this.props.onClickShare, this.props.model)}>{{shareMessage}}</a></li>);
             }
 
@@ -736,7 +736,7 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
             return {};
         },
         render: function() {
-            var pointsString = window.document.webL10n.get("points");
+            var pointsString = document.webL10n.get("points");
             return <div className="profile">
                 <img className="avatar" src={this.state.avatarUrl}/>
                 <h1>{this.state.nickname || this.state.username}</h1>
@@ -875,7 +875,7 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
             }
 
             this.setState({
-                currentModel: model.get("parent"),
+                currentModel: model.getParent(),
                 showProfile: false,
                 showDownloads: false,
                 showSettings: false,
@@ -922,7 +922,7 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
                 name: "view",
                 data: {
                     type: "url",
-                    url: model.get("ka_url")
+                    url: model.getKAUrl()
                 }
             });
         },
@@ -931,30 +931,30 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
                 name: "share",
                 data: {
                     type: "url",
-                    url: model.get("ka_url")
+                    url: model.getKAUrl()
                 }
             });
         },
         onClickDownloadContent: function(model) {
             if (models.TempAppState.get("isDownloadingTopic")) {
-                alert(window.document.webL10n.get("already-downloading"));
+                alert(document.webL10n.get("already-downloading"));
                 return;
             } else if (Util.isMeteredConnection()) {
-                if (!confirm(window.document.webL10n.get("metered-connection-warning"))) {
+                if (!confirm(document.webL10n.get("metered-connection-warning"))) {
                     return;
                 }
             } else if (Util.isBandwidthCapped()) {
-                if (!confirm(window.document.webL10n.get("limited-bandwidth-warning"))) {
+                if (!confirm(document.webL10n.get("limited-bandwidth-warning"))) {
                     return;
                 }
             } else if (model.isTopic()) {
                 var totalCount = model.getChildNotDownloadedCount();
                 if (totalCount === 0) {
-                    alert(window.document.webL10n.get("already-downloaded"));
+                    alert(document.webL10n.get("already-downloaded"));
                     return;
                 }
                 totalCount = Util.numberWithCommas(totalCount);
-                if (!confirm(window.document.webL10n.get("download-remaining",
+                if (!confirm(document.webL10n.get("download-remaining",
                             {"totalCount": totalCount}))) {
                     return;
                 }
@@ -962,11 +962,11 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
 
             var onProgress = (model, count, cancelling) => {
                 if (cancelling) {
-                    Status.update(window.document.webL10n.get("canceling-download"));
+                    Status.update(document.webL10n.get("canceling-download"));
                     return;
                 }
                 count = Util.numberWithCommas(count);
-                var progressMessage = window.document.webL10n.get("downloading-progress",
+                var progressMessage = document.webL10n.get("downloading-progress",
                             {"count" : count, "totalCount": totalCount});
                 Status.update(progressMessage);
             };
@@ -974,19 +974,19 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
                 Status.start();
             }
             Downloads.download(model, onProgress).done(function(model, count) {
-                var title = window.document.webL10n.get("download-complete");
-                var contentTitle = model.get("translated_title");
+                var title = document.webL10n.get("download-complete");
+                var contentTitle = model.getTitle();
                 var message;
                 if (model.isContent()) {
                     if (model.isVideo()) {
-                        message = window.document.webL10n.get("video-complete-body",
+                        message = document.webL10n.get("video-complete-body",
                             {"title" : contentTitle});
                     } else {
-                        message = window.document.webL10n.get("article-complete-body",
+                        message = document.webL10n.get("article-complete-body",
                             {"title" : contentTitle});
                     }
                 } else {
-                    message = window.document.webL10n.get("content-items-downloaded-succesfully",
+                    message = document.webL10n.get("content-items-downloaded-succesfully",
                         {"count" : count, "title": contentTitle});
                 }
                 if (model.isTopic()) {

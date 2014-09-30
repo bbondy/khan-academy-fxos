@@ -27,7 +27,7 @@ define(["storage", "models"],
          */
         _writeManifest: function() {
             var contentListIds = this.contentList.models.map(function(model) {
-                return model.get("id");
+                return model.getId();
             });
             var jsonManifest = JSON.stringify(contentListIds);
             return Storage.writeText(this.manifestFilename, jsonManifest);
@@ -55,7 +55,7 @@ define(["storage", "models"],
         },
         _setDownloaded: function(model, downloaded) {
             model.set("downloaded", downloaded);
-            while (model = model.get("parent")) {
+            while (model = model.getParent()) {
                 var downloadCount = model.get("downloadCount");
                 if (downloaded) {
                     downloadCount++;
@@ -137,7 +137,7 @@ define(["storage", "models"],
          */
         downloadContent: function(contentItem) {
             var d = $.Deferred();
-            var filename = contentItem.get("id");
+            var filename = contentItem.getId();
             var handleContentLoaded = (contentData) => {
                 var blob = new Blob([contentData], {type: contentItem.getContentMimeType()});
                 Storage.writeBlob(filename, blob).done(() => {
@@ -146,7 +146,7 @@ define(["storage", "models"],
                 });
             };
             if (contentItem.isVideo()) {
-                var url = contentItem.get("download_urls").mp4;
+                var url = contentItem.getDownloadUrl();
                 var req = new XMLHttpRequest({mozSystem: true});
                 req.open("GET", url, true);
                 req.responseType = "arraybuffer";
@@ -168,7 +168,7 @@ define(["storage", "models"],
          */
         deleteContent: function(contentItem) {
             var d = $.Deferred();
-            var filename = contentItem.get("id");
+            var filename = contentItem.getId();
             Storage.delete(filename).done(() => {
                 this._removeDownloadFromManifest(contentItem);
                 d.resolve();
