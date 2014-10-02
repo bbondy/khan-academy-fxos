@@ -154,7 +154,7 @@ define(["oauth", "storage", "util"], function(_oauth, Storage, Util) {
             if (lang) {
                 filename += "-" + lang;
             }
-            filename += ".json";
+            filename += ".min.json";
             return this._basicAPICall(filename);
         },
         getTopicTree: function() {

@@ -27,7 +27,7 @@ define([], function() {
                 d.resolve(file);
             };
             request.onerror = function () {
-                console.warn("Unable to get the file: %o", this.error);
+                console.warn("Unable to get the file %s: %o", filename, this.error);
                 d.reject();
             };
 
@@ -51,7 +51,7 @@ define([], function() {
                 }
             };
             request.onerror = function () {
-                console.warn("Unable to get the file: %o", this.error);
+                console.warn("Unable to get the file %s: %o", filename, this.error);
                 d.reject();
             };
 
