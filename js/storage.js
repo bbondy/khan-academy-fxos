@@ -27,7 +27,7 @@ define([], function() {
                 d.resolve(file);
             };
             request.onerror = function () {
-                console.warn("Unable to get the file: " + this.error);
+                console.warn("Unable to get the file: %o", this.error);
                 d.reject();
             };
 
@@ -51,7 +51,7 @@ define([], function() {
                 }
             };
             request.onerror = function () {
-                console.warn("Unable to get the file: " + this.error);
+                console.warn("Unable to get the file: %o", this.error);
                 d.reject();
             };
 
@@ -74,7 +74,7 @@ define([], function() {
                 if (this.error.name === "NotFoundError") {
                     d.resolve();
                 } else {
-                    console.warn("Unable to delete the file: " + this.error);
+                    console.warn("Unable to delete the file: %o", this.error);
                     d.reject();
                 }
             };
@@ -106,8 +106,7 @@ define([], function() {
                 };
                 // An error typically occur if a file with the same name already exist
                 request.onerror = function () {
-                    console.warn('Unable to write the file: ');
-                    console.warn(this.error);
+                    console.warn('Unable to write the file: %o', this.error);
                     d.reject();
                 };
             });
