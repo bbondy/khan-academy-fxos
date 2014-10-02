@@ -2,3 +2,8 @@ curl 'www.khanacademy.org/api/v1/fxos/topictree' > data/topic-tree.json
 curl 'www.khanacademy.org/api/v1/fxos/topictree?lang=fr' > data/topic-tree-fr.json
 curl 'www.khanacademy.org/api/v1/fxos/topictree?lang=es' > data/topic-tree-es.json
 curl 'www.khanacademy.org/api/v1/fxos/topictree?lang=pt' > data/topic-tree-pt.json
+node ./tools/minifyTopicTreeData.js
+rm data/topic-tree.json
+rm data/topic-tree-fr.json
+rm data/topic-tree-es.json
+rm data/topic-tree-pt.json
