@@ -1,13 +1,13 @@
-define(["util", "apiclient", "storage"], function(Util, APIClient, Storage) {
+define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Storage, _Minify) {
     var TopicTreeBase = {
         getId: function() {
-            return this.get("id");
+            return this.get(Minify.getShortName("id"));
         },
         getKind: function() {
-            return this.get("kind");
+            return this.get(Minify.getShortName("kind"));
         },
         getTitle: function() {
-            return this.get("translated_title");
+            return this.get(Minify.getShortName("translated_title"));
         },
         isTopic: function() {
             return false;
@@ -16,13 +16,13 @@ define(["util", "apiclient", "storage"], function(Util, APIClient, Storage) {
             return false;
         },
         isVideo: function() {
-            return this.getKind() === "Video";
+            return this.getKind() === Minify.getShortValue("kind", "Video");
         },
         isArticleList: function() {
             return false;
         },
         isArticle: function() {
-            return this.getKind() === "Article";
+            return this.getKind() === Minify.getShortValue("kind", "Article");
         },
         isContent: function() {
             return this.isVideo() || this.isArticle();
@@ -79,10 +79,10 @@ define(["util", "apiclient", "storage"], function(Util, APIClient, Storage) {
                 defaultTreeLoadPromise.done((topicTreeData) => {
                     console.log("Loaded topic tree from installed default");
                     this.root = new TopicModel(topicTreeData, {parse: true});
+                d.resolve();
                     d.resolve();
                 });
                 defaultTreeLoadPromise.fail(() => {
-                    console.log('init topic tree 4');
                     d.reject("Fatal error! Could not load topic tree!");
                 });
             });
@@ -103,7 +103,7 @@ define(["util", "apiclient", "storage"], function(Util, APIClient, Storage) {
         },
         getTopicTreeFilename: function() {
             var lang = Util.getLang();
-            return `topictree3-${lang}.json`;
+            return `topictree4-${lang}.json`;
         },
 
         allContentItems: [],
@@ -207,26 +207,24 @@ define(["util", "apiclient", "storage"], function(Util, APIClient, Storage) {
          * a matching title to the results array.
          */
         _findContentItems: function(search, results, maxResults) {
-            if (results.length > maxResults)
+            if (results.length > maxResults) {
                 return;
-            if (this.get("contentItems")) {
-                this.get("contentItems").forEach((item) => {
-                    // TODO: Possibly search descriptions too?
-                    // TODO: We could potentially index the transcripts for a really good search
-                    // TODO: Tokenize the `search` string and do an indexOf for each token
-                    // TODO: Allow for OR/AND search term strings
-                    if (item.getTitle() &&
-                            item.getTitle().toLowerCase().indexOf(search.toLowerCase()) !== -1) {
-                        results.push(item);
-                    }
-                });
             }
 
-            if (this.get("topics")) {
-                this.get("topics").forEach((item) => {
-                    item._findContentItems(search, results, maxResults);
-                });
-            }
+            _(this.get("contentItems")).each((item) => {
+                // TODO: Possibly search descriptions too?
+                // TODO: We could potentially index the transcripts for a really good search
+                // TODO: Tokenize the `search` string and do an indexOf for each token
+                // TODO: Allow for OR/AND search term strings
+                if (item.getTitle() &&
+                        item.getTitle().toLowerCase().indexOf(search.toLowerCase()) !== -1) {
+                    results.push(item);
+                }
+            });
+
+            _(this.get("topics")).each((item) => {
+                item._findContentItems(search, results, maxResults);
+            });
         },
         /**
          * Recursively parses a topic with 2 extra properties:
@@ -235,15 +233,17 @@ define(["util", "apiclient", "storage"], function(Util, APIClient, Storage) {
          */
         parse: function(response){
             var parseTopicChildren = (topic) => {
-                topic.children.forEach((item) => {
+                _(topic[Minify.getShortName("children")]).each((item) => {
                     item.parent = this;//response;
                 });
-                var topics = topic.children.filter(function(item) {
+                var topics = _(topic[Minify.getShortName("children")]).filter(function(item) {
                     // Not new and noteworthy (x29232c6b)
-                    return item.kind === "Topic" && item.id !== "x29232c6b";
+                    return item[Minify.getShortName("kind")] === Minify.getShortValue("kind", "Topic") &&
+                        item[Minify.getShortName("id")] !== "x29232c6b";
                 });
-                var contentItems = topic.children.filter(function(item) {
-                    return item.kind === "Video" || item.kind === "Article";
+                var contentItems = _(topic[Minify.getShortName("children")]).filter(function(item) {
+                    return item[Minify.getShortName("kind")] === Minify.getShortValue("kind", "Video") ||
+                        item[Minify.getShortName("kind")] === Minify.getShortValue("kind", "Article");
                 });
                 response.downloadCount = 0;
                 response.topics = new TopicList(topics, {parse: true});
@@ -266,6 +266,9 @@ define(["util", "apiclient", "storage"], function(Util, APIClient, Storage) {
         isDownloaded: function() {
             return !!this.get("downloaded");
         },
+        setDownloaded: function(downloaded) {
+            this.set("downloaded", downloaded);
+        },
         getContentMimeType: function() {
             return this.isVideo ? "video/mp4" : "text/html";
         },
@@ -276,22 +279,33 @@ define(["util", "apiclient", "storage"], function(Util, APIClient, Storage) {
             return this.get("started");
         },
         getYoutubeId: function() {
-            return this.get("youtube_id");
+            return this.get(Minify.getShortName("youtube_id"));
         },
         getPoints: function() {
             return this.get("points");
         },
         getKAUrl: function() {
-            return this.get("ka_url");
-        },
-        getDownloadUrl: function() {
-            if (!this.get("download_urls")) {
+            var value = this.get(Minify.getShortName("ka_url"));
+            if (!value) {
                 return null;
             }
-            return this.get("download_urls").mp4;
+            if (value.substring(0, 4) !== "http") {
+                value = "http://www.khanacademy.org/video/" + value;
+            }
+            return value;
+        },
+        getDownloadUrl: function() {
+            var value = this.get(Minify.getShortName("download_urls"));
+            if (!value) {
+                return null;
+            }
+            if (value.substring(0, 4) !== "http") {
+                value = "http://s3.amazonaws.com/KA-youtube-converted/" + value + ".mp4";
+            }
+            return value;
         },
         getDuration: function() {
-            return this.get("duration");
+            return this.get(Minify.getShortName("duration"));
         }
     });
 
@@ -350,8 +364,7 @@ define(["util", "apiclient", "storage"], function(Util, APIClient, Storage) {
             // The call is needed for completed/in progress status of content items
             // Unlike getUserVideos, this includes both articles and videos.
             APIClient.getUserProgress().done(function(data) {
-                console.log('user progress summary: ');
-                console.log(data);
+                console.log('user progress summary: %o', data);
                 this.completedEntityIds = data.complete;
                 this.startedEntityIds = data.started;
 
@@ -376,15 +389,12 @@ define(["util", "apiclient", "storage"], function(Util, APIClient, Storage) {
                     contentItem.set("started", true);
                 });
 
-                console.log("completed entities:");
-                console.log(this.completedEntities);
-                console.log("started entities:");
-                console.log(this.startedEntities);
+                console.log("completed entities: %o", this.completedEntities);
+                console.log("started entities: %o", this.startedEntities);
 
                 // The call is needed for the last second watched and points of each watched item.
                 APIClient.getUserVideos().done(function(results) {
-                    console.log('getUserVideos:')
-                    console.log(results);
+                    console.log('getUserVideos: %o', results)
 
                     // Get a list of the Ids we'll be searching for in TopicTree models
                     // This is only being done for a fast lookup so we don't need to later
@@ -414,8 +424,7 @@ define(["util", "apiclient", "storage"], function(Util, APIClient, Storage) {
             var videoId = video.getId();
             var duration = video.getDuration();
             APIClient.reportVideoProgress(videoId, youTubeId, duration, secondsWatched, lastSecondWatched).done((result) => {
-                console.log('reportVideoProgress result:');
-                console.log(result);
+                console.log('reportVideoProgress result: %o', result);
 
                 var lastPoints = video.getPoints() || 0;
                 var newPoints = lastPoints + result.points_earned;
