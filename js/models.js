@@ -79,7 +79,6 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
                 defaultTreeLoadPromise.done((topicTreeData) => {
                     console.log("Loaded topic tree from installed default");
                     this.root = new TopicModel(topicTreeData, {parse: true});
-                d.resolve();
                     d.resolve();
                 });
                 defaultTreeLoadPromise.fail(() => {
@@ -346,6 +345,8 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
                 // We don't need to wait for the result of the
                 // refreshLoggedInInfo promise, just resolve right away.
                 d.resolve();
+            }).fail(() => {
+                d.reject();
             });
             return d.promise();
         },
@@ -416,6 +417,8 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
                     });
                     d.resolve();
                 });
+            }).fail(() => {
+                d.reject();
             });
             return d.promise();
         },
@@ -458,6 +461,8 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
                     videoId: videoId,
                     id: result.id
                 });
+            }).fail(() => {
+                d.reject();
             });
             return d.promise();
         }
