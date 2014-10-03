@@ -50,8 +50,7 @@ define(["oauth", "storage", "util"], function(_oauth, Storage, Util) {
                     this.oauth.oauthVerifier = undefined;
                 },
                 error: (xhr, status) => {
-                    alert("error: " + status);
-                    console.log(xhr);
+                    console.error(`error: ${status}: %o`, xhr);
                 }
             }));
         },
@@ -87,6 +86,8 @@ define(["oauth", "storage", "util"], function(_oauth, Storage, Util) {
                     this._getAccessToken().done(() => {
                         this._saveAuth();
                         d.resolve();
+                    }).fail(() => {
+                        d.reject();
                     });
                 } else {
                     d.resolve();
@@ -133,8 +134,7 @@ define(["oauth", "storage", "util"], function(_oauth, Storage, Util) {
                 },
                 error: function(xhr, status) {
                     d.reject();
-                    console.error("error: " + status);
-                    console.error(xhr);
+                    console.error(`error: ${status}: %o`, xhr);
                 }
             }));
             return d.promise();
@@ -170,10 +170,11 @@ define(["oauth", "storage", "util"], function(_oauth, Storage, Util) {
             var d = $.Deferred();
             var promise = this._basicAPICall(this.API_V1_BASE + `/user/article/${articleId}/log`, undefined, "POST");
             promise.done((data) => {
-                console.log('reported article complete!');
-                console.log(data);
+                console.log('reported article complete: %o', data);
                 d.resolve(data);
                 this.completedEntities.push(articleId);
+            }).fail(() => {
+                d.reject();
             });
             return d.promise();
         },
