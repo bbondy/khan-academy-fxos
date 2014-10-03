@@ -143,6 +143,8 @@ define(["storage", "models"],
                 Storage.writeBlob(filename, blob).done(() => {
                     this._addDownloadToManifest(contentItem);
                     d.resolve(contentItem, 1);
+                }).fail(() => {
+                    d.reject();
                 });
             };
             if (contentItem.isVideo()) {
@@ -152,7 +154,10 @@ define(["storage", "models"],
                 req.responseType = "arraybuffer";
                 req.onload = () => {
                     handleContentLoaded(req.response);
-                }
+                };
+                req.onerror = () => {
+                    d.reject();
+                };
                 req.send();
             } else {
                 // Articles have a content property with the html we want to
