@@ -177,6 +177,8 @@ define(["storage", "models"],
             Storage.delete(filename).done(() => {
                 this._removeDownloadFromManifest(contentItem);
                 d.resolve();
+            }).fail(() => {
+                d.reject();
             });
             return d.promise();
         },
