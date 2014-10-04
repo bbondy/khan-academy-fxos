@@ -1,3 +1,4 @@
-rm -Rf build*
+rm -Rf build
 jsx  --harmony js build
 cp js/lib/react*.js build/lib
+cp js/lib/*.map build/lib
