@@ -220,7 +220,7 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
                 return;
             }
 
-            _(this.get("contentItems")).each((item) => {
+            _(this.get("contentItems").models).each((item) => {
                 // TODO: Possibly search descriptions too?
                 // TODO: We could potentially index the transcripts for a really good search
                 // TODO: Tokenize the `search` string and do an indexOf for each token
@@ -231,7 +231,7 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
                 }
             });
 
-            _(this.get("topics")).each((item) => {
+            _(this.get("topics").models).each((item) => {
                 item._findContentItems(search, results, maxResults);
             });
         },
