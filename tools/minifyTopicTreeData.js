@@ -9,8 +9,12 @@ files.forEach(function(filename) {
 
         Minify.minify(topicTree);
 
-        //var outputData = Minify.getOutput(topicTree);
-        var outputData = JSON.stringify(topicTree);
-        fs.writeFile(filename.substring(0, filename.length - 5) + ".min.json", outputData);
+        // .js output
+        var outputData = Minify.getOutput(topicTree);
+        fs.writeFile(filename.substring(0, filename.length - 5) + ".min.js", "window.topicTree = " + outputData + ";");
+
+        // JSON output
+        //var outputData = JSON.stringify(topicTree);
+        //fs.writeFile(filename.substring(0, filename.length - 5) + ".min.json", outputData);
     });
 });
