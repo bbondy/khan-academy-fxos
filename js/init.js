@@ -12,13 +12,13 @@ require.config({
         "test": "../test/test",
 
         // Third party libs
-        "text": "./lib/text",
-        "react": "./lib/react-with-addons",
-        "JSXTransformer": "./lib/JSXTransformer",
-        "jsx": "./lib/jsx",
+        "text": "./lib/text-min",
+        "react": "./lib/react-with-addons-min",
+        "JSXTransformer": "./lib/JSXTransformer-min",
+        "jsx": "./lib/jsx-min",
         "underscore": "./lib/underscore-min",
-        "jquery": "./lib/jquery",
-        "backbone": "./lib/backbone"
+        "jquery": "./lib/jquery-min",
+        "backbone": "./lib/backbone-min"
     }
 });
 
