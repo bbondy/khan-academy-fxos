@@ -37,10 +37,12 @@
 
         // Map common property values to a shorter version
         // [element name, old prop value, new prop value]
+        // We use numbers for the shorter values because storing the quotes
+        // takes extra space.
         propertyValueMap: [
-            ["kind", "Article", "A"],
-            ["kind", "Topic", "T"],
-            ["kind", "Video", "V"]
+            ["kind", "Article", 0],
+            ["kind", "Topic", 1],
+            ["kind", "Video", 2]
         ],
 
         // Things specified in the endpoint that I may need eventually
@@ -153,11 +155,16 @@
                 if (p === 'c') {
                     output += "c:[";
                     node.c.forEach(function(child) {
-                        output += this.getOutput(child);
+                        output += this.getOutput(child) + ",";
                     }.bind(this));
+                    output = output.substring(0, output.length - 1);
                     output += "],";
                 } else {
-                    output += p + ":\"" + node[p] + "\",";
+                    if (typeof node[p] !== "number") {
+                        output += p + ":\"" + node[p].replace(/\\/g, "\\\\").replace(/\"/g, "\\\"")  + "\",";
+                    } else {
+                        output += p + ":" + node[p] + ",";
+                    }
                 }
             }
             // Remove trailing comma
