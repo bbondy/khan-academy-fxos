@@ -1,3 +1,5 @@
+rm -Rf data/*
+mkdir data
 curl 'www.khanacademy.org/api/v1/fxos/topictree' > data/topic-tree.json
 curl 'www.khanacademy.org/api/v1/fxos/topictree?lang=fr' > data/topic-tree-fr.json
 curl 'www.khanacademy.org/api/v1/fxos/topictree?lang=es' > data/topic-tree-es.json

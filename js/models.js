@@ -75,15 +75,21 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
             // If we don't have a local downloaded copy, load in the
             // one we shipped with for the instaled app.
             topicTreePromise.fail(() => {
-                var defaultTreeLoadPromise = APIClient.getInstalledTopicTree();
-                defaultTreeLoadPromise.done((topicTreeData) => {
-                    console.log("Loaded topic tree from installed default");
-                    this.root = new TopicModel(topicTreeData, {parse: true});
+                var filename = `data/topic-tree`;
+                lang = Util.getLang();
+                if (lang) {
+                    filename += "-" + lang;
+                }
+                filename += ".min.js";
+                var s = document.createElement("script");
+                s.type = "text/javascript";
+                s.src = filename;
+                s.onload = () => {
+                    this.root = new TopicModel(window.topicTree, {parse: true});
                     d.resolve();
-                });
-                defaultTreeLoadPromise.fail(() => {
-                    d.reject("Fatal error! Could not load topic tree!");
-                });
+                };
+                document.getElementsByTagName("head")[0].appendChild(s);
+                //s.async = false;
             });
             return d.promise();
         },
@@ -102,7 +108,11 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
         },
         getTopicTreeFilename: function() {
             var lang = Util.getLang();
-            return `topictree4-${lang}.json`;
+            var path = "topictree";
+            if (lang) {
+                path += `-${lang}`;
+            }
+            return path + ".json";
         },
 
         allContentItems: [],
