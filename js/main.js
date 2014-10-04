@@ -603,38 +603,38 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
 
             if (models.TempAppState.get("isDownloadingTopic")) {
                 items.push(<li className="hot-item">
-                        <a href="#" data-l10n-id="cancel-topic-downloading" onClick={Util.partial(this.props.onClickCancelDownloadContent, this.props.model)}>Cancel topic downloading</a>
+                        <a href="#" data-l10n-id="cancel-downloading" onClick={Util.partial(this.props.onClickCancelDownloadContent, this.props.model)}>Cancel Downloading</a>
                     </li>);
             } else if(!this.props.isPaneShowing &&
                         this.props.model && this.props.model.isTopic()) {
                 items.push(<li className="hot-item">
-                        <a href="#" data-l10n-id="download-full-topic-content" onClick={Util.partial(this.props.onClickDownloadContent, this.props.model)}>Download full topic content</a>
+                        <a href="#" data-l10n-id="download-topic" onClick={Util.partial(this.props.onClickDownloadContent, this.props.model)}>Download Topic</a>
                     </li>);
             }
 
             ////////////////////
             // Followed by sign in
-            if (!models.CurrentUser.isSignedIn() || this.props.isProfileShowing) {
+            if (!models.CurrentUser.isSignedIn()) {
                 // If the user is not signed in, add that option first
-                items.push(<li><a data-l10n-id="sign-in" href="#" onClick={this.props.onClickSignin}>Sign in</a></li>);
+                items.push(<li><a data-l10n-id="sign-in" href="#" onClick={this.props.onClickSignin}>Sign In</a></li>);
             }
 
             ////////////////////
             // Followed by view pane items
             if (models.CurrentUser.isSignedIn() && !this.props.isProfileShowing) {
                 // User is signed in, add all the signed in options here
-                items.push(<li><a  data-l10n-id="view-profile" href="#" onClick={this.props.onClickProfile}>Profile</a></li>);
+                items.push(<li><a  data-l10n-id="view-profile" href="#" onClick={this.props.onClickProfile}>View Profile</a></li>);
             }
             if (!this.props.isSettingsShowing) {
-                items.push(<li><a data-l10n-id="view-settings" href="#" onClick={this.props.onClickSettings}>Settings</a></li>);
+                items.push(<li><a data-l10n-id="view-settings" href="#" onClick={this.props.onClickSettings}>View Settings</a></li>);
             }
             if (!this.props.isDownloadsShowing) {
-                items.push(<li><a data-l10n-id="view-downloads" href="#" onClick={this.props.onClickDownloads}>Downloads</a></li>);
+                items.push(<li><a data-l10n-id="view-downloads" href="#" onClick={this.props.onClickDownloads}>View Downloads</a></li>);
             }
 
             // Add the signout button last
             if (models.CurrentUser.isSignedIn()) {
-                items.push(<li><a data-l10n-id="sign-out" href="#" onClick={this.props.onClickSignout}>Sign out</a></li>);
+                items.push(<li><a data-l10n-id="sign-out" href="#" onClick={this.props.onClickSignout}>Sign Out</a></li>);
             }
 
             return <section className="sidebar" data-type="sidebar">

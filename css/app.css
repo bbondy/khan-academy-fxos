@@ -420,6 +420,10 @@ article {
     font-weight: bold;
 }
 
+.sidebar li {
+    text-transform: capitalize;
+}
+
 .profile .badge-category-icon {
     width: 30px;
     height: 30px;
