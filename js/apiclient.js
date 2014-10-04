@@ -108,8 +108,9 @@ define(["oauth", "storage", "util"], function(_oauth, Storage, Util) {
             this.oauth.tokenSecret = "";
             this._saveAuth();
         },
-        _basicAPICall: function(url, extraParams, method) {
+        _basicAPICall: function(url, extraParams, method, dataType) {
             extraParams = extraParams || {};
+            dataType = dataType || "json";
             if (_.isUndefined(method)) {
                 method = "GET";
             }
@@ -128,13 +129,14 @@ define(["oauth", "storage", "util"], function(_oauth, Storage, Util) {
                 type: method,
                 url: url,
                 timeout: 15000,
-                dataType: "json",
+                dataType,
                 success: (data) => {
                     d.resolve(data);
                 },
                 error: function(xhr, status) {
-                    d.reject();
+                    alert('data type was: ' + dataType);
                     console.error(`error: ${status}: %o`, xhr);
+                    d.reject();
                 }
             }));
             return d.promise();
@@ -148,14 +150,15 @@ define(["oauth", "storage", "util"], function(_oauth, Storage, Util) {
         getUserInfo: function() {
             return this._basicAPICall(this.API_V1_BASE + "/user");
         },
-        getInstalledTopicTree: function() {
+        getInstalledTopicTree: function(jsOnly) {
             var filename = `data/topic-tree`;
             var lang = Util.getLang();
             if (lang) {
                 filename += "-" + lang;
             }
-            filename += ".min.json";
-            return this._basicAPICall(filename);
+            filename += jsOnly ? ".min.js" : ".min.json";
+            console.log(filename);
+            return this._basicAPICall(filename, undefined, undefined, jsOnly ? "text" : "json");
         },
         getTopicTree: function() {
             return this._basicAPICall(this.API_V1_BASE + "/fxos/topictree");
