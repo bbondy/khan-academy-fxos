@@ -348,6 +348,9 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
     });
 
     var UserModel = Backbone.Model.extend({
+        init: function() {
+            return this.refreshLoggedInInfo();
+        },
         signIn: function() {
             var d = $.Deferred();
             APIClient.signIn().done(() => {
