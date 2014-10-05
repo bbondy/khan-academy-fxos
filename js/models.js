@@ -75,7 +75,7 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
             // If we don't have a local downloaded copy, load in the
             // one we shipped with for the instaled app.
             topicTreePromise.fail(() => {
-                var filename = `data/topic-tree`;
+                var filename = `/data/topic-tree`;
                 lang = Util.getLang();
                 if (lang) {
                     filename += "-" + lang;
