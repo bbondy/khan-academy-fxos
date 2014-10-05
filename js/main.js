@@ -1107,12 +1107,10 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
     }).then(function() {
         return $.when(Downloads.init(), Cache.init(), models.AppOptions.fetch());
     }).then(function() {
+        // We don't want to have to wait for results, so just start this and don't wait
+        models.CurrentUser.init();
+        // Render everything
         React.renderComponent(<MainView model={models.TopicTree.root}/>, mountNode);
-
-        // TODO: Remove or move ???
-        Storage.readText("data.json").done(function(data) {
-            console.log('read: ' + data);
-        });
     }).fail((error) => {
         alert(error);
         Util.quit();
