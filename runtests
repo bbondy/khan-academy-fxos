@@ -1,1 +1,2 @@
+./runserver&
 open http://localhost:8092/test/test.html
