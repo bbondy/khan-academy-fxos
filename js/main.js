@@ -180,16 +180,18 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
         componentDidMount: function() {
         },
         render: function() {
+            var topics;
             if (this.props.topic.get("topics")) {
-                var topics = _(this.props.topic.get("topics").models).map((topic) => {
+                topics = _(this.props.topic.get("topics").models).map((topic) => {
                     return <TopicListItem topic={topic}
-                                      onClickTopic={this.props.onClickTopic}
-                                      key={topic.getId()}/>;
+                                          onClickTopic={this.props.onClickTopic}
+                                          key={topic.getId()}/>;
                 });
             }
 
+            var contentItems;
             if (this.props.topic.get("contentItems")) {
-                var contentItems = _(this.props.topic.get("contentItems").models).map((contentItem) => {
+                contentItems = _(this.props.topic.get("contentItems").models).map((contentItem) => {
                     if (contentItem.isVideo()) {
                         return <VideoListItem video={contentItem}
                                               onClickVideo={this.props.onClickContentItem}
@@ -220,8 +222,9 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
      */
     var ContentListViewer = React.createClass({
         render: function() {
+            var contentItems;
             if (this.props.collection.models) {
-                var contentItems = _(this.props.collection.models).map((contentItem) => {
+                contentItems = _(this.props.collection.models).map((contentItem) => {
                     if (contentItem.isVideo()) {
                         return <VideoListItem video={contentItem}
                                               onClickVideo={this.props.onClickContentItem}
@@ -317,7 +320,7 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
             if (this.props.article.get("content")) {
                 return <article dangerouslySetInnerHTML={{
                     __html: this.props.article.get("content")
-                }}/>
+                }}/>;
 
             }
             return null;
@@ -381,10 +384,6 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
             });
 
             video.addEventListener("timeupdate", (e) => {
-                var video = e.target;
-                var currentSecond = video.currentTime | 0;
-                var totalSeconds = video.duration | 0;
-
                 // Sometimes a 'timeupdate' event will come before a 'play' event when
                 // resuming a paused video. We need to get the play event before reporting
                 // seconds watched to properly update the secondsWatched though.
@@ -563,7 +562,7 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
             if (!models.TempAppState.get("status")) {
                 return <div/>;
             }
-            return <div className="status-bar">{models.TempAppState.get("status")}</div>
+            return <div className="status-bar">{models.TempAppState.get("status")}</div>;
         }
     });
 
@@ -918,7 +917,7 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
             });
         },
         onClickViewOnKA: function(model) {
-            var activity = new MozActivity({
+            new MozActivity({
                 name: "view",
                 data: {
                     type: "url",
@@ -927,7 +926,7 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
             });
         },
         onClickShare: function(model) {
-            var activity = new MozActivity({
+            new MozActivity({
                 name: "share",
                 data: {
                     type: "url",

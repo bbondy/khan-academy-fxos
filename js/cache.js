@@ -69,7 +69,7 @@ define(["util", "models"],
         },
         heartbeatTopicTreeName: "heartbeat-topic-tree-1",
         heartbeatUserInfoName: "heartbeat-user-info-1"
-    }
+    };
 
     return Cache;
 

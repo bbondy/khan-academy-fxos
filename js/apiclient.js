@@ -73,7 +73,7 @@ define(["oauth", "storage", "util"], function(_oauth, Storage, Util) {
             this.startedEntities = [];
             this.videosProgress = {};
             if (Util.isFirefoxOS()) {
-                this._oauthCallback = "http://firefoxos.non-existent-domain-asdfg.com/authenticated.html"
+                this._oauthCallback = "http://firefoxos.non-existent-domain-asdfg.com/authenticated.html";
             }
 
             // TODO: Only fetch from secrets.json if we don't have local storage values
@@ -122,7 +122,9 @@ define(["oauth", "storage", "util"], function(_oauth, Storage, Util) {
             }
 
             for (var p in extraParams) {
-                url = Util.appendQueryParam(url, p, extraParams[p]);
+                if (extraParams.hasOwnProperty(p)) {
+                    url = Util.appendQueryParam(url, p, extraParams[p]);
+                }
             }
             var d = $.Deferred();
             $.oauth($.extend( {}, this.oauth, {

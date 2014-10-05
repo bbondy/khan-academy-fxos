@@ -64,7 +64,7 @@ define([], function() {
             if (_.isUndefined(params)) {
                 params = window.location.search;
             }
-            if (params.length && params[0] != "?") {
+            if (params.length && params[0] !== "?") {
                 params = "?" + params;
             }
             var match = RegExp('[?&]' + name + '=([^&]*)').exec(params);
@@ -74,7 +74,7 @@ define([], function() {
          * Adds a query parameter to the specified url
          */
         appendQueryParam: function(url, name, value) {
-            if (url.indexOf("?") == -1) {
+            if (url.indexOf("?") === -1) {
                 url += "?";
             } else {
                 url += "&";
@@ -99,7 +99,7 @@ define([], function() {
           var args = aps.call(arguments, 1);
           return function() {
               return fn.apply(this, args.concat(aps.call(arguments)));
-          }
+          };
         },
         // An example generic Mixin that you can add to any component that should react
         // to changes in a Backbone component. The use cases we've identified thus far

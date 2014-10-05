@@ -70,11 +70,13 @@
                 delete node.id;
             }
             for (var x in node) {
-                this.uneededProps.forEach(function(uneededProp) {
-                    if (x === uneededProp) {
-                        delete node[x];
-                    }
-                });
+                if (node.hasOwnProperty(x)) {
+                    this.uneededProps.forEach(function(uneededProp) {
+                        if (x === uneededProp) {
+                            delete node[x];
+                        }
+                    });
+                }
             }
         },
 
@@ -114,10 +116,12 @@
 
         translateNodePropertyNames: function(node) {
             for (var name in this.propertyNameMap) {
-                var value = this.propertyNameMap[name];
-                if (typeof node[name] !== 'undefined') {
-                    node[value] = node[name];
-                    delete node[name];
+                if (this.propertyNameMap.hasOwnProperty(name)) {
+                    var value = this.propertyNameMap[name];
+                    if (typeof node[name] !== 'undefined') {
+                        node[value] = node[name];
+                        delete node[name];
+                    }
                 }
             }
         },
@@ -188,7 +192,7 @@
             });
             return found;
         }
-    }
+    };
 
     global.Minify = Minify;
 }(this));
