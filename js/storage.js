@@ -45,10 +45,10 @@ define([], function() {
             request.onsuccess = function () {
                 var file = this.result;
                 var fileReader = new FileReader();
-                fileReader.readAsText(file.slice())
+                fileReader.readAsText(file.slice());
                 fileReader.onloadend = function() {
                     d.resolve(fileReader.result);
-                }
+                };
             };
             request.onerror = function () {
                 console.warn("Unable to get the file %s: %o", filename, this.error);
@@ -101,7 +101,6 @@ define([], function() {
                 var request = this.sdcard.addNamed(blob, filename);
                 request.onsuccess = function () {
                     console.log(filename + ' was written successfully!');
-                    var name = this.result;
                     d.resolve();
                 };
                 // An error typically occur if a file with the same name already exist

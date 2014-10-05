@@ -141,7 +141,7 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
          */
         getContentItemsByIds: function(ids, filteredList) {
             return _(this.allContentItems).filter(function(model) {
-                return ids.indexOf(model.getId()) != -1;
+                return ids.indexOf(model.getId()) !== -1;
             });
         }
     };
@@ -350,7 +350,7 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
     var UserModel = Backbone.Model.extend({
         signIn: function() {
             var d = $.Deferred();
-            return APIClient.signIn().done(() => {
+            APIClient.signIn().done(() => {
                 this.refreshLoggedInInfo();
                 // We don't need to wait for the result of the
                 // refreshLoggedInInfo promise, just resolve right away.
@@ -405,7 +405,7 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
 
                 // The call is needed for the last second watched and points of each watched item.
                 APIClient.getUserVideos().done(function(results) {
-                    console.log('getUserVideos: %o', results)
+                    console.log('getUserVideos: %o', results);
 
                     // Get a list of the Ids we'll be searching for in TopicTree models
                     // This is only being done for a fast lookup so we don't need to later

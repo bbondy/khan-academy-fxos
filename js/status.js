@@ -1,6 +1,6 @@
 "use strict";
 
-define([], function() {
+define(["models"], function(models) {
     var Status = {
         // A new status message is starting
         start: function() {

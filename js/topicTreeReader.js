@@ -32,7 +32,7 @@ define(["util"], function(Util) {
                     d.reject();
                 };
                 h.onsuccess = function() {
-                    if (this.result.length == 0) {
+                    if (this.result.length === 0) {
                         console.warn("Zip read but contains no topic tree filenames");
                         d.reject();
                     }
@@ -48,13 +48,13 @@ define(["util"], function(Util) {
                         console.log(`Read: : ${this.result.name}, contentType: ${this.result.type}, size: ${this.result.size}`);
 
                         var fileReader = new FileReader();
-                        fileReader.readAsText(this.result.slice())
+                        fileReader.readAsText(this.result.slice());
                         fileReader.onloadend = function() {
                             d.resolve(fileReader.result);
-                        }
-                    }
+                        };
+                    };
                 };
-            }
+            };
             req.send();
             return d.promise();
         }
