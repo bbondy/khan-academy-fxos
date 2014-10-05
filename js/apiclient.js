@@ -153,7 +153,7 @@ define(["oauth", "storage", "util"], function(_oauth, Storage, Util) {
             return this._basicAPICall(this.API_V1_BASE + "/user");
         },
         getInstalledTopicTree: function(jsOnly) {
-            var filename = `data/topic-tree`;
+            var filename = `/data/topic-tree`;
             var lang = Util.getLang();
             if (lang) {
                 filename += "-" + lang;
