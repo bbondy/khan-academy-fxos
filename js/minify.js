@@ -132,8 +132,13 @@
                 node.children.forEach(function(child) {
                     if (this.excludedKinds.indexOf(child.kind) === -1 &&
                             this.excludedIds.indexOf(child.id)) {
-                        newChildren.push(child);
                         this.minify(child);
+                        // Also remove empty nodes, do this after minification because since we filter out some
+                        // types of content items, it might only be empty after minification.
+                        if (child[this.getShortName("kind")] !== this.getShortValue("kind", "Topic") ||
+                            child[this.getShortName("children")] && child[this.getShortName("children")].length > 0) {
+                            newChildren.push(child);
+                        }
                     }
                 }.bind(this));
                 node.children = newChildren;
@@ -178,7 +183,7 @@
         },
         getShortName: function(name) {
             var value = this.propertyNameMap[name];
-            if (_.isUndefined(value)) {
+            if (typeof value === "undefined") {
                 return name;
             }
             return value;
