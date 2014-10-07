@@ -291,7 +291,7 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
             return this.get(Minify.getShortName("youtube_id"));
         },
         getPoints: function() {
-            return this.get("points");
+            return this.get("points") || 0;
         },
         getKAUrl: function() {
             var value = this.get(Minify.getShortName("ka_url"));
@@ -440,6 +440,10 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
             var videoId = video.getId();
             var duration = video.getDuration();
             APIClient.reportVideoProgress(videoId, youTubeId, duration, secondsWatched, lastSecondWatched).done((result) => {
+                if (!result) {
+                    console.warn("Video progress report returned null results!");
+                    return;
+                }
                 console.log('reportVideoProgress result: %o', result);
 
                 var lastPoints = video.getPoints() || 0;

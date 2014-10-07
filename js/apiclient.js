@@ -136,7 +136,6 @@ define(["oauth", "storage", "util"], function(_oauth, Storage, Util) {
                     d.resolve(data);
                 },
                 error: function(xhr, status) {
-                    alert('data type was: ' + dataType);
                     console.error(`error: ${status}: %o`, xhr);
                     d.reject();
                 }

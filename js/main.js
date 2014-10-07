@@ -315,8 +315,7 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
             clearTimeout(this.timerId);
         },
         render: function() {
-            console.log("render article: ");
-            console.log(this.props.article);
+            console.log("render article: :%o", this.props.article);
             if (this.props.article.get("content")) {
                 return <article dangerouslySetInnerHTML={{
                     __html: this.props.article.get("content")
@@ -332,10 +331,6 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
      * display it to the user.
      */
     var VideoViewer = React.createClass({
-        mixins: [Util.BackboneMixin],
-        getBackboneModels: function() {
-            return [this.props.video];
-        },
         componentWillMount: function() {
             APIClient.getVideoTranscript(this.props.video.getYoutubeId()).done((transcript) => {
                 this.setState({transcript: transcript});
@@ -344,15 +339,12 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
             if (this.props.video.isDownloaded()) {
                 Storage.readAsBlob(this.props.video.getId()).done((result) => {
                     var download_url = URL.createObjectURL(result);
-                    console.log('download url is: ');
-                    console.log(download_url);
+                    console.log('download url is: ' + download_url);
                     this.setState({downloadedUrl: download_url});
                 });
             }
 
-            console.log('video:');
-            console.log(this.props.video);
-
+            console.log('video: %o', this.props.video);
             this.videoId = this.props.video.getId();
             this.lastSecondWatched = 0;
             if (this.props.video.get("lastSecondWatched") &&
@@ -362,6 +354,8 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
             this.secondsWatched = 0;
             this.lastReportedTime = new Date();
             this.lastWatchedTimeSinceLastUpdate = new Date();
+            this.pointsPerReport = this.availablePoints * this.MIN_SECONDS_BETWEEN_REPORTS / this.props.video.getDuration();
+            this.pointsObj = {num: this.props.video.getPoints()};
         },
         onClickTranscript: function(obj) {
             var startSecond = obj.start_time / 1000 | 0;
@@ -397,12 +391,16 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
                 // don't count paused time towards secondsWatched
                 this.lastWatchedTimeSinceLastUpdate = new Date();
                 this.isPlaying = true;
+                this.animatePoints();
             }, true);
 
-            video.addEventListener("pause", (e) => {
+            var onStop = (e) => {
                 this.updateSecondsWatched();
                 this.isPlaying = false;
-            }, true);
+                this.stopAnimatingPoints();
+            };
+            video.addEventListener("pause", onStop, true);
+            video.addEventListener("stop", onStop, true);
         },
 
         // Updates the secondsWatched variable with the difference between the current
@@ -411,6 +409,33 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
             var currentTime = new Date();
             this.secondsWatched += (currentTime.getTime() - this.lastWatchedTimeSinceLastUpdate.getTime()) / 1000;
             this.lastWatchedTimeSinceLastUpdate = currentTime;
+        },
+
+        availablePoints: 750,
+
+        // Start animating the points going up
+        animatePoints: function() {
+            // Never start animating if we aren't playing.
+            // This was sometimes happening after the video was complete,
+            // and new progress responses were received.
+            if (!this.isPlaying || this.pointsObj.num === this.availablePoints) {
+                return;
+            }
+            $(this.pointsObj).stop(true, false).animate({num: Math.min(this.availablePoints, this.pointsObj.num + this.pointsPerReport)}, {
+                // Add an extra second to the duration so the UI never looks like it's stuck waiting for the HTTP reply
+                duration: this.MIN_SECONDS_BETWEEN_REPORTS * 1000 + 1000,
+                step: (num) => {
+                    this.pointsObj.num = Math.ceil(num);
+                    var pointsString = document.webL10n.get("points-so-far",
+                        {"earned" : this.pointsObj.num, "available": this.availablePoints});
+                    $(".energy-points").text(pointsString);
+                }
+            });
+        },
+
+        // Stop the current animation and jump to the end
+        stopAnimatingPoints: function() {
+            $(this.pointsObj).stop(true, false);
         },
 
         // Reports the seconds watched to the server if it hasn't been reported recently
@@ -432,13 +457,17 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
             var secondsSinceLastReport = (currentTime.getTime() - this.lastReportedTime.getTime()) / 1000;
             if (secondsSinceLastReport >= this.MIN_SECONDS_BETWEEN_REPORTS || this.lastSecondWatched >= (video.duration | 0)) {
                 this.lastReportedTime = new Date();
-                // Note that this call will asynchronously report progress.
-                // And once that is done the video model that this class refers to will
-                // re-render itself with the new points.
                 models.CurrentUser.reportVideoProgress(this.props.video,
                         this.props.video.getYoutubeId(),
                         this.secondsWatched,
-                        this.lastSecondWatched);
+                        this.lastSecondWatched).done(() => {
+                            // We could just add a backbone model to watch for video model
+                            // changes and it would work automatically, but to get animated points
+                            // growing, we need to do it manually.
+                            // Re-animate the points
+                            this.pointsObj.num = this.props.video.getPoints();
+                            this.animatePoints();
+                        });
                 this.secondsWatched = 0;
             }
         },
@@ -454,15 +483,13 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
                 videoSrc = this.state.downloadedUrl;
             }
             console.log('video rendered with url: ' + videoSrc);
-            var points = this.props.video.getPoints() || 0;
-            var availablePoints = 750;
             var pointsString = document.webL10n.get("points-so-far",
-                        {"earned" : points, "available": availablePoints});
+                        {"earned" : this.props.video.getPoints(), "available": this.availablePoints});
             return <div className="video-viewer-container">
                  <video ref="video" controls>
                     <source src={videoSrc} type={this.props.video.getContentMimeType()}/>
                  </video>
-                 <div className="video-info-bar"><div className="energy-points pull-right">{{pointsString}}</div></div>
+                 <div className="video-info-bar"><div className="energy-points pull-right">{pointsString}</div></div>
                 {transcriptViewer}
             </div>;
         },
@@ -727,8 +754,7 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
                     points: result.points,
                     badgeCounts: result.badge_counts
                 });
-                console.log('user info result:');
-                console.log(result);
+                console.log('user info result: %o', result);
             });
         },
         getInitialState: function() {
@@ -828,8 +854,6 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
          * be less ugly by simply using a stack of current pane views.
          */
         onClickBack: function(model) {
-            console.log('onClickBack');
-
             // If we were on a content item from downloads,
             // then go back to downloads.
             if (this.state.wasLastDownloads) {
@@ -890,7 +914,6 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
             this.forceUpdate();
         },
         onClickProfile: function() {
-            console.log('Click profile');
             this.setState({
                 showProfile: true,
                 showDownloads: false,
@@ -899,7 +922,6 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
             });
         },
         onClickDownloads: function() {
-            console.log('Click downloads');
             this.setState({
                 showDownloads: true,
                 showProfile: false,
@@ -908,7 +930,6 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
             });
         },
         onClickSettings: function(model) {
-            console.log('Click settings');
             this.setState({
                 showDownloads: false,
                 showProfile: false,
@@ -998,7 +1019,6 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
             Downloads.cancelDownloading();
         },
         onClickDeleteDownloadedVideo: function(video) {
-            console.log('click delete downloaded video');
             Downloads.deleteContent(video);
         },
         isPaneShowing: function() {
