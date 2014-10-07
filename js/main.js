@@ -418,7 +418,9 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
             // Never start animating if we aren't playing.
             // This was sometimes happening after the video was complete,
             // and new progress responses were received.
-            if (!this.isPlaying || this.pointsObj.num === this.availablePoints) {
+            if (!this.isPlaying ||
+                    this.pointsObj.num === this.availablePoints ||
+                    !models.CurrentUser.isSignedIn()) {
                 return;
             }
             $(this.pointsObj).stop(true, false).animate({num: Math.min(this.availablePoints, this.pointsObj.num + this.pointsPerReport)}, {
@@ -485,11 +487,15 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
             console.log('video rendered with url: ' + videoSrc);
             var pointsString = document.webL10n.get("points-so-far",
                         {"earned" : this.props.video.getPoints(), "available": this.availablePoints});
+            var pointsDiv;
+            if (models.CurrentUser.isSignedIn()) {
+                pointsDiv = <div className="energy-points pull-right">{pointsString}</div>;
+            }
             return <div className="video-viewer-container">
                  <video ref="video" controls>
                     <source src={videoSrc} type={this.props.video.getContentMimeType()}/>
                  </video>
-                 <div className="video-info-bar"><div className="energy-points pull-right">{pointsString}</div></div>
+                 <div className="video-info-bar">{pointsDiv}</div>
                 {transcriptViewer}
             </div>;
         },
