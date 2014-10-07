@@ -451,24 +451,22 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
                 if (newPoints > 750) {
                     newPoints = 750;
                 }
-                video.set("points", newPoints);
 
                 // If they've watched some part of the video, and it's not almost the end
+                // Otherwise check if we already have video progress for this item and we
+                // therefore no longer need it.
+                var lastSecondWatched;
                 if (result.last_second_watched > 10 &&
                         duration - result.last_second_watched > 10) {
-                    video.set("lastSecondWatched", result.last_second_watched);
-                // Otherwise check if we already have video progress for this item and we
-                // therefore no longer need it.  Remove it to save memory.
-                } else {
-                    video.unset("lastSecondWatched");
+                    lastSecondWatched = result.last_second_watched;
                 }
 
-                if (result.is_video_completed) {
-                    video.set("completed", true);
-                    video.unset("started");
-                } else {
-                    video.set("started", true);
-                }
+                video.set({
+                    points: newPoints,
+                    completed: result.is_video_completed,
+                    started: !result.is_video_completed,
+                    lastSecondWatched: lastSecondWatched
+                });
 
                 d.resolve({
                     completed: result.is_video_completed,
