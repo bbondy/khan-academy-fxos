@@ -333,6 +333,7 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
     var VideoViewer = React.createClass({
         componentWillMount: function() {
             APIClient.getVideoTranscript(this.props.video.getYoutubeId()).done((transcript) => {
+                // This will cause a second re-render but that's OK
                 this.setState({transcript: transcript});
             });
 

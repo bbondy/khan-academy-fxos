@@ -12,8 +12,9 @@ define(["oauth", "storage", "util"], function(_oauth, Storage, Util) {
             tokenSecret: Util.getParameterByName("oauth_token_secret"),
             oauthVerifier: Util.getParameterByName("oauth_verifier")
         },
+        _localStorageAuthName: "oauth",
         _loadAuth: function() {
-            var oauth = localStorage.getItem("oauth");
+            var oauth = localStorage.getItem(this._localStorageAuthName);
             if (oauth) {
                 this.oauth = JSON.parse(oauth);
             }
@@ -29,7 +30,7 @@ define(["oauth", "storage", "util"], function(_oauth, Storage, Util) {
             }
         },
         _saveAuth: function() {
-            localStorage.setItem("oauth", JSON.stringify(this.oauth));
+            localStorage.setItem(this._localStorageAuthName, JSON.stringify(this.oauth));
         },
         _getSecrets: function() {
             return $.ajax({
@@ -39,7 +40,8 @@ define(["oauth", "storage", "util"], function(_oauth, Storage, Util) {
             });
         },
         _getAccessToken: function() {
-            return $.oauth($.extend( {}, this.oauth, {
+            var d = $.Deferred();
+            $.oauth($.extend( {}, this.oauth, {
                 type: "GET",
                 url: this.API_BASE + "/auth/access_token",
                 oauthCallback: this._oauthCallback,
@@ -47,12 +49,15 @@ define(["oauth", "storage", "util"], function(_oauth, Storage, Util) {
                 success: (data) => {
                     this.oauth.token = Util.getParameterByName("oauth_token", data);
                     this.oauth.tokenSecret = Util.getParameterByName("oauth_token_secret", data);
-                    this.oauth.oauthVerifier = undefined;
+                    delete this.oauth.oauthVerifier;
+                    d.resolve();
                 },
                 error: (xhr, status) => {
                     console.error(`error: ${status}: %o`, xhr);
+                    d.reject();
                 }
             }));
+            return d.promise();
         },
         isSignedIn: function() {
             return !!(this.oauth.consumerKey &&
@@ -61,7 +66,6 @@ define(["oauth", "storage", "util"], function(_oauth, Storage, Util) {
                 this.oauth.tokenSecret);
         },
         init: function() {
-
             // If a login is not in progress, then load the auth info
             var oauthVerifier = Util.getParameterByName("oauth_token");
             if (!oauthVerifier) {
@@ -87,7 +91,10 @@ define(["oauth", "storage", "util"], function(_oauth, Storage, Util) {
                         this._saveAuth();
                         d.resolve();
                     }).fail(() => {
-                        d.reject();
+                        // Even if we failed, we should resolve because this
+                        // indicates we are initialized successfully, justnot
+                        // signed in.
+                        d.resolve();
                     });
                 } else {
                     d.resolve();
@@ -158,7 +165,7 @@ define(["oauth", "storage", "util"], function(_oauth, Storage, Util) {
                 filename += "-" + lang;
             }
             filename += jsOnly ? ".min.js" : ".min.json";
-            console.log(filename);
+            console.log("Getting installed topic tree from: " + filename);
             return this._basicAPICall(filename, undefined, undefined, jsOnly ? "text" : "json");
         },
         getTopicTree: function() {
