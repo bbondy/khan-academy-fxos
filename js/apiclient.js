@@ -19,16 +19,6 @@ define(["oauth", "storage", "util"], function(_oauth, Storage, Util) {
                 this.oauth = JSON.parse(oauth);
             }
         },
-        _loadCompletedAndProgress: function() {
-            this.completedEntities = localStorage.getItem("completed");
-            if (this.completedEntities) {
-                this.completedEntities = JSON.parse(this.completedEntities);
-            }
-            this.startedEntities = localStorage.getItem("progress");
-            if (this.startedEntities) {
-                this.startedEntities = JSON.parse(this.startedEntities);
-            }
-        },
         _saveAuth: function() {
             localStorage.setItem(this._localStorageAuthName, JSON.stringify(this.oauth));
         },
@@ -73,8 +63,6 @@ define(["oauth", "storage", "util"], function(_oauth, Storage, Util) {
             }
             var d = $.Deferred();
             this._oauthCallback = window.location.href.split("#")[0].split('?')[0];
-            this.completedEntities = [];
-            this.startedEntities = [];
             this.videosProgress = {};
             if (Util.isFirefoxOS()) {
                 this._oauthCallback = "http://firefoxos.non-existent-domain-asdfg.com/authenticated.html";
@@ -178,16 +166,7 @@ define(["oauth", "storage", "util"], function(_oauth, Storage, Util) {
             return this._basicAPICall(this.API_V1_BASE + "/articles/" + articleId);
         },
         reportArticleRead: function(articleId) {
-            var d = $.Deferred();
-            var promise = this._basicAPICall(this.API_V1_BASE + `/user/article/${articleId}/log`, undefined, "POST");
-            promise.done((data) => {
-                console.log('reported article complete: %o', data);
-                d.resolve(data);
-                this.completedEntities.push(articleId);
-            }).fail(() => {
-                d.reject();
-            });
-            return d.promise();
+            return this._basicAPICall(this.API_V1_BASE + `/user/article/${articleId}/log`, undefined, "POST");
         },
         getUserVideos: function() {
             return this._basicAPICall(this.API_V1_BASE + "/user/videos");

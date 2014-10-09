@@ -31,7 +31,6 @@ define(["util", "models"],
 
             var TEN_MINUTES = 1000 * 60 * 10;
             setInterval(this.heartbeat.bind(this), TEN_MINUTES);
-            this.heartbeat();
             return d.resolve().promise();
         },
         heartbeat: function() {
