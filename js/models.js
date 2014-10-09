@@ -348,13 +348,26 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
     });
 
     var UserModel = Backbone.Model.extend({
+        _completedEntitiesLocalStorageName: "completedList-1",
+        _startedEntitiesLocalStorageName: "startedList-1",
+        _userVideosLocalStorageName: "userVideosList-1",
         init: function() {
-            return this.refreshLoggedInInfo();
+            // If we have cached info, use that, otherwise fall back
+            // to refreshing the user info.
+            if (!this._loadCompletedAndProgress()) {
+                this.refreshLoggedInInfo();
+            }
+
+            return $.Deferred().resolve().promise();
         },
         signIn: function() {
             var d = $.Deferred();
             APIClient.signIn().done(() => {
-                this.refreshLoggedInInfo();
+                //this.refreshLoggedInInfo(); <-- Since we currently change the
+                // window.locaiton, we dont' get a callback from this promise.
+                // So there's no point to refreshLoggedInInfo.  Commenting for
+                // extra emphasis.
+
                 // We don't need to wait for the result of the
                 // refreshLoggedInInfo promise, just resolve right away.
                 d.resolve();
@@ -369,6 +382,70 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
         isSignedIn: function() {
             return APIClient.isSignedIn();
         },
+        _loadCompletedAndProgress: function() {
+            this.completedEntityIds = localStorage.getItem(this._completedEntitiesLocalStorageName);
+            if (this.completedEntityIds) {
+                this.completedEntityIds = JSON.parse(this.completedEntityIds);
+                this._syncCompletedToTopicTree();
+            }
+            this.startedEntityIds = localStorage.getItem(this._startedEntitiesLocalStorageName);
+            if (this.startedEntityIds) {
+                this.startedEntityIds = JSON.parse(this.startedEntityIds);
+                this._syncStartedToTopicTree();
+            }
+            this.userVideos = localStorage.getItem(this._userVideosLocalStorageName);
+            if (this.userVideos) {
+                this.userVideos = JSON.parse(this.userVideos);
+                this._syncUserProgressToTopicTree();
+            }
+            return this.completedEntityIds && this.startedEntityIds && this.userVideos;
+        },
+        _syncCompletedToTopicTree: function() {
+            var completedEntities = TopicTree.getContentItemsByIds(this.completedEntityIds);
+            _.each(completedEntities, function(contentItem) {
+                contentItem.set("completed", true);
+            });
+            console.log("completed entities: %o", completedEntities);
+            console.log("completed entity Ids: %o", this.completedEntityIds);
+        },
+        _syncStartedToTopicTree: function() {
+            var startedEntities = TopicTree.getContentItemsByIds(this.startedEntityIds);
+            _.each(startedEntities, function(contentItem) {
+                contentItem.set("started", true);
+            });
+            console.log("started entities: %o", startedEntities);
+            console.log("completed entity Ids: %o", this.startedEntityIds);
+        },
+        _syncUserProgressToTopicTree: function() {
+            // Get a list of the Ids we'll be searching for in TopicTree models
+            // This is only being done for a fast lookup so we don't need to later
+            // search through all o the models
+            var filteredContentItemIds = _(this.userVideos).map((result) => {
+                return result.video.id;
+            });
+            var filteredContentItems = TopicTree.getContentItemsByIds(filteredContentItemIds);
+
+            _(this.userVideos).each((result) => {
+                // By passing filteredContentItems here we don't need to search through all
+                // of the content item models! :D
+                var video = TopicTree.getContentItemById(result.video.id, filteredContentItems);
+                if (result.last_second_watched > 10 &&
+                        result.duration - result.last_second_watched > 10) {
+                    video.set("lastSecondWatched", result.last_second_watched);
+                    video.set("points", result.points);
+                }
+            });
+            console.log('getUserVideos entities: %o', this.userVideos);
+        },
+        _saveStarted: function() {
+            localStorage.setItem(this._startedEntitiesLocalStorageName, JSON.stringify(this.startedEntityIds));
+        },
+        _saveCompleted: function() {
+            localStorage.setItem(this._completedEntitiesLocalStorageName, JSON.stringify(this.completedEntityIds));
+        },
+        _saveUserVideos: function() {
+            localStorage.setItem(this._userVideosLocalStorageName, JSON.stringify(this.userVideos));
+        },
         refreshLoggedInInfo: function() {
             var d = $.Deferred();
             if (!this.isSignedIn()) {
@@ -377,59 +454,52 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
 
             // The call is needed for completed/in progress status of content items
             // Unlike getUserVideos, this includes both articles and videos.
-            APIClient.getUserProgress().done(function(data) {
-                console.log('user progress summary: %o', data);
-                this.completedEntityIds = data.complete;
+            APIClient.getUserProgress().done((data) => {
+                console.log("getUserProgress: %o", data);
                 this.startedEntityIds = data.started;
+                this.completedEntityIds = data.complete;
 
                 // Get rid of the 'a' and 'v' prefixes, and set the completed / started
                 // attributes accordingly.
-                this.completedEntityIds = _.map(this.completedEntityIds, function(e) {
-                    return e.substring(1);
-                });
                 this.startedEntityIds = _.map(this.startedEntityIds, function(e) {
                     return e.substring(1);
                 });
-
-                // Get the entities corresponding to the ids
-                this.completedEntities = TopicTree.getContentItemsByIds(this.completedEntityIds);
-                this.startedEntities = TopicTree.getContentItemsByIds(this.startedEntityIds);
-
-                // Mark the entities as completed and started
-                this.completedEntities = _.each(this.completedEntities, function(contentItem) {
-                    contentItem.set("completed", true);
-                });
-                this.startedEntities = _.map(this.startedEntities, function(contentItem) {
-                    contentItem.set("started", true);
+                this.completedEntityIds = _.map(this.completedEntityIds, function(e) {
+                    return e.substring(1);
                 });
 
-                console.log("completed entities: %o", this.completedEntities);
-                console.log("started entities: %o", this.startedEntities);
+                this._syncStartedToTopicTree(this.startedEntityIds);
+                this._syncCompletedToTopicTree(this.completedEntityIds);
+
+                this._saveStarted();
+                this._saveCompleted();
 
                 // The call is needed for the last second watched and points of each watched item.
-                APIClient.getUserVideos().done(function(results) {
-                    console.log('getUserVideos: %o', results);
-
-                    // Get a list of the Ids we'll be searching for in TopicTree models
-                    // This is only being done for a fast lookup so we don't need to later
-                    // search through all o the models
-                    var filteredContentItemIds = _(results).map((result) => {
-                        return result.video.id;
-                    });
-                    var filteredContentItems = TopicTree.getContentItemsByIds(filteredContentItemIds);
-
-                    _(results).each((result) => {
-                        // By passing filteredContentItems here we don't need to search through all
-                        // of the content item models! :D
-                        var video = TopicTree.getContentItemById(result.video.id, filteredContentItems);
-                        if (result.last_second_watched > 10 &&
-                                result.duration - result.last_second_watched > 10) {
-                            video.set("lastSecondWatched", result.last_second_watched);
-                            video.set("points", result.points);
-                        }
-                    });
+                APIClient.getUserVideos().done((results) => {
+                    this.userVideos = results;
+                    this._syncUserProgressToTopicTree();
+                    this._saveUserVideos();
                     d.resolve();
                 });
+            }).fail(() => {
+                d.reject();
+            });
+            return d.promise();
+        },
+        reportArticleRead: function(article) {
+            var d = $.Deferred();
+            var promise = APIClient.reportArticleRead(article.getId()).done((result) => {
+                console.log('reported article complete: %o', result);
+                article.set({
+                    completed: true
+                });
+
+                var index = this.completedEntityIds.indexOf(article.getId());
+                if (index === -1) {
+                    this.completedEntityIds.push(article.getId());
+                }
+                this._saveCompleted();
+                d.resolve(result);
             }).fail(() => {
                 d.reject();
             });
@@ -468,13 +538,49 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
                     lastSecondWatched: lastSecondWatched
                 });
 
+                // Update locally stored cached info
+                var index;
+                if (result.is_video_completed) {
+                    index = this.startedEntityIds.indexOf(video.getId());
+                    if (index !== -1) {
+                        this.startedEntityIds.splice(index, 1);
+                    }
+                    index = this.completedEntityIds.indexOf(video.getId());
+                    if (index === -1) {
+                        this.completedEntityIds.push(video.getId());
+                    }
+                } else {
+                    index = this.startedEntityIds.indexOf(video.getId());
+                    if (index === -1) {
+                        this.startedEntityIds.push(video.getId());
+                    }
+                }
+
+                var foundUserVideo = _(this.userVideos).find((info) => {
+                    info.video.id === video.getId();
+                });
+                var isNew = !foundUserVideo;
+                foundUserVideo = foundUserVideo || {
+                    video: { id: video.getId() },
+                    duration: video.getDuration()
+                };
+                foundUserVideo["points"] = newPoints;
+                foundUserVideo["last_second_watched"] = lastSecondWatched;
+                if (isNew) {
+                    this.userVideos.push(foundUserVideo);
+                }
+
+                this._saveStarted();
+                this._saveCompleted();
+                this._saveUserVideos();
+
                 d.resolve({
                     completed: result.is_video_completed,
                     lastSecondWatched: result.last_second_watched,
                     pointsEarned: result.points_earned,
                     youtubeId: result.youtube_id,
                     videoId: videoId,
-                    id: result.id
+                    id: video.getId()
                 });
             }).fail(() => {
                 d.reject();
