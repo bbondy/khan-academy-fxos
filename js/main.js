@@ -299,7 +299,7 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
                     this.props.article.set("content", result);
                 });
             } else {
-                APIClient.getArticle(this.props.article.id).done((result) => {
+                APIClient.getArticle(this.props.article.getId()).done((result) => {
                     console.log("rendered article from web");
                     this.props.article.set("content", result.translated_html_content);
                 });
@@ -309,7 +309,7 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
             this.timerId = setTimeout(this.onReportComplete.bind(this), 5000);
         },
         onReportComplete: function() {
-            APIClient.reportArticleRead(this.props.article.id);
+            models.CurrentUser.reportArticleRead(this.props.article);
         },
         componentWillUnmount: function() {
             clearTimeout(this.timerId);
