@@ -23,6 +23,14 @@ define(["oauth", "storage", "util"], function(_oauth, Storage, Util) {
             localStorage.setItem(this._localStorageAuthName, JSON.stringify(this.oauth));
         },
         _getSecrets: function() {
+            // First check if we have the info from the local storage values
+            // If so just resolve from that.
+            if (this.oauth.consumerKey && this.oauth.consumerSecret) {
+                console.log("resolving wiht local secrets info");
+                return $.Deferred().resolve(this.oauth).promise();
+            }
+
+            // Otherwise request the info from the secrets.json file
             return $.ajax({
                 url: "/secrets.json",
                 timeout: 15000,
@@ -68,10 +76,9 @@ define(["oauth", "storage", "util"], function(_oauth, Storage, Util) {
                 this._oauthCallback = "http://firefoxos.non-existent-domain-asdfg.com/authenticated.html";
             }
 
-            // TODO: Only fetch from secrets.json if we don't have local storage values
             this._getSecrets().done((keyData) => {
-                this.oauth.consumerKey = keyData.key;
-                this.oauth.consumerSecret = keyData.secret;
+                this.oauth.consumerKey = keyData.consumerKey;
+                this.oauth.consumerSecret = keyData.consumerSecret;
 
                 // TODO: Only do access token stuff if we don't have local storage values
                 if (this.oauth.oauthVerifier) {
@@ -87,6 +94,10 @@ define(["oauth", "storage", "util"], function(_oauth, Storage, Util) {
                 } else {
                     d.resolve();
                 }
+            }).fail(() => {
+                // We should always be able to obtain secrets.json info!
+                console.warn("Could not obtain secrets");
+                d.reject();
             });
             return d.promise();
         },
