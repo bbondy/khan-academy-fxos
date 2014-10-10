@@ -100,8 +100,6 @@ define(["storage", "models"],
             if (onProgress) {
                 onProgress(null, 0);
             }
-            // TODO: It would be better to show a single notification for all content items
-            // downloaded instead of one for each downloaded.
             var predicate = (model) => !model.isDownloaded();
             var seq = topic.enumChildrenGenerator(predicate);
             var downloadOneAtATime = () => {
