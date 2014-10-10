@@ -751,53 +751,38 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
      */
     var ProfileViewer = React.createClass({
         componentWillMount: function() {
-            APIClient.getUserInfo().done((result) => {
-                //this.setState({content: result.translated_html_content});
-                this.setState({
-                    avatarUrl: result.avatar_url,
-                    joined: result.joined,
-                    nickname: result.nickname,
-                    username: result.username,
-                    points: result.points,
-                    badgeCounts: result.badge_counts
-                });
-                console.log('user info result: %o', result);
-            });
-        },
-        getInitialState: function() {
-            return {};
         },
         render: function() {
             var pointsString = document.webL10n.get("points");
             return <div className="profile">
-                <img className="avatar" src={this.state.avatarUrl}/>
-                <h1>{this.state.nickname || this.state.username}</h1>
-                <h2>{{pointsString}}: <div className="energy-points">{Util.numberWithCommas(this.state.points)}</div></h2>
+                <img className="avatar" src={models.CurrentUser.get("userInfo").avatarUrl}/>
+                <h1>{models.CurrentUser.get("userInfo").nickname || models.CurrentUser.get("userInfo").username}</h1>
+                <h2>{{pointsString}}: <div className="energy-points">{Util.numberWithCommas(models.CurrentUser.get("userInfo").points)}</div></h2>
 
-                { this.state.badgeCounts ?
+                { models.CurrentUser.get("userInfo").badgeCounts ?
                     <div>
                     <span className="span2">
-                        <div className="badge-category-count">{this.state.badgeCounts[5]}</div>
+                        <div className="badge-category-count">{models.CurrentUser.get("userInfo").badgeCounts[5]}</div>
                         <img className="badge-category-icon" title="Challenge Patches" src="img/badges/master-challenge-blue-60x60.png"/>
                     </span>
                     <span className="span2">
-                        <div className="badge-category-count">{this.state.badgeCounts[4]}</div>
+                        <div className="badge-category-count">{models.CurrentUser.get("userInfo").badgeCounts[4]}</div>
                         <img className="badge-category-icon" title="Black Hole Badges" src="img/badges/eclipse-60x60.png"/>
                     </span>
                     <span className="span2">
-                        <div className="badge-category-count">{this.state.badgeCounts[3]}</div>
+                        <div className="badge-category-count">{models.CurrentUser.get("userInfo").badgeCounts[3]}</div>
                         <img className="badge-category-icon" title="Sun Badges" src="img/badges/sun-60x60.png"/>
                     </span>
                     <span className="span2">
-                        <div className="badge-category-count">{this.state.badgeCounts[2]}</div>
+                        <div className="badge-category-count">{models.CurrentUser.get("userInfo").badgeCounts[2]}</div>
                         <img className="badge-category-icon" title="Earth Badges" src="img/badges/earth-60x60.png"/>
                     </span>
                     <span className="span2">
-                        <div className="badge-category-count">{this.state.badgeCounts[1]}</div>
+                        <div className="badge-category-count">{models.CurrentUser.get("userInfo").badgeCounts[1]}</div>
                         <img className="badge-category-icon" title="Moon Badges" src="img/badges/moon-60x60.png"/>
                     </span>
                     <span className="span2">
-                        <div className="badge-category-count">{this.state.badgeCounts[0]}</div>
+                        <div className="badge-category-count">{models.CurrentUser.get("userInfo").badgeCounts[0]}</div>
                         <img className="badge-category-icon" title="Meteorite Badges" src="img/badges/meteorite-60x60.png"/>
                     </span>
                     </div> : null }
