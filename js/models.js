@@ -348,13 +348,14 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
     });
 
     var UserModel = Backbone.Model.extend({
-        _completedEntitiesLocalStorageName: "completedList-1",
-        _startedEntitiesLocalStorageName: "startedList-1",
-        _userVideosLocalStorageName: "userVideosList-1",
+        _completedEntitiesLocalStorageName: "completedList-2",
+        _startedEntitiesLocalStorageName: "startedList-2",
+        _userVideosLocalStorageName: "userVideosList-2",
+        _userInfoLocalStorageName: "userInfo-2",
         init: function() {
             // If we have cached info, use that, otherwise fall back
             // to refreshing the user info.
-            if (!this._loadCompletedAndProgress()) {
+            if (!this._loadLocalStorageData()) {
                 this.refreshLoggedInInfo();
             }
 
@@ -382,50 +383,57 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
         isSignedIn: function() {
             return APIClient.isSignedIn();
         },
-        _loadCompletedAndProgress: function() {
-            this.completedEntityIds = localStorage.getItem(this._completedEntitiesLocalStorageName);
-            if (this.completedEntityIds) {
-                this.completedEntityIds = JSON.parse(this.completedEntityIds);
+        _loadLocalStorageData: function() {
+            var userInfo = localStorage.getItem(this._userInfoLocalStorageName);
+            if (userInfo) {
+                this.set("userInfo", JSON.parse(userInfo));
+            }
+            var completedEntityIds = localStorage.getItem(this._completedEntitiesLocalStorageName);
+            if (completedEntityIds) {
+                this.set("completedEntityIds", JSON.parse(completedEntityIds));
                 this._syncCompletedToTopicTree();
             }
-            this.startedEntityIds = localStorage.getItem(this._startedEntitiesLocalStorageName);
-            if (this.startedEntityIds) {
-                this.startedEntityIds = JSON.parse(this.startedEntityIds);
+            var startedEntityIds = localStorage.getItem(this._startedEntitiesLocalStorageName);
+            if (startedEntityIds) {
+                this.set("startedEntityIds", JSON.parse(startedEntityIds));
                 this._syncStartedToTopicTree();
             }
-            this.userVideos = localStorage.getItem(this._userVideosLocalStorageName);
-            if (this.userVideos) {
-                this.userVideos = JSON.parse(this.userVideos);
+            var userVideos = localStorage.getItem(this._userVideosLocalStorageName);
+            if (userVideos) {
+                this.set("userVideos", JSON.parse(userVideos));
                 this._syncUserProgressToTopicTree();
             }
-            return this.completedEntityIds && this.startedEntityIds && this.userVideos;
+            return this.get("userInfo") &&
+                this.get("completedEntityIds") &&
+                this.get("startedEntityIds") &&
+                this.get("userVideos");
         },
         _syncCompletedToTopicTree: function() {
-            var completedEntities = TopicTree.getContentItemsByIds(this.completedEntityIds);
+            var completedEntities = TopicTree.getContentItemsByIds(this.get("completedEntityIds"));
             _.each(completedEntities, function(contentItem) {
                 contentItem.set("completed", true);
             });
+            console.log("completed entity Ids: %o", this.get("completedEntityIds"));
             console.log("completed entities: %o", completedEntities);
-            console.log("completed entity Ids: %o", this.completedEntityIds);
         },
         _syncStartedToTopicTree: function() {
-            var startedEntities = TopicTree.getContentItemsByIds(this.startedEntityIds);
+            var startedEntities = TopicTree.getContentItemsByIds(this.get("startedEntityIds"));
             _.each(startedEntities, function(contentItem) {
                 contentItem.set("started", true);
             });
+            console.log("completed entity Ids: %o", this.get("startedEntityIds"));
             console.log("started entities: %o", startedEntities);
-            console.log("completed entity Ids: %o", this.startedEntityIds);
         },
         _syncUserProgressToTopicTree: function() {
             // Get a list of the Ids we'll be searching for in TopicTree models
             // This is only being done for a fast lookup so we don't need to later
             // search through all o the models
-            var filteredContentItemIds = _(this.userVideos).map((result) => {
+            var filteredContentItemIds = _(this.get("userVideos")).map((result) => {
                 return result.video.id;
             });
             var filteredContentItems = TopicTree.getContentItemsByIds(filteredContentItemIds);
 
-            _(this.userVideos).each((result) => {
+            _(this.get("userVideos")).each((result) => {
                 // By passing filteredContentItems here we don't need to search through all
                 // of the content item models! :D
                 var video = TopicTree.getContentItemById(result.video.id, filteredContentItems);
@@ -435,16 +443,27 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
                     video.set("points", result.points);
                 }
             });
-            console.log('getUserVideos entities: %o', this.userVideos);
+            console.log('getUserVideos entities: %o', this.get("userVideos"));
+        },
+        _saveUserInfo: function() {
+            if (this.get("userInfo")) {
+                localStorage.setItem(this._userInfoLocalStorageName, JSON.stringify(this.get("userInfo")));
+            }
         },
         _saveStarted: function() {
-            localStorage.setItem(this._startedEntitiesLocalStorageName, JSON.stringify(this.startedEntityIds));
+            if (this.get("startedEntityIds")) {
+                localStorage.setItem(this._startedEntitiesLocalStorageName, JSON.stringify(this.get("startedEntityIds")));
+            }
         },
         _saveCompleted: function() {
-            localStorage.setItem(this._completedEntitiesLocalStorageName, JSON.stringify(this.completedEntityIds));
+            if (this.get("completedEntityIds")) {
+                localStorage.setItem(this._completedEntitiesLocalStorageName, JSON.stringify(this.get("completedEntityIds")));
+            }
         },
         _saveUserVideos: function() {
-            localStorage.setItem(this._userVideosLocalStorageName, JSON.stringify(this.userVideos));
+            if (this.get("userVideos")) {
+                localStorage.setItem(this._userVideosLocalStorageName, JSON.stringify(this.get("userVideos")));
+            }
         },
         refreshLoggedInInfo: function() {
             var d = $.Deferred();
@@ -452,38 +471,56 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
                 return d.resolve().promise();
             }
 
-            // The call is needed for completed/in progress status of content items
-            // Unlike getUserVideos, this includes both articles and videos.
-            APIClient.getUserProgress().done((data) => {
-                console.log("getUserProgress: %o", data);
-                this.startedEntityIds = data.started;
-                this.completedEntityIds = data.complete;
-
-                // Get rid of the 'a' and 'v' prefixes, and set the completed / started
-                // attributes accordingly.
-                this.startedEntityIds = _.map(this.startedEntityIds, function(e) {
-                    return e.substring(1);
+            // Get the user profile info
+            APIClient.getUserInfo().done((result) => {
+                this.set("userInfo", {
+                    avatarUrl: result.avatar_url,
+                    joined: result.joined,
+                    nickname: result.nickname,
+                    username: result.username,
+                    points: result.points,
+                    badgeCounts: result.badge_counts
                 });
-                this.completedEntityIds = _.map(this.completedEntityIds, function(e) {
-                    return e.substring(1);
-                });
+                this._saveUserVideos();
 
-                this._syncStartedToTopicTree(this.startedEntityIds);
-                this._syncCompletedToTopicTree(this.completedEntityIds);
+                // The call is needed for completed/in progress status of content items
+                // Unlike getUserVideos, this includes both articles and videos.
+                APIClient.getUserProgress().done((data) => {
+                    console.log("getUserProgress: %o", data);
+                    var startedEntityIds = data.started;
+                    var completedEntityIds = data.complete;
 
-                this._saveStarted();
-                this._saveCompleted();
+                    // Get rid of the 'a' and 'v' prefixes, and set the completed / started
+                    // attributes accordingly.
+                    this.set("startedEntityIds", _.map(startedEntityIds, function(e) {
+                        return e.substring(1);
+                    }));
+                    this.set("completedEntityIds", _.map(completedEntityIds, function(e) {
+                        return e.substring(1);
+                    }));
 
-                // The call is needed for the last second watched and points of each watched item.
-                APIClient.getUserVideos().done((results) => {
-                    this.userVideos = results;
-                    this._syncUserProgressToTopicTree();
-                    this._saveUserVideos();
-                    d.resolve();
+                    // Update topic tree models
+                    this._syncStartedToTopicTree();
+                    this._syncCompletedToTopicTree();
+
+                    // Save to local storage
+                    this._saveStarted();
+                    this._saveCompleted();
+
+                    // The call is needed for the last second watched and points of each watched item.
+                    APIClient.getUserVideos().done((results) => {
+                        this.set("userVideos", results);
+                        this._syncUserProgressToTopicTree();
+                        this._saveUserVideos();
+                        d.resolve();
+                    });
+                }).fail(() => {
+                    d.reject();
                 });
             }).fail(() => {
                 d.reject();
             });
+
             return d.promise();
         },
         reportArticleRead: function(article) {
@@ -494,9 +531,9 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
                     completed: true
                 });
 
-                var index = this.completedEntityIds.indexOf(article.getId());
+                var index = this.get("completedEntityIds").indexOf(article.getId());
                 if (index === -1) {
-                    this.completedEntityIds.push(article.getId());
+                    this.get("completedEntityIds").push(article.getId());
                 }
                 this._saveCompleted();
                 d.resolve(result);
@@ -541,22 +578,22 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
                 // Update locally stored cached info
                 var index;
                 if (result.is_video_completed) {
-                    index = this.startedEntityIds.indexOf(video.getId());
+                    index = this.get("startedEntityIds").indexOf(video.getId());
                     if (index !== -1) {
-                        this.startedEntityIds.splice(index, 1);
+                        this.get("startedEntityIds").splice(index, 1);
                     }
-                    index = this.completedEntityIds.indexOf(video.getId());
+                    index = this.get("completedEntityIds").indexOf(video.getId());
                     if (index === -1) {
-                        this.completedEntityIds.push(video.getId());
+                        this.get("completedEntityIds").push(video.getId());
                     }
                 } else {
-                    index = this.startedEntityIds.indexOf(video.getId());
+                    index = this.get("startedEntityIds").indexOf(video.getId());
                     if (index === -1) {
-                        this.startedEntityIds.push(video.getId());
+                        this.get("startedEntityIds").push(video.getId());
                     }
                 }
 
-                var foundUserVideo = _(this.userVideos).find((info) => {
+                var foundUserVideo = _(this.get("userVideos")).find((info) => {
                     info.video.id === video.getId();
                 });
                 var isNew = !foundUserVideo;
@@ -567,7 +604,7 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
                 foundUserVideo["points"] = newPoints;
                 foundUserVideo["last_second_watched"] = lastSecondWatched;
                 if (isNew) {
-                    this.userVideos.push(foundUserVideo);
+                    this.get("userVideos").push(foundUserVideo);
                 }
 
                 this._saveStarted();
