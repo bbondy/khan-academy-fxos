@@ -348,15 +348,28 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
     });
 
     var UserModel = Backbone.Model.extend({
-        _completedEntitiesLocalStorageName: "completedList-2",
-        _startedEntitiesLocalStorageName: "startedList-2",
-        _userVideosLocalStorageName: "userVideosList-2",
-        _userInfoLocalStorageName: "userInfo-2",
+        _getLocalStorageName(base) {
+            return base + "-uid-" + (this.get("userInfo").nickname ||
+                this.get("userInfo").username);
+        },
+        _completedEntitiesLocalStorageName: function() {
+            return this._getLocalStorageName("completed");
+        },
+        _startedEntitiesLocalStorageName: function() {
+            return this._getLocalStorageName("started");
+        },
+        _userVideosLocalStorageName: function() {
+            return this._getLocalStorageName("userVideos");
+        },
+        _userInfoLocalStorageName: "userInfo-3",
         init: function() {
             // If we have cached info, use that, otherwise fall back
             // to refreshing the user info.
             if (!this._loadLocalStorageData()) {
+                console.log("User info being refreshed from server");
                 this.refreshLoggedInInfo();
+            } else {
+                console.log("User info being refreshed from cache");
             }
 
             return $.Deferred().resolve().promise();
@@ -387,18 +400,22 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
             var userInfo = localStorage.getItem(this._userInfoLocalStorageName);
             if (userInfo) {
                 this.set("userInfo", JSON.parse(userInfo));
+            } else {
+                // userInfo at a minimum is needed or else we can't get the local
+                // storage names of the other cached data.
+                return false;
             }
-            var completedEntityIds = localStorage.getItem(this._completedEntitiesLocalStorageName);
+            var completedEntityIds = localStorage.getItem(this._completedEntitiesLocalStorageName());
             if (completedEntityIds) {
                 this.set("completedEntityIds", JSON.parse(completedEntityIds));
                 this._syncCompletedToTopicTree();
             }
-            var startedEntityIds = localStorage.getItem(this._startedEntitiesLocalStorageName);
+            var startedEntityIds = localStorage.getItem(this._startedEntitiesLocalStorageName());
             if (startedEntityIds) {
                 this.set("startedEntityIds", JSON.parse(startedEntityIds));
                 this._syncStartedToTopicTree();
             }
-            var userVideos = localStorage.getItem(this._userVideosLocalStorageName);
+            var userVideos = localStorage.getItem(this._userVideosLocalStorageName());
             if (userVideos) {
                 this.set("userVideos", JSON.parse(userVideos));
                 this._syncUserProgressToTopicTree();
@@ -452,17 +469,17 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
         },
         _saveStarted: function() {
             if (this.get("startedEntityIds")) {
-                localStorage.setItem(this._startedEntitiesLocalStorageName, JSON.stringify(this.get("startedEntityIds")));
+                localStorage.setItem(this._startedEntitiesLocalStorageName(), JSON.stringify(this.get("startedEntityIds")));
             }
         },
         _saveCompleted: function() {
             if (this.get("completedEntityIds")) {
-                localStorage.setItem(this._completedEntitiesLocalStorageName, JSON.stringify(this.get("completedEntityIds")));
+                localStorage.setItem(this._completedEntitiesLocalStorageName(), JSON.stringify(this.get("completedEntityIds")));
             }
         },
         _saveUserVideos: function() {
             if (this.get("userVideos")) {
-                localStorage.setItem(this._userVideosLocalStorageName, JSON.stringify(this.get("userVideos")));
+                localStorage.setItem(this._userVideosLocalStorageName(), JSON.stringify(this.get("userVideos")));
             }
         },
         refreshLoggedInInfo: function() {
@@ -473,6 +490,7 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
 
             // Get the user profile info
             APIClient.getUserInfo().done((result) => {
+                console.log("getUserInfo: %o", result);
                 this.set("userInfo", {
                     avatarUrl: result.avatar_url,
                     joined: result.joined,
@@ -481,7 +499,7 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
                     points: result.points,
                     badgeCounts: result.badge_counts
                 });
-                this._saveUserVideos();
+                this._saveUserInfo();
 
                 // The call is needed for completed/in progress status of content items
                 // Unlike getUserVideos, this includes both articles and videos.
