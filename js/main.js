@@ -36,7 +36,7 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
 
             return <li className={topicClass}>
                 { this.props.topic.isRootChild() ? <div className="color-block"/> : null }
-                <a href="#" onClick={Util.partial(this.props.onClickTopic, this.props.topic)}>
+                <a href="javascript:void(0)" onClick={Util.partial(this.props.onClickTopic, this.props.topic)}>
                     <p className="topic-title">{this.props.topic.getTitle()}</p>
                 </a>
             </li>;
@@ -81,12 +81,12 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
             var videoClass = cx(videoClassObj);
             return <li className={videoClass}>
                 <div className={subwayIconClass}>
-                    <a href="#" onClick={Util.partial(this.props.onClickVideo, this.props.video)}>
+                    <a href="javascript:void(0)" onClick={Util.partial(this.props.onClickVideo, this.props.video)}>
                         <div className={videoNodeClass}/>
                     </a>
                     <div className={pipeClass}/>
                 </div>
-                <a href="#" onClick={Util.partial(this.props.onClickVideo, this.props.video)}>
+                <a href="javascript:void(0)" onClick={Util.partial(this.props.onClickVideo, this.props.video)}>
                     <p className="video-title">{this.props.video.getTitle()}</p>
                 </a>
             </li>;
@@ -127,12 +127,12 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
             var articleClass = cx(articleClassObj);
             return <li className={articleClass}>
                 <div className={subwayIconClass}>
-                    <a href="#" onClick={Util.partial(this.props.onClickArticle, this.props.article)}>
+                    <a href="javascript:void(0)" onClick={Util.partial(this.props.onClickArticle, this.props.article)}>
                         <div className={articleNodeClass}/>
                     </a>
                     <div className={pipeClass}/>
                 </div>
-                <a href="#" onClick={Util.partial(this.props.onClickArticle, this.props.article)}>
+                <a href="javascript:void(0)" onClick={Util.partial(this.props.onClickArticle, this.props.article)}>
                     <p className="article-title">{this.props.article.getTitle()}</p>
                 </a>
             </li>;
@@ -148,7 +148,7 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
     var BackButton = React.createClass({
         render: function() {
             return <div>
-                <a className="icon-back-link " href="#" onClick={Util.partial(this.props.onClickBack, this.props.model)}>
+                <a className="icon-back-link " href="javascript:void(0)" onClick={Util.partial(this.props.onClickBack, this.props.model)}>
                     <span className="icon icon-back">Back</span>
                 </a>
             </div>;
@@ -258,7 +258,7 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
             var startSecond = this.props.transcriptItem.start_time / 1000 % 60 | 0;
             startSecond = ("0" + startSecond).slice(-2);
             return <li className="transcript-item">
-                <a href="#" onClick={Util.partial(this.props.onClickTranscript, this.props.transcriptItem)}>
+                <a href="javascript:void(0)" onClick={Util.partial(this.props.onClickTranscript, this.props.transcriptItem)}>
                     <div>{startMinute}:{startSecond}</div>
                     <div>{this.props.transcriptItem.text}</div>
                 </a>
@@ -615,12 +615,12 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
                 if (this.props.model.isDownloaded()) {
                     var text = document.webL10n.get(this.props.model.isVideo() ? "delete-downloaded-video" : "delete-downloaded-article");
                     items.push(<li className="hot-item">
-                            <a href="#" onClick={Util.partial(this.props.onClickDeleteDownloadedVideo, this.props.model)}>{{text}}</a>
+                            <a href="javascript:void(0)" onClick={Util.partial(this.props.onClickDeleteDownloadedVideo, this.props.model)}>{{text}}</a>
                         </li>);
                 } else {
                     var text = document.webL10n.get(this.props.model.isVideo() ? "download-video" : "download-article");
                     items.push(<li className="hot-item">
-                            <a href="#" onClick={Util.partial(this.props.onClickDownloadContent, this.props.model)}>{{text}}</a>
+                            <a href="javascript:void(0)" onClick={Util.partial(this.props.onClickDownloadContent, this.props.model)}>{{text}}</a>
                         </li>);
                 }
             }
@@ -629,19 +629,19 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
                     this.props.model.isContent() &&
                     this.props.model.getKAUrl()) {
                 var viewOnKAMessage = document.webL10n.get("open-in-website");
-                items.push(<li><a href="#" onClick={Util.partial(this.props.onClickViewOnKA, this.props.model)}>{{viewOnKAMessage}}</a></li>);
+                items.push(<li><a href="javascript:void(0)" onClick={Util.partial(this.props.onClickViewOnKA, this.props.model)}>{{viewOnKAMessage}}</a></li>);
                 var shareMessage = document.webL10n.get("share");
-                items.push(<li><a href="#" onClick={Util.partial(this.props.onClickShare, this.props.model)}>{{shareMessage}}</a></li>);
+                items.push(<li><a href="javascript:void(0)" onClick={Util.partial(this.props.onClickShare, this.props.model)}>{{shareMessage}}</a></li>);
             }
 
             if (models.TempAppState.get("isDownloadingTopic")) {
                 items.push(<li className="hot-item">
-                        <a href="#" data-l10n-id="cancel-downloading" onClick={Util.partial(this.props.onClickCancelDownloadContent, this.props.model)}>Cancel Downloading</a>
+                        <a href="javascript:void(0)" data-l10n-id="cancel-downloading" onClick={Util.partial(this.props.onClickCancelDownloadContent, this.props.model)}>Cancel Downloading</a>
                     </li>);
             } else if(!this.props.isPaneShowing &&
                         this.props.model && this.props.model.isTopic()) {
                 items.push(<li className="hot-item">
-                        <a href="#" data-l10n-id="download-topic" onClick={Util.partial(this.props.onClickDownloadContent, this.props.model)}>Download Topic</a>
+                        <a href="javascript:void(0)" data-l10n-id="download-topic" onClick={Util.partial(this.props.onClickDownloadContent, this.props.model)}>Download Topic</a>
                     </li>);
             }
 
@@ -649,25 +649,25 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
             // Followed by sign in
             if (!models.CurrentUser.isSignedIn()) {
                 // If the user is not signed in, add that option first
-                items.push(<li><a data-l10n-id="sign-in" href="#" onClick={this.props.onClickSignin}>Sign In</a></li>);
+                items.push(<li><a data-l10n-id="sign-in" href="javascript:void(0)" onClick={this.props.onClickSignin}>Sign In</a></li>);
             }
 
             ////////////////////
             // Followed by view pane items
             if (models.CurrentUser.isSignedIn() && !this.props.isProfileShowing) {
                 // User is signed in, add all the signed in options here
-                items.push(<li><a  data-l10n-id="view-profile" href="#" onClick={this.props.onClickProfile}>View Profile</a></li>);
+                items.push(<li><a  data-l10n-id="view-profile" href="javascript:void(0)" onClick={this.props.onClickProfile}>View Profile</a></li>);
             }
             if (!this.props.isSettingsShowing) {
-                items.push(<li><a data-l10n-id="view-settings" href="#" onClick={this.props.onClickSettings}>View Settings</a></li>);
+                items.push(<li><a data-l10n-id="view-settings" href="javascript:void(0)" onClick={this.props.onClickSettings}>View Settings</a></li>);
             }
             if (!this.props.isDownloadsShowing) {
-                items.push(<li><a data-l10n-id="view-downloads" href="#" onClick={this.props.onClickDownloads}>View Downloads</a></li>);
+                items.push(<li><a data-l10n-id="view-downloads" href="javascript:void(0)" onClick={this.props.onClickDownloads}>View Downloads</a></li>);
             }
 
             // Add the signout button last
             if (models.CurrentUser.isSignedIn()) {
-                items.push(<li><a data-l10n-id="sign-out" href="#" onClick={this.props.onClickSignout}>Sign Out</a></li>);
+                items.push(<li><a data-l10n-id="sign-out" href="javascript:void(0)" onClick={this.props.onClickSignout}>Sign Out</a></li>);
             }
 
             return <section className="sidebar" data-type="sidebar">
