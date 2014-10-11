@@ -50,6 +50,10 @@
         uneededProps: ["sha", "date_added", "readable_id", "slug", "render_type"],
 
         stripKnownUrls: function(node) {
+            if (node.kind !== "Video") {
+                return;
+            }
+
             var urlPrefix = "http://www.khanacademy.org/video/";
             if (node.ka_url &&
                     node.ka_url.indexOf(urlPrefix) === 0) {
@@ -135,8 +139,16 @@
                         this.minify(child);
                         // Also remove empty nodes, do this after minification because since we filter out some
                         // types of content items, it might only be empty after minification.
-                        if (child[this.getShortName("kind")] !== this.getShortValue("kind", "Topic") ||
-                            child[this.getShortName("children")] && child[this.getShortName("children")].length > 0) {
+                        if (child[this.getShortName("kind")] !== this.getShortValue("kind", "Topic")) {
+                            // Exclude video items that have no download url
+                            if (child[this.getShortName("kind")] !== this.getShortValue("kind", "Video") ||
+                                    child[this.getShortName("download_urls")]) {
+                                newChildren.push(child);
+                            } else if (child[this.getShortName("kind")] === this.getShortValue("kind", "Video")) {
+                                console.log("Warning: Excluding because of no vidoe URL: " + child[this.getShortName("id")] +
+                                    ", " + child[this.getShortName("translated_title")]);
+                            }
+                        } else if (child[this.getShortName("children")] && child[this.getShortName("children")].length > 0) {
                             newChildren.push(child);
                         }
                     }
