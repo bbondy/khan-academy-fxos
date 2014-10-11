@@ -716,7 +716,6 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
             this.props.options.save();
         },
         render: function() {
-            console.log('rendering for value of: ' + this.props.options.get("showDownloadsOnly"));
             return <div className="settings topic-list-container">
 
                 <div data-l10n-id="show-downloads-only">Show downloads only</div>
