@@ -901,7 +901,7 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
             this.forceUpdate();
         },
         onClickSignout: function() {
-            APIClient.signOut();
+            models.CurrentUser.signOut();
             this.forceUpdate();
         },
         onClickProfile: function() {
