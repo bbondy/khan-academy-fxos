@@ -17,3 +17,8 @@ Everything is built using JavaScript.
 Please feel free to contribute directly by adding pull requests and issues through github.
 If you would like help getting setup feel free to contact [Brian R. Bondy](http://www.brianbondy.com/contact/)
 
+## Contributors
+
+- [Brian R. Bondy](http://www.brianbondy.com) - App developer
+- [Rodrigo Silveira](blog.rodms.com) - Portuguese app translation
+
