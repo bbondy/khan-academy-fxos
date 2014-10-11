@@ -49,7 +49,7 @@ define(["util", "models"],
                 console.log('heartbeat: no need to refresh user info yet!');
             } else {
                 console.log('heartbeat: Refreshing logged in info!');
-                models.CurrentUser.refreshLoggedInInfo().done(() => {
+                models.CurrentUser.refreshLoggedInInfo(true).done(() => {
                     this.lastUserInfoRefresh = new Date();
                     localStorage.setItem(this.heartbeatUserInfoName, this.lastUserInfoRefresh);
                 });
