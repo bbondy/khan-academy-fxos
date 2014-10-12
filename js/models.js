@@ -623,6 +623,16 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
                     lastSecondWatched = result.last_second_watched;
                 }
 
+                // If we're just getting a completion of a video update
+                // the user's overall points locally.
+                if (result.points_earned > 0) {
+                    // TODO: It would be better to store userInfo properties directly
+                    // That way notificaitons will go out automatically.
+                    var userInfo = CurrentUser.get("userInfo");
+                    userInfo.points += result.points_earned;
+                    CurrentUser._saveUserInfo();
+                }
+
                 video.set({
                     points: newPoints,
                     completed: result.is_video_completed,
@@ -717,6 +727,7 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
         _name: "appOptions.json"
     });
 
+    var CurrentUser = new UserModel();
     return {
         TopicModel,
         ContentModel,
@@ -729,6 +740,6 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
         TopicTree,
         AppOptions: new AppOptionsModel(),
         TempAppState: new TempAppStateModel(),
-        CurrentUser: new UserModel()
+        CurrentUser
     };
 });
