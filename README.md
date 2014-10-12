@@ -16,6 +16,14 @@ Note that reporting user points will not work unless you have an annointed key.
 See here for information on how to apply for a Khan Academy API key:  
 https://github.com/Khan/khan-api/wiki/Khan-Academy-API-Authentication
 
+## Building the source
+
+You need [Nodejs](http://nodejs.org) installed to run the following commands (please run them in the order given).
+
+* Install react-tools by running `npm install -g react-tools`.
+
+* Install jsx by running `npm install -g jsx`
+
 The first time you get setup, run `./rebuild`.  Then run `./runserver`.  
 This will start a local python HTTP server on port 8092.  
 It will also start watching js and jsx changes and transpile everything in the `./js` directory to the `./build` directory.  In this way React and ES6 features can be used.
