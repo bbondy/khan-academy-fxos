@@ -431,7 +431,7 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
                     this.pointsObj.num = Math.ceil(num);
                     var pointsString = document.webL10n.get("points-so-far",
                         {"earned" : this.pointsObj.num, "available": this.availablePoints});
-                    $(".energy-points").text(pointsString);
+                    $(".energy-points.energy-points-video").text(pointsString);
                 }
             });
         },
@@ -490,7 +490,7 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
                         {"earned" : this.props.video.getPoints(), "available": this.availablePoints});
             var pointsDiv;
             if (models.CurrentUser.isSignedIn()) {
-                pointsDiv = <div className="energy-points pull-right">{pointsString}</div>;
+                pointsDiv = <div className="energy-points energy-points-video pull-right">{pointsString}</div>;
             }
             return <div className="video-viewer-container">
                  <video ref="video" controls>
@@ -756,7 +756,7 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
             return <div className="profile">
                 <img className="avatar" src={models.CurrentUser.get("userInfo").avatarUrl}/>
                 <h1>{models.CurrentUser.get("userInfo").nickname || models.CurrentUser.get("userInfo").username}</h1>
-                <h2>{{pointsString}}: <div className="energy-points">{Util.numberWithCommas(models.CurrentUser.get("userInfo").points)}</div></h2>
+                <h2>{{pointsString}}: <div className="energy-points energy-points-profile">{Util.numberWithCommas(models.CurrentUser.get("userInfo").points)}</div></h2>
 
                 { models.CurrentUser.get("userInfo").badgeCounts ?
                     <div>
