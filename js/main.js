@@ -395,13 +395,16 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
                 this.animatePoints();
             }, true);
 
-            var onStop = (e) => {
+            video.addEventListener("pause", (e) => {
                 this.updateSecondsWatched();
                 this.isPlaying = false;
-                this.stopAnimatingPoints();
-            };
-            video.addEventListener("pause", onStop, true);
-            video.addEventListener("stop", onStop, true);
+                this.stopAnimatingPoints(false);
+            }, true);
+            video.addEventListener("stop", (e) => {
+                this.updateSecondsWatched();
+                this.isPlaying = false;
+                this.stopAnimatingPoints(true);
+            }, true);
         },
 
         // Updates the secondsWatched variable with the difference between the current
@@ -420,13 +423,14 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
             // This was sometimes happening after the video was complete,
             // and new progress responses were received.
             if (!this.isPlaying ||
-                    this.pointsObj.num === this.availablePoints ||
                     !models.CurrentUser.isSignedIn()) {
                 return;
             }
-            $(this.pointsObj).stop(true, false).animate({num: Math.min(this.availablePoints, this.pointsObj.num + this.pointsPerReport)}, {
+
+            var points = Math.min(this.availablePoints, this.pointsObj.num + this.pointsPerReport);
+            $(this.pointsObj).stop(true, false).animate({num: points}, {
                 // Add an extra second to the duration so the UI never looks like it's stuck waiting for the HTTP reply
-                duration: this.MIN_SECONDS_BETWEEN_REPORTS * 1000 + 1000,
+                duration: this.MIN_SECONDS_BETWEEN_REPORTS * 1000,
                 step: (num) => {
                     this.pointsObj.num = Math.ceil(num);
                     var pointsString = document.webL10n.get("points-so-far",
@@ -437,8 +441,8 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
         },
 
         // Stop the current animation and jump to the end
-        stopAnimatingPoints: function() {
-            $(this.pointsObj).stop(true, false);
+        stopAnimatingPoints: function(jumpToEnd) {
+            $(this.pointsObj).stop(true, jumpToEnd);
         },
 
         // Reports the seconds watched to the server if it hasn't been reported recently
