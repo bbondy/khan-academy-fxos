@@ -27,7 +27,8 @@
       "name": "Khan Academy"
     },
     "pt": {
-      "name": "Khan Academy"
+      "name": "Khan Academy",
+      "description": "A Khan Academy te permite aprender quase tudo sem pagar nada"
     }
   },
   "default_locale": "en",
