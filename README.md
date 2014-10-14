@@ -24,7 +24,7 @@ You need [Nodejs](http://nodejs.org) installed to run the following commands (pl
 
 * Install jsx by running `npm install -g jsx`
 
-The first time you get setup, run `./rebuild`.  Then run `./runserver`.  
+The first time you get setup, run `./tools/rebuild`.  Then run `./tools/runserver`.  
 This will start a local python HTTP server on port 8092.  
 It will also start watching js and jsx changes and transpile everything in the `./js` directory to the `./build` directory.  In this way React and ES6 features can be used.
 
@@ -32,7 +32,8 @@ Due to using JavaScript generators, if you want to test in Chrome you'll have to
 
 ## Running tests
 
-Run `./runserver` and load `./test/test.html` in Firefox.
+Run `./tools/runserver` and load `./test/test.html` in Firefox.
+Or just run `./tools/runtests`.
 
 ## Contribute
 
