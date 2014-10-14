@@ -1126,6 +1126,10 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
         models.CurrentUser.init();
         // Render everything
         React.renderComponent(<MainView model={models.TopicTree.root}/>, mountNode);
+        $("body").bind("contextmenu", function (e) {
+            console.log('contextmenu!');
+            e.preventDefault();
+        });
     }).fail((error) => {
         alert(error);
         Util.quit();
