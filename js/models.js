@@ -365,6 +365,7 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
         init: function() {
             if (!this.isSignedIn()) {
                 console.log("Not signed in, won't get user info!");
+                this.initialized = true;
                 return $.Deferred().resolve().promise();
             }
 
@@ -382,6 +383,7 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
                 this.refreshLoggedInInfo(false);
             }
 
+            this.initialized = true;
             return $.Deferred().resolve().promise();
         },
         signIn: function() {
