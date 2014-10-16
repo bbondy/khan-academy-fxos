@@ -619,12 +619,12 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
                 if (this.props.model.isDownloaded()) {
                     var text = document.webL10n.get(this.props.model.isVideo() ? "delete-downloaded-video" : "delete-downloaded-article");
                     items.push(<li className="hot-item">
-                            <a href="javascript:void(0)" onClick={Util.partial(this.props.onClickDeleteDownloadedVideo, this.props.model)}>{{text}}</a>
+                            <a href="#" onClick={Util.partial(this.props.onClickDeleteDownloadedVideo, this.props.model)}>{{text}}</a>
                         </li>);
                 } else {
                     var text = document.webL10n.get(this.props.model.isVideo() ? "download-video" : "download-article");
                     items.push(<li className="hot-item">
-                            <a href="javascript:void(0)" onClick={Util.partial(this.props.onClickDownloadContent, this.props.model)}>{{text}}</a>
+                            <a href="#" onClick={Util.partial(this.props.onClickDownloadContent, this.props.model)}>{{text}}</a>
                         </li>);
                 }
             }
@@ -633,19 +633,19 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
                     this.props.model.isContent() &&
                     this.props.model.getKAUrl()) {
                 var viewOnKAMessage = document.webL10n.get("open-in-website");
-                items.push(<li><a href="javascript:void(0)" onClick={Util.partial(this.props.onClickViewOnKA, this.props.model)}>{{viewOnKAMessage}}</a></li>);
+                items.push(<li><a href="#" onClick={Util.partial(this.props.onClickViewOnKA, this.props.model)}>{{viewOnKAMessage}}</a></li>);
                 var shareMessage = document.webL10n.get("share");
-                items.push(<li><a href="javascript:void(0)" onClick={Util.partial(this.props.onClickShare, this.props.model)}>{{shareMessage}}</a></li>);
+                items.push(<li><a href="#" onClick={Util.partial(this.props.onClickShare, this.props.model)}>{{shareMessage}}</a></li>);
             }
 
             if (models.TempAppState.get("isDownloadingTopic")) {
                 items.push(<li className="hot-item">
-                        <a href="javascript:void(0)" data-l10n-id="cancel-downloading" onClick={Util.partial(this.props.onClickCancelDownloadContent, this.props.model)}>Cancel Downloading</a>
+                        <a href="#" data-l10n-id="cancel-downloading" onClick={Util.partial(this.props.onClickCancelDownloadContent, this.props.model)}>Cancel Downloading</a>
                     </li>);
             } else if(!this.props.isPaneShowing &&
                         this.props.model && this.props.model.isTopic()) {
                 items.push(<li className="hot-item">
-                        <a href="javascript:void(0)" data-l10n-id="download-topic" onClick={Util.partial(this.props.onClickDownloadContent, this.props.model)}>Download Topic</a>
+                        <a href="#" data-l10n-id="download-topic" onClick={Util.partial(this.props.onClickDownloadContent, this.props.model)}>Download Topic</a>
                     </li>);
             }
 
@@ -653,25 +653,25 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
             // Followed by sign in
             if (!models.CurrentUser.isSignedIn()) {
                 // If the user is not signed in, add that option first
-                items.push(<li><a data-l10n-id="sign-in" href="javascript:void(0)" onClick={this.props.onClickSignin}>Sign In</a></li>);
+                items.push(<li><a data-l10n-id="sign-in" href="#" onClick={this.props.onClickSignin}>Sign In</a></li>);
             }
 
             ////////////////////
             // Followed by view pane items
             if (models.CurrentUser.isSignedIn() && !this.props.isProfileShowing) {
                 // User is signed in, add all the signed in options here
-                items.push(<li><a  data-l10n-id="view-profile" href="javascript:void(0)" onClick={this.props.onClickProfile}>View Profile</a></li>);
+                items.push(<li><a  data-l10n-id="view-profile" href="#" onClick={this.props.onClickProfile}>View Profile</a></li>);
             }
             if (!this.props.isSettingsShowing) {
-                items.push(<li><a data-l10n-id="view-settings" href="javascript:void(0)" onClick={this.props.onClickSettings}>View Settings</a></li>);
+                items.push(<li><a data-l10n-id="view-settings" href="#" onClick={this.props.onClickSettings}>View Settings</a></li>);
             }
             if (!this.props.isDownloadsShowing) {
-                items.push(<li><a data-l10n-id="view-downloads" href="javascript:void(0)" onClick={this.props.onClickDownloads}>View Downloads</a></li>);
+                items.push(<li><a data-l10n-id="view-downloads" href="#" onClick={this.props.onClickDownloads}>View Downloads</a></li>);
             }
 
             // Add the signout button last
             if (models.CurrentUser.isSignedIn()) {
-                items.push(<li><a data-l10n-id="sign-out" href="javascript:void(0)" onClick={this.props.onClickSignout}>Sign Out</a></li>);
+                items.push(<li><a data-l10n-id="sign-out" href="#" onClick={this.props.onClickSignout}>Sign Out</a></li>);
             }
 
             return <section className="sidebar" data-type="sidebar">
