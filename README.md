@@ -35,6 +35,18 @@ Due to using JavaScript generators, if you want to test in Chrome you'll have to
 Run `./tools/runserver` and load `./test/test.html` in Firefox.
 Or just run `./tools/runtests`.
 
+## Storage
+
+Device Storage API is used for downloads and for cached topic trees.  
+It is sometimes useful to clear this data while using a simulator.  
+You can find this storage when using a simulator in a location similar to this:
+`/Users/brianbondy//Library/Application Support/Firefox/Profiles/s9r03lep.default-1410874219924/extensions/fxos_2_0_simulator@mozilla.org/profile/fake-sdcard/`  
+
+Your exact path will differ depending on your OS, your profile, and the simulator being used.
+
+Some other storage for smaller cached values is used with local storage.
+You can clear that simply by opening the console and executing: `localStorage.clear();`
+
 ## Contribute
 
 Please feel free to contribute directly by adding pull requests and issues through github.
