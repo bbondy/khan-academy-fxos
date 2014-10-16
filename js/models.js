@@ -64,32 +64,31 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
             var d = $.Deferred();
 
             // Check if we have a local downloaded copy of the topic tree
+            console.log("loading topic tree from storage");
             var topicTreePromise = Storage.readText(this.getTopicTreeFilename());
-            topicTreePromise.done((data) => {
+            topicTreePromise.done((topicTree) => {
                 console.log("Loaded topic tree from local copy");
-                var topicTreeData = JSON.parse(data);
-                this.root = new TopicModel(topicTreeData, {parse: true});
+                this.root = new TopicModel(JSON.parse(topicTree), {parse: true});
                 d.resolve();
             });
 
             // If we don't have a local downloaded copy, load in the
             // one we shipped with for the instaled app.
             topicTreePromise.fail(() => {
+                console.log("going for pre-installed default file");
                 var filename = `/data/topic-tree`;
                 lang = Util.getLang();
                 if (lang) {
                     filename += "-" + lang;
                 }
                 filename += ".min.js";
-                var s = document.createElement("script");
-                s.type = "text/javascript";
-                s.src = filename;
-                s.onload = () => {
-                    this.root = new TopicModel(window.topicTree, {parse: true});
+                Util.loadScript(filename).done(() => {
+                    console.log(window.topictree);
+                    this.root = new TopicModel(window.topictree, {parse: true});
                     d.resolve();
-                };
-                document.getElementsByTagName("head")[0].appendChild(s);
-                //s.async = false;
+                }).fail(() => {
+                    d.reject();
+                });
             });
             return d.promise();
         },
@@ -97,7 +96,10 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
             var d = $.Deferred();
             var getTopicTreePromise = APIClient.getTopicTree();
             getTopicTreePromise.done((data) => {
-                Storage.writeText(this.getTopicTreeFilename(), JSON.stringify(data));
+                // Mutates passed in object tree
+                Minify.minify(data);
+                Storage.writeText(this.getTopicTreeFilename(),
+                    JSON.stringify(data));
                 d.resolve(data);
             });
 
@@ -106,13 +108,15 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
             });
             return d.promise();
         },
+        // Obtains the path of a locally cached topic tree file
+        // if one is specified.
         getTopicTreeFilename: function() {
             var lang = Util.getLang();
             var path = "topictree";
             if (lang) {
                 path += `-${lang}`;
             }
-            return path + ".json";
+            return path + ".min.json";
         },
 
         allContentItems: [],
