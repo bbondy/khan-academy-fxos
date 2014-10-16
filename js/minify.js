@@ -130,7 +130,7 @@
             }
         },
 
-        minify: function(node) {
+        minify: function(node, logWarnings) {
             var newChildren = [];
             if (node.children) {
                 node.children.forEach(function(child) {
@@ -145,8 +145,10 @@
                                     child[this.getShortName("download_urls")]) {
                                 newChildren.push(child);
                             } else if (child[this.getShortName("kind")] === this.getShortValue("kind", "Video")) {
-                                console.log("Warning: Excluding because of no vidoe URL: " + child[this.getShortName("id")] +
-                                    ", " + child[this.getShortName("translated_title")]);
+                                if (logWarnings) {
+                                    console.log("Warning: Excluding because of no vidoe URL: " + child[this.getShortName("id")] +
+                                        ", " + child[this.getShortName("translated_title")]);
+                                }
                             }
                         } else if (child[this.getShortName("children")] && child[this.getShortName("children")].length > 0) {
                             newChildren.push(child);
@@ -170,13 +172,18 @@
          * for the topic tree.
          */
         getOutput: function(node) {
+            return "window.topictree =" +
+                this._getOutput(node) + ";";
+        },
+
+        _getOutput: function(node) {
             var output = "{";
 
             for (var p in node) {
                 if (p === 'c') {
                     output += "c:[";
                     node.c.forEach(function(child) {
-                        output += this.getOutput(child) + ",";
+                        output += this._getOutput(child) + ",";
                     }.bind(this));
                     output = output.substring(0, output.length - 1);
                     output += "],";
