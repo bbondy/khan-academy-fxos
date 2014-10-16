@@ -134,6 +134,22 @@ define([], function() {
             componentDidUpdate: function() {
                 window.document.webL10n.translate(this.getDOMNode());
             }
+        },
+
+        loadScript: function(filename) {
+            var d = $.Deferred();
+            var s = document.createElement("script");
+            s.type = "text/javascript";
+            s.src = filename;
+            s.onload = () => {
+                d.resolve();
+            };
+            s.onerror = (e) => {
+                console.log("on error: %o", e);
+                d.reject();
+            };
+            document.getElementsByTagName("head")[0].appendChild(s);
+            return d.promise();
         }
     };
 
