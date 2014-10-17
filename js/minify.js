@@ -189,7 +189,16 @@
                     output += "],";
                 } else {
                     if (typeof node[p] !== "number") {
-                        output += p + ":\"" + node[p].replace(/\\/g, "\\\\").replace(/\"/g, "\\\"")  + "\",";
+                        output += p + ":\"" + node[p]
+                            // Replace a slash with 2 slashes
+                            .replace(/\\/g, "\\\\")
+                            // Replace whitespace with a space
+                            .replace(/\r\n/g, " ")
+                            .replace(/\n/g, " ")
+                            .replace(/\r/g, " ")
+                            .replace(/\t/g, " ")
+                            // Replace quotes with \"
+                            .replace(/\"/g, "\\\"")  + "\",";
                     } else {
                         output += p + ":" + node[p] + ",";
                     }
