@@ -4,8 +4,10 @@
 
 "use strict";
 
-define(["react", "util", "models", "apiclient", "cache", "storage", "downloads", "notifications", "status"],
-        function(React, Util, models, APIClient, Cache, Storage, Downloads, Notifications, Status) {
+define(["react", "util", "models", "apiclient", "cache", "storage",
+        "downloads", "notifications", "status"],
+        function(React, Util, models, APIClient, Cache, Storage,
+            Downloads, Notifications, Status) {
     var cx = React.addons.classSet;
 
     // TODO: remove, just for easy inpsection
@@ -35,8 +37,11 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
             var topicClass = cx(topicClassObj);
 
             return <li className={topicClass}>
-                { this.props.topic.isRootChild() ? <div className="color-block"/> : null }
-                <a href="javascript:void(0)" onClick={Util.partial(this.props.onClickTopic, this.props.topic)}>
+                { this.props.topic.isRootChild() ?
+                    <div className="color-block"/> : null }
+                <a href="javascript:void(0)"
+                   onClick={Util.partial(this.props.onClickTopic,
+                       this.props.topic)}>
                     <p className="topic-title">{this.props.topic.getTitle()}</p>
                 </a>
             </li>;
@@ -81,12 +86,16 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
             var videoClass = cx(videoClassObj);
             return <li className={videoClass}>
                 <div className={subwayIconClass}>
-                    <a href="javascript:void(0)" onClick={Util.partial(this.props.onClickVideo, this.props.video)}>
+                    <a href="javascript:void(0)"
+                       onClick={Util.partial(this.props.onClickVideo,
+                               this.props.video)}>
                         <div className={videoNodeClass}/>
                     </a>
                     <div className={pipeClass}/>
                 </div>
-                <a href="javascript:void(0)" onClick={Util.partial(this.props.onClickVideo, this.props.video)}>
+                <a href="javascript:void(0)"
+                   onClick={Util.partial(this.props.onClickVideo,
+                           this.props.video)}>
                     <p className="video-title">{this.props.video.getTitle()}</p>
                 </a>
             </li>;
