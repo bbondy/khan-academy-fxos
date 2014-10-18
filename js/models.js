@@ -4,7 +4,7 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
             return this.get(Minify.getShortName("id"));
         },
         getKind: function() {
-            return this.get(Minify.getShortName("kind"));
+            return Minify.getLongValue("kind", this.get(Minify.getShortName("kind")));
         },
         getTitle: function() {
             return this.get(Minify.getShortName("translated_title"));
@@ -16,13 +16,13 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
             return false;
         },
         isVideo: function() {
-            return this.getKind() === Minify.getShortValue("kind", "Video");
+            return this.getKind() === "Video";
         },
         isArticleList: function() {
             return false;
         },
         isArticle: function() {
-            return this.getKind() === Minify.getShortValue("kind", "Article");
+            return this.getKind() === "Article";
         },
         isContent: function() {
             return this.isVideo() || this.isArticle();
@@ -212,7 +212,7 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
                 maxResults = 100;
             }
             var results = [];
-            this._findContentItems(search, results);
+            this._findContentItems(search, results, maxResults);
             return results.slice(0, maxResults);
         },
         /**

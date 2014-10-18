@@ -217,10 +217,21 @@
             return value;
         },
         getShortValue: function(prop, value) {
+            // propertyValueMap has entries like: ["kind", "Article", 0],
             var found = null;
             this.propertyValueMap.forEach(function(map) {
                 if (map[0] === prop && map[1] === value) {
                     found = map[2];
+                }
+            });
+            return found;
+        },
+        getLongValue: function(prop, value) {
+            // propertyValueMap has entries like: ["kind", "Article", 0],
+            var found = null;
+            this.propertyValueMap.forEach(function(map) {
+                if (map[0] === prop && map[2] === value) {
+                    found = map[1];
                 }
             });
             return found;

@@ -26,7 +26,7 @@ define(["oauth", "storage", "util"], function(_oauth, Storage, Util) {
             // First check if we have the info from the local storage values
             // If so just resolve from that.
             if (this.oauth.consumerKey && this.oauth.consumerSecret) {
-                console.log("resolving wiht local secrets info");
+                console.log("resolving with local secrets info");
                 return $.Deferred().resolve(this.oauth).promise();
             }
 
