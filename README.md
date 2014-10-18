@@ -57,3 +57,4 @@ If you would like help getting setup feel free to contact [Brian R. Bondy](http:
 - [Brian R. Bondy](http://www.brianbondy.com) - App developer
 - [Rodrigo Silveira](blog.rodms.com) - Portuguese app translation
 - [Romain Sertelon](https://www.bluepyth.fr/) - French app translation
+- [Pablo Solares Acebal](pablo.edicionescamelot.com) - Spanish translation
