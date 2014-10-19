@@ -1,5 +1,5 @@
-require(["react", "models", "apiclient", "storage", "downloads", "cache", "minify"],
-        function(React, models, APIClient, Storage, Downloads, Cache, Minify) {
+require(["react", "util", "models", "apiclient", "storage", "downloads", "cache", "minify"],
+        function(React, Util, models, APIClient, Storage, Downloads, Cache, Minify) {
 
     QUnit.asyncTest("APIClient.init", function(assert) {
         expect(2);
@@ -10,7 +10,10 @@ require(["react", "models", "apiclient", "storage", "downloads", "cache", "minif
             QUnit.start();
         });
     });
+
     QUnit.asyncTest("models.TopicTree.init", function(assert) {
+
+        // Helper method for validating a valid topic
         var assertValidTopic = (t) => {
             assert.ok(t.isTopic());
             assert.ok(!t.isVideoList());
@@ -21,6 +24,8 @@ require(["react", "models", "apiclient", "storage", "downloads", "cache", "minif
             assert.ok(!t.isContentList());
             assert.strictEqual(t.getKind(), "Topic");
         };
+
+        // Helper method for validating a validcontent item
         var assertValidContent = (c) => {
             assert.ok(!c.isTopic());
             assert.ok(!c.isVideoList());
@@ -38,35 +43,56 @@ require(["react", "models", "apiclient", "storage", "downloads", "cache", "minif
             }
         };
 
-        models.TopicTree.init().done(function() {
-            var root = models.TopicTree.root;
-            assert.ok(root);
-            assert.strictEqual(root.getTitle(), "Khan Academy");
-            assert.ok(!root.getParentDomain());
-            assert.ok(root.isRoot());
-            assert.ok(!root.getParent());
-            assertValidTopic(root);
+        // Languages in which topic trees should be tested for
+        var languages = ["en", "fr", "es", "pt"];
 
-            // Topics are at root
-            assert.ok(models.TopicTree.root.get("topics").models.length > 0);
-            _(models.TopicTree.root.get("topics").models).each((m) => {
-                assert.ok(m.getParentDomain());
-                assert.ok(!m.isRoot());
-                assert.ok(m.getParent());
-                assertValidTopic(m);
+        var promise = $.Deferred().resolve().promise();
+        languages.forEach((lang) => {
+
+            promise = promise.then(function() {
+                var stub = sinon.stub(Util, "getLang", function() {
+                    if (lang === "en") {
+                        return null;
+                    }
+                    return lang;
+                });
+                var p = models.TopicTree.init();
+                Util.getLang.restore();
+                return p;
+            }).then(function() {
+
+                var root = models.TopicTree.root;
+                assert.ok(root);
+                assert.strictEqual(root.getTitle(), "Khan Academy");
+                assert.ok(!root.getParentDomain());
+                assert.ok(root.isRoot());
+                assert.ok(!root.getParent());
+                assertValidTopic(root);
+
+                // Topics are at root
+                assert.ok(models.TopicTree.root.get("topics").models.length > 0);
+                _(models.TopicTree.root.get("topics").models).each((m) => {
+                    assert.ok(m.getParentDomain());
+                    assert.ok(!m.isRoot());
+                    assert.ok(m.getParent());
+                    assertValidTopic(m);
+                });
+
+                assert.ok(models.TopicTree.allContentItems.length > 0);
+                _(models.TopicTree.allContentItems).each((c) => {
+                    assertValidContent(c);
+                });
+
+                // But there are no content items at root
+                assert.ok(models.TopicTree.root.get("contentItems").models.length === 0);
+                assert.strictEqual(models.TopicTree.root.findContentItems("math", 1).length, 1);
+                var results = models.TopicTree.root.findContentItems("math", 2);
+                assert.strictEqual(results.length, 2);
+                assert.notStrictEqual(results[0], results[1]);
+
             });
-
-            assert.ok(models.TopicTree.allContentItems.length > 0);
-            _(models.TopicTree.allContentItems).each((c) => {
-                assertValidContent(c);
-            });
-
-            // But there are no content items at root
-            assert.ok(models.TopicTree.root.get("contentItems").models.length === 0);
-            assert.strictEqual(models.TopicTree.root.findContentItems("math", 1).length, 1);
-            var results = models.TopicTree.root.findContentItems("math", 2);
-            assert.strictEqual(results.length, 2);
-            assert.notStrictEqual(results[0], results[1]);
+        });
+        promise.done(() => {
             QUnit.start();
         });
     });
