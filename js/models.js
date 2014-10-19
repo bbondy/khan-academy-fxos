@@ -65,6 +65,7 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
 
             // Check if we have a local downloaded copy of the topic tree
             console.log("loading topic tree from storage");
+            this.allContentItems.length = 0;
             var topicTreePromise = Storage.readText(this.getTopicTreeFilename());
             topicTreePromise.done((topicTree) => {
                 console.log("Loaded topic tree from local copy");
@@ -75,15 +76,14 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
             // If we don't have a local downloaded copy, load in the
             // one we shipped with for the instaled app.
             topicTreePromise.fail(() => {
-                console.log("going for pre-installed default file");
                 var filename = `/data/topic-tree`;
                 lang = Util.getLang();
                 if (lang) {
                     filename += "-" + lang;
                 }
                 filename += ".min.js";
+                console.log("going for pre-installed default file: %s", filename);
                 Util.loadScript(filename).done(() => {
-                    console.log(window.topictree);
                     this.root = new TopicModel(window.topictree, {parse: true});
                     d.resolve();
                 }).fail(() => {
