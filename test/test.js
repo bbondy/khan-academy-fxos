@@ -1,6 +1,33 @@
 require(["react", "util", "models", "apiclient", "storage", "downloads", "cache", "minify"],
         function(React, Util, models, APIClient, Storage, Downloads, Cache, Minify) {
 
+    // Languages in which topic trees should be tested for
+    var languages = ["en", "fr", "es", "pt"];
+
+    QUnit.test("testLocalization", function(assert) {
+
+        document.webL10n.setAsyncLoading(false);
+        document.webL10n.setExactLangOnly(true);
+        var enDict = document.webL10n.getData()
+        var otherLanguages = languages.slice(1);
+
+        // Make sure each localization file has an associated string
+        otherLanguages.forEach(function(lang) {
+            document.webL10n.setLanguage(lang);
+            for (var s in enDict) {
+                if (enDict.hasOwnProperty(s)) {
+
+                    var translated = document.webL10n.get(s);
+                    if (!translated) {
+                        console.error("Not localized! lang: %s, prop: %s, en-associated: %o",
+                            lang, s, enDict[s], lang);
+                    }
+                    assert.ok(translated.length);
+                }
+            }
+        });
+    });
+
     QUnit.asyncTest("APIClient.init", function(assert) {
         expect(2);
         APIClient.init().done(function() {
@@ -42,9 +69,6 @@ require(["react", "util", "models", "apiclient", "storage", "downloads", "cache"
                 assert.strictEqual(c.getKind(), "Article");
             }
         };
-
-        // Languages in which topic trees should be tested for
-        var languages = ["en", "fr", "es", "pt"];
 
         var promise = $.Deferred().resolve().promise();
         languages.forEach((lang) => {
