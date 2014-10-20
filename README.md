@@ -35,6 +35,9 @@ Due to using JavaScript generators, if you want to test in Chrome you'll have to
 Run `./tools/runserver` and load `./test/test.html` in Firefox.
 Or just run `./tools/runtests`.
 
+For now, it's best to run the tests in a fresh restart of the browser in private browsing mode so you can be sure no files are cached.
+This is currently known to happen for some localization files with the simple python HTTP server otherwise.
+
 ## Storage
 
 Device Storage API is used for downloads and for cached topic trees.  
