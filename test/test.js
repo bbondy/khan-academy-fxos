@@ -29,12 +29,21 @@ require(["react", "util", "models", "apiclient", "storage", "downloads", "cache"
     });
 
     QUnit.asyncTest("APIClient.init", function(assert) {
-        expect(2);
+        expect(5);
         APIClient.init().done(function() {
             // Consumer key and secret should be available after init
             assert.ok(APIClient.oauth.consumerKey);
             assert.ok(APIClient.oauth.consumerSecret);
-            QUnit.start();
+            APIClient.getTopicTree().done(function() {
+                assert.ok(true);
+                return APIClient.getVideoTranscript();
+            }).then(function() {
+                assert.ok(true);
+                return APIClient.getVideoTranscript();
+            }).done(function() {
+                assert.ok(true);
+                QUnit.start();
+            });
         });
     });
 
@@ -155,5 +164,4 @@ require(["react", "util", "models", "apiclient", "storage", "downloads", "cache"
             QUnit.start();
         });
     });
-
 });
