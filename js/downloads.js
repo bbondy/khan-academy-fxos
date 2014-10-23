@@ -82,7 +82,7 @@ define(["storage", "models"],
          */
         download: function(model, onProgress) {
             if (model.isContent()) {
-                return this.downloadContent(model);
+                return this.downloadContent(model, onProgress);
             } else if (model.isTopic()) {
                 return this.downloadTopic(model, onProgress);
             }
@@ -133,13 +133,20 @@ define(["storage", "models"],
          * Downloads the file at the specified URL and stores it to the
          * specified filename.
          */
-        downloadContent: function(contentItem) {
+        downloadContent: function(contentItem, onProgress) {
             var d = $.Deferred();
+            if (onProgress) {
+                onProgress(null, 0);
+            }
+
             var filename = contentItem.getId();
             var handleContentLoaded = (contentData) => {
                 var blob = new Blob([contentData], {type: contentItem.getContentMimeType()});
                 Storage.writeBlob(filename, blob).done(() => {
                     this._addDownloadToManifest(contentItem);
+                    if (onProgress) {
+                        onProgress(contentItem, 1);
+                    }
                     d.resolve(contentItem, 1);
                 }).fail(() => {
                     d.reject();

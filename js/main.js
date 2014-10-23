@@ -960,6 +960,7 @@ define(["react", "util", "models", "apiclient", "cache", "storage",
             });
         },
         onClickDownloadContent: function(model) {
+            var totalCount = 1;
             if (models.TempAppState.get("isDownloadingTopic")) {
                 alert(document.webL10n.get("already-downloading"));
                 return;
@@ -972,7 +973,7 @@ define(["react", "util", "models", "apiclient", "cache", "storage",
                     return;
                 }
             } else if (model.isTopic()) {
-                var totalCount = model.getChildNotDownloadedCount();
+                totalCount = model.getChildNotDownloadedCount();
                 if (totalCount === 0) {
                     alert(document.webL10n.get("already-downloaded"));
                     return;
@@ -994,9 +995,7 @@ define(["react", "util", "models", "apiclient", "cache", "storage",
                             {"count" : count, "totalCount": totalCount});
                 Status.update(progressMessage);
             };
-            if (model.isTopic()) {
-                Status.start();
-            }
+            Status.start();
             Downloads.download(model, onProgress).done(function(model, count) {
                 var title = document.webL10n.get("download-complete");
                 var contentTitle = model.getTitle();
@@ -1013,9 +1012,7 @@ define(["react", "util", "models", "apiclient", "cache", "storage",
                     message = document.webL10n.get("content-items-downloaded-succesfully",
                         {"count" : count, "title": contentTitle});
                 }
-                if (model.isTopic()) {
-                    Status.stop();
-                }
+                Status.stop();
                 Notifications.info(title, message);
             });
         },
