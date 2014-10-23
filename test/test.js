@@ -144,8 +144,18 @@ require(["react", "util", "models", "apiclient", "storage", "downloads", "cache"
     });
     QUnit.asyncTest("Storage.init", function(assert) {
         expect(1);
-        Storage.init().done(function() {
-            assert.ok(true);
+        Storage.init().then(function() {
+            if (!Util.isFirefoxOS()) {
+                assert.ok(true);
+                QUnit.start();
+                return;
+            }
+            return Storage.writeText("test-file", "test");
+        }).then(function() {
+            return Storage.readText("test-file");
+        }).done(function(result) {
+            console.log('did the test!!!');
+            assert.strictEqual(result, "test");
             QUnit.start();
         });
     });
