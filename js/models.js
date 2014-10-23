@@ -452,6 +452,9 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
             _.each(completedEntities, function(contentItem) {
                 if (set) {
                     contentItem.set("completed", true);
+                    if (contentItem.isVideo()) {
+                        contentItem.set("points", 750);
+                    }
                 } else {
                     contentItem.unset("completed");
                 }
