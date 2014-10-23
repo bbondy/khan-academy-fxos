@@ -1,14 +1,13 @@
-require(["react", "util", "models", "apiclient", "storage", "downloads", "cache", "minify"],
-        function(React, Util, models, APIClient, Storage, Downloads, Cache, Minify) {
+require(["react", "util", "models", "apiclient", "storage", "downloads", "cache", "minify", "notifications", "status"],
+        function(React, Util, models, APIClient, Storage, Downloads, Cache, Minify, Notifications, Status) {
 
     // Languages in which topic trees should be tested for
     var languages = ["en", "fr", "es", "pt"];
 
     QUnit.test("testLocalization", function(assert) {
-
         document.webL10n.setAsyncLoading(false);
         document.webL10n.setExactLangOnly(true);
-        var enDict = document.webL10n.getData()
+        var enDict = document.webL10n.getData();
         var otherLanguages = languages.slice(1);
 
         // Make sure each localization file has an associated string
@@ -157,11 +156,55 @@ require(["react", "util", "models", "apiclient", "storage", "downloads", "cache"
             QUnit.start();
         });
     });
-    QUnit.asyncTest("Cache.init", function(assert) {
-        expect(1);
-        Cache.init().done(function() {
-            assert.ok(true);
+    QUnit.asyncTest("Status.start, stop, update", function(assert) {
+        expect(6);
+        assert.ok(!models.TempAppState.get("showingStatus"));
+        Status.start();
+        assert.strictEqual(models.TempAppState.get("showingStatus"), true);
+        var message = "hello world!";
+        Status.update(message);
+        assert.strictEqual(models.TempAppState.get("status"), message);
+        message = "changed message!";
+        Status.update(message);
+        assert.strictEqual(models.TempAppState.get("status"), message);
+        Status.stop();
+        setTimeout(function() {
+            assert.strictEqual(models.TempAppState.get("status"), "");
+            assert.strictEqual(models.TempAppState.get("showingStatus"), false);
             QUnit.start();
         });
+    });
+    QUnit.asyncTest("Cache.init", function(assert) {
+        expect(2);
+        Cache.heartbeatInterval = 100;
+        var count = 0;
+        sinon.stub(Cache, "heartbeat", function() {
+            ++count;
+            if (count >= 3) {
+                assert.ok(true);
+                window.clearInterval(Cache.timer);
+                Cache.heartbeat.restore();
+                QUnit.start();
+            }
+        });
+        Cache.init().done(function() {
+            assert.ok(Cache.timer);
+        });
+    });
+    QUnit.test("Notifications.info", function(assert) {
+        var notificationPropExists = !!window.Notification;
+        window.Notification = window.Notification || function() {};
+        var title = "title";
+        var message = "message";
+        sinon.stub(window, "Notification", function(t, m) {
+            assert.strictEqual(t, title);
+            assert.strictEqual(m.body, message);
+        });
+        Notifications.info(title, message);
+        if (notificationPropExists) {
+            window.Notification.restore();
+        } else {
+            delete window.Notification;
+        }
     });
 });

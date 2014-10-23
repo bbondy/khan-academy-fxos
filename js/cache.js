@@ -13,7 +13,10 @@
 define(["util", "models"],
         function(Util, models) {
 
+    var TEN_MINUTES = 1000 * 60 * 10;
     var Cache = {
+        heartbeatInterval: TEN_MINUTES,
+
         /**
          * Initializes the cache manager
          */
@@ -29,8 +32,7 @@ define(["util", "models"],
                 this.lastTopicTreeRefresh = Date.parse(this.lastTopicTreeRefresh);
             }
 
-            var TEN_MINUTES = 1000 * 60 * 10;
-            setInterval(this.heartbeat.bind(this), TEN_MINUTES);
+            this.timer = setInterval(this.heartbeat.bind(this), this.heartbeatInterval);
             return d.resolve().promise();
         },
         heartbeat: function() {
