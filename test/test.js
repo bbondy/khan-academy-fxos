@@ -3,6 +3,21 @@ require(["react", "util", "models", "apiclient", "storage", "downloads", "cache"
 
     // Languages in which topic trees should be tested for
     var languages = ["en", "fr", "es", "pt"];
+    QUnit.asyncTest("testLocalization", function(assert) {
+        assert.strictEqual(Util.numberWithCommas("1234567890"),"1,234,567,890");
+        var oneAdder = Util.partial(function(x, y) { return x + y; }, 1);
+        assert.strictEqual(oneAdder(5), 6);
+        assert.strictEqual(window.x, undefined);
+        assert.strictEqual(Util.appendQueryParam("http://test.com?a=b", "x", "y"), "http://test.com?a=b&x=y");
+        assert.strictEqual(Util.appendQueryParam("http://test.com", "x", "y"), "http://test.com?x=y");
+        assert.strictEqual(Util.getParameterByName("a", "?a=b"), "b");
+        assert.strictEqual(Util.getParameterByName("a", "?a=b&c=d"), "b");
+        assert.strictEqual(Util.getParameterByName("c", "?a=b&c=d"), "d");
+        Util.loadScript("/test/_test1.js").done(function() {
+            assert.strictEqual(window.x, 3);
+            QUnit.start();
+        });
+    });
 
     QUnit.test("testLocalization", function(assert) {
         document.webL10n.setAsyncLoading(false);
