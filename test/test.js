@@ -3,7 +3,7 @@ require(["react", "util", "models", "apiclient", "storage", "downloads", "cache"
 
     // Languages in which topic trees should be tested for
     var languages = ["en", "fr", "es", "pt"];
-    QUnit.asyncTest("testLocalization", function(assert) {
+    QUnit.asyncTest("testUtil", function(assert) {
         assert.strictEqual(Util.numberWithCommas("1234567890"),"1,234,567,890");
         var oneAdder = Util.partial(function(x, y) { return x + y; }, 1);
         assert.strictEqual(oneAdder(5), 6);
@@ -13,6 +13,19 @@ require(["react", "util", "models", "apiclient", "storage", "downloads", "cache"
         assert.strictEqual(Util.getParameterByName("a", "?a=b"), "b");
         assert.strictEqual(Util.getParameterByName("a", "?a=b&c=d"), "b");
         assert.strictEqual(Util.getParameterByName("c", "?a=b&c=d"), "d");
+        var old = navigator.connection;
+        if (!navigator.connection) {
+            navigator.connection = { metered: false, bandwidth: Infinity };
+            assert.strictEqual(Util.isMeteredConnection(), false);
+            assert.strictEqual(Util.isBandwidthCapped(), false);
+            navigator.connection = { metered: true, bandwidth: 33};
+            assert.strictEqual(Util.isMeteredConnection(), true);
+            assert.strictEqual(Util.isBandwidthCapped(), true);
+            navigator.connection = { metered: false, bandwidth: 33};
+            assert.strictEqual(Util.isMeteredConnection(), false);
+            assert.strictEqual(Util.isBandwidthCapped(), true);
+        }
+        navigator.connection = old;
         Util.loadScript("/test/_test1.js").done(function() {
             assert.strictEqual(window.x, 3);
             QUnit.start();
