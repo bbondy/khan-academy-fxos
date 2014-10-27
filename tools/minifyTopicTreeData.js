@@ -10,8 +10,8 @@ files.forEach(function(filename) {
         Minify.minify(topicTree);
 
         // .js output
-        var outputData = Minify.getOutput(topicTree);
-        fs.writeFile(filename.substring(0, filename.length - 5) + ".min.js", "window.topicTree = " + outputData + ";");
+        var outputData = Minify.getOutput(topicTree, true);
+        fs.writeFile(filename.substring(0, filename.length - 5) + ".min.js",  outputData);
 
         // JSON output
         //var outputData = JSON.stringify(topicTree);

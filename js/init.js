@@ -10,6 +10,7 @@ require.config({
         "notifications": "notifications",
         "cache": "cache",
         "test": "../test/test",
+        "sinon": "../test/sinon-1.1.0.3",
 
         // Third party libs
         "text": "./lib/text-min",
@@ -28,6 +29,7 @@ require.config({
 
 var initModules = ['main'];
 if (window.isTest) {
+    initModules.push('sinon');
     initModules.push('test');
 }
 requirejs(initModules);

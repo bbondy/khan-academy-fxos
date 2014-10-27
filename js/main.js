@@ -4,8 +4,10 @@
 
 "use strict";
 
-define(["react", "util", "models", "apiclient", "cache", "storage", "downloads", "notifications", "status"],
-        function(React, Util, models, APIClient, Cache, Storage, Downloads, Notifications, Status) {
+define(["react", "util", "models", "apiclient", "cache", "storage",
+        "downloads", "notifications", "status"],
+        function(React, Util, models, APIClient, Cache, Storage,
+            Downloads, Notifications, Status) {
     var cx = React.addons.classSet;
 
     // TODO: remove, just for easy inpsection
@@ -35,8 +37,11 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
             var topicClass = cx(topicClassObj);
 
             return <li className={topicClass}>
-                { this.props.topic.isRootChild() ? <div className="color-block"/> : null }
-                <a href="javascript:void(0)" onClick={Util.partial(this.props.onClickTopic, this.props.topic)}>
+                { this.props.topic.isRootChild() ?
+                    <div className="color-block"/> : null }
+                <a href="javascript:void(0)"
+                   onClick={Util.partial(this.props.onClickTopic,
+                       this.props.topic)}>
                     <p className="topic-title">{this.props.topic.getTitle()}</p>
                 </a>
             </li>;
@@ -81,12 +86,16 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
             var videoClass = cx(videoClassObj);
             return <li className={videoClass}>
                 <div className={subwayIconClass}>
-                    <a href="javascript:void(0)" onClick={Util.partial(this.props.onClickVideo, this.props.video)}>
+                    <a href="javascript:void(0)"
+                       onClick={Util.partial(this.props.onClickVideo,
+                               this.props.video)}>
                         <div className={videoNodeClass}/>
                     </a>
                     <div className={pipeClass}/>
                 </div>
-                <a href="javascript:void(0)" onClick={Util.partial(this.props.onClickVideo, this.props.video)}>
+                <a href="javascript:void(0)"
+                   onClick={Util.partial(this.props.onClickVideo,
+                           this.props.video)}>
                     <p className="video-title">{this.props.video.getTitle()}</p>
                 </a>
             </li>;
@@ -395,13 +404,16 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
                 this.animatePoints();
             }, true);
 
-            var onStop = (e) => {
+            video.addEventListener("pause", (e) => {
                 this.updateSecondsWatched();
                 this.isPlaying = false;
-                this.stopAnimatingPoints();
-            };
-            video.addEventListener("pause", onStop, true);
-            video.addEventListener("stop", onStop, true);
+                this.stopAnimatingPoints(false);
+            }, true);
+            video.addEventListener("stop", (e) => {
+                this.updateSecondsWatched();
+                this.isPlaying = false;
+                this.stopAnimatingPoints(true);
+            }, true);
         },
 
         // Updates the secondsWatched variable with the difference between the current
@@ -420,25 +432,26 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
             // This was sometimes happening after the video was complete,
             // and new progress responses were received.
             if (!this.isPlaying ||
-                    this.pointsObj.num === this.availablePoints ||
                     !models.CurrentUser.isSignedIn()) {
                 return;
             }
-            $(this.pointsObj).stop(true, false).animate({num: Math.min(this.availablePoints, this.pointsObj.num + this.pointsPerReport)}, {
+
+            var points = Math.min(this.availablePoints, this.pointsObj.num + this.pointsPerReport);
+            $(this.pointsObj).stop(true, false).animate({num: points}, {
                 // Add an extra second to the duration so the UI never looks like it's stuck waiting for the HTTP reply
-                duration: this.MIN_SECONDS_BETWEEN_REPORTS * 1000 + 1000,
+                duration: this.MIN_SECONDS_BETWEEN_REPORTS * 1000,
                 step: (num) => {
                     this.pointsObj.num = Math.ceil(num);
                     var pointsString = document.webL10n.get("points-so-far",
                         {"earned" : this.pointsObj.num, "available": this.availablePoints});
-                    $(".energy-points").text(pointsString);
+                    $(".energy-points.energy-points-video").text(pointsString);
                 }
             });
         },
 
         // Stop the current animation and jump to the end
-        stopAnimatingPoints: function() {
-            $(this.pointsObj).stop(true, false);
+        stopAnimatingPoints: function(jumpToEnd) {
+            $(this.pointsObj).stop(true, jumpToEnd);
         },
 
         // Reports the seconds watched to the server if it hasn't been reported recently
@@ -490,7 +503,7 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
                         {"earned" : this.props.video.getPoints(), "available": this.availablePoints});
             var pointsDiv;
             if (models.CurrentUser.isSignedIn()) {
-                pointsDiv = <div className="energy-points pull-right">{pointsString}</div>;
+                pointsDiv = <div className="energy-points energy-points-video pull-right">{pointsString}</div>;
             }
             return <div className="video-viewer-container">
                  <video ref="video" controls>
@@ -615,12 +628,12 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
                 if (this.props.model.isDownloaded()) {
                     var text = document.webL10n.get(this.props.model.isVideo() ? "delete-downloaded-video" : "delete-downloaded-article");
                     items.push(<li className="hot-item">
-                            <a href="javascript:void(0)" onClick={Util.partial(this.props.onClickDeleteDownloadedVideo, this.props.model)}>{{text}}</a>
+                            <a href="#" onClick={Util.partial(this.props.onClickDeleteDownloadedVideo, this.props.model)}>{{text}}</a>
                         </li>);
                 } else {
                     var text = document.webL10n.get(this.props.model.isVideo() ? "download-video" : "download-article");
                     items.push(<li className="hot-item">
-                            <a href="javascript:void(0)" onClick={Util.partial(this.props.onClickDownloadContent, this.props.model)}>{{text}}</a>
+                            <a href="#" onClick={Util.partial(this.props.onClickDownloadContent, this.props.model)}>{{text}}</a>
                         </li>);
                 }
             }
@@ -629,19 +642,19 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
                     this.props.model.isContent() &&
                     this.props.model.getKAUrl()) {
                 var viewOnKAMessage = document.webL10n.get("open-in-website");
-                items.push(<li><a href="javascript:void(0)" onClick={Util.partial(this.props.onClickViewOnKA, this.props.model)}>{{viewOnKAMessage}}</a></li>);
+                items.push(<li><a href="#" onClick={Util.partial(this.props.onClickViewOnKA, this.props.model)}>{{viewOnKAMessage}}</a></li>);
                 var shareMessage = document.webL10n.get("share");
-                items.push(<li><a href="javascript:void(0)" onClick={Util.partial(this.props.onClickShare, this.props.model)}>{{shareMessage}}</a></li>);
+                items.push(<li><a href="#" onClick={Util.partial(this.props.onClickShare, this.props.model)}>{{shareMessage}}</a></li>);
             }
 
             if (models.TempAppState.get("isDownloadingTopic")) {
                 items.push(<li className="hot-item">
-                        <a href="javascript:void(0)" data-l10n-id="cancel-downloading" onClick={Util.partial(this.props.onClickCancelDownloadContent, this.props.model)}>Cancel Downloading</a>
+                        <a href="#" data-l10n-id="cancel-downloading" onClick={Util.partial(this.props.onClickCancelDownloadContent, this.props.model)}>Cancel Downloading</a>
                     </li>);
             } else if(!this.props.isPaneShowing &&
                         this.props.model && this.props.model.isTopic()) {
                 items.push(<li className="hot-item">
-                        <a href="javascript:void(0)" data-l10n-id="download-topic" onClick={Util.partial(this.props.onClickDownloadContent, this.props.model)}>Download Topic</a>
+                        <a href="#" data-l10n-id="download-topic" onClick={Util.partial(this.props.onClickDownloadContent, this.props.model)}>Download Topic</a>
                     </li>);
             }
 
@@ -649,25 +662,25 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
             // Followed by sign in
             if (!models.CurrentUser.isSignedIn()) {
                 // If the user is not signed in, add that option first
-                items.push(<li><a data-l10n-id="sign-in" href="javascript:void(0)" onClick={this.props.onClickSignin}>Sign In</a></li>);
+                items.push(<li><a data-l10n-id="sign-in" href="#" onClick={this.props.onClickSignin}>Sign In</a></li>);
             }
 
             ////////////////////
             // Followed by view pane items
             if (models.CurrentUser.isSignedIn() && !this.props.isProfileShowing) {
                 // User is signed in, add all the signed in options here
-                items.push(<li><a  data-l10n-id="view-profile" href="javascript:void(0)" onClick={this.props.onClickProfile}>View Profile</a></li>);
+                items.push(<li><a  data-l10n-id="view-profile" href="#" onClick={this.props.onClickProfile}>View Profile</a></li>);
             }
             if (!this.props.isSettingsShowing) {
-                items.push(<li><a data-l10n-id="view-settings" href="javascript:void(0)" onClick={this.props.onClickSettings}>View Settings</a></li>);
+                items.push(<li><a data-l10n-id="view-settings" href="#" onClick={this.props.onClickSettings}>View Settings</a></li>);
             }
             if (!this.props.isDownloadsShowing) {
-                items.push(<li><a data-l10n-id="view-downloads" href="javascript:void(0)" onClick={this.props.onClickDownloads}>View Downloads</a></li>);
+                items.push(<li><a data-l10n-id="view-downloads" href="#" onClick={this.props.onClickDownloads}>View Downloads</a></li>);
             }
 
             // Add the signout button last
             if (models.CurrentUser.isSignedIn()) {
-                items.push(<li><a data-l10n-id="sign-out" href="javascript:void(0)" onClick={this.props.onClickSignout}>Sign Out</a></li>);
+                items.push(<li><a data-l10n-id="sign-out" href="#" onClick={this.props.onClickSignout}>Sign Out</a></li>);
             }
 
             return <section className="sidebar" data-type="sidebar">
@@ -756,7 +769,7 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
             return <div className="profile">
                 <img className="avatar" src={models.CurrentUser.get("userInfo").avatarUrl}/>
                 <h1>{models.CurrentUser.get("userInfo").nickname || models.CurrentUser.get("userInfo").username}</h1>
-                <h2>{{pointsString}}: <div className="energy-points">{Util.numberWithCommas(models.CurrentUser.get("userInfo").points)}</div></h2>
+                <h2>{{pointsString}}: <div className="energy-points energy-points-profile">{Util.numberWithCommas(models.CurrentUser.get("userInfo").points)}</div></h2>
 
                 { models.CurrentUser.get("userInfo").badgeCounts ?
                     <div>
@@ -947,6 +960,7 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
             });
         },
         onClickDownloadContent: function(model) {
+            var totalCount = 1;
             if (models.TempAppState.get("isDownloadingTopic")) {
                 alert(document.webL10n.get("already-downloading"));
                 return;
@@ -959,7 +973,7 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
                     return;
                 }
             } else if (model.isTopic()) {
-                var totalCount = model.getChildNotDownloadedCount();
+                totalCount = model.getChildNotDownloadedCount();
                 if (totalCount === 0) {
                     alert(document.webL10n.get("already-downloaded"));
                     return;
@@ -981,9 +995,7 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
                             {"count" : count, "totalCount": totalCount});
                 Status.update(progressMessage);
             };
-            if (model.isTopic()) {
-                Status.start();
-            }
+            Status.start();
             Downloads.download(model, onProgress).done(function(model, count) {
                 var title = document.webL10n.get("download-complete");
                 var contentTitle = model.getTitle();
@@ -1000,9 +1012,7 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
                     message = document.webL10n.get("content-items-downloaded-succesfully",
                         {"count" : count, "title": contentTitle});
                 }
-                if (model.isTopic()) {
-                    Status.stop();
-                }
+                Status.stop();
                 Notifications.info(title, message);
             });
         },
@@ -1122,6 +1132,10 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
         models.CurrentUser.init();
         // Render everything
         React.renderComponent(<MainView model={models.TopicTree.root}/>, mountNode);
+        $("body").bind("contextmenu", function (e) {
+            console.log('contextmenu!');
+            e.preventDefault();
+        });
     }).fail((error) => {
         alert(error);
         Util.quit();

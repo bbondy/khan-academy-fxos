@@ -4,7 +4,7 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
             return this.get(Minify.getShortName("id"));
         },
         getKind: function() {
-            return this.get(Minify.getShortName("kind"));
+            return Minify.getLongValue("kind", this.get(Minify.getShortName("kind")));
         },
         getTitle: function() {
             return this.get(Minify.getShortName("translated_title"));
@@ -16,13 +16,13 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
             return false;
         },
         isVideo: function() {
-            return this.getKind() === Minify.getShortValue("kind", "Video");
+            return this.getKind() === "Video";
         },
         isArticleList: function() {
             return false;
         },
         isArticle: function() {
-            return this.getKind() === Minify.getShortValue("kind", "Article");
+            return this.getKind() === "Article";
         },
         isContent: function() {
             return this.isVideo() || this.isArticle();
@@ -64,11 +64,12 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
             var d = $.Deferred();
 
             // Check if we have a local downloaded copy of the topic tree
+            console.log("loading topic tree from storage");
+            this.allContentItems.length = 0;
             var topicTreePromise = Storage.readText(this.getTopicTreeFilename());
-            topicTreePromise.done((data) => {
+            topicTreePromise.done((topicTree) => {
                 console.log("Loaded topic tree from local copy");
-                var topicTreeData = JSON.parse(data);
-                this.root = new TopicModel(topicTreeData, {parse: true});
+                this.root = new TopicModel(JSON.parse(topicTree), {parse: true});
                 d.resolve();
             });
 
@@ -81,15 +82,13 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
                     filename += "-" + lang;
                 }
                 filename += ".min.js";
-                var s = document.createElement("script");
-                s.type = "text/javascript";
-                s.src = filename;
-                s.onload = () => {
-                    this.root = new TopicModel(window.topicTree, {parse: true});
+                console.log("going for pre-installed default file: %s", filename);
+                Util.loadScript(filename).done(() => {
+                    this.root = new TopicModel(window.topictree, {parse: true});
                     d.resolve();
-                };
-                document.getElementsByTagName("head")[0].appendChild(s);
-                //s.async = false;
+                }).fail(() => {
+                    d.reject();
+                });
             });
             return d.promise();
         },
@@ -97,7 +96,10 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
             var d = $.Deferred();
             var getTopicTreePromise = APIClient.getTopicTree();
             getTopicTreePromise.done((data) => {
-                Storage.writeText(this.getTopicTreeFilename(), JSON.stringify(data));
+                // Mutates passed in object tree
+                Minify.minify(data);
+                Storage.writeText(this.getTopicTreeFilename(),
+                    JSON.stringify(data));
                 d.resolve(data);
             });
 
@@ -106,13 +108,15 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
             });
             return d.promise();
         },
+        // Obtains the path of a locally cached topic tree file
+        // if one is specified.
         getTopicTreeFilename: function() {
             var lang = Util.getLang();
             var path = "topictree";
             if (lang) {
                 path += `-${lang}`;
             }
-            return path + ".json";
+            return path + ".min.json";
         },
 
         allContentItems: [],
@@ -208,7 +212,7 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
                 maxResults = 100;
             }
             var results = [];
-            this._findContentItems(search, results);
+            this._findContentItems(search, results, maxResults);
             return results.slice(0, maxResults);
         },
         /**
@@ -365,6 +369,7 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
         init: function() {
             if (!this.isSignedIn()) {
                 console.log("Not signed in, won't get user info!");
+                this.initialized = true;
                 return $.Deferred().resolve().promise();
             }
 
@@ -382,6 +387,7 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
                 this.refreshLoggedInInfo(false);
             }
 
+            this.initialized = true;
             return $.Deferred().resolve().promise();
         },
         signIn: function() {
@@ -446,6 +452,9 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
             _.each(completedEntities, function(contentItem) {
                 if (set) {
                     contentItem.set("completed", true);
+                    if (contentItem.isVideo()) {
+                        contentItem.set("points", 750);
+                    }
                 } else {
                     contentItem.unset("completed");
                 }
@@ -623,6 +632,16 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
                     lastSecondWatched = result.last_second_watched;
                 }
 
+                // If we're just getting a completion of a video update
+                // the user's overall points locally.
+                if (result.points_earned > 0) {
+                    // TODO: It would be better to store userInfo properties directly
+                    // That way notificaitons will go out automatically.
+                    var userInfo = CurrentUser.get("userInfo");
+                    userInfo.points += result.points_earned;
+                    CurrentUser._saveUserInfo();
+                }
+
                 video.set({
                     points: newPoints,
                     completed: result.is_video_completed,
@@ -717,6 +736,7 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
         _name: "appOptions.json"
     });
 
+    var CurrentUser = new UserModel();
     return {
         TopicModel,
         ContentModel,
@@ -729,6 +749,6 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
         TopicTree,
         AppOptions: new AppOptionsModel(),
         TempAppState: new TempAppStateModel(),
-        CurrentUser: new UserModel()
+        CurrentUser
     };
 });

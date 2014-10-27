@@ -24,7 +24,7 @@ You need [Nodejs](http://nodejs.org) installed to run the following commands (pl
 
 * Install jsx by running `npm install -g jsx`
 
-The first time you get setup, run `./rebuild`.  Then run `./runserver`.  
+The first time you get setup, run `./tools/rebuild`.  Then run `./tools/runserver`.  
 This will start a local python HTTP server on port 8092.  
 It will also start watching js and jsx changes and transpile everything in the `./js` directory to the `./build` directory.  In this way React and ES6 features can be used.
 
@@ -32,7 +32,23 @@ Due to using JavaScript generators, if you want to test in Chrome you'll have to
 
 ## Running tests
 
-Run `./runserver` and load `./test/test.html` in Firefox.
+Run `./tools/runserver` and load `./test/test.html` in Firefox.
+Or just run `./tools/runtests`.
+
+For now, it's best to run the tests in a fresh restart of the browser in private browsing mode so you can be sure no files are cached.
+This is currently known to happen for some localization files with the simple python HTTP server otherwise.
+
+## Storage
+
+Device Storage API is used for downloads and for cached topic trees.  
+It is sometimes useful to clear this data while using a simulator.  
+You can find this storage when using a simulator in a location similar to this:
+`/Users/brianbondy//Library/Application Support/Firefox/Profiles/s9r03lep.default-1410874219924/extensions/fxos_2_0_simulator@mozilla.org/profile/fake-sdcard/`  
+
+Your exact path will differ depending on your OS, your profile, and the simulator being used.
+
+Some other storage for smaller cached values is used with local storage.
+You can clear that simply by opening the console and executing: `localStorage.clear();`
 
 ## Contribute
 
@@ -42,5 +58,6 @@ If you would like help getting setup feel free to contact [Brian R. Bondy](http:
 ## Contributors
 
 - [Brian R. Bondy](http://www.brianbondy.com) - App developer
-- [Rodrigo Silveira](blog.rodms.com) - Portuguese app translation
-
+- [Rodrigo Silveira](http://blog.rodms.com) - Portuguese app translation
+- [Romain Sertelon](https://www.bluepyth.fr/) - French app translation
+- [Pablo Solares Acebal]( http://pablo.edicionescamelot.com) - Spanish translation
