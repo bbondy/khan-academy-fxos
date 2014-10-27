@@ -72,6 +72,7 @@ define([], function() {
         },
         /**
          * Adds a query parameter to the specified url
+         * TODO: Handle fragments
          */
         appendQueryParam: function(url, name, value) {
             if (url.indexOf("?") === -1) {
