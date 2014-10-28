@@ -38,6 +38,10 @@ Or just run `./tools/runtests`.
 For now, it's best to run the tests in a fresh restart of the browser in private browsing mode so you can be sure no files are cached.
 This is currently known to happen for some localization files with the simple python HTTP server otherwise.
 
+The first time you run tests they may fail from a timeout. This is because the topic tree API may not be in cache on the KA servers.
+One solution would be to not depend on KA API at all, but this test is specifically to make sure the KA API will return a valid format.
+This will require a fix on the KA API side to fix the long timeout problem.
+
 ## Storage
 
 Device Storage API is used for downloads and for cached topic trees.  
