@@ -10,7 +10,9 @@ define([], function() {
          */
         supportedLocales: ["boxes", "es", "fr", "pt"],
         /**
-         * Returns the phone's locale or null for the default locale (en-US)
+         * Obtains the phone's locale or null for the default locale (en-US)
+         *
+         * @return the locale
          */
         getLang: function() {
             if (!this.isFirefoxOS()) {
@@ -28,17 +30,24 @@ define([], function() {
             }
             return lang;
         },
+        /**
+         * Terminates the application.
+         */
         quit: function() {
             window.close();
         },
         /**
          * Returns true when run within a gaia environment
+         *
+         * @return true if the bandwidth is metered.
          */
         isFirefoxOS: function() {
             return window.location.protocol === 'app:';
         },
         /**
          * Determines if the connection is metered (pay per use)
+         *
+         * @return true if the bandwidth is metered.
          */
         isMeteredConnection: function() {
             var connection = navigator.connection || navigator.mozConnection;
@@ -49,6 +58,8 @@ define([], function() {
         },
         /**
          * Determines if there's a cap on the bandwidth
+         *
+         * @return true if the bandwidth is capped.
          */
         isBandwidthCapped: function() {
             var connection = navigator.connection || navigator.mozConnection;
@@ -59,6 +70,11 @@ define([], function() {
         },
         /**
          * Obtains a URL query parameter
+         *
+         * @param name The name of the parameter to obtain
+         * @param params Optional, specifies the parameters to parse, if
+         *   not specified, uses window.location.search.
+         * @return The obtained parameter value
          */
         getParameterByName: function(name, params) {
             if (_.isUndefined(params)) {
@@ -72,6 +88,12 @@ define([], function() {
         },
         /**
          * Adds a query parameter to the specified url
+         *
+         * @param url The URL to append to
+         * @param name The naem of the parameter to append
+         * @param value The value of the parameter to append
+         * @return The built url
+         *
          * TODO: Handle fragments
          */
         appendQueryParam: function(url, name, value) {
@@ -94,6 +116,8 @@ define([], function() {
         },
         /**
          * Binds a set of arguments to a function without modifying the bound `this`
+         *
+         * @return The same function with one of the specified parameters found.
          */
         partial: function( fn /*, args...*/) {
           var aps = Array.prototype.slice;
@@ -128,6 +152,9 @@ define([], function() {
           }
         },
 
+        /**
+         * Mixin to help with localization
+         */
         LocalizationMixin: {
             componentDidMount: function() {
                 window.document.webL10n.translate(this.getDOMNode());
@@ -137,6 +164,14 @@ define([], function() {
             }
         },
 
+        /**
+         * Loads a script from the specified installed file path.
+         * Note taht the filename specified must be installed on the device
+         * and even if we changed the interface to execute code on the fly
+         * it would not work. Eval is disabled for other scripts.
+         *
+         * @param filename The URL to load
+         */
         loadScript: function(filename) {
             var d = $.Deferred();
             var s = document.createElement("script");
