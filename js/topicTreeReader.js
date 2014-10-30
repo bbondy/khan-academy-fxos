@@ -1,6 +1,7 @@
 "use strict";
 
 /**
+ * NOT CURRENTLY IN USE
  * Reads in a topic tree from the installed default
  * or from a more recent cached version.
  * Topic tree data is stored zipped for faster reading

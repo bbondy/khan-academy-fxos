@@ -92,6 +92,10 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
             });
             return d.promise();
         },
+        /**
+         * Refreshes topic tree info by doing an API call and minifying the
+         * output. On the next program load it will be used.
+         */
         refreshTopicTreeInfo: function() {
             var d = $.Deferred();
             var getTopicTreePromise = APIClient.getTopicTree();
