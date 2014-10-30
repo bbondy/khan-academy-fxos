@@ -95,6 +95,7 @@ define([], function() {
             var d = $.Deferred();
             this.delete(filename).always(() => {
                 if (!this.sdcard) {
+                    console.log('rejected!');
                     return d.reject().promise();
                 }
 
