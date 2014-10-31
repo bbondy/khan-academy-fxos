@@ -35,6 +35,13 @@ define(["util", "models"],
             this.timer = setInterval(this.heartbeat.bind(this), this.heartbeatInterval);
             return d.resolve().promise();
         },
+        /**
+         * Heartbeat called every heartbeatInterval
+         * Nothing is performed on metered connections or with the bandwidth is capped.
+         * The following actions are performed:
+         *   - refreshing logged in info (at most every 12 hours)
+         *   - refreshing the topic tree (at most once a week)
+         */
         heartbeat: function() {
             if (Util.isMeteredConnection()) {
                 console.log('skipping heartbeat due to metered connection!');
