@@ -146,8 +146,11 @@
                                 newChildren.push(child);
                             } else if (child[this.getShortName("kind")] === this.getShortValue("kind", "Video")) {
                                 if (logWarnings) {
-                                    console.log("Warning: Excluding because of no vidoe URL: " + child[this.getShortName("id")] +
-                                        ", " + child[this.getShortName("translated_title")]);
+                                    if (typeof console != 'undefined') {
+                                        console.log("Warning: Excluding because of no vidoe URL: " +
+                                            child[this.getShortName("id")] +
+                                            ", " + child[this.getShortName("translated_title")]);
+                                    }
                                 }
                             }
                         } else if (child[this.getShortName("children")] && child[this.getShortName("children")].length > 0) {

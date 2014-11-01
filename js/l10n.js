@@ -59,13 +59,13 @@ document.webL10n = (function(window, document, undefined) {
   var gDEBUG = 1;
 
   function consoleLog(message) {
-    if (gDEBUG >= 2) {
+    if (gDEBUG >= 2 && typeof console !== 'undefined') {
       console.log('[l10n] ' + message);
     }
   };
 
   function consoleWarn(message) {
-    if (gDEBUG) {
+    if (gDEBUG && typeof console !== 'undefined') {
       console.warn('[l10n] ' + message);
     }
   };
@@ -1003,7 +1003,6 @@ document.webL10n = (function(window, document, undefined) {
   } else if (window.attachEvent) { // IE8 and before (= oldIE)
     // TODO: check if jQuery is loaded (CSS selector + JSON + events)
 
-    // dummy `console.log' and `console.warn' functions
     if (!window.console) {
       consoleLog = function(message) {}; // just ignore console.log calls
       consoleWarn = function(message) {

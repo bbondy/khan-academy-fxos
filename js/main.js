@@ -304,12 +304,12 @@ define(["react", "util", "models", "apiclient", "cache", "storage",
         componentWillMount: function() {
             if (this.props.article.isDownloaded()) {
                 Storage.readText(this.props.article.getId()).done((result) => {
-                    console.log("rendered article from storage");
+                    Util.log("rendered article from storage");
                     this.props.article.set("content", result);
                 });
             } else {
                 APIClient.getArticle(this.props.article.getId()).done((result) => {
-                    console.log("rendered article from web");
+                    Util.log("rendered article from web");
                     this.props.article.set("content", result.translated_html_content);
                 });
             }
@@ -324,7 +324,7 @@ define(["react", "util", "models", "apiclient", "cache", "storage",
             clearTimeout(this.timerId);
         },
         render: function() {
-            console.log("render article: :%o", this.props.article);
+            Util.log("render article: :%o", this.props.article);
             if (this.props.article.get("content")) {
                 return <article dangerouslySetInnerHTML={{
                     __html: this.props.article.get("content")
@@ -349,12 +349,12 @@ define(["react", "util", "models", "apiclient", "cache", "storage",
             if (this.props.video.isDownloaded()) {
                 Storage.readAsBlob(this.props.video.getId()).done((result) => {
                     var download_url = URL.createObjectURL(result);
-                    console.log('download url is: ' + download_url);
+                    Util.log('download url is: ' + download_url);
                     this.setState({downloadedUrl: download_url});
                 });
             }
 
-            console.log('video: %o', this.props.video);
+            Util.log('video: %o', this.props.video);
             this.videoId = this.props.video.getId();
             this.lastSecondWatched = 0;
             if (this.props.video.get("lastSecondWatched") &&
@@ -383,7 +383,7 @@ define(["react", "util", "models", "apiclient", "cache", "storage",
             video.addEventListener("canplay", (e) => {
                 if (this.lastSecondWatched) {
                     video.currentTime = this.lastSecondWatched;
-                    console.log('set current time to: ' + video.currentTime);
+                    Util.log('set current time to: ' + video.currentTime);
                 }
             });
 
@@ -498,7 +498,7 @@ define(["react", "util", "models", "apiclient", "cache", "storage",
             if (this.state.downloadedUrl) {
                 videoSrc = this.state.downloadedUrl;
             }
-            console.log('video rendered with url: ' + videoSrc);
+            Util.log('video rendered with url: ' + videoSrc);
             var pointsString = document.webL10n.get("points-so-far",
                         {"earned" : this.props.video.getPoints(), "available": this.availablePoints});
             var pointsDiv;
@@ -1133,7 +1133,7 @@ define(["react", "util", "models", "apiclient", "cache", "storage",
         // Render everything
         React.renderComponent(<MainView model={models.TopicTree.root}/>, mountNode);
         $("body").bind("contextmenu", function (e) {
-            console.log('contextmenu!');
+            Util.log('contextmenu!');
             e.preventDefault();
         });
     }).fail((error) => {

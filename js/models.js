@@ -108,11 +108,11 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
             var d = $.Deferred();
 
             // Check if we have a local downloaded copy of the topic tree
-            console.log("loading topic tree from storage");
+            Util.log("loading topic tree from storage");
             this.allContentItems.length = 0;
             var topicTreePromise = Storage.readText(this.getTopicTreeFilename());
             topicTreePromise.done((topicTree) => {
-                console.log("Loaded topic tree from local copy");
+                Util.log("Loaded topic tree from local copy");
                 this.root = new TopicModel(JSON.parse(topicTree), {parse: true});
                 d.resolve();
             });
@@ -126,7 +126,7 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
                     filename += "-" + lang;
                 }
                 filename += ".min.js";
-                console.log("going for pre-installed default file: %s", filename);
+                Util.log("going for pre-installed default file: %s", filename);
                 Util.loadScript(filename).done(() => {
                     this.root = new TopicModel(window.topictree, {parse: true});
                     d.resolve();
@@ -416,7 +416,7 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
         _userInfoLocalStorageName: "userInfo-3",
         init: function() {
             if (!this.isSignedIn()) {
-                console.log("Not signed in, won't get user info!");
+                Util.log("Not signed in, won't get user info!");
                 this.initialized = true;
                 return $.Deferred().resolve().promise();
             }
@@ -429,9 +429,9 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
             }
 
             if (this._loadLocalStorageData()) {
-                console.log("User info being refreshed from cache");
+                Util.log("User info being refreshed from cache");
             } else {
-                console.log("User info being refreshed from server");
+                Util.log("User info being refreshed from server");
                 this.refreshLoggedInInfo(false);
             }
 
@@ -507,8 +507,8 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
                     contentItem.unset("completed");
                 }
             });
-            console.log("completed entity Ids: %o", this.get("completedEntityIds"));
-            console.log("completed entities: %o", completedEntities);
+            Util.log("completed entity Ids: %o", this.get("completedEntityIds"));
+            Util.log("completed entities: %o", completedEntities);
         },
         _syncStartedToTopicTree: function(set) {
             var startedEntities = TopicTree.getContentItemsByIds(this.get("startedEntityIds"));
@@ -519,8 +519,8 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
                     contentItem.unset("started");
                 }
             });
-            console.log("started entity Ids: %o", this.get("startedEntityIds"));
-            console.log("started entities: %o", startedEntities);
+            Util.log("started entity Ids: %o", this.get("startedEntityIds"));
+            Util.log("started entities: %o", startedEntities);
         },
         _syncUserProgressToTopicTree: function(set) {
             // Get a list of the Ids we'll be searching for in TopicTree models
@@ -549,7 +549,7 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
                     video.unset("points");
                 }
             });
-            console.log('getUserVideos entities: %o', this.get("userVideos"));
+            Util.log('getUserVideos entities: %o', this.get("userVideos"));
         },
         _saveUserInfo: function() {
             if (this.get("userInfo")) {
@@ -579,7 +579,7 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
 
             // Get the user profile info
             APIClient.getUserInfo().done((result) => {
-                console.log("getUserInfo: %o", result);
+                Util.log("getUserInfo: %o", result);
                 this.set("userInfo", {
                     avatarUrl: result.avatar_url,
                     joined: result.joined,
@@ -591,14 +591,14 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
                 this._saveUserInfo();
 
                 if (!forceRefreshAllInfo && this._loadLocalStorageData()) {
-                    console.log("User info only obtained. Not obtaining user data because we have it cached already!");
+                    Util.log("User info only obtained. Not obtaining user data because we have it cached already!");
                     return;
                 }
 
                 // The call is needed for completed/in progress status of content items
                 // Unlike getUserVideos, this includes both articles and videos.
                 APIClient.getUserProgress().done((data) => {
-                    console.log("getUserProgress: %o", data);
+                    Util.log("getUserProgress: %o", data);
                     var startedEntityIds = data.started;
                     var completedEntityIds = data.complete;
 
@@ -638,7 +638,7 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
         reportArticleRead: function(article) {
             var d = $.Deferred();
             var promise = APIClient.reportArticleRead(article.getId()).done((result) => {
-                console.log('reported article complete: %o', result);
+                Util.log('reported article complete: %o', result);
                 article.set({
                     completed: true
                 });
@@ -660,10 +660,10 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
             var duration = video.getDuration();
             APIClient.reportVideoProgress(videoId, youTubeId, duration, secondsWatched, lastSecondWatched).done((result) => {
                 if (!result) {
-                    console.warn("Video progress report returned null results!");
+                    Util.warn("Video progress report returned null results!");
                     return;
                 }
-                console.log('reportVideoProgress result: %o', result);
+                Util.log('reportVideoProgress result: %o', result);
 
                 var lastPoints = video.getPoints() || 0;
                 var newPoints = lastPoints + result.points_earned;
