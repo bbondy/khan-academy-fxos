@@ -36,7 +36,7 @@ define(["oauth", "util"], function(_oauth, Util) {
             // First check if we have the info from the local storage values
             // If so just resolve from that.
             if (this.oauth.consumerKey && this.oauth.consumerSecret) {
-                console.log("resolving with local secrets info");
+                Util.log("resolving with local secrets info");
                 return $.Deferred().resolve(this.oauth).promise();
             }
 
@@ -117,7 +117,7 @@ define(["oauth", "util"], function(_oauth, Util) {
                 }
             }).fail(() => {
                 // We should always be able to obtain secrets.json info!
-                console.warn("Could not obtain secrets");
+                Util.warn("Could not obtain secrets");
                 d.reject();
             });
             return d.promise();
@@ -215,7 +215,7 @@ define(["oauth", "util"], function(_oauth, Util) {
                 filename += "-" + lang;
             }
             filename += jsOnly ? ".min.js" : ".min.json";
-            console.log("Getting installed topic tree from: " + filename);
+            Util.log("Getting installed topic tree from: " + filename);
             return this._basicAPICall(filename, undefined, undefined, jsOnly ? "text" : "json");
         },
         /**

@@ -7,8 +7,8 @@
  *   - Provides the ability to delete those downloads
  */
 
-define(["storage", "models"],
-        function(Storage, models) {
+define(["util", "storage", "models"],
+        function(Util, Storage, models) {
 
     var Downloads = {
         /**
@@ -192,8 +192,8 @@ define(["storage", "models"],
          */
         _addDownloadToManifest: function(model) {
             this._setDownloaded(model, true);
-            console.log('adding model to manifest: ');
-            console.log(model);
+            Util.log('adding model to manifest: ');
+            Util.log(model);
             this.contentList.push(model);
             this._writeManifest();
         },
@@ -202,8 +202,8 @@ define(["storage", "models"],
          */
         _removeDownloadFromManifest: function(model) {
             this._setDownloaded(model, false);
-            console.log('removing model from manifest: ');
-            console.log(model);
+            Util.log('removing model from manifest: ');
+            Util.log(model);
             this.contentList.remove(model);
             this._writeManifest();
         },

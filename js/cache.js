@@ -44,20 +44,20 @@ define(["util", "models"],
          */
         heartbeat: function() {
             if (Util.isMeteredConnection()) {
-                console.log('skipping heartbeat due to metered connection!');
+                Util.log('skipping heartbeat due to metered connection!');
                 return;
             }
 
             if (Util.isBandwidthCapped()) {
-                console.log('skipping heartbeat due to capped bandwidth!');
+                Util.log('skipping heartbeat due to capped bandwidth!');
                 return;
             }
 
             var TWELVE_HOURS = 1000 * 60 * 60 * 12;
             if (this.lastUserInfoRefresh && new Date() - this.lastUserInfoRefresh < TWELVE_HOURS) {
-                console.log('heartbeat: no need to refresh user info yet!');
+                Util.log('heartbeat: no need to refresh user info yet!');
             } else {
-                console.log('heartbeat: Refreshing logged in info!');
+                Util.log('heartbeat: Refreshing logged in info!');
                 models.CurrentUser.refreshLoggedInInfo(true).done(() => {
                     this.lastUserInfoRefresh = new Date();
                     localStorage.setItem(this.heartbeatUserInfoName, this.lastUserInfoRefresh);
@@ -66,9 +66,9 @@ define(["util", "models"],
 
             var ONE_WEEK = 1000 * 60 * 60 * 24 * 7;
             if (this.lastTopicTreeRefresh && new Date() - this.lastTopicTreeRefresh < ONE_WEEK) {
-                console.log('heartbeat: no need to refresh topic tree yet!');
+                Util.log('heartbeat: no need to refresh topic tree yet!');
             } else {
-                console.log('heartbeat: Refreshing topic tree!');
+                Util.log('heartbeat: Refreshing topic tree!');
                 models.TopicTree.refreshTopicTreeInfo().done(() => {
                     this.lastTopicTreeRefresh = new Date();
                     localStorage.setItem(this.heartbeatTopicTreeName, this.lastTopicTreeRefresh);

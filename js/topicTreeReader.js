@@ -29,24 +29,24 @@ define(["util"], function(Util) {
                 var reader = ArchiveReader(blob);
                 var h = reader.getFilenames();
                 h.onerror = function() {
-                    console.warn("Could not obtain topic tree filename from zip");
+                    Util.warn("Could not obtain topic tree filename from zip");
                     d.reject();
                 };
                 h.onsuccess = function() {
                     if (this.result.length === 0) {
-                        console.warn("Zip read but contains no topic tree filenames");
+                        Util.warn("Zip read but contains no topic tree filenames");
                         d.reject();
                     }
 
-                    console.log("Read file in zip: " + this.result[0]);
+                    Util.log("Read file in zip: " + this.result[0]);
                     var hf = reader.getFile(this.result[0]);
                     hf.onerror = function() {
-                        console.warn("Could not read file from topic tree zip");
+                        Util.warn("Could not read file from topic tree zip");
                         d.reject();
                     };
                     hf.onsuccess = function() {
                         // this.result is a DOM File
-                        console.log(`Read: : ${this.result.name}, contentType: ${this.result.type}, size: ${this.result.size}`);
+                        Util.log(`Read: : ${this.result.name}, contentType: ${this.result.type}, size: ${this.result.size}`);
 
                         var fileReader = new FileReader();
                         fileReader.readAsText(this.result.slice());

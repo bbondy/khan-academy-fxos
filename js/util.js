@@ -6,6 +6,22 @@ define([], function() {
      */
     var Util = {
         /**
+         * Wrapper around console.log
+         */
+        log: function(message, ...rest) {
+            if (typeof console != 'undefined') {
+                console.log(message, ...rest);
+            }
+        },
+        /**
+         * Wrapper around console.warn
+         */
+        warn: function(message, ...rest) {
+            if (typeof console != 'undefined') {
+                console.warn(message, ...rest);
+            }
+        },
+        /**
          * We don't need to list en here since that is the default
          */
         supportedLocales: ["boxes", "es", "fr", "pt"],
@@ -181,7 +197,7 @@ define([], function() {
                 d.resolve();
             };
             s.onerror = (e) => {
-                console.log("on error: %o", e);
+                Util.log("on error: %o", e);
                 d.reject();
             };
             document.getElementsByTagName("head")[0].appendChild(s);
