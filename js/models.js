@@ -1,35 +1,69 @@
 define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Storage, _Minify) {
     var TopicTreeBase = {
+        /**
+         * Gets the ID of the topic tree item
+         */
         getId: function() {
             return this.get(Minify.getShortName("id"));
         },
+        /**
+         * Gets the kind of the topic tree item
+         * Example values: Article, Topic, Video
+         */
         getKind: function() {
             return Minify.getLongValue("kind", this.get(Minify.getShortName("kind")));
         },
+        /**
+         * Obtains the translated title of the topic tree item
+         */
         getTitle: function() {
             return this.get(Minify.getShortName("translated_title"));
         },
+        /**
+         * Checks if the topic tree item is a topic
+         */
         isTopic: function() {
             return false;
         },
+        /**
+         * Checks if the topic tree item is a video list
+         */
         isVideoList: function() {
             return false;
         },
+        /**
+         * Checks if the topic tree item is a video
+         */
         isVideo: function() {
             return this.getKind() === "Video";
         },
+        /**
+         * Checks if the topic tree item is an article list
+         */
         isArticleList: function() {
             return false;
         },
+        /**
+         * Checks if the topic tree item is an article
+         */
         isArticle: function() {
             return this.getKind() === "Article";
         },
+        /**
+         * Checks if the topic tree item is a content item
+         */
         isContent: function() {
             return this.isVideo() || this.isArticle();
         },
+        /**
+         * Checks if the topic tree item is a content list
+         */
         isContentList: function() {
             return false;
         },
+        /**
+         * Obtains the parent domain topic tree item
+         */
         getParentDomain: function() {
             var current = this;
             while (current && !current.isRootChild()) {
@@ -37,12 +71,22 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
             }
             return current;
         },
+        /**
+         * Checks if the topic tree item is a child of the root topic tree item
+         * I.e. a top level subject.
+         */
         isRootChild: function() {
             return this.getParent() && this.getParent().isRoot();
         },
+        /**
+         * Cehecks if the topic tree item is the root item
+         */
         isRoot: function() {
             return !this.getParent();
         },
+        /**
+         * Obtains the parent of this topic tree item.
+         */
         getParent: function() {
             return this.get("parent");
         }
