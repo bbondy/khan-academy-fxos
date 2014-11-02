@@ -637,7 +637,7 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
         },
         reportArticleRead: function(article) {
             var d = $.Deferred();
-            var promise = APIClient.reportArticleRead(article.getId()).done((result) => {
+            APIClient.reportArticleRead(article.getId()).done((result) => {
                 Util.log('reported article complete: %o', result);
                 article.set({
                     completed: true

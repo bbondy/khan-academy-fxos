@@ -9,7 +9,7 @@ define([], function() {
          * Wrapper around console.log
          */
         log: function(message, ...rest) {
-            if (typeof console != 'undefined') {
+            if (typeof console !== 'undefined') {
                 console.log(message, ...rest);
             }
         },
@@ -17,7 +17,7 @@ define([], function() {
          * Wrapper around console.warn
          */
         warn: function(message, ...rest) {
-            if (typeof console != 'undefined') {
+            if (typeof console !== 'undefined') {
                 console.warn(message, ...rest);
             }
         },

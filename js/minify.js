@@ -146,7 +146,7 @@
                                 newChildren.push(child);
                             } else if (child[this.getShortName("kind")] === this.getShortValue("kind", "Video")) {
                                 if (logWarnings) {
-                                    if (typeof console != 'undefined') {
+                                    if (typeof console !== 'undefined') {
                                         console.log("Warning: Excluding because of no vidoe URL: " +
                                             child[this.getShortName("id")] +
                                             ", " + child[this.getShortName("translated_title")]);
