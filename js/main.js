@@ -1,7 +1,3 @@
-/**
- * @jsx React.DOM
- */
-
 "use strict";
 
 define(["react", "util", "models", "apiclient", "cache", "storage",
