@@ -22,7 +22,7 @@ You need [Nodejs](http://nodejs.org) installed to run the following commands (pl
 
 * Install react-tools by running `npm install -g react-tools`.
 
-* Install jsx by running `npm install -g jsx`
+* Install jsx by running `npm install -g jsx`.  Make sure you're using at least 0.12.0 by running `jsx --version`.
 
 The first time you get setup, run `./tools/rebuild`.  Then run `./tools/runserver`.  
 This will start a local python HTTP server on port 8092.  
