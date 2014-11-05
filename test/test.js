@@ -1,5 +1,39 @@
-require(["react", "util", "models", "apiclient", "storage", "downloads", "cache", "minify", "notifications", "status"],
-        function(React, Util, models, APIClient, Storage, Downloads, Cache, Minify, Notifications, Status) {
+require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "cache", "minify", "notifications", "status", "views"],
+        function(React, Util, models, APIClient, Storage, Downloads, Cache, Minify, Notifications, Status, Views) {
+
+    var TestUtils = React.addons.TestUtils;
+
+    QUnit.asyncTest("test react views", function(assert) {
+        var MainView = React.createFactory(Views.MainView);
+        var mountNode = document.getElementById("app");
+
+        // Init everything
+        Storage.init().then(function(){
+          return APIClient.init();
+        }).then(function() {
+            return models.TopicTree.init();
+        }).then(function() {
+            return $.when(Downloads.init(), Cache.init(), models.AppOptions.fetch());
+        }).then(function() {
+            assert.ok(true);
+            // We don't want to have to wait for results, so just start this and don't wait
+            models.CurrentUser.init();
+
+            var mainView = React.render(MainView({
+                model: models.TopicTree.root
+            }), mountNode);
+
+            var mainViewElements = ["header-title", "search", "icon-menu",
+                "topic-list-container", "sidebar"];
+            mainViewElements.forEach(function(c) {
+                TestUtils.findRenderedDOMComponentWithClass(mainView, c);
+            });
+
+            QUnit.start();
+        }).fail(function(error) {
+            Util.warn(error);
+        });
+    });
 
     QUnit.asyncTest("test APIClient calls the right things", function(assert) {
 
@@ -99,29 +133,6 @@ require(["react", "util", "models", "apiclient", "storage", "downloads", "cache"
         Util.loadScript("/test/_test1.js").done(function() {
             assert.strictEqual(window.x, 3);
             QUnit.start();
-        });
-    });
-
-    QUnit.test("testLocalization", function(assert) {
-        document.webL10n.setAsyncLoading(false);
-        document.webL10n.setExactLangOnly(true);
-        var enDict = document.webL10n.getData();
-        var otherLanguages = languages.slice(1);
-
-        // Make sure each localization file has an associated string
-        otherLanguages.forEach(function(lang) {
-            document.webL10n.setLanguage(lang);
-            for (var s in enDict) {
-                if (enDict.hasOwnProperty(s)) {
-
-                    var translated = document.webL10n.get(s);
-                    if (!translated) {
-                        console.error("Not localized! lang: %s, prop: %s, en-associated: %o",
-                            lang, s, enDict[s], lang);
-                    }
-                    assert.ok(translated.length);
-                }
-            }
         });
     });
 
@@ -314,5 +325,28 @@ require(["react", "util", "models", "apiclient", "storage", "downloads", "cache"
         } else {
             delete window.Notification;
         }
+    });
+
+    QUnit.test("testLocalization", function(assert) {
+        document.webL10n.setAsyncLoading(false);
+        document.webL10n.setExactLangOnly(true);
+        var enDict = document.webL10n.getData();
+        var otherLanguages = languages.slice(1);
+
+        // Make sure each localization file has an associated string
+        otherLanguages.forEach(function(lang) {
+            document.webL10n.setLanguage(lang);
+            for (var s in enDict) {
+                if (enDict.hasOwnProperty(s)) {
+
+                    var translated = document.webL10n.get(s);
+                    if (!translated) {
+                        console.error("Not localized! lang: %s, prop: %s, en-associated: %o",
+                            lang, s, enDict[s], lang);
+                    }
+                    assert.ok(translated.length);
+                }
+            }
+        });
     });
 });
