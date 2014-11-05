@@ -15,6 +15,7 @@ require.config({
         // Third party libs
         "text": "./lib/text-min",
         "react": "./lib/react-with-addons-min",
+        "react-dev": "./lib/react-with-addons-dev",
         "jsx": "./lib/jsx-min",
         "underscore": "./lib/underscore-min",
         "jquery": "./lib/jquery-min",
