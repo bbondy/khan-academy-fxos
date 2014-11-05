@@ -410,6 +410,11 @@ define(["react", "util", "models", "apiclient", "cache", "storage",
                 this.isPlaying = false;
                 this.stopAnimatingPoints(true);
             }, true);
+            video.addEventListener("error", (e) => {
+                if (video.networkState === HTMLMediaElement.NETWORK_NO_SOURCE) {
+                    this.setState({showOfflineImage: true});
+                }
+            }, true);
         },
 
         // Updates the secondsWatched variable with the difference between the current
@@ -502,9 +507,10 @@ define(["react", "util", "models", "apiclient", "cache", "storage",
                 pointsDiv = <div className="energy-points energy-points-video pull-right">{pointsString}</div>;
             }
             return <div className="video-viewer-container">
+                {this.state.showOfflineImage ? <img className="video-placeholder" src="img/offline.png"/> :
                  <video ref="video" controls>
                     <source src={videoSrc} type={this.props.video.getContentMimeType()}/>
-                 </video>
+                 </video>}
                  <div className="video-info-bar">{pointsDiv}</div>
                 {transcriptViewer}
             </div>;
