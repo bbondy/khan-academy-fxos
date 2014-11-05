@@ -992,7 +992,7 @@ define(["react", "util", "models", "apiclient", "cache", "storage",
                 Status.update(progressMessage);
             };
             Status.start();
-            Downloads.download(model, onProgress).done(function(model, count) {
+            Downloads.download(model, onProgress).done((model, count) => {
                 var title = document.webL10n.get("download-complete");
                 var contentTitle = model.getTitle();
                 var message;
@@ -1008,6 +1008,11 @@ define(["react", "util", "models", "apiclient", "cache", "storage",
                     message = document.webL10n.get("content-items-downloaded-succesfully",
                         {"count" : count, "title": contentTitle});
                 }
+                Status.stop();
+                Notifications.info(title, message);
+            }).fail(() => {
+                var title = document.webL10n.get("download-aborted");
+                var message = document.webL10n.get("content-items-downloaded-failure");
                 Status.stop();
                 Notifications.info(title, message);
             });

@@ -118,6 +118,8 @@ define(["util", "storage", "models"],
                             return;
                         }
                         setTimeout(downloadOneAtATime, 1000);
+                    }).fail(() => {
+                        d.reject();
                     });
                 } catch (e) {
                     // done, no more items in the generator
@@ -160,7 +162,7 @@ define(["util", "storage", "models"],
                 req.onload = () => {
                     handleContentLoaded(req.response);
                 };
-                req.onerror = () => {
+                req.onerror = (e) => {
                     d.reject();
                 };
                 req.send();
