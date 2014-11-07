@@ -21,9 +21,9 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
             // We don't want to have to wait for results, so just start this and don't wait
             models.CurrentUser.init();
 
-            var mainView = React.render(MainView({
+            var mainView = TestUtils.renderIntoDocument(MainView({
                 model: models.TopicTree.root
-            }), mountNode);
+            }));
 
             var mainViewElements = ["header-title", "search", "icon-menu",
                 "topic-list-container", "sidebar"];
@@ -31,10 +31,16 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
                 TestUtils.findRenderedDOMComponentWithClass(mainView, c);
             });
 
-            // Make sure topic-item
-            var topicItems = TestUtils.scryRenderedDOMComponentsWithClass(mainView, "topic-item");
+            // Make sure topic tree items display
+            var topicItems = TestUtils.scryRenderedComponentsWithType(mainView, Views.TopicListItem);
             assert.ok(topicItems.length >= 10);
-            console.log($(topicItems[0].getDOMNode()).html());
+            assert.strictEqual(topicItems[0].props.topic.getTitle(), "Math");
+
+            // Make sure topic tree navigation works
+            var link = TestUtils.findRenderedDOMComponentWithTag(topicItems[0], "a");
+            Simulate.click(link.getDOMNode());
+            topicItems = TestUtils.scryRenderedComponentsWithType(mainView, Views.TopicListItem);
+            assert.strictEqual(topicItems[0].props.topic.getTitle(), "Arithmetic");
 
             QUnit.start();
         }).fail(function(error) {

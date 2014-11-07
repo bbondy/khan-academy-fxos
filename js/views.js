@@ -1,6 +1,6 @@
 "use strict";
 
-define(["react", "util", "models", "apiclient", "cache", "storage",
+define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "cache", "storage",
         "downloads", "notifications", "status"],
         function(React, Util, models, APIClient, Cache, Storage,
             Downloads, Notifications, Status) {
