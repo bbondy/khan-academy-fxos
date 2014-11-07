@@ -27,10 +27,12 @@ require.config({
 // Replaces all localized strings with boxes.
 //window.translateToBoxes = true;
 
-var initModules = ['main'];
+var initModules = [];
 if (window.isTest) {
     initModules.push('sinon');
     initModules.push('test');
+} else {
+    initModules.push('main');
 }
 requirejs(initModules);
 
