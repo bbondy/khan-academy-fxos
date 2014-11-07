@@ -2,10 +2,12 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
         function(React, Util, models, APIClient, Storage, Downloads, Cache, Minify, Notifications, Status, Views) {
 
     var TestUtils = React.addons.TestUtils;
+    var Simulate = TestUtils.Simulate;
 
     QUnit.asyncTest("test react views", function(assert) {
         var MainView = React.createFactory(Views.MainView);
         var mountNode = document.getElementById("app");
+        $(mountNode).empty();
 
         // Init everything
         Storage.init().then(function(){
@@ -28,6 +30,11 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
             mainViewElements.forEach(function(c) {
                 TestUtils.findRenderedDOMComponentWithClass(mainView, c);
             });
+
+            // Make sure topic-item
+            var topicItems = TestUtils.scryRenderedDOMComponentsWithClass(mainView, "topic-item");
+            assert.ok(topicItems.length >= 10);
+            console.log($(topicItems[0].getDOMNode()).html());
 
             QUnit.start();
         }).fail(function(error) {
