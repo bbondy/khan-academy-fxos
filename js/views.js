@@ -322,7 +322,7 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                 }}/>;
 
             }
-            return null;
+            return <article/>;
         }
     });
 
@@ -332,12 +332,18 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
      */
     var VideoViewer = React.createClass({
         componentWillMount: function() {
-            APIClient.getVideoTranscript(this.props.video.getYoutubeId()).done((transcript) => {
+            this.p1 = APIClient.getVideoTranscript(this.props.video.getYoutubeId()).done((transcript) => {
+                if (!this.isMounted()) {
+                    return;
+                }
                 // This will cause a second re-render but that's OK
                 this.setState({transcript: transcript});
             });
 
             if (this.props.video.isDownloaded()) {
+                if (!this.isMounted()) {
+                    return;
+                }
                 Storage.readAsBlob(this.props.video.getId()).done((result) => {
                     var download_url = URL.createObjectURL(result);
                     Util.log('download url is: ' + download_url);

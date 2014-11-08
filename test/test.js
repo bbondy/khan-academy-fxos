@@ -25,6 +25,18 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
                 model: models.TopicTree.root
             }));
 
+            var clickBack = function() {
+                var backButton = TestUtils.findRenderedComponentWithType(mainView, Views.BackButton);
+                var backLink = TestUtils.findRenderedDOMComponentWithTag(backButton, "a").getDOMNode();
+                Simulate.click(backLink);
+            };
+
+            var search = function(term) {
+                var topicSearch = TestUtils.findRenderedComponentWithType(mainView, Views.TopicSearch);
+                var input = TestUtils.findRenderedDOMComponentWithTag(topicSearch, "input").getDOMNode();
+                Simulate.change(input, { target: { value: term} });
+            };
+
             var mainViewElements = ["header-title", "search", "icon-menu",
                 "topic-list-container", "sidebar"];
             mainViewElements.forEach(function(c) {
@@ -53,9 +65,7 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
             }));
 
             //Make sure that the back button works
-            var backButton = TestUtils.findRenderedComponentWithType(mainView, Views.BackButton);
-            link = TestUtils.findRenderedDOMComponentWithTag(backButton, "a");
-            Simulate.click(link.getDOMNode());
+            clickBack();
             topicItems = TestUtils.scryRenderedComponentsWithType(mainView, Views.TopicListItem);
             assert.ok(_(topicItems).some(function(topicItem) {
                 return topicItem.props.topic.getTitle() === "Math";
@@ -65,9 +75,7 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
             }));
 
             // Test topic search
-            var topicSearch = TestUtils.findRenderedComponentWithType(mainView, Views.TopicSearch);
-            var input = TestUtils.findRenderedDOMComponentWithTag(topicSearch, "input").getDOMNode();
-            Simulate.change(input, { target: { value: 'monkey' } });
+            search("monkey");
             var videoItems = TestUtils.scryRenderedComponentsWithType(mainView, Views.VideoListItem);
             assert.ok(videoItems.length >= 2);
             assert.ok(_(videoItems).some(function(videoItem) {
@@ -76,6 +84,20 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
             assert.ok(_(videoItems).some(function(videoItem) {
                 return videoItem.props.video.getTitle() === "Harlow monkey experiments";
             }));
+
+            // Test that video view renders
+            link = TestUtils.scryRenderedDOMComponentsWithTag(videoItems[0], "a")[0];
+            Simulate.click(link.getDOMNode());
+            TestUtils.findRenderedDOMComponentWithTag(mainView, "video");
+            TestUtils.findRenderedDOMComponentWithClass(mainView, "energy-points");
+
+            clickBack();
+            // Test that an article renders
+            search("Oscillation with angular velocity");
+            var articleItem = TestUtils.findRenderedComponentWithType(mainView, Views.ArticleListItem);
+            link = TestUtils.scryRenderedDOMComponentsWithTag(articleItem, "a")[0];
+            Simulate.click(link.getDOMNode());
+            TestUtils.findRenderedDOMComponentWithTag(mainView, "article");
 
             QUnit.start();
         }).fail(function(error) {
