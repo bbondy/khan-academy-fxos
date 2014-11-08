@@ -34,13 +34,48 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
             // Make sure topic tree items display
             var topicItems = TestUtils.scryRenderedComponentsWithType(mainView, Views.TopicListItem);
             assert.ok(topicItems.length >= 10);
-            assert.strictEqual(topicItems[0].props.topic.getTitle(), "Math");
+            assert.ok(_(topicItems).some(function(topicItem) {
+                return topicItem.props.topic.getTitle() === "Math";
+            }));
+            assert.ok(!_(topicItems).some(function(topicItem) {
+                return topicItem.props.topic.getTitle() === "Arithmetic";
+            }));
 
             // Make sure topic tree navigation works
             var link = TestUtils.findRenderedDOMComponentWithTag(topicItems[0], "a");
             Simulate.click(link.getDOMNode());
             topicItems = TestUtils.scryRenderedComponentsWithType(mainView, Views.TopicListItem);
-            assert.strictEqual(topicItems[0].props.topic.getTitle(), "Arithmetic");
+            assert.ok(_(topicItems).some(function(topicItem) {
+                return topicItem.props.topic.getTitle() === "Arithmetic";
+            }));
+            assert.ok(!_(topicItems).some(function(topicItem) {
+                return topicItem.props.topic.getTitle() === "Math";
+            }));
+
+            //Make sure that the back button works
+            var backButton = TestUtils.findRenderedComponentWithType(mainView, Views.BackButton);
+            link = TestUtils.findRenderedDOMComponentWithTag(backButton, "a");
+            Simulate.click(link.getDOMNode());
+            topicItems = TestUtils.scryRenderedComponentsWithType(mainView, Views.TopicListItem);
+            assert.ok(_(topicItems).some(function(topicItem) {
+                return topicItem.props.topic.getTitle() === "Math";
+            }));
+            assert.ok(!_(topicItems).some(function(topicItem) {
+                return topicItem.props.topic.getTitle() === "Arithmetic";
+            }));
+
+            // Test topic search
+            var topicSearch = TestUtils.findRenderedComponentWithType(mainView, Views.TopicSearch);
+            var input = TestUtils.findRenderedDOMComponentWithTag(topicSearch, "input").getDOMNode();
+            Simulate.change(input, { target: { value: 'monkey' } });
+            var videoItems = TestUtils.scryRenderedComponentsWithType(mainView, Views.VideoListItem);
+            assert.ok(videoItems.length >= 2);
+            assert.ok(_(videoItems).some(function(videoItem) {
+                return videoItem.props.video.getTitle() === "Monkeys for a party";
+            }));
+            assert.ok(_(videoItems).some(function(videoItem) {
+                return videoItem.props.video.getTitle() === "Harlow monkey experiments";
+            }));
 
             QUnit.start();
         }).fail(function(error) {
