@@ -172,7 +172,7 @@ define(["oauth", "util"], function(_oauth, Util) {
             $.oauth($.extend( {}, this.oauth, {
                 type: method,
                 url: url,
-                timeout: 15000,
+                timeout: 45000,
                 dataType,
                 success: (data) => {
                     d.resolve(data);
