@@ -306,6 +306,9 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                     Util.log("rendered article from web");
                     this.props.article.set("content", result.translated_html_content);
                 }).fail(() => {
+                    if (!this.isMounted()) {
+                        return;
+                    }
                     this.setState({articleDownloadError: true});
                 });
             }
@@ -348,10 +351,10 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
             });
 
             if (this.props.video.isDownloaded()) {
-                if (!this.isMounted()) {
-                    return;
-                }
                 Storage.readAsBlob(this.props.video.getId()).done((result) => {
+                    if (!this.isMounted()) {
+                        return;
+                    }
                     var download_url = URL.createObjectURL(result);
                     Util.log('download url is: ' + download_url);
                     this.setState({downloadedUrl: download_url});
