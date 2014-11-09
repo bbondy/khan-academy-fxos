@@ -317,7 +317,9 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
             this.timerId = setTimeout(this.onReportComplete.bind(this), 5000);
         },
         onReportComplete: function() {
-            models.CurrentUser.reportArticleRead(this.props.article);
+            if (models.CurrentUser.isSignedIn()) {
+                models.CurrentUser.reportArticleRead(this.props.article);
+            }
         },
         componentWillUnmount: function() {
             clearTimeout(this.timerId);
