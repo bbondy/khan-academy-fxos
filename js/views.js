@@ -292,6 +292,9 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
         getBackboneModels: function() {
             return [this.props.article];
         },
+        getInitialState: function() {
+            return { };
+        },
         componentWillMount: function() {
             if (this.props.article.isDownloaded()) {
                 Storage.readText(this.props.article.getId()).done((result) => {
@@ -302,6 +305,8 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                 APIClient.getArticle(this.props.article.getId()).done((result) => {
                     Util.log("rendered article from web");
                     this.props.article.set("content", result.translated_html_content);
+                }).fail(() => {
+                    this.setState({articleDownloadError: true});
                 });
             }
         },
@@ -316,7 +321,9 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
         },
         render: function() {
             Util.log("render article: :%o", this.props.article);
-            if (this.props.article.get("content")) {
+            if (this.state.articleDownloadError) {
+                return <img className="video-placeholder" src="img/offline.png"/>;
+            } else if (this.props.article.get("content")) {
                 return <article dangerouslySetInnerHTML={{
                     __html: this.props.article.get("content")
                 }}/>;

@@ -167,6 +167,9 @@ define(["util", "storage", "models"],
                 };
                 req.send();
             } else {
+                if (!contentItem.get("content")) {
+                    return d.reject().promise();
+                }
                 // Articles have a content property with the html we want to
                 // download already. It's not loaded in by the topic tree but
                 // when the article is actually loaded.
