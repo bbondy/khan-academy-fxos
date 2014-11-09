@@ -89,15 +89,29 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
             link = TestUtils.scryRenderedDOMComponentsWithTag(videoItems[0], "a")[0];
             Simulate.click(link.getDOMNode());
             TestUtils.findRenderedDOMComponentWithTag(mainView, "video");
-            TestUtils.findRenderedDOMComponentWithClass(mainView, "energy-points");
-
+            //TestUtils.findRenderedDOMComponentWithClass(mainView, "energy-points"); // Only if signed in
             clickBack();
+
             // Test that an article renders
             search("Oscillation with angular velocity");
             var articleItem = TestUtils.findRenderedComponentWithType(mainView, Views.ArticleListItem);
             link = TestUtils.scryRenderedDOMComponentsWithTag(articleItem, "a")[0];
             Simulate.click(link.getDOMNode());
             TestUtils.findRenderedDOMComponentWithTag(mainView, "article");
+
+            // View setings works
+            var sidebar = TestUtils.findRenderedComponentWithType(mainView, Views.Sidebar);
+            var viewSettingsLink = TestUtils.findRenderedDOMComponentWithClass(sidebar, "view-settings-link").getDOMNode();
+            Simulate.click(viewSettingsLink);
+            TestUtils.findRenderedDOMComponentWithClass(mainView, "settings").getDOMNode();
+            clickBack();
+
+            // View downloads works
+            var sidebar = TestUtils.findRenderedComponentWithType(mainView, Views.Sidebar);
+            var viewDownloadsLink = TestUtils.findRenderedDOMComponentWithClass(sidebar, "view-downloads-link").getDOMNode();
+            Simulate.click(viewDownloadsLink);
+            TestUtils.findRenderedDOMComponentWithClass(mainView, "downloads").getDOMNode();
+            clickBack();
 
             QUnit.start();
         }).fail(function(error) {
