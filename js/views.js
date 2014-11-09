@@ -682,10 +682,10 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                 items.push(<li><a  data-l10n-id="view-profile" href="#" onClick={this.props.onClickProfile}>View Profile</a></li>);
             }
             if (!this.props.isSettingsShowing) {
-                items.push(<li><a data-l10n-id="view-settings" href="#" onClick={this.props.onClickSettings}>View Settings</a></li>);
+                items.push(<li><a data-l10n-id="view-settings" className="view-settings-link" href="#" onClick={this.props.onClickSettings}>View Settings</a></li>);
             }
             if (!this.props.isDownloadsShowing) {
-                items.push(<li><a data-l10n-id="view-downloads" href="#" onClick={this.props.onClickDownloads}>View Downloads</a></li>);
+                items.push(<li><a data-l10n-id="view-downloads" className="view-downloads-link" href="#" onClick={this.props.onClickDownloads}>View Downloads</a></li>);
             }
 
             // Add the signout button last
