@@ -7,8 +7,8 @@
  *   - Provides the ability to delete those downloads
  */
 
-define(["util", "storage", "models"],
-        function(Util, Storage, models) {
+define(["util", "storage", "models", "apiclient"],
+        function(Util, Storage, models, APIClient) {
 
     var Downloads = {
         /**
@@ -166,14 +166,22 @@ define(["util", "storage", "models"],
                     d.reject();
                 };
                 req.send();
-            } else {
-                if (!contentItem.get("content")) {
-                    return d.reject().promise();
+            } else if (contentItem.isArticle()) {
+                if (contentItem.get("content")) {
+                    // Articles have a content property with the html we want to
+                    // download already. It's not loaded in by the topic tree but
+                    // when the article is actually loaded.
+                    handleContentLoaded(contentItem.get("content"));
+                } else {
+                    // Sometimes articles are downloaded before they are viewed,
+                    // so try to download it here.
+                    APIClient.getArticle(contentItem.getId()).done((result) => {
+                        contentItem.set("content", result.translated_html_content);
+                        handleContentLoaded(contentItem.get("content"));
+                    }).fail(() => {
+                        return d.reject().promise();
+                    });
                 }
-                // Articles have a content property with the html we want to
-                // download already. It's not loaded in by the topic tree but
-                // when the article is actually loaded.
-                handleContentLoaded(contentItem.get("content"));
             }
             return d.promise();
         },
