@@ -107,11 +107,16 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
             clickBack();
 
             // View downloads works
-            var sidebar = TestUtils.findRenderedComponentWithType(mainView, Views.Sidebar);
+            sidebar = TestUtils.findRenderedComponentWithType(mainView, Views.Sidebar);
             var viewDownloadsLink = TestUtils.findRenderedDOMComponentWithClass(sidebar, "view-downloads-link").getDOMNode();
             Simulate.click(viewDownloadsLink);
             TestUtils.findRenderedDOMComponentWithClass(mainView, "downloads").getDOMNode();
             clickBack();
+
+            // Open support link exists
+            sidebar = TestUtils.findRenderedComponentWithType(mainView, Views.Sidebar);
+            TestUtils.findRenderedDOMComponentWithClass(sidebar, "open-support-link");
+
 
             QUnit.start();
         }).fail(function(error) {

@@ -693,6 +693,8 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                 items.push(<li><a data-l10n-id="view-downloads" className="view-downloads-link" href="#" onClick={this.props.onClickDownloads}>View Downloads</a></li>);
             }
 
+            items.push(<li><a data-l10n-id="open-support" className="open-support-link" href="#" onClick={this.props.onClickSupport}>Open support website</a></li>);
+
             // Add the signout button last
             if (models.CurrentUser.isSignedIn()) {
                 items.push(<li><a data-l10n-id="sign-out" href="#" onClick={this.props.onClickSignout}>Sign Out</a></li>);
@@ -956,6 +958,16 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                 wasLastDownloads: false
             });
         },
+        onClickSupport: function(model) {
+            var url = "https://khanacademy.zendesk.com/hc/communities/public/topics/200155074-Mobile-Discussions";
+            new MozActivity({
+                name: "view",
+                data: {
+                    type: "url",
+                    url: url
+                }
+            });
+        },
         onClickViewOnKA: function(model) {
             new MozActivity({
                 name: "view",
@@ -1103,6 +1115,7 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                          onClickProfile={this.onClickProfile}
                          onClickDownloads={this.onClickDownloads}
                          onClickSettings={this.onClickSettings}
+                         onClickSupport={this.onClickSupport}
                          onClickDownloadContent={this.onClickDownloadContent}
                          onClickViewOnKA={this.onClickViewOnKA}
                          onClickShare={this.onClickShare}
