@@ -89,7 +89,16 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
             link = TestUtils.scryRenderedDOMComponentsWithTag(videoItems[0], "a")[0];
             Simulate.click(link.getDOMNode());
             TestUtils.findRenderedDOMComponentWithTag(mainView, "video");
-            //TestUtils.findRenderedDOMComponentWithClass(mainView, "energy-points"); // Only if signed in
+            if (models.CurrentUser.isSignedIn()) {
+                TestUtils.findRenderedDOMComponentWithClass(mainView, "energy-points"); // Only if signed in
+            } else {
+                assert.strictEqual(TestUtils.scryRenderedDOMComponentsWithClass(mainView, "energy-points").length, 0);
+            }
+            // Check to make sure the sidebar contains: Download Video, Open in Website, Share
+            var sidebar = TestUtils.findRenderedComponentWithType(mainView, Views.Sidebar);
+            TestUtils.findRenderedDOMComponentWithClass(sidebar, "download-video-link");
+            TestUtils.findRenderedDOMComponentWithClass(sidebar, "open-in-website-link");
+            TestUtils.findRenderedDOMComponentWithClass(sidebar, "share-link");
             clickBack();
 
             // Test that an article renders
@@ -98,9 +107,12 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
             link = TestUtils.scryRenderedDOMComponentsWithTag(articleItem, "a")[0];
             Simulate.click(link.getDOMNode());
             TestUtils.findRenderedDOMComponentWithTag(mainView, "article");
+            TestUtils.findRenderedDOMComponentWithClass(sidebar, "download-article-link");
+            assert.strictEqual(TestUtils.scryRenderedDOMComponentsWithClass(sidebar, "open-in-website-link").length, 0);
+            assert.strictEqual(TestUtils.scryRenderedDOMComponentsWithClass(sidebar, "share-link").length, 0);
 
             // View setings works
-            var sidebar = TestUtils.findRenderedComponentWithType(mainView, Views.Sidebar);
+            sidebar = TestUtils.findRenderedComponentWithType(mainView, Views.Sidebar);
             var viewSettingsLink = TestUtils.findRenderedDOMComponentWithClass(sidebar, "view-settings-link").getDOMNode();
             Simulate.click(viewSettingsLink);
             TestUtils.findRenderedDOMComponentWithClass(mainView, "settings").getDOMNode();
@@ -117,6 +129,27 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
             sidebar = TestUtils.findRenderedComponentWithType(mainView, Views.Sidebar);
             TestUtils.findRenderedDOMComponentWithClass(sidebar, "open-support-link");
 
+            ////////////////////
+            // Logged in only tests
+            ////////////////////
+
+            if (!models.CurrentUser.isSignedIn()) {
+                alert("Not signed in, not all tests were run.");
+                QUnit.start();
+                return;
+            }
+
+            // Make sure View Profile works correctly
+            sidebar = TestUtils.findRenderedComponentWithType(mainView, Views.Sidebar);
+            var viewProfileLink = TestUtils.findRenderedDOMComponentWithClass(sidebar, "view-profile-link").getDOMNode();
+            Simulate.click(viewProfileLink);
+            TestUtils.findRenderedDOMComponentWithClass(mainView, "profile").getDOMNode();
+            TestUtils.findRenderedDOMComponentWithClass(mainView, "username").getDOMNode();
+            TestUtils.findRenderedDOMComponentWithClass(mainView, "points-header").getDOMNode();
+            TestUtils.findRenderedDOMComponentWithClass(mainView, "energy-points-profile").getDOMNode();
+            assert.strictEqual(TestUtils.scryRenderedDOMComponentsWithClass(mainView, "badge-category-count").length, 6);
+            assert.strictEqual(TestUtils.scryRenderedDOMComponentsWithClass(mainView, "badge-category-icon").length, 6);
+            clickBack();
 
             QUnit.start();
         }).fail(function(error) {

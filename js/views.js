@@ -648,7 +648,7 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                 } else {
                     var text = document.webL10n.get(this.props.model.isVideo() ? "download-video" : "download-article");
                     items.push(<li className="hot-item">
-                            <a href="#" onClick={Util.partial(this.props.onClickDownloadContent, this.props.model)}>{{text}}</a>
+                            <a href="#" className={this.props.model.isVideo() ? "download-video-link" : "download-article-link"} onClick={Util.partial(this.props.onClickDownloadContent, this.props.model)}>{{text}}</a>
                         </li>);
                 }
             }
@@ -657,9 +657,9 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                     this.props.model.isContent() &&
                     this.props.model.getKAUrl()) {
                 var viewOnKAMessage = document.webL10n.get("open-in-website");
-                items.push(<li><a href="#" onClick={Util.partial(this.props.onClickViewOnKA, this.props.model)}>{{viewOnKAMessage}}</a></li>);
+                items.push(<li><a href="#" className="open-in-website-link" onClick={Util.partial(this.props.onClickViewOnKA, this.props.model)}>{{viewOnKAMessage}}</a></li>);
                 var shareMessage = document.webL10n.get("share");
-                items.push(<li><a href="#" onClick={Util.partial(this.props.onClickShare, this.props.model)}>{{shareMessage}}</a></li>);
+                items.push(<li><a href="#" className="share-link" onClick={Util.partial(this.props.onClickShare, this.props.model)}>{{shareMessage}}</a></li>);
             }
 
             if (models.TempAppState.get("isDownloadingTopic")) {
@@ -684,7 +684,7 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
             // Followed by view pane items
             if (models.CurrentUser.isSignedIn() && !this.props.isProfileShowing) {
                 // User is signed in, add all the signed in options here
-                items.push(<li><a  data-l10n-id="view-profile" href="#" onClick={this.props.onClickProfile}>View Profile</a></li>);
+                items.push(<li><a  data-l10n-id="view-profile" className="view-profile-link" href="#" onClick={this.props.onClickProfile}>View Profile</a></li>);
             }
             if (!this.props.isSettingsShowing) {
                 items.push(<li><a data-l10n-id="view-settings" className="view-settings-link" href="#" onClick={this.props.onClickSettings}>View Settings</a></li>);
@@ -785,8 +785,8 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
             var pointsString = document.webL10n.get("points");
             return <div className="profile">
                 <img className="avatar" src={models.CurrentUser.get("userInfo").avatarUrl}/>
-                <h1>{models.CurrentUser.get("userInfo").nickname || models.CurrentUser.get("userInfo").username}</h1>
-                <h2>{{pointsString}}: <div className="energy-points energy-points-profile">{Util.numberWithCommas(models.CurrentUser.get("userInfo").points)}</div></h2>
+                <h1 className="username">{models.CurrentUser.get("userInfo").nickname || models.CurrentUser.get("userInfo").username}</h1>
+                <h2 className="points-header">{{pointsString}}: <div className="energy-points energy-points-profile">{Util.numberWithCommas(models.CurrentUser.get("userInfo").points)}</div></h2>
 
                 { models.CurrentUser.get("userInfo").badgeCounts ?
                     <div>
