@@ -254,10 +254,11 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
      */
     var TranscriptItem = React.createClass({
         render: function() {
-            var startMinute = this.props.transcriptItem.start_time / 1000 / 60 | 0;
-            var startSecond = this.props.transcriptItem.start_time / 1000 % 60 | 0;
+            var totalSeconds = this.props.transcriptItem.start_time / 1000 | 0;
+            var startMinute = totalSeconds / 60 | 0;
+            var startSecond = totalSeconds % 60 | 0;
             startSecond = ("0" + startSecond).slice(-2);
-            return <li className="transcript-item">
+            return <li className="transcript-item" data-time={totalSeconds}>
                 <a href="javascript:void(0)" onClick={Util.partial(this.props.onClickTranscript, this.props.transcriptItem)}>
                     <div>{startMinute}:{startSecond}</div>
                     <div>{this.props.transcriptItem.text}</div>
@@ -393,6 +394,7 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                 if (this.lastSecondWatched) {
                     video.currentTime = this.lastSecondWatched;
                     Util.log('set current time to: ' + video.currentTime);
+                    delete this.lastSecondWatched;
                 }
             });
 
@@ -402,6 +404,18 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                 // seconds watched to properly update the secondsWatched though.
                 if (this.isPlaying) {
                     this.reportSecondsWatched();
+
+                    var video = this.refs.video.getDOMNode();
+                    var totalSeconds = Math.round(video.currentTime);
+                    var node = $("li[data-time='" + totalSeconds + "']");
+                    var ul = $("ul");
+                    if (node.length > 0) {
+                        var scrollOffset = node.get(0).offsetTop -
+                            $("ul.transcript").get(0).offsetTop;
+                        $("ul.transcript").stop(true, true).animate({
+                            scrollTop: scrollOffset
+                        }, 400);
+                    }
                 }
             }, true);
 
