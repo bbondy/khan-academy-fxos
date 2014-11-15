@@ -3,11 +3,25 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
 
     var TestUtils = React.addons.TestUtils;
     var Simulate = TestUtils.Simulate;
+    var mainView;
+
+    var clickBack = function() {
+        var backButton = TestUtils.findRenderedComponentWithType(mainView, Views.BackButton);
+        var backLink = TestUtils.findRenderedDOMComponentWithTag(backButton, "a").getDOMNode();
+        Simulate.click(backLink);
+    };
+
+    var search = function(term) {
+        var topicSearch = TestUtils.findRenderedComponentWithType(mainView, Views.TopicSearch);
+        var input = TestUtils.findRenderedDOMComponentWithTag(topicSearch, "input").getDOMNode();
+        Simulate.change(input, { target: { value: term} });
+    };
+
+    var MainView = React.createFactory(Views.MainView);
+    var mountNode = document.getElementById("app");
+    $(mountNode).empty();
 
     QUnit.asyncTest("test react views", function(assert) {
-        var MainView = React.createFactory(Views.MainView);
-        var mountNode = document.getElementById("app");
-        $(mountNode).empty();
 
         // Init everything
         Storage.init().then(function(){
@@ -21,21 +35,9 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
             // We don't want to have to wait for results, so just start this and don't wait
             models.CurrentUser.init();
 
-            var mainView = TestUtils.renderIntoDocument(MainView({
+            mainView = TestUtils.renderIntoDocument(MainView({
                 model: models.TopicTree.root
             }));
-
-            var clickBack = function() {
-                var backButton = TestUtils.findRenderedComponentWithType(mainView, Views.BackButton);
-                var backLink = TestUtils.findRenderedDOMComponentWithTag(backButton, "a").getDOMNode();
-                Simulate.click(backLink);
-            };
-
-            var search = function(term) {
-                var topicSearch = TestUtils.findRenderedComponentWithType(mainView, Views.TopicSearch);
-                var input = TestUtils.findRenderedDOMComponentWithTag(topicSearch, "input").getDOMNode();
-                Simulate.change(input, { target: { value: term} });
-            };
 
             var mainViewElements = ["header-title", "search", "icon-menu",
                 "topic-list-container", "sidebar"];
@@ -88,6 +90,11 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
             // Test that video view renders
             link = TestUtils.scryRenderedDOMComponentsWithTag(videoItems[0], "a")[0];
             Simulate.click(link.getDOMNode());
+            // Check to make sure the sidebar contains: Download Video, Open in Website, Share
+            var sidebar = TestUtils.findRenderedComponentWithType(mainView, Views.Sidebar);
+            TestUtils.findRenderedDOMComponentWithClass(sidebar, "download-video-link");
+            TestUtils.findRenderedDOMComponentWithClass(sidebar, "open-in-website-link");
+            TestUtils.findRenderedDOMComponentWithClass(sidebar, "share-link");
             TestUtils.findRenderedDOMComponentWithTag(mainView, "video");
             if (models.CurrentUser.isSignedIn()) {
                 TestUtils.findRenderedDOMComponentWithClass(mainView, "energy-points"); // Only if signed in
@@ -95,72 +102,73 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
                 assert.strictEqual(TestUtils.scryRenderedDOMComponentsWithClass(mainView, "energy-points").length, 0);
             }
             var videoViewer = TestUtils.findRenderedComponentWithType(mainView, Views.VideoViewer);
-            videoViewer.p1.done(function() {
-                var transcriptViewer = TestUtils.findRenderedComponentWithType(videoViewer, Views.TranscriptViewer);
-                var transcriptItems = TestUtils.scryRenderedComponentsWithType(transcriptViewer, Views.TranscriptItem);
-                assert.ok(transcriptItems.length > 0);
-            }).then(function() {
-                // Check to make sure the sidebar contains: Download Video, Open in Website, Share
-                var sidebar = TestUtils.findRenderedComponentWithType(mainView, Views.Sidebar);
-                TestUtils.findRenderedDOMComponentWithClass(sidebar, "download-video-link");
-                TestUtils.findRenderedDOMComponentWithClass(sidebar, "open-in-website-link");
-                TestUtils.findRenderedDOMComponentWithClass(sidebar, "share-link");
-                clickBack();
+            return videoViewer.p1;
+        }).then(function() {
+            var videoViewer = TestUtils.findRenderedComponentWithType(mainView, Views.VideoViewer);
+            var transcriptViewer = TestUtils.findRenderedComponentWithType(videoViewer, Views.TranscriptViewer);
+            var transcriptItems = TestUtils.scryRenderedComponentsWithType(transcriptViewer, Views.TranscriptItem);
+            assert.ok(transcriptItems.length > 0);
+            clickBack();
+        }).then(function() {
+            // Test that an article renders
+            search("Oscillation with angular velocity");
+            var articleItem = TestUtils.findRenderedComponentWithType(mainView, Views.ArticleListItem);
+            link = TestUtils.scryRenderedDOMComponentsWithTag(articleItem, "a")[0];
+            Simulate.click(link.getDOMNode());
+            TestUtils.findRenderedDOMComponentWithTag(mainView, "article");
+            var sidebar = TestUtils.findRenderedComponentWithType(mainView, Views.Sidebar);
+            TestUtils.findRenderedDOMComponentWithClass(sidebar, "download-article-link");
+            assert.strictEqual(TestUtils.scryRenderedDOMComponentsWithClass(sidebar, "open-in-website-link").length, 0);
+            assert.strictEqual(TestUtils.scryRenderedDOMComponentsWithClass(sidebar, "share-link").length, 0);
+            var articleViewer = TestUtils.findRenderedComponentWithType(mainView, Views.ArticleViewer);
+            return articleViewer.p1;
+        }).then(function() {
+            // View setings works
+            sidebar = TestUtils.findRenderedComponentWithType(mainView, Views.Sidebar);
+            var viewSettingsLink = TestUtils.findRenderedDOMComponentWithClass(sidebar, "view-settings-link").getDOMNode();
+            Simulate.click(viewSettingsLink);
+            TestUtils.findRenderedDOMComponentWithClass(mainView, "settings").getDOMNode();
+            clickBack();
 
-                // Test that an article renders
-                search("Oscillation with angular velocity");
-                var articleItem = TestUtils.findRenderedComponentWithType(mainView, Views.ArticleListItem);
-                link = TestUtils.scryRenderedDOMComponentsWithTag(articleItem, "a")[0];
-                Simulate.click(link.getDOMNode());
-                TestUtils.findRenderedDOMComponentWithTag(mainView, "article");
-                TestUtils.findRenderedDOMComponentWithClass(sidebar, "download-article-link");
-                assert.strictEqual(TestUtils.scryRenderedDOMComponentsWithClass(sidebar, "open-in-website-link").length, 0);
-                assert.strictEqual(TestUtils.scryRenderedDOMComponentsWithClass(sidebar, "share-link").length, 0);
+            // View downloads works
+            sidebar = TestUtils.findRenderedComponentWithType(mainView, Views.Sidebar);
+            var viewDownloadsLink = TestUtils.findRenderedDOMComponentWithClass(sidebar, "view-downloads-link").getDOMNode();
+            Simulate.click(viewDownloadsLink);
+            TestUtils.findRenderedDOMComponentWithClass(mainView, "downloads").getDOMNode();
+            clickBack();
 
-                // View setings works
-                sidebar = TestUtils.findRenderedComponentWithType(mainView, Views.Sidebar);
-                var viewSettingsLink = TestUtils.findRenderedDOMComponentWithClass(sidebar, "view-settings-link").getDOMNode();
-                Simulate.click(viewSettingsLink);
-                TestUtils.findRenderedDOMComponentWithClass(mainView, "settings").getDOMNode();
-                clickBack();
+            // Open support link exists
+            sidebar = TestUtils.findRenderedComponentWithType(mainView, Views.Sidebar);
+            TestUtils.findRenderedDOMComponentWithClass(sidebar, "open-support-link");
 
-                // View downloads works
-                sidebar = TestUtils.findRenderedComponentWithType(mainView, Views.Sidebar);
-                var viewDownloadsLink = TestUtils.findRenderedDOMComponentWithClass(sidebar, "view-downloads-link").getDOMNode();
-                Simulate.click(viewDownloadsLink);
-                TestUtils.findRenderedDOMComponentWithClass(mainView, "downloads").getDOMNode();
-                clickBack();
+            ////////////////////
+            // Logged in only tests
+            ////////////////////
 
-                // Open support link exists
-                sidebar = TestUtils.findRenderedComponentWithType(mainView, Views.Sidebar);
-                TestUtils.findRenderedDOMComponentWithClass(sidebar, "open-support-link");
-
-                ////////////////////
-                // Logged in only tests
-                ////////////////////
-
-                if (!models.CurrentUser.isSignedIn()) {
-                    alert("Not signed in, not all tests were run.");
-                    QUnit.start();
-                    return;
-                }
-
-                // Make sure View Profile works correctly
-                sidebar = TestUtils.findRenderedComponentWithType(mainView, Views.Sidebar);
-                var viewProfileLink = TestUtils.findRenderedDOMComponentWithClass(sidebar, "view-profile-link").getDOMNode();
-                Simulate.click(viewProfileLink);
-                TestUtils.findRenderedDOMComponentWithClass(mainView, "profile").getDOMNode();
-                TestUtils.findRenderedDOMComponentWithClass(mainView, "username").getDOMNode();
-                TestUtils.findRenderedDOMComponentWithClass(mainView, "points-header").getDOMNode();
-                TestUtils.findRenderedDOMComponentWithClass(mainView, "energy-points-profile").getDOMNode();
-                assert.strictEqual(TestUtils.scryRenderedDOMComponentsWithClass(mainView, "badge-category-count").length, 6);
-                assert.strictEqual(TestUtils.scryRenderedDOMComponentsWithClass(mainView, "badge-category-icon").length, 6);
-                clickBack();
+            if (!models.CurrentUser.isSignedIn()) {
+                alert("Not signed in, not all tests were run.");
                 QUnit.start();
-            });
+                return;
+            }
 
+            // Make sure View Profile works correctly
+            sidebar = TestUtils.findRenderedComponentWithType(mainView, Views.Sidebar);
+            var viewProfileLink = TestUtils.findRenderedDOMComponentWithClass(sidebar, "view-profile-link").getDOMNode();
+            Simulate.click(viewProfileLink);
+            TestUtils.findRenderedDOMComponentWithClass(mainView, "profile").getDOMNode();
+            TestUtils.findRenderedDOMComponentWithClass(mainView, "username").getDOMNode();
+            TestUtils.findRenderedDOMComponentWithClass(mainView, "points-header").getDOMNode();
+            TestUtils.findRenderedDOMComponentWithClass(mainView, "energy-points-profile").getDOMNode();
+            assert.strictEqual(TestUtils.scryRenderedDOMComponentsWithClass(mainView, "badge-category-count").length, 6);
+            assert.strictEqual(TestUtils.scryRenderedDOMComponentsWithClass(mainView, "badge-category-icon").length, 6);
+            clickBack();
+            QUnit.start();
         }).fail(function(error) {
-            Util.warn(error);
+            if (error) {
+                Util.warn("Promise failed: " + error);
+            } else {
+                Util.warn("Promise failed");
+            }
         });
     });
 
@@ -392,7 +400,6 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
         }).then(function() {
             return Storage.readText("test-file");
         }).done(function(result) {
-            console.log('did the test!!!');
             assert.strictEqual(result, "test");
             QUnit.start();
         });
