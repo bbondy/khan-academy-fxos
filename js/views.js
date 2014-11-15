@@ -298,12 +298,12 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
         },
         componentWillMount: function() {
             if (this.props.article.isDownloaded()) {
-                Storage.readText(this.props.article.getId()).done((result) => {
+                this.p1 = Storage.readText(this.props.article.getId()).done((result) => {
                     Util.log("rendered article from storage");
                     this.props.article.set("content", result);
                 });
             } else {
-                APIClient.getArticle(this.props.article.getId()).done((result) => {
+                this.p1 = APIClient.getArticle(this.props.article.getId()).done((result) => {
                     Util.log("rendered article from web");
                     this.props.article.set("content", result.translated_html_content);
                 }).fail(() => {
