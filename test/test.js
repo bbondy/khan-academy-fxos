@@ -94,64 +94,71 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
             } else {
                 assert.strictEqual(TestUtils.scryRenderedDOMComponentsWithClass(mainView, "energy-points").length, 0);
             }
-            // Check to make sure the sidebar contains: Download Video, Open in Website, Share
-            var sidebar = TestUtils.findRenderedComponentWithType(mainView, Views.Sidebar);
-            TestUtils.findRenderedDOMComponentWithClass(sidebar, "download-video-link");
-            TestUtils.findRenderedDOMComponentWithClass(sidebar, "open-in-website-link");
-            TestUtils.findRenderedDOMComponentWithClass(sidebar, "share-link");
-            clickBack();
+            var videoViewer = TestUtils.findRenderedComponentWithType(mainView, Views.VideoViewer);
+            videoViewer.p1.done(function() {
+                var transcriptViewer = TestUtils.findRenderedComponentWithType(videoViewer, Views.TranscriptViewer);
+                var transcriptItems = TestUtils.scryRenderedComponentsWithType(transcriptViewer, Views.TranscriptItem);
+                assert.ok(transcriptItems.length > 0);
+            }).then(function() {
+                // Check to make sure the sidebar contains: Download Video, Open in Website, Share
+                var sidebar = TestUtils.findRenderedComponentWithType(mainView, Views.Sidebar);
+                TestUtils.findRenderedDOMComponentWithClass(sidebar, "download-video-link");
+                TestUtils.findRenderedDOMComponentWithClass(sidebar, "open-in-website-link");
+                TestUtils.findRenderedDOMComponentWithClass(sidebar, "share-link");
+                clickBack();
 
-            // Test that an article renders
-            search("Oscillation with angular velocity");
-            var articleItem = TestUtils.findRenderedComponentWithType(mainView, Views.ArticleListItem);
-            link = TestUtils.scryRenderedDOMComponentsWithTag(articleItem, "a")[0];
-            Simulate.click(link.getDOMNode());
-            TestUtils.findRenderedDOMComponentWithTag(mainView, "article");
-            TestUtils.findRenderedDOMComponentWithClass(sidebar, "download-article-link");
-            assert.strictEqual(TestUtils.scryRenderedDOMComponentsWithClass(sidebar, "open-in-website-link").length, 0);
-            assert.strictEqual(TestUtils.scryRenderedDOMComponentsWithClass(sidebar, "share-link").length, 0);
+                // Test that an article renders
+                search("Oscillation with angular velocity");
+                var articleItem = TestUtils.findRenderedComponentWithType(mainView, Views.ArticleListItem);
+                link = TestUtils.scryRenderedDOMComponentsWithTag(articleItem, "a")[0];
+                Simulate.click(link.getDOMNode());
+                TestUtils.findRenderedDOMComponentWithTag(mainView, "article");
+                TestUtils.findRenderedDOMComponentWithClass(sidebar, "download-article-link");
+                assert.strictEqual(TestUtils.scryRenderedDOMComponentsWithClass(sidebar, "open-in-website-link").length, 0);
+                assert.strictEqual(TestUtils.scryRenderedDOMComponentsWithClass(sidebar, "share-link").length, 0);
 
-            // View setings works
-            sidebar = TestUtils.findRenderedComponentWithType(mainView, Views.Sidebar);
-            var viewSettingsLink = TestUtils.findRenderedDOMComponentWithClass(sidebar, "view-settings-link").getDOMNode();
-            Simulate.click(viewSettingsLink);
-            TestUtils.findRenderedDOMComponentWithClass(mainView, "settings").getDOMNode();
-            clickBack();
+                // View setings works
+                sidebar = TestUtils.findRenderedComponentWithType(mainView, Views.Sidebar);
+                var viewSettingsLink = TestUtils.findRenderedDOMComponentWithClass(sidebar, "view-settings-link").getDOMNode();
+                Simulate.click(viewSettingsLink);
+                TestUtils.findRenderedDOMComponentWithClass(mainView, "settings").getDOMNode();
+                clickBack();
 
-            // View downloads works
-            sidebar = TestUtils.findRenderedComponentWithType(mainView, Views.Sidebar);
-            var viewDownloadsLink = TestUtils.findRenderedDOMComponentWithClass(sidebar, "view-downloads-link").getDOMNode();
-            Simulate.click(viewDownloadsLink);
-            TestUtils.findRenderedDOMComponentWithClass(mainView, "downloads").getDOMNode();
-            clickBack();
+                // View downloads works
+                sidebar = TestUtils.findRenderedComponentWithType(mainView, Views.Sidebar);
+                var viewDownloadsLink = TestUtils.findRenderedDOMComponentWithClass(sidebar, "view-downloads-link").getDOMNode();
+                Simulate.click(viewDownloadsLink);
+                TestUtils.findRenderedDOMComponentWithClass(mainView, "downloads").getDOMNode();
+                clickBack();
 
-            // Open support link exists
-            sidebar = TestUtils.findRenderedComponentWithType(mainView, Views.Sidebar);
-            TestUtils.findRenderedDOMComponentWithClass(sidebar, "open-support-link");
+                // Open support link exists
+                sidebar = TestUtils.findRenderedComponentWithType(mainView, Views.Sidebar);
+                TestUtils.findRenderedDOMComponentWithClass(sidebar, "open-support-link");
 
-            ////////////////////
-            // Logged in only tests
-            ////////////////////
+                ////////////////////
+                // Logged in only tests
+                ////////////////////
 
-            if (!models.CurrentUser.isSignedIn()) {
-                alert("Not signed in, not all tests were run.");
+                if (!models.CurrentUser.isSignedIn()) {
+                    alert("Not signed in, not all tests were run.");
+                    QUnit.start();
+                    return;
+                }
+
+                // Make sure View Profile works correctly
+                sidebar = TestUtils.findRenderedComponentWithType(mainView, Views.Sidebar);
+                var viewProfileLink = TestUtils.findRenderedDOMComponentWithClass(sidebar, "view-profile-link").getDOMNode();
+                Simulate.click(viewProfileLink);
+                TestUtils.findRenderedDOMComponentWithClass(mainView, "profile").getDOMNode();
+                TestUtils.findRenderedDOMComponentWithClass(mainView, "username").getDOMNode();
+                TestUtils.findRenderedDOMComponentWithClass(mainView, "points-header").getDOMNode();
+                TestUtils.findRenderedDOMComponentWithClass(mainView, "energy-points-profile").getDOMNode();
+                assert.strictEqual(TestUtils.scryRenderedDOMComponentsWithClass(mainView, "badge-category-count").length, 6);
+                assert.strictEqual(TestUtils.scryRenderedDOMComponentsWithClass(mainView, "badge-category-icon").length, 6);
+                clickBack();
                 QUnit.start();
-                return;
-            }
+            });
 
-            // Make sure View Profile works correctly
-            sidebar = TestUtils.findRenderedComponentWithType(mainView, Views.Sidebar);
-            var viewProfileLink = TestUtils.findRenderedDOMComponentWithClass(sidebar, "view-profile-link").getDOMNode();
-            Simulate.click(viewProfileLink);
-            TestUtils.findRenderedDOMComponentWithClass(mainView, "profile").getDOMNode();
-            TestUtils.findRenderedDOMComponentWithClass(mainView, "username").getDOMNode();
-            TestUtils.findRenderedDOMComponentWithClass(mainView, "points-header").getDOMNode();
-            TestUtils.findRenderedDOMComponentWithClass(mainView, "energy-points-profile").getDOMNode();
-            assert.strictEqual(TestUtils.scryRenderedDOMComponentsWithClass(mainView, "badge-category-count").length, 6);
-            assert.strictEqual(TestUtils.scryRenderedDOMComponentsWithClass(mainView, "badge-category-icon").length, 6);
-            clickBack();
-
-            QUnit.start();
         }).fail(function(error) {
             Util.warn(error);
         });
