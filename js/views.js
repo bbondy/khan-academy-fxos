@@ -390,13 +390,15 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
             // Add an event listener to track watched time
             var video = this.refs.video.getDOMNode();
 
-            video.addEventListener("canplay", (e) => {
+            var canPlay = (e) => {
                 if (this.lastSecondWatched) {
                     video.currentTime = this.lastSecondWatched;
                     Util.log('set current time to: ' + video.currentTime);
                     delete this.lastSecondWatched;
                 }
-            });
+                video.removeEventListener("canplay", canPlay);
+            };
+            video.addEventListener("canplay", canPlay);
 
             video.addEventListener("timeupdate", (e) => {
                 // Sometimes a 'timeupdate' event will come before a 'play' event when
