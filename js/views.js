@@ -1060,7 +1060,9 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                             {"title" : contentTitle});
                     }
                 } else {
-                    count = Util.numberWithCommas(count);
+                    // TODO: We don't want commas here so we should change the source
+                    // strings for all locales for count and countStr
+                    // count = Util.numberWithCommas(count);
                     message = document.webL10n.get("content-items-downloaded-succesfully",
                         {"count" : count, "title": contentTitle});
                 }
