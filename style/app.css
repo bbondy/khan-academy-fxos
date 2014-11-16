@@ -430,8 +430,8 @@ article {
 }
 
 .profile .badge-category-icon {
-    width: 5rem;
-    height: 5rem;
+    width: 4rem;
+    height: 4rem;
     display: block;
     position: relative;
     top: auto;
@@ -451,14 +451,14 @@ article {
     border-radius: 5px;
     color: #999;
     font-size: 2rem;
-    height: 4rem;
+    height: 5rem;
     padding-top: 15px;
     position: relative;
     text-align: center;
 }
 
 .profile span.span2 {
-    width: 5rem;
+    width: 4rem;
     display: inline-block;
     margin-right: 0.5rem;
 }
