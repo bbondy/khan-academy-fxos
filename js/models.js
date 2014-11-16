@@ -257,7 +257,7 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
          */
         findContentItems: function(search, maxResults) {
             if (_.isUndefined(maxResults)) {
-                maxResults = 100;
+                maxResults = 40;
             }
             var results = [];
             this._findContentItems(search, results, maxResults);
