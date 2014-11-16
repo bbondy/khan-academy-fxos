@@ -1004,7 +1004,15 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
         },
         onClickDownloadContent: function(model) {
             var totalCount = 1;
-            if (models.TempAppState.get("isDownloadingTopic")) {
+            if (model.isTopic()) {
+                totalCount = model.getChildNotDownloadedCount();
+            }
+
+            // Check for errors
+            if (totalCount === 0) {
+                alert(document.webL10n.get("already-downloaded"));
+                return;
+            } else if (models.TempAppState.get("isDownloadingTopic")) {
                 alert(document.webL10n.get("already-downloading"));
                 return;
             } else if (Util.isMeteredConnection()) {
@@ -1015,15 +1023,15 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                 if (!confirm(document.webL10n.get("limited-bandwidth-warning"))) {
                     return;
                 }
-            } else if (model.isTopic()) {
-                totalCount = model.getChildNotDownloadedCount();
-                if (totalCount === 0) {
-                    alert(document.webL10n.get("already-downloaded"));
-                    return;
-                }
-                totalCount = Util.numberWithCommas(totalCount);
+            }
+
+            // Format to string with commas
+            var totalCountStr = Util.numberWithCommas(totalCount);
+
+            // Prompt to download remaining
+            if (model.isTopic()) {
                 if (!confirm(document.webL10n.get("download-remaining",
-                            {"totalCount": totalCount}))) {
+                            {"totalCount": totalCount, "totalCountStr": totalCountStr}))) {
                     return;
                 }
             }
@@ -1035,7 +1043,7 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                 }
                 count = Util.numberWithCommas(count);
                 var progressMessage = document.webL10n.get("downloading-progress",
-                            {"count" : count, "totalCount": totalCount});
+                            {"count" : count, "totalCount": totalCount, "totalCountStr": totalCountStr});
                 Status.update(progressMessage);
             };
             Status.start();
@@ -1052,6 +1060,7 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                             {"title" : contentTitle});
                     }
                 } else {
+                    count = Util.numberWithCommas(count);
                     message = document.webL10n.get("content-items-downloaded-succesfully",
                         {"count" : count, "title": contentTitle});
                 }
