@@ -766,7 +766,7 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
 
                 <div data-l10n-id="show-downloads-only">Show downloads only</div>
                 <label className="pack-switch">
-                <input title="hello" ref="showDownloadsOnly"
+                <input ref="showDownloadsOnly"
                        type="checkbox"
                        checked={this.props.options.get("showDownloadsOnly")}
                        onChange={this.handleChange}></input>
@@ -801,8 +801,8 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
             var pointsString = document.webL10n.get("points");
             return <div className="profile">
                 <img className="avatar" src={models.CurrentUser.get("userInfo").avatarUrl}/>
-                <h1 className="username">{models.CurrentUser.get("userInfo").nickname || models.CurrentUser.get("userInfo").username}</h1>
-                <h2 className="points-header">{{pointsString}}: <div className="energy-points energy-points-profile">{Util.numberWithCommas(models.CurrentUser.get("userInfo").points)}</div></h2>
+                <div className="username">{models.CurrentUser.get("userInfo").nickname || models.CurrentUser.get("userInfo").username}</div>
+                <div className="points-header">{{pointsString}}: <div className="energy-points energy-points-profile">{Util.numberWithCommas(models.CurrentUser.get("userInfo").points)}</div></div>
 
                 { models.CurrentUser.get("userInfo").badgeCounts ?
                     <div>
