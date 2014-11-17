@@ -439,6 +439,10 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                 this.isPlaying = false;
                 this.stopAnimatingPoints(true);
             }, true);
+            video.addEventListener("ended", (e) => {
+                // If we're full screen, exit out.
+                document.mozCancelFullScreen();
+            });
             video.addEventListener("error", (e) => {
                 if (video.networkState === HTMLMediaElement.NETWORK_NO_SOURCE) {
                     this.setState({showOfflineImage: true});
