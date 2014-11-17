@@ -42,6 +42,7 @@ section[role="region"] > header:first-child h1 {
 }
 [data-type="list"] ul {
     padding-left: 0;
+    padding-bottom: 2rem;
 }
 
 section[role="region"] > header.fixed:first-child {
