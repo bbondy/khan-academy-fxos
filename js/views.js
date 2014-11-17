@@ -555,21 +555,21 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
     var AppHeader = React.createClass({
         render: function() {
                 var backButton;
-                if (this.props.isPaneShowing ||
+                if (this.props.model && (this.props.isPaneShowing ||
                         this.props.model.isContent() ||
                         this.props.model.isTopic() && !this.props.model.isRoot() ||
-                        this.props.model.isContentList()) {
+                        this.props.model.isContentList())) {
                     backButton = <BackButton model={this.props.model}
                                              onClickBack={this.props.onClickBack}/>;
                 }
 
                 var styleObj = {
                     fixed: true,
-                    "topic-header": !this.props.model.isRoot() &&
+                    "topic-header": this.props.model && !this.props.model.isRoot() &&
                         !this.props.isPaneShowing &&
                         (this.props.model.isTopic() || this.props.model.isContent())
                 };
-                var parentDomain = this.props.model.getParentDomain();
+                var parentDomain = this.props.model && this.props.model.getParentDomain();
                 if (parentDomain && !this.props.isPaneShowing) {
                     styleObj[parentDomain.getId()] = true;
                 }
@@ -582,15 +582,20 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                     title = document.webL10n.get("view-profile");
                 } else if (this.props.isSettingsShowing) {
                     title = document.webL10n.get("view-settings");
-                } else if (this.props.model.getTitle()) {
+                } else if (this.props.model && this.props.model.getTitle()) {
                     title = this.props.model.getTitle();
-                } else if (this.props.model.isContentList()) {
+                } else if (this.props.model && this.props.model.isContentList()) {
                     title = document.webL10n.get("search");
+                }
+
+                var menuButton;
+                if (this.props.model) {
+                    menuButton = <MenuButton/>;
                 }
 
                 return <header className={styleClass}>
                         {backButton}
-                        <MenuButton/>
+                        {menuButton}
                         <h1 className="header-title">{title}</h1>
                     </header>;
         }
@@ -1122,7 +1127,11 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
         render: function() {
             var currentModel = this.getCurrentModel();
             var control;
-            if (this.state.showProfile) {
+            if (!currentModel) {
+                // Still loading topic tree
+                control = <div className="app-loading"/>;
+            }
+            else if (this.state.showProfile) {
                 control = <ProfileViewer/>;
             }
             else if (this.state.showDownloads) {
@@ -1147,7 +1156,7 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
             }
 
             var topicSearch;
-            if (!this.isPaneShowing() && !currentModel.isContent()) {
+            if (!this.isPaneShowing() && currentModel && !currentModel.isContent()) {
                 topicSearch = <TopicSearch model={currentModel}
                                            onTopicSearch={this.onTopicSearch}/>;
             }
