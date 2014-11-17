@@ -391,6 +391,7 @@ video, .video-placeholder {
     padding-right: 1rem;
     overflow-y: scroll !important;
     width: 100%;
+    box-sizing: border-box;¬
 }
 
 .transcript li {
