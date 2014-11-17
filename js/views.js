@@ -541,7 +541,7 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
             }
             return <div className="video-viewer-container">
                 {this.state.showOfflineImage ? <img className="video-placeholder" src="img/offline.png"/> :
-                 <video ref="video" controls>
+                 <video ref="video" preload="auto" controls>
                     <source src={videoSrc} type={this.props.video.getContentMimeType()}/>
                  </video>}
                  <div className="video-info-bar">{pointsDiv}</div>
