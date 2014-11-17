@@ -112,7 +112,7 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
             this.allContentItems.length = 0;
             var topicTreePromise = Storage.readText(this.getTopicTreeFilename());
             topicTreePromise.done((topicTree) => {
-                Util.log("Loaded topic tree from local copy");
+                Util.log("Loaded topic tree from local copy, parsing...");
                 this.root = new TopicModel(JSON.parse(topicTree), {parse: true});
                 d.resolve();
             });
@@ -128,6 +128,7 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
                 filename += ".min.js";
                 Util.log("going for pre-installed default file: %s", filename);
                 Util.loadScript(filename).done(() => {
+                    Util.log("Topic tree script loaded, parsing...");
                     this.root = new TopicModel(window.topictree, {parse: true});
                     d.resolve();
                 }).fail(() => {
@@ -361,7 +362,7 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
                 return null;
             }
             if (value.substring(0, 4) !== "http") {
-                value = "http://s3.amazonaws.com/KA-youtube-converted/" + value + ".mp4";
+                value = "http://fastly.kastatic.org/KA-youtube-converted/" + value + ".mp4";
             }
             return value;
         },

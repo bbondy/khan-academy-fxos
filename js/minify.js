@@ -60,8 +60,9 @@
                 node.ka_url = node.ka_url.substring(urlPrefix.length);
             }
 
-            urlPrefix = "http://s3.amazonaws.com/KA-youtube-converted/";
-            if (node.download_urls && node.download_urls.mp4) {
+            urlPrefix = "http://fastly.kastatic.org/KA-youtube-converted/";
+            if (node.download_urls && node.download_urls.mp4 &&
+                    node.download_urls.mp4.indexOf(urlPrefix) === 0) {
                 node.download_urls.mp4 = node.download_urls.mp4.substring(urlPrefix.length);
                 node.download_urls.mp4 = node.download_urls.mp4.substring(0,  node.download_urls.mp4.length - 4);
             }
