@@ -82,7 +82,17 @@ define([], function() {
             if (!connection) {
                 return false;
             }
-            return connection.bandwidth !== Infinity;
+
+            // 1.* emulators return this
+            if (connection.bandwidth === Infinity) {
+                return false;
+            }
+
+            // 2.* devices return this
+            if (connection.type === "wifi" || connection.type === "none") {
+                return false;
+            }
+            return true;
         },
         /**
          * Obtains a URL query parameter
