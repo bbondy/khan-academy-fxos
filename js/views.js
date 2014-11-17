@@ -615,6 +615,18 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
             this.setState({value: topicSearch});
             this.props.onTopicSearch(topicSearch);
         },
+        handleFocus: function(event) {
+            $("html, body").stop(true, true).animate({
+                scrollTop: $(this.refs.search.getDOMNode()).offset().top
+            }, 400);
+        },
+        handleBlur: function(event) {
+            $("html, body").stop(true, true).animate({
+                scrollTop: 0
+            }, 400);
+        },
+
+
         render: function() {
             var style = {
                 width: "100%",
@@ -627,13 +639,17 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                         {"topic": this.props.model.getTitle()});
             }
             return <div>
-                <input className="search"
+                <input ref="search"
+                       className="search"
                        type="searh"
                        placeholder={text}
                        value={this.state.value}
                        required=""
                        style={style}
-                       onChange={this.onChange}/>
+                       onChange={this.onChange}
+                       onFocus={this.handleFocus}
+                       onBlur={this.handleBlur}
+                       />
             </div>;
 
         }
