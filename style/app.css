@@ -511,7 +511,7 @@ label.pack-switch {
 li.faded p.topic-title,
 li.faded p.video-title,
 li.faded p.article-title {
-    color: #ccc;
+    color: #999;
 }
 
 .video-info-bar {
