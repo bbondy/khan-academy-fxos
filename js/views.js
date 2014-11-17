@@ -523,11 +523,8 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
         },
 
         render: function() {
-            var transcriptViewer;
-            if (this.state.transcript) {
-                 transcriptViewer = <TranscriptViewer collection={this.state.transcript}
-                                                      onClickTranscript={this.onClickTranscript} />;
-            }
+            var transcriptViewer = <TranscriptViewer collection={this.state.transcript}
+                                                     onClickTranscript={this.onClickTranscript} />;
             var videoSrc = this.props.video.getDownloadUrl();
             if (this.state.downloadedUrl) {
                 videoSrc = this.state.downloadedUrl;
