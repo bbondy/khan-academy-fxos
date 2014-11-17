@@ -14,8 +14,16 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
     window.Util = Util;
     window.models = models;
 
+    $("body").bind("contextmenu", function (e) {
+        Util.log('contextmenu!');
+        e.preventDefault();
+    });
+
     var MainView = Views.MainView;
     var mountNode = document.getElementById("app");
+
+    // Render the main app chrome
+    var mainView = React.renderComponent(<MainView/>, mountNode);
 
     // Init everything
     Storage.init().then(function(){
@@ -27,12 +35,11 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
     }).then(function() {
         // We don't want to have to wait for results, so just start this and don't wait
         models.CurrentUser.init();
-        // Render everything
-        React.renderComponent(<MainView model={models.TopicTree.root}/>, mountNode);
-        $("body").bind("contextmenu", function (e) {
-            Util.log('contextmenu!');
-            e.preventDefault();
-        });
+
+        console.log("setting main view props");
+        // Start showing the topic tree
+        mainView.setProps({model: models.TopicTree.root});
+        mainView.setState({currentModel: models.TopicTree.root});
     }).fail((error) => {
         alert(error);
         Util.quit();
