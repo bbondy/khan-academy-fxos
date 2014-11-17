@@ -265,6 +265,12 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
             navigator.connection = { metered: false, bandwidth: 33};
             assert.strictEqual(Util.isMeteredConnection(), false);
             assert.strictEqual(Util.isBandwidthCapped(), true);
+            navigator.connection = { type: "wifi" };
+            assert.strictEqual(Util.isBandwidthCapped(), false);
+            navigator.connection = { type: "none" };
+            assert.strictEqual(Util.isBandwidthCapped(), false);
+            navigator.connection = { type: "cellular" };
+            assert.strictEqual(Util.isBandwidthCapped(), true);
         }
         navigator.connection = old;
         Util.loadScript("/test/_test1.js").done(function() {
