@@ -421,6 +421,11 @@ article {
     margin-top: 1rem;
 }
 
+.profile {
+    overflow-y: scroll;
+    height: calc(100% - 8rem);
+}
+
 .sidebar .hot-item {
     font-weight: bold;
 }
