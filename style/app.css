@@ -550,10 +550,9 @@ section[role="region"] > header:first-child h1 {
 }
 
 .app-loading {
-    width: 100%;
     height: 50%;
     background:url('/img/throbber-full.gif') no-repeat center center;
-    background-size: 40%;
+    background-size: 10rem;
 }
 
 #overlay {
