@@ -381,9 +381,17 @@ ul li a p.video-title, ul li a p.article-title {
 }
 
 
-video, .video-placeholder {
+video {
     width: 100%;
     max-height: 50%;
+}
+
+.video-placeholder {
+    width: 100%;
+    background:url('/img/offline.png') no-repeat center center;
+    max-height: 50%;
+    height: 50%;
+    background-color: black;
 }
 
 .transcript {

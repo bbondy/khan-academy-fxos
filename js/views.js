@@ -541,7 +541,7 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
             // I'm not sure exactly why but I guess maybe it pushes out the painting to its own layer
             // or something along those lines.
             return <div className="video-viewer-container">
-                {this.state.showOfflineImage ? <img className="video-placeholder" src="img/offline.png"/> :
+                {this.state.showOfflineImage ? <div className="video-placeholder"/> :
                  <video ref="video" preload="auto" controls>
                     <source src={videoSrc} type={this.props.video.getContentMimeType()}/>
                  </video>}
