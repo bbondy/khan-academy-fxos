@@ -22,6 +22,14 @@ define([], function() {
             }
         },
         /**
+         * Wrapper around console.error
+         */
+        error: function(message, ...rest) {
+            if (typeof console !== 'undefined') {
+                console.error(message, ...rest);
+            }
+        },
+        /**
          * We don't need to list en here since that is the default
          */
         supportedLocales: ["boxes", "es", "fr", "pt"],

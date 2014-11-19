@@ -64,7 +64,7 @@ define(["oauth", "util"], function(_oauth, Util) {
                     d.resolve();
                 },
                 error: (xhr, status) => {
-                    console.error(`error: ${status}: %o`, xhr);
+                    Util.error(`error: ${status}: %o`, xhr);
                     d.reject();
                 }
             }));
@@ -178,7 +178,7 @@ define(["oauth", "util"], function(_oauth, Util) {
                     d.resolve(data);
                 },
                 error: function(xhr, status) {
-                    console.error(`error: ${status}: %o`, xhr);
+                    Util.error(`error: ${status}: %o`, xhr);
                     d.reject();
                 }
             }));
