@@ -826,6 +826,10 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
         },
         render: function() {
             var pointsString = document.webL10n.get("points");
+            // TODO(bbondy): The title attributes on the images need to change
+            // because you can't hover with your finger on FxOS Maybe just
+            // when you tap it, it gives you the name underneath or something
+            // like that.
             return <div className="profile">
                 <img className="avatar" src={models.CurrentUser.get("userInfo").avatarUrl}/>
                 <div className="username">{models.CurrentUser.get("userInfo").nickname || models.CurrentUser.get("userInfo").username}</div>
