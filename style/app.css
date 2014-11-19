@@ -513,6 +513,10 @@ article {
     margin-bottom: 2rem;
 }
 
+.energy-points-video {
+    vertical-align:middle
+}
+
 label.pack-switch {
     margin-left: 1em;
 }
@@ -524,6 +528,8 @@ li.faded p.article-title {
 }
 
 .video-info-bar {
+    border-bottom: solid 0.1rem #e7e7e7;
+    text-align: right;
 }
 
 .pull-right {
@@ -573,4 +579,12 @@ section[role="region"] > header:first-child h1 {
     opacity: 0.01;
     z-index: 10000;
     pointer-events: none;
+}
+
+span.fa-arrows-alt {
+    padding: 0.1rem;
+    margin-right: 1rem;
+    margin-left: 1rem;
+    z-index: 100;
+    vertical-align:middle
 }

@@ -396,7 +396,7 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                     Util.log('set current time to: ' + video.currentTime);
                     delete this.lastSecondWatched;
                 }
-                video.removeEventListener("canplay", canPlay);
+                this.setState({showOfflineImage: false});
             };
             video.addEventListener("canplay", canPlay);
 
@@ -522,6 +522,18 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
             }
         },
 
+        onReloadVideo: function() {
+            Util.log("Calling video load!");
+            var video = this.refs.video.getDOMNode();
+            video.load();
+        },
+
+        onFullscreen: function() {
+            console.log("onFullScreen!!!");
+            var video = this.refs.video.getDOMNode();
+            video.mozRequestFullScreen();
+        },
+
         render: function() {
             var transcriptViewer = <TranscriptViewer collection={this.state.transcript}
                                                      onClickTranscript={this.onClickTranscript} />;
@@ -534,18 +546,22 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                         {"earned" : this.props.video.getPoints(), "available": this.availablePoints});
             var pointsDiv;
             if (models.CurrentUser.isSignedIn()) {
-                pointsDiv = <div className="energy-points energy-points-video pull-right">{pointsString}</div>;
+                pointsDiv = <div className="energy-points energy-points-video">{pointsString}</div>;
             }
+
+            var fullscreenButton = !this.state.showOfflineImage ?
+                <span onClick={this.onFullscreen} className="fa fa-arrows-alt"></span> : null;
 
             // The overlay div helps with a bug where html5 video sometimes doesn't render properly.
             // I'm not sure exactly why but I guess maybe it pushes out the painting to its own layer
             // or something along those lines.
             return <div className="video-viewer-container">
-                {this.state.showOfflineImage ? <div className="video-placeholder"/> :
+                {this.state.showOfflineImage ?
+                 <div className="video-placeholder" onClick={this.onReloadVideo}/> :
                  <video ref="video" preload="auto" controls>
                     <source src={videoSrc} type={this.props.video.getContentMimeType()}/>
                  </video>}
-                 <div className="video-info-bar">{pointsDiv}</div>
+                 <div className="video-info-bar">{pointsDiv}{fullscreenButton}</div>
                  <div id="overlay"></div>
                 {transcriptViewer}
             </div>;
@@ -1161,7 +1177,7 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
             } else if (currentModel.isArticle()) {
                 control = <ArticleViewer  article={currentModel}/>;
             } else {
-                console.error("Unrecognized content item!");
+                Util.error("Unrecognized content item!");
             }
 
             var topicSearch;
