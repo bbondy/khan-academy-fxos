@@ -639,16 +639,17 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
             this.props.onTopicSearch(topicSearch);
         },
         handleFocus: function(event) {
-            $("html, body").stop(true, true).animate({
-                scrollTop: $(this.refs.search.getDOMNode()).offset().top
-            }, 400);
+            setTimeout(() => {
+                $("html, body").stop(true, true).animate({
+                    scrollTop: $(this.refs.search.getDOMNode()).offset().top
+                }, 500);
+            }, 500);
         },
         handleBlur: function(event) {
             $("html, body").stop(true, true).animate({
                 scrollTop: 0
-            }, 400);
+            }, 500);
         },
-
 
         render: function() {
             var style = {
