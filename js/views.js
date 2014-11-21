@@ -345,13 +345,15 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
      */
     var VideoViewer = React.createClass({
         componentWillMount: function() {
-            this.p1 = APIClient.getVideoTranscript(this.props.video.getYoutubeId()).done((transcript) => {
-                if (!this.isMounted()) {
-                    return;
-                }
-                // This will cause a second re-render but that's OK
-                this.setState({transcript: transcript});
-            });
+            if (models.AppOptions.get("showTranscripts")) {
+                this.p1 = APIClient.getVideoTranscript(this.props.video.getYoutubeId()).done((transcript) => {
+                    if (!this.isMounted()) {
+                        return;
+                    }
+                    // This will cause a second re-render but that's OK
+                    this.setState({transcript: transcript});
+                });
+            }
 
             if (this.props.video.isDownloaded()) {
                 Storage.readAsBlob(this.props.video.getId()).done((result) => {
@@ -384,7 +386,7 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
             video.play();
         },
         getInitialState: function() {
-            return { };
+            return { showOfflineImage: false };
         },
         componentDidMount: function() {
             // Add an event listener to track watched time
@@ -528,15 +530,13 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
             video.load();
         },
 
-        onFullscreen: function() {
-            console.log("onFullScreen!!!");
-            var video = this.refs.video.getDOMNode();
-            video.mozRequestFullScreen();
-        },
-
         render: function() {
-            var transcriptViewer = <TranscriptViewer collection={this.state.transcript}
+            var transcriptViewer;
+            if (models.AppOptions.get("showTranscripts")) {
+                transcriptViewer = <TranscriptViewer collection={this.state.transcript}
                                                      onClickTranscript={this.onClickTranscript} />;
+            }
+
             var videoSrc = this.props.video.getDownloadUrl();
             if (this.state.downloadedUrl) {
                 videoSrc = this.state.downloadedUrl;
@@ -549,8 +549,9 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                 pointsDiv = <div className="energy-points energy-points-video">{pointsString}</div>;
             }
 
-            var fullscreenButton = !this.state.showOfflineImage ?
-                <span onClick={this.onFullscreen} className="fa fa-arrows-alt"></span> : null;
+            var videoClass = cx({
+              'video-has-transcript': false//!!this.state.transcript,
+            });
 
             // The overlay div helps with a bug where html5 video sometimes doesn't render properly.
             // I'm not sure exactly why but I guess maybe it pushes out the painting to its own layer
@@ -558,10 +559,10 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
             return <div className="video-viewer-container">
                 {this.state.showOfflineImage ?
                  <div className="video-placeholder" onClick={this.onReloadVideo}/> :
-                 <video ref="video" preload="auto" controls>
+                 <video className={videoClass} ref="video" preload="auto" controls>
                     <source src={videoSrc} type={this.props.video.getContentMimeType()}/>
                  </video>}
-                 <div className="video-info-bar">{pointsDiv}{fullscreenButton}</div>
+                 <div className="video-info-bar">{pointsDiv}</div>
                  <div id="overlay"></div>
                 {transcriptViewer}
             </div>;
@@ -801,8 +802,12 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
      * global state.
      */
     var SettingsViewer = React.createClass({
-        handleChange: function(event) {
+        handleShowDownloadsChange: function(event) {
             this.props.options.set("showDownloadsOnly", event.target.checked);
+            this.props.options.save();
+        },
+        handleShowTranscriptsChange: function(event) {
+            this.props.options.set("showTranscripts", event.target.checked);
             this.props.options.save();
         },
         render: function() {
@@ -813,9 +818,19 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                 <input ref="showDownloadsOnly"
                        type="checkbox"
                        checked={this.props.options.get("showDownloadsOnly")}
-                       onChange={this.handleChange}></input>
+                       onChange={this.handleShowDownloadsChange}></input>
                 <span></span>
                 </label>
+
+                <div data-l10n-id="show-transcripts">Show transcripts</div>
+                <label className="pack-switch">
+                <input ref="showTranscripts"
+                       type="checkbox"
+                       checked={this.props.options.get("showTranscripts")}
+                       onChange={this.handleShowTranscriptsChange}></input>
+                <span></span>
+                </label>
+
             </div>;
         }
     });

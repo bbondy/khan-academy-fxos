@@ -383,7 +383,15 @@ ul li a p.video-title, ul li a p.article-title {
 
 video {
     width: 100%;
+    max-height: calc(100% - 5rem);
+}
+
+video.video-has-transcript {
     max-height: 50%;
+}
+
+video ~ !.transcript {
+    max-height; 100%;
 }
 
 .video-placeholder {
