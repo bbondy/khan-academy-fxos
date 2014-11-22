@@ -522,7 +522,6 @@ article {
 }
 
 .energy-points-video {
-    vertical-align:middle
 }
 
 label.pack-switch {
@@ -536,8 +535,6 @@ li.faded p.article-title {
 }
 
 .video-info-bar {
-    border-bottom: solid 0.1rem #e7e7e7;
-    text-align: right;
 }
 
 .pull-right {

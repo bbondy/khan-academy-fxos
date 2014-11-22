@@ -532,7 +532,7 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
 
         render: function() {
             var transcriptViewer;
-            if (models.AppOptions.get("showTranscripts")) {
+            if (!!this.state.transcript) {
                 transcriptViewer = <TranscriptViewer collection={this.state.transcript}
                                                      onClickTranscript={this.onClickTranscript} />;
             }
@@ -546,11 +546,11 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                         {"earned" : this.props.video.getPoints(), "available": this.availablePoints});
             var pointsDiv;
             if (models.CurrentUser.isSignedIn()) {
-                pointsDiv = <div className="energy-points energy-points-video">{pointsString}</div>;
+                pointsDiv = <div className="energy-points energy-points-video pull-right">{pointsString}</div>;
             }
 
             var videoClass = cx({
-              'video-has-transcript': false//!!this.state.transcript,
+              'video-has-transcript': !!this.state.transcript
             });
 
             // The overlay div helps with a bug where html5 video sometimes doesn't render properly.
