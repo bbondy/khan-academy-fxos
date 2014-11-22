@@ -386,6 +386,12 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                 Util.log("Revoking: " + this.state.downloadedUrl);
                 URL.revokeObjectURL(this.state.downloadedUrl);
             }
+            var video = this.refs.video.getDOMNode();
+            // Do a reset to make sure all data is cleared right away.
+            // Otherwise the app degrades and doesn't play videos anymore
+            // after about 15 minutes of use while viewing videos.
+            video.src = "";
+            video.load();
         },
         onClickTranscript: function(obj) {
             var startSecond = obj.start_time / 1000 | 0;
@@ -442,6 +448,7 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
             video.addEventListener("play", (e) => {
                 // Update lastWatchedTimeSinceLastUpdate so that we
                 // don't count paused time towards secondsWatched
+                Util.warn("Video play: %o", e);
                 this.lastWatchedTimeSinceLastUpdate = new Date();
                 this.isPlaying = true;
                 this.animatePoints();
@@ -468,6 +475,30 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                     this.stopAnimatingPoints(false);
                     this.setState({showOfflineImage: true});
                 }
+
+                if (!e.target || !e.target.error ||
+                        e.target.error.code === undefined) {
+                    return;
+                }
+
+                // video playback failed - show a message saying why
+                switch (e.target.error.code) {
+                    case e.target.error.MEDIA_ERR_ABORTED:
+                        Util.warn("video error: You aborted the video playback.");
+                    break;
+                    case e.target.error.MEDIA_ERR_NETWORK:
+                        Util.warn("video error: A network error caused the video download to fail part-way.");
+                    break;
+                    case e.target.error.MEDIA_ERR_DECODE:
+                        Util.warn("The video playback was aborted due to a corruption problem or because the video used features your browser did not support.");
+                    break;
+                    case e.target.error.MEDIA_ERR_SRC_NOT_SUPPORTED:
+                        Util.warn("The video could not be loaded, either because the server or network failed or because the format is not supported.");
+                        break;
+                    default:
+                        Util.warn("An unknown error occurred.");
+                        break;
+               }
             }, true);
         },
 
@@ -545,8 +576,9 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
 
         onReloadVideo: function() {
             Util.log("Calling video load!");
-            var video = this.refs.video.getDOMNode();
-            video.load();
+            if (this.refs.video) {
+               this.refs.video.getDOMNode().load();
+            }
         },
 
         render: function() {
@@ -575,11 +607,12 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
             // The overlay div helps with a bug where html5 video sometimes doesn't render properly.
             // I'm not sure exactly why but I guess maybe it pushes out the painting to its own layer
             // or something along those lines.
+            // http://fastly.kastatic.org/KA-youtube-converted/wx2gI8iwMCA.mp4/wx2gI8iwMCA.mp4
+                    //<source src={videoSrc} type={this.props.video.getContentMimeType()}/>
             return <div className="video-viewer-container">
                 {this.state.showOfflineImage ?
                  <div className="video-placeholder" onClick={this.onReloadVideo}/> :
-                 <video className={videoClass} ref="video" preload="auto" controls>
-                    <source src={videoSrc} type={this.props.video.getContentMimeType()}/>
+                 <video className={videoClass} src={videoSrc} ref="video" preload="auto" controls>
                  </video>}
                  <div className="video-info-bar">{pointsDiv}</div>
                  <div id="overlay"></div>
