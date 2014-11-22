@@ -345,6 +345,7 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
      */
     var VideoViewer = React.createClass({
         componentWillMount: function() {
+            Util.log("VideoViewer will mount");
             if (models.AppOptions.get("showTranscripts")) {
                 this.p1 = APIClient.getVideoTranscript(this.props.video.getYoutubeId()).done((transcript) => {
                     if (!this.isMounted() || transcript && transcript.length === 0) {
@@ -368,10 +369,11 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
 
             Util.log('video: %o', this.props.video);
             this.videoId = this.props.video.getId();
+            this.initSecondWatched = 0;
             this.lastSecondWatched = 0;
             if (this.props.video.get("lastSecondWatched") &&
                     this.props.video.get("lastSecondWatched") + 10 < this.props.video.getDuration()) {
-                this.lastSecondWatched = this.props.video.get("lastSecondWatched");
+                this.initSecondWatched = this.props.video.get("lastSecondWatched");
             }
             this.secondsWatched = 0;
             this.lastReportedTime = new Date();
@@ -380,8 +382,10 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
             this.pointsObj = {num: this.props.video.getPoints()};
         },
         componentWillUnmount: function() {
-            console.log(this.state.downloadedUrl);
-            URL.revokeObjectURL(this.state.downloadedUrl);
+            if (this.state.downloadedUrl) {
+                Util.log("Revoking: " + this.state.downloadedUrl);
+                URL.revokeObjectURL(this.state.downloadedUrl);
+            }
         },
         onClickTranscript: function(obj) {
             var startSecond = obj.start_time / 1000 | 0;
@@ -397,12 +401,17 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
             var video = this.refs.video.getDOMNode();
 
             var canPlay = (e) => {
-                if (this.lastSecondWatched) {
-                    video.currentTime = this.lastSecondWatched;
+                if (this.initSecondWatched) {
+                    video.currentTime = this.initSecondWatched;
                     Util.log('set current time to: ' + video.currentTime);
-                    delete this.lastSecondWatched;
+                    delete this.initSecondWatched;
                 }
-                this.setState({showOfflineImage: false});
+                Util.warn("Video error: %o", e);
+                if (this.state.showOfflineImage) {
+                    Util.log("Video has no source.", e);
+                    this.stopAnimatingPoints(false);
+                    this.setState({showOfflineImage: false});
+                }
             };
             video.addEventListener("canplay", canPlay);
 
