@@ -52,6 +52,13 @@ Your exact path will differ depending on your OS, your profile, and the simulato
 Some other storage for smaller cached values is used with local storage.
 You can clear that simply by opening the console and executing: `localStorage.clear();`
 
+## ADB commands
+
+For OOM failures, check for sigkill being sent to app.
+The size is listed in pages (4 KB/page).
+
+`adb shell dmesg | tail -20`
+
 ## Contribute
 
 Please feel free to contribute directly by adding pull requests and issues through github.
