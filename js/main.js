@@ -14,10 +14,22 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
     window.Util = Util;
     window.models = models;
 
-    $("body").bind("contextmenu", function (e) {
+    $("body").bind("contextmenu", function(e) {
         Util.log('contextmenu!');
         e.preventDefault();
     });
+
+    // App is moving to background
+    $(document).bind("visibilitychange", function(e) {
+        if (document.hidden) {
+            Util.log("visibility changing (hide)");
+            // TODO(bbondy): Try to free up resources here for a smaller chance
+            // of getting discarded.
+        } else {
+            Util.log("visibility changing (show)");
+        }
+    });
+
 
     var MainView = Views.MainView;
     var mountNode = document.getElementById("app");
