@@ -347,7 +347,7 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
         componentWillMount: function() {
             if (models.AppOptions.get("showTranscripts")) {
                 this.p1 = APIClient.getVideoTranscript(this.props.video.getYoutubeId()).done((transcript) => {
-                    if (!this.isMounted()) {
+                    if (!this.isMounted() || transcript && transcript.length === 0) {
                         return;
                     }
                     // This will cause a second re-render but that's OK
@@ -407,6 +407,9 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
             video.addEventListener("canplay", canPlay);
 
             video.addEventListener("timeupdate", (e) => {
+                if (!this.isMounted()) {
+                    return;
+                }
                 // Sometimes a 'timeupdate' event will come before a 'play' event when
                 // resuming a paused video. We need to get the play event before reporting
                 // seconds watched to properly update the secondsWatched though.
