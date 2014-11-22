@@ -379,6 +379,10 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
             this.pointsPerReport = this.availablePoints * this.MIN_SECONDS_BETWEEN_REPORTS / this.props.video.getDuration();
             this.pointsObj = {num: this.props.video.getPoints()};
         },
+        componentWillUnmount: function() {
+            console.log(this.state.downloadedUrl);
+            URL.revokeObjectURL(this.state.downloadedUrl);
+        },
         onClickTranscript: function(obj) {
             var startSecond = obj.start_time / 1000 | 0;
             var video = this.refs.video.getDOMNode();
