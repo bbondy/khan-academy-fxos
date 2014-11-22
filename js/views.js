@@ -421,6 +421,14 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
             };
             video.addEventListener("canplay", canPlay);
 
+            // Called when network state changes
+            video.addEventListener("progress", () => {
+                if (!this.isMounted()) {
+                    return;
+                }
+                Util.log("Network state changed: ", video.networkState);
+            });
+
             video.addEventListener("timeupdate", (e) => {
                 if (!this.isMounted()) {
                     return;
@@ -756,7 +764,7 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                 if (this.props.model.isDownloaded()) {
                     var text = document.webL10n.get(this.props.model.isVideo() ? "delete-downloaded-video" : "delete-downloaded-article");
                     items.push(<li className="hot-item">
-                            <a href="#" onClick={Util.partial(this.props.onClickDeleteDownloadedVideo, this.props.model)}>{{text}}</a>
+                            <a href="#" onClick={Util.partial(this.props.onClickDeleteDownloadedContent, this.props.model)}>{{text}}</a>
                         </li>);
                 } else {
                     var text = document.webL10n.get(this.props.model.isVideo() ? "download-video" : "download-article");
@@ -1193,7 +1201,7 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
         onClickCancelDownloadContent: function(model) {
             Downloads.cancelDownloading();
         },
-        onClickDeleteDownloadedVideo: function(video) {
+        onClickDeleteDownloadedContent: function(video) {
             Downloads.deleteContent(video);
         },
         isPaneShowing: function() {
@@ -1266,7 +1274,7 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                          onClickViewOnKA={this.onClickViewOnKA}
                          onClickShare={this.onClickShare}
                          onClickCancelDownloadContent={this.onClickCancelDownloadContent}
-                         onClickDeleteDownloadedVideo={this.onClickDeleteDownloadedVideo}
+                         onClickDeleteDownloadedContent={this.onClickDeleteDownloadedContent}
                          isPaneShowing={this.isPaneShowing()}
                          isDownloadsShowing={this.state.showDownloads}
                          isProfileShowing={this.state.showProfile}
