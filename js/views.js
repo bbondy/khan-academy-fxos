@@ -453,7 +453,10 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                 document.mozCancelFullScreen();
             });
             video.addEventListener("error", (e) => {
+                Util.warn("Video error: %o", e);
                 if (video.networkState === HTMLMediaElement.NETWORK_NO_SOURCE) {
+                    Util.log("Video has no source.", e);
+                    this.stopAnimatingPoints(false);
                     this.setState({showOfflineImage: true});
                 }
             }, true);
