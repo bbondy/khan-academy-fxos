@@ -709,7 +709,7 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
         handleBlur: function(event) {
             $("html, body").stop(true, true).animate({
                 scrollTop: 0
-            }, 500);
+            }, 700);
         },
 
         render: function() {
@@ -1227,6 +1227,11 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
         },
         render: function() {
             var currentModel = this.getCurrentModel();
+
+            // Make sure scrollTop is at the top of the page
+            // This is in case the search box scrolling doesn't get an onblur
+            $("html, body").scrollTop(0);
+
             var control;
             if (!currentModel) {
                 // Still loading topic tree
