@@ -21,6 +21,14 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
     var mountNode = document.getElementById("app");
     $(mountNode).empty();
 
+    QUnit.asyncTest("models.AppOptions.fetch defaults", function(assert) {
+        expect(2);
+        models.AppOptions.fetch().done(function() {
+            assert.strictEqual(models.AppOptions.get("showDownloadsOnly"), false);
+            assert.strictEqual(models.AppOptions.get("showTranscripts"), true);
+            QUnit.start();
+        });
+    });
     QUnit.asyncTest("test react views", function(assert) {
 
         // Init everything
@@ -86,7 +94,8 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
                 return videoItem.props.video.getTitle() === "Harlow monkey experiments";
             }));
 
-            // Test that video view renders
+            // Test that video view render with transcripts
+            models.AppOptions.set("showTranscripts", true);
             link = TestUtils.scryRenderedDOMComponentsWithTag(videoItems[0], "a")[0];
             Simulate.click(link.getDOMNode());
             // Check to make sure the sidebar contains: Download Video, Open in Website, Share
@@ -101,14 +110,24 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
                 assert.strictEqual(TestUtils.scryRenderedDOMComponentsWithClass(mainView, "energy-points").length, 0);
             }
             var videoViewer = TestUtils.findRenderedComponentWithType(mainView, Views.VideoViewer);
-            return videoViewer.p1;
+            return videoViewer.transcriptPromise;
         }).then(function() {
             var videoViewer = TestUtils.findRenderedComponentWithType(mainView, Views.VideoViewer);
             var transcriptViewer = TestUtils.findRenderedComponentWithType(videoViewer, Views.TranscriptViewer);
             var transcriptItems = TestUtils.scryRenderedComponentsWithType(transcriptViewer, Views.TranscriptItem);
             assert.ok(transcriptItems.length > 0);
             clickBack();
-        }).then(function() {
+
+            // Make sure a video with transcript option off has no transcript promise
+            models.AppOptions.set("showTranscripts", false);
+            search("monkey");
+            var videoItems = TestUtils.scryRenderedComponentsWithType(mainView, Views.VideoListItem);
+            link = TestUtils.scryRenderedDOMComponentsWithTag(videoItems[0], "a")[0];
+            Simulate.click(link.getDOMNode());
+            videoViewer = TestUtils.findRenderedComponentWithType(mainView, Views.VideoViewer);
+            assert.ok(!videoViewer.transcriptPromise);
+            clickBack();
+
             // Test that an article renders
             search("Oscillation with angular velocity");
             var articleItem = TestUtils.findRenderedComponentWithType(mainView, Views.ArticleListItem);
@@ -383,16 +402,6 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
         expect(1);
         models.CurrentUser.init().done(function() {
             assert.ok(models.CurrentUser.initialized);
-            QUnit.start();
-        });
-    });
-    QUnit.asyncTest("models.AppOptions.fetch", function(assert) {
-        expect(2);
-        models.AppOptions.fetch().done(function() {
-            assert.strictEqual(models.AppOptions.get("showDownloadsOnly"), false);
-        });
-        models.AppOptions.fetch().done(function() {
-            assert.strictEqual(models.AppOptions.get("showTranscripts"), true);
             QUnit.start();
         });
     });
