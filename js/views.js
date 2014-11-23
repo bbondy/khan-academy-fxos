@@ -1230,7 +1230,9 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
 
             // Make sure scrollTop is at the top of the page
             // This is in case the search box scrolling doesn't get an onblur
-            $("html, body").scrollTop(0);
+            if (currentModel && !currentModel.isContentList()) {
+                $("html, body").scrollTop(0);
+            }
 
             var control;
             if (!currentModel) {
