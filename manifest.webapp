@@ -1,5 +1,5 @@
 {
-  "version": "0.1",
+  "version": "1.0",
   "name": "Khan Academy",
   "description": "Khan Academy allows you to learn almost anything for free",
   "launch_path": "/index.html",
