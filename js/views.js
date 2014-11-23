@@ -348,7 +348,7 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
             Util.log("VideoViewer will mount");
             if (models.AppOptions.get("showTranscripts")) {
                 this.p1 = APIClient.getVideoTranscript(this.props.video.getYoutubeId()).done((transcript) => {
-                    if (!this.isMounted() || transcript && transcript.length === 0) {
+                    if (transcript && transcript.length === 0) {
                         return;
                     }
                     // This will cause a second re-render but that's OK
@@ -358,9 +358,6 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
 
             if (this.props.video.isDownloaded()) {
                 Storage.readAsBlob(this.props.video.getId()).done((result) => {
-                    if (!this.isMounted()) {
-                        return;
-                    }
                     var download_url = URL.createObjectURL(result);
                     Util.log('download url is: ' + download_url);
                     this.setState({downloadedUrl: download_url});
@@ -618,11 +615,11 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
             // I'm not sure exactly why but I guess maybe it pushes out the painting to its own layer
             // or something along those lines.
             // http://fastly.kastatic.org/KA-youtube-converted/wx2gI8iwMCA.mp4/wx2gI8iwMCA.mp4
-                    //<source src={videoSrc} type={this.props.video.getContentMimeType()}/>
             return <div className="video-viewer-container">
                 {this.state.showOfflineImage ?
                  <div className="video-placeholder" onClick={this.onReloadVideo}/> :
-                 <video className={videoClass} src={videoSrc} ref="video" preload="auto" controls>
+                 <video className={videoClass} src={videoSrc} ref="video" preload="auto"
+                        type={this.props.video.getContentMimeType()} controls>
                  </video>}
                  <div className="video-info-bar">{pointsDiv}</div>
                  <div id="overlay"></div>
