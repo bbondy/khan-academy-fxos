@@ -386,12 +386,14 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                 Util.log("Revoking: " + this.state.downloadedUrl);
                 URL.revokeObjectURL(this.state.downloadedUrl);
             }
-            var video = this.refs.video.getDOMNode();
-            // Do a reset to make sure all data is cleared right away.
-            // Otherwise the app degrades and doesn't play videos anymore
-            // after about 15 minutes of use while viewing videos.
-            video.src = "";
-            video.load();
+            if (this.refs.video) {
+                var video = this.refs.video.getDOMNode();
+                // Do a reset to make sure all data is cleared right away.
+                // Otherwise the app degrades and doesn't play videos anymore
+                // after about 15 minutes of use while viewing videos.
+                video.src = "";
+                video.load();
+            }
         },
         onClickTranscript: function(obj) {
             var startSecond = obj.start_time / 1000 | 0;
