@@ -158,7 +158,7 @@ define(["util", "storage", "models", "apiclient"],
                 var url = contentItem.getDownloadUrl();
                 var req = new XMLHttpRequest({mozSystem: true});
                 req.open("GET", url, true);
-                req.responseType = "blob";
+                req.responseType = "arraybuffer";
                 req.onload = () => {
                     handleContentLoaded(req.response);
                 };
