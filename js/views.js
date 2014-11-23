@@ -347,12 +347,16 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
         componentWillMount: function() {
             Util.log("VideoViewer will mount");
             if (models.AppOptions.get("showTranscripts")) {
-                this.p1 = APIClient.getVideoTranscript(this.props.video.getYoutubeId()).done((transcript) => {
+                this.transcriptPromise = $.Deferred();
+                APIClient.getVideoTranscript(this.props.video.getYoutubeId()).done((transcript) => {
                     if (transcript && transcript.length === 0) {
                         return;
                     }
                     // This will cause a second re-render but that's OK
                     this.setState({transcript: transcript});
+                    this.transcriptPromise.resolve();
+                }).fail((e) => {
+                    this.transcriptPromise.reject(e);
                 });
             }
 
@@ -390,6 +394,7 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                 video.src = "";
                 video.load();
             }
+            this.cleanedUp = true;
         },
         onClickTranscript: function(obj) {
             var startSecond = obj.start_time / 1000 | 0;
@@ -479,7 +484,7 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                 if (video.networkState === HTMLMediaElement.NETWORK_NO_SOURCE) {
                     Util.log("Video has no source.", e);
                     this.stopAnimatingPoints(false);
-                    if (!this.state.downloadedUrl) {
+                    if (!this.state.downloadedUrl && !this.cleanedUp) {
                         this.setState({showOfflineImage: true});
                     }
                 }
