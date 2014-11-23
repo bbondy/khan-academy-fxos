@@ -359,8 +359,7 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
             if (this.props.video.isDownloaded()) {
                 Storage.readAsBlob(this.props.video.getId()).done((result) => {
                     var download_url = URL.createObjectURL(result);
-                    Util.log('download url is: ' + download_url);
-                    this.setState({downloadedUrl: download_url});
+                    this.setState({downloadedUrl: download_url, showOfflineImage: false});
                 });
             }
 
@@ -480,7 +479,9 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                 if (video.networkState === HTMLMediaElement.NETWORK_NO_SOURCE) {
                     Util.log("Video has no source.", e);
                     this.stopAnimatingPoints(false);
-                    this.setState({showOfflineImage: true});
+                    if (!this.state.downloadedUrl) {
+                        this.setState({showOfflineImage: true});
+                    }
                 }
 
                 if (!e.target || !e.target.error ||
@@ -616,7 +617,7 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
             // or something along those lines.
             // http://fastly.kastatic.org/KA-youtube-converted/wx2gI8iwMCA.mp4/wx2gI8iwMCA.mp4
             return <div className="video-viewer-container">
-                {this.state.showOfflineImage ?
+                {this.state.showOfflineImage?
                  <div className="video-placeholder" onClick={this.onReloadVideo}/> :
                  <video className={videoClass} src={videoSrc} ref="video" preload="auto"
                         type={this.props.video.getContentMimeType()} controls>
