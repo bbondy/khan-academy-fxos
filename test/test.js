@@ -22,10 +22,11 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
     $(mountNode).empty();
 
     QUnit.asyncTest("models.AppOptions.fetch defaults", function(assert) {
-        expect(2);
+        expect(3);
         models.AppOptions.fetch().done(function() {
             assert.strictEqual(models.AppOptions.get("showDownloadsOnly"), false);
             assert.strictEqual(models.AppOptions.get("showTranscripts"), true);
+            assert.strictEqual(models.AppOptions.get("useYouTubePlayer"), true);
             QUnit.start();
         });
     });

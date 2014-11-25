@@ -767,7 +767,8 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
     var AppOptionsModel = Backbone.Model.extend({
         defaults: {
             showDownloadsOnly: false,
-            showTranscripts: true
+            showTranscripts: true,
+            useYouTubePlayer: true
         },
         sync: function(method, model, options) {
             if (method === "create" || method === "update") {
