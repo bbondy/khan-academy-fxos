@@ -875,6 +875,10 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
             this.props.options.set("showTranscripts", event.target.checked);
             this.props.options.save();
         },
+        handleUseYouTubePlayerChange: function(event) {
+            this.props.options.set("useYouTubePlayer", event.target.checked);
+            this.props.options.save();
+        },
         render: function() {
             return <div className="settings topic-list-container">
 
@@ -893,6 +897,15 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                        type="checkbox"
                        checked={this.props.options.get("showTranscripts")}
                        onChange={this.handleShowTranscriptsChange}></input>
+                <span></span>
+                </label>
+
+                <div data-l10n-id="use-youtube-player">Use YouTube player</div>
+                <label className="pack-switch">
+                <input ref="useYouTubePlayer"
+                       type="checkbox"
+                       checked={this.props.options.get("useYouTubePlayer")}
+                       onChange={this.handleUseYouTubePlayerChange}></input>
                 <span></span>
                 </label>
 
