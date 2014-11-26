@@ -6,11 +6,37 @@ define([], function() {
      */
     var Util = {
         /**
+         * Wrapper around console.log
+         */
+        log: function(message, ...rest) {
+            if (typeof console !== 'undefined') {
+                console.log(message, ...rest);
+            }
+        },
+        /**
+         * Wrapper around console.warn
+         */
+        warn: function(message, ...rest) {
+            if (typeof console !== 'undefined') {
+                console.warn(message, ...rest);
+            }
+        },
+        /**
+         * Wrapper around console.error
+         */
+        error: function(message, ...rest) {
+            if (typeof console !== 'undefined') {
+                console.error(message, ...rest);
+            }
+        },
+        /**
          * We don't need to list en here since that is the default
          */
         supportedLocales: ["boxes", "es", "fr", "pt"],
         /**
-         * Returns the phone's locale or null for the default locale (en-US)
+         * Obtains the phone's locale or null for the default locale (en-US)
+         *
+         * @return the locale
          */
         getLang: function() {
             if (!this.isFirefoxOS()) {
@@ -28,17 +54,24 @@ define([], function() {
             }
             return lang;
         },
+        /**
+         * Terminates the application.
+         */
         quit: function() {
             window.close();
         },
         /**
          * Returns true when run within a gaia environment
+         *
+         * @return true if the bandwidth is metered.
          */
         isFirefoxOS: function() {
             return window.location.protocol === 'app:';
         },
         /**
          * Determines if the connection is metered (pay per use)
+         *
+         * @return true if the bandwidth is metered.
          */
         isMeteredConnection: function() {
             var connection = navigator.connection || navigator.mozConnection;
@@ -49,16 +82,33 @@ define([], function() {
         },
         /**
          * Determines if there's a cap on the bandwidth
+         *
+         * @return true if the bandwidth is capped.
          */
         isBandwidthCapped: function() {
             var connection = navigator.connection || navigator.mozConnection;
             if (!connection) {
                 return false;
             }
-            return connection.bandwidth !== Infinity;
+
+            // 1.* emulators return this
+            if (connection.bandwidth === Infinity) {
+                return false;
+            }
+
+            // 2.* devices return this
+            if (connection.type === "wifi" || connection.type === "none") {
+                return false;
+            }
+            return true;
         },
         /**
          * Obtains a URL query parameter
+         *
+         * @param name The name of the parameter to obtain
+         * @param params Optional, specifies the parameters to parse, if
+         *   not specified, uses window.location.search.
+         * @return The obtained parameter value
          */
         getParameterByName: function(name, params) {
             if (_.isUndefined(params)) {
@@ -72,6 +122,12 @@ define([], function() {
         },
         /**
          * Adds a query parameter to the specified url
+         *
+         * @param url The URL to append to
+         * @param name The naem of the parameter to append
+         * @param value The value of the parameter to append
+         * @return The built url
+         *
          * TODO: Handle fragments
          */
         appendQueryParam: function(url, name, value) {
@@ -94,6 +150,8 @@ define([], function() {
         },
         /**
          * Binds a set of arguments to a function without modifying the bound `this`
+         *
+         * @return The same function with one of the specified parameters found.
          */
         partial: function( fn /*, args...*/) {
           var aps = Array.prototype.slice;
@@ -128,6 +186,9 @@ define([], function() {
           }
         },
 
+        /**
+         * Mixin to help with localization
+         */
         LocalizationMixin: {
             componentDidMount: function() {
                 window.document.webL10n.translate(this.getDOMNode());
@@ -137,6 +198,14 @@ define([], function() {
             }
         },
 
+        /**
+         * Loads a script from the specified installed file path.
+         * Note taht the filename specified must be installed on the device
+         * and even if we changed the interface to execute code on the fly
+         * it would not work. Eval is disabled for other scripts.
+         *
+         * @param filename The URL to load
+         */
         loadScript: function(filename) {
             var d = $.Deferred();
             var s = document.createElement("script");
@@ -146,7 +215,7 @@ define([], function() {
                 d.resolve();
             };
             s.onerror = (e) => {
-                console.log("on error: %o", e);
+                Util.log("on error: %o", e);
                 d.reject();
             };
             document.getElementsByTagName("head")[0].appendChild(s);

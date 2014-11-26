@@ -22,7 +22,7 @@ You need [Nodejs](http://nodejs.org) installed to run the following commands (pl
 
 * Install react-tools by running `npm install -g react-tools`.
 
-* Install jsx by running `npm install -g jsx`
+* Install jsx by running `npm install -g jsx`.  Make sure you're using at least 0.12.0 by running `jsx --version`.
 
 The first time you get setup, run `./tools/rebuild`.  Then run `./tools/runserver`.  
 This will start a local python HTTP server on port 8092.  
@@ -38,6 +38,8 @@ Or just run `./tools/runtests`.
 For now, it's best to run the tests in a fresh restart of the browser in private browsing mode so you can be sure no files are cached.
 This is currently known to happen for some localization files with the simple python HTTP server otherwise.
 
+The first time you run tests, the APIClient.init test may take a while because it fetches the topic tree and may not be cached on the KA servers.
+
 ## Storage
 
 Device Storage API is used for downloads and for cached topic trees.  
@@ -49,6 +51,13 @@ Your exact path will differ depending on your OS, your profile, and the simulato
 
 Some other storage for smaller cached values is used with local storage.
 You can clear that simply by opening the console and executing: `localStorage.clear();`
+
+## ADB commands
+
+For OOM failures, check for sigkill being sent to app.
+The size is listed in pages (4 KB/page).
+
+`adb shell dmesg | tail -20`
 
 ## Contribute
 

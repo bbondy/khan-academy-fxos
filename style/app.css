@@ -1,4 +1,9 @@
+html {
+    font-size: 10px;
+}
+
 body {
+    font-size: 1.9rem; // normal
     margin: 0;
 }
 
@@ -37,6 +42,7 @@ section[role="region"] > header:first-child h1 {
 }
 [data-type="list"] ul {
     padding-left: 0;
+    padding-bottom: 2rem;
 }
 
 section[role="region"] > header.fixed:first-child {
@@ -48,7 +54,7 @@ input {
     padding-right: 1rem;
     width: 100%;
     box-sizing: border-box;
-    font-size: 1.5rem;
+    font-size: 1.7rem; // p.alt
 }
 
 input[type="checkbox"] {
@@ -64,7 +70,6 @@ ul > li.article-item > a {
 ul li div.subway-icon {
     display: block;
     position: absolute;
-    width: 40px;
     height: 100%;
 }
 
@@ -378,7 +383,23 @@ ul li a p.video-title, ul li a p.article-title {
 
 video {
     width: 100%;
+    max-height: calc(100% - 5rem);
+}
+
+video.video-has-transcript {
     max-height: 50%;
+}
+
+video ~ !.transcript {
+    max-height; 100%;
+}
+
+.video-placeholder {
+    width: 100%;
+    background:url('/img/offline.png') no-repeat center center;
+    max-height: 50%;
+    height: 50%;
+    background-color: black;
 }
 
 .transcript {
@@ -387,6 +408,7 @@ video {
     padding-right: 1rem;
     overflow-y: scroll !important;
     width: 100%;
+    box-sizing: border-box;¬
 }
 
 .transcript li {
@@ -394,6 +416,7 @@ video {
     padding-bottom: 0.7rem;
     border-bottom: solid 0.1rem #e7e7e7;
     color: rgb(51, 51, 51);
+    font-size: 1.3rem; // p.micro
 }
 
 .transcript li > span:first-child {
@@ -416,6 +439,11 @@ article {
     margin-top: 1rem;
 }
 
+.profile {
+    overflow-y: scroll;
+    height: calc(100% - 8rem);
+}
+
 .sidebar .hot-item {
     font-weight: bold;
 }
@@ -425,15 +453,15 @@ article {
 }
 
 .profile .badge-category-icon {
-    width: 30px;
-    height: 30px;
+    width: 4rem;
+    height: 4rem;
     display: block;
     position: relative;
     top: auto;
     right: auto;
     bottom: auto;
     left: auto;
-    margin: -20px auto 0;
+    margin: -2rem auto 0;
 }
 
 .profile .avatar {
@@ -445,15 +473,15 @@ article {
     background: #eee;
     border-radius: 5px;
     color: #999;
-    font-size: 18px;
-    height: 45px;
+    font-size: 2rem;
+    height: 5rem;
     padding-top: 15px;
     position: relative;
     text-align: center;
 }
 
 .profile span.span2 {
-    width: 30px;
+    width: 4rem;
     display: inline-block;
     margin-right: 0.5rem;
 }
@@ -465,7 +493,6 @@ article {
 
 .transcript-item div {
     display: inline;
-    font-size: 1.5rem;
 }
 
 .transcript-item div:first-child {
@@ -480,13 +507,21 @@ article {
 .energy-points {
     display: inline;
     background: #005a88;
-    line-height: 18px;
+    font-size: 1.3rem; // p.micro
     text-align: center;
     padding: 2px 5px 3px;
     color: white;
     font-family: 'Proxima Nova',sans-serif;
     text-shadow: none;
     border-radius: 5px;
+}
+
+.username, .points-header, .energy-points.energy-points-profile {
+    font-size: 1.9rem;
+    margin-bottom: 2rem;
+}
+
+.energy-points-video {
 }
 
 label.pack-switch {
@@ -496,7 +531,7 @@ label.pack-switch {
 li.faded p.topic-title,
 li.faded p.video-title,
 li.faded p.article-title {
-    color: #ccc;
+    color: #999;
 }
 
 .video-info-bar {
@@ -516,10 +551,45 @@ li.faded p.article-title {
     border-top: 2px solid #EEE;
     bottom: 0;
     color: #FFF;
-    font-size: 1.5rem;
+    font-size: 1.5rem; // p.small
     opacity: 0.8;
     padding: 1.5em;
     position: absolute;
     width: calc(100% - 3rem);
     z-index: 100;
+}
+
+
+section[data-type="sidebar"] > nav > ul > li > a {
+    border-bottom: 0.15rem solid #596068;
+}
+
+section[role="region"] > header:first-child h1 {
+    font-size: 2.5rem;
+}
+
+.app-loading {
+    height: 50%;
+    background:url('/img/throbber-full.gif') no-repeat center center;
+    background-size: 10rem;
+}
+
+#overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #fff;
+    opacity: 0.01;
+    z-index: 10000;
+    pointer-events: none;
+}
+
+span.fa-arrows-alt {
+    padding: 0.1rem;
+    margin-right: 1rem;
+    margin-left: 1rem;
+    z-index: 100;
+    vertical-align:middle
 }

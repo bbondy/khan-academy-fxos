@@ -1,5 +1,5 @@
 {
-  "version": "0.1",
+  "version": "1.0",
   "name": "Khan Academy",
   "description": "Khan Academy allows you to learn almost anything for free",
   "launch_path": "/index.html",
@@ -14,7 +14,6 @@
   "installs_allowed_from": [
     "*"
   ],
-  "appcache_path": "/cache.manifest",
   "locales": {
     "en": {
       "name": "Khan Academy",
@@ -35,12 +34,22 @@
   },
   "default_locale": "en",
   "type": "privileged",
-  "fullscreen": true,
+  "fullscreen": "true",
   "permissions": {
-    "desktop-notification": {},
-    "systemXHR": {},
-    "device-storage:videos":{ "access": "readwrite" },
-    "device-storage:sdcard":{ "access": "readwrite" }
+    "desktop-notification": {
+      "description": "Downloaded videos notifications"
+    },
+    "systemXHR": {
+      "description": "Communicate with the KA API"
+    },
+    "device-storage:videos": {
+      "access": "readwrite",
+      "description": "Video storage"
+    },
+    "device-storage:sdcard": {
+      "access": "readwrite",
+      "description" : "Topic tree storage"
+    }
   },
   "redirects": [
     {"from": "http://firefoxos.non-existent-domain-asdfg.com/authenticated.html",

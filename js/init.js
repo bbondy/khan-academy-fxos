@@ -15,7 +15,7 @@ require.config({
         // Third party libs
         "text": "./lib/text-min",
         "react": "./lib/react-with-addons-min",
-        "JSXTransformer": "./lib/JSXTransformer-min",
+        "react-dev": "./lib/react-with-addons-dev",
         "jsx": "./lib/jsx-min",
         "underscore": "./lib/underscore-min",
         "jquery": "./lib/jquery-min",
@@ -27,10 +27,12 @@ require.config({
 // Replaces all localized strings with boxes.
 //window.translateToBoxes = true;
 
-var initModules = ['main'];
+var initModules = [];
 if (window.isTest) {
     initModules.push('sinon');
     initModules.push('test');
+} else {
+    initModules.push('main');
 }
 requirejs(initModules);
 

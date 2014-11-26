@@ -1,0 +1,2 @@
+rm ka-fxos.zip
+zip -r ka-fxos.zip ./ -x "*.git*" -x "*node_modules*" -x "*.DS_Store" -x "*.module-cache*" -x "tools*" -x "style/*.html" -x "test/*"
