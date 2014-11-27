@@ -3,6 +3,8 @@ Khan Academy Firefox OS app
 
 Khan Academy's Firefox OS app source is [Mozilla Public License Version 2.0](https://www.mozilla.org/MPL/2.0/) licensed.
 
+You can download the Khan Academy Firefox OS app on your device at the [Firefox Marketplace](https://marketplace.firefox.com/app/khan-academy).
+
 ## About the source
 
 Everything is built using JavaScript.
