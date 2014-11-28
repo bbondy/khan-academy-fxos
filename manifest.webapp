@@ -8,8 +8,8 @@
     "128": "/img/icons/ka-128.png"
   },
   "developer": {
-    "name": "Brian R. Bondy",
-    "url": "http://brianbondy.com"
+    "name": "Khan Academy",
+    "url": "http://khanacademy.org"
   },
   "installs_allowed_from": [
     "*"
