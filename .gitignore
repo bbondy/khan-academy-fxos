@@ -28,3 +28,6 @@ node_modules
 secrets.json
 
 build/
+
+# Marketplace submission file
+ka-fxos.zip

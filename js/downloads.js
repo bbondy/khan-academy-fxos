@@ -7,8 +7,8 @@
  *   - Provides the ability to delete those downloads
  */
 
-define(["storage", "models"],
-        function(Storage, models) {
+define(["util", "storage", "models", "apiclient"],
+        function(Util, Storage, models, APIClient) {
 
     var Downloads = {
         /**
@@ -82,7 +82,7 @@ define(["storage", "models"],
          */
         download: function(model, onProgress) {
             if (model.isContent()) {
-                return this.downloadContent(model);
+                return this.downloadContent(model, onProgress);
             } else if (model.isTopic()) {
                 return this.downloadTopic(model, onProgress);
             }
@@ -118,6 +118,8 @@ define(["storage", "models"],
                             return;
                         }
                         setTimeout(downloadOneAtATime, 1000);
+                    }).fail(() => {
+                        d.reject();
                     });
                 } catch (e) {
                     // done, no more items in the generator
@@ -133,13 +135,20 @@ define(["storage", "models"],
          * Downloads the file at the specified URL and stores it to the
          * specified filename.
          */
-        downloadContent: function(contentItem) {
+        downloadContent: function(contentItem, onProgress) {
             var d = $.Deferred();
+            if (onProgress) {
+                onProgress(null, 0);
+            }
+
             var filename = contentItem.getId();
             var handleContentLoaded = (contentData) => {
                 var blob = new Blob([contentData], {type: contentItem.getContentMimeType()});
                 Storage.writeBlob(filename, blob).done(() => {
                     this._addDownloadToManifest(contentItem);
+                    if (onProgress) {
+                        onProgress(contentItem, 1);
+                    }
                     d.resolve(contentItem, 1);
                 }).fail(() => {
                     d.reject();
@@ -153,15 +162,26 @@ define(["storage", "models"],
                 req.onload = () => {
                     handleContentLoaded(req.response);
                 };
-                req.onerror = () => {
+                req.onerror = (e) => {
                     d.reject();
                 };
                 req.send();
-            } else {
-                // Articles have a content property with the html we want to
-                // download already. It's not loaded in by the topic tree but
-                // when the article is actually loaded.
-                handleContentLoaded(contentItem.get("content"));
+            } else if (contentItem.isArticle()) {
+                if (contentItem.get("content")) {
+                    // Articles have a content property with the html we want to
+                    // download already. It's not loaded in by the topic tree but
+                    // when the article is actually loaded.
+                    handleContentLoaded(contentItem.get("content"));
+                } else {
+                    // Sometimes articles are downloaded before they are viewed,
+                    // so try to download it here.
+                    APIClient.getArticle(contentItem.getId()).done((result) => {
+                        contentItem.set("content", result.translated_html_content);
+                        handleContentLoaded(contentItem.get("content"));
+                    }).fail(() => {
+                        return d.reject().promise();
+                    });
+                }
             }
             return d.promise();
         },
@@ -185,8 +205,8 @@ define(["storage", "models"],
          */
         _addDownloadToManifest: function(model) {
             this._setDownloaded(model, true);
-            console.log('adding model to manifest: ');
-            console.log(model);
+            Util.log('adding model to manifest: ');
+            Util.log(model);
             this.contentList.push(model);
             this._writeManifest();
         },
@@ -195,8 +215,8 @@ define(["storage", "models"],
          */
         _removeDownloadFromManifest: function(model) {
             this._setDownloaded(model, false);
-            console.log('removing model from manifest: ');
-            console.log(model);
+            Util.log('removing model from manifest: ');
+            Util.log(model);
             this.contentList.remove(model);
             this._writeManifest();
         },

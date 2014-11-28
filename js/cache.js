@@ -13,7 +13,10 @@
 define(["util", "models"],
         function(Util, models) {
 
+    var TEN_MINUTES = 1000 * 60 * 10;
     var Cache = {
+        heartbeatInterval: TEN_MINUTES,
+
         /**
          * Initializes the cache manager
          */
@@ -29,26 +32,32 @@ define(["util", "models"],
                 this.lastTopicTreeRefresh = Date.parse(this.lastTopicTreeRefresh);
             }
 
-            var TEN_MINUTES = 1000 * 60 * 10;
-            setInterval(this.heartbeat.bind(this), TEN_MINUTES);
+            this.timer = setInterval(this.heartbeat.bind(this), this.heartbeatInterval);
             return d.resolve().promise();
         },
+        /**
+         * Heartbeat called every heartbeatInterval
+         * Nothing is performed on metered connections or with the bandwidth is capped.
+         * The following actions are performed:
+         *   - refreshing logged in info (at most every 12 hours)
+         *   - refreshing the topic tree (at most once a week)
+         */
         heartbeat: function() {
             if (Util.isMeteredConnection()) {
-                console.log('skipping heartbeat due to metered connection!');
+                Util.log('skipping heartbeat due to metered connection!');
                 return;
             }
 
             if (Util.isBandwidthCapped()) {
-                console.log('skipping heartbeat due to capped bandwidth!');
+                Util.log('skipping heartbeat due to capped bandwidth!');
                 return;
             }
 
             var TWELVE_HOURS = 1000 * 60 * 60 * 12;
             if (this.lastUserInfoRefresh && new Date() - this.lastUserInfoRefresh < TWELVE_HOURS) {
-                console.log('heartbeat: no need to refresh user info yet!');
+                Util.log('heartbeat: no need to refresh user info yet!');
             } else {
-                console.log('heartbeat: Refreshing logged in info!');
+                Util.log('heartbeat: Refreshing logged in info!');
                 models.CurrentUser.refreshLoggedInInfo(true).done(() => {
                     this.lastUserInfoRefresh = new Date();
                     localStorage.setItem(this.heartbeatUserInfoName, this.lastUserInfoRefresh);
@@ -57,9 +66,9 @@ define(["util", "models"],
 
             var ONE_WEEK = 1000 * 60 * 60 * 24 * 7;
             if (this.lastTopicTreeRefresh && new Date() - this.lastTopicTreeRefresh < ONE_WEEK) {
-                console.log('heartbeat: no need to refresh topic tree yet!');
+                Util.log('heartbeat: no need to refresh topic tree yet!');
             } else {
-                console.log('heartbeat: Refreshing topic tree!');
+                Util.log('heartbeat: Refreshing topic tree!');
                 models.TopicTree.refreshTopicTreeInfo().done(() => {
                     this.lastTopicTreeRefresh = new Date();
                     localStorage.setItem(this.heartbeatTopicTreeName, this.lastTopicTreeRefresh);

@@ -44,7 +44,8 @@ document.webL10n = (function(window, document, undefined) {
    * content until the `localized' event happens.
    */
 
-  var gAsyncResourceLoading = true; // read-only
+  var gAsyncResourceLoading = true;
+  var gExactLangOnly = false;
 
 
   /**
@@ -58,13 +59,13 @@ document.webL10n = (function(window, document, undefined) {
   var gDEBUG = 1;
 
   function consoleLog(message) {
-    if (gDEBUG >= 2) {
+    if (gDEBUG >= 2 && typeof console !== 'undefined') {
       console.log('[l10n] ' + message);
     }
   };
 
   function consoleWarn(message) {
-    if (gDEBUG) {
+    if (gDEBUG && typeof console !== 'undefined') {
       console.warn('[l10n] ' + message);
     }
   };
@@ -229,7 +230,9 @@ document.webL10n = (function(window, document, undefined) {
             }
             if (reImport.test(line)) { // @import rule?
               match = reImport.exec(line);
-              loadImport(baseURL + match[1]); // load the resource synchronously
+              if (currentLang !== '*' || !gExactLangOnly) {
+                  loadImport(baseURL + match[1]); // load the resource synchronously
+              }
             }
           }
 
@@ -1000,7 +1003,6 @@ document.webL10n = (function(window, document, undefined) {
   } else if (window.attachEvent) { // IE8 and before (= oldIE)
     // TODO: check if jQuery is loaded (CSS selector + JSON + events)
 
-    // dummy `console.log' and `console.warn' functions
     if (!window.console) {
       consoleLog = function(message) {}; // just ignore console.log calls
       consoleWarn = function(message) {
@@ -1118,6 +1120,13 @@ document.webL10n = (function(window, document, undefined) {
     // debug
     getData: function() { return gL10nData; },
     getText: function() { return gTextData; },
+    // This is used for testing only
+    setAsyncLoading: function(v) {
+        gAsyncResourceLoading = v;
+    },
+    setExactLangOnly: function(v) {
+        gExactLangOnly = v;
+    },
 
     // get|set the document language
     getLanguage: function() { return gLanguage; },

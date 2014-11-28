@@ -60,8 +60,9 @@
                 node.ka_url = node.ka_url.substring(urlPrefix.length);
             }
 
-            urlPrefix = "http://s3.amazonaws.com/KA-youtube-converted/";
-            if (node.download_urls && node.download_urls.mp4) {
+            urlPrefix = "http://fastly.kastatic.org/KA-youtube-converted/";
+            if (node.download_urls && node.download_urls.mp4 &&
+                    node.download_urls.mp4.indexOf(urlPrefix) === 0) {
                 node.download_urls.mp4 = node.download_urls.mp4.substring(urlPrefix.length);
                 node.download_urls.mp4 = node.download_urls.mp4.substring(0,  node.download_urls.mp4.length - 4);
             }
@@ -130,7 +131,7 @@
             }
         },
 
-        minify: function(node) {
+        minify: function(node, logWarnings) {
             var newChildren = [];
             if (node.children) {
                 node.children.forEach(function(child) {
@@ -145,8 +146,13 @@
                                     child[this.getShortName("download_urls")]) {
                                 newChildren.push(child);
                             } else if (child[this.getShortName("kind")] === this.getShortValue("kind", "Video")) {
-                                console.log("Warning: Excluding because of no vidoe URL: " + child[this.getShortName("id")] +
-                                    ", " + child[this.getShortName("translated_title")]);
+                                if (logWarnings) {
+                                    if (typeof console !== 'undefined') {
+                                        console.log("Warning: Excluding because of no vidoe URL: " +
+                                            child[this.getShortName("id")] +
+                                            ", " + child[this.getShortName("translated_title")]);
+                                    }
+                                }
                             }
                         } else if (child[this.getShortName("children")] && child[this.getShortName("children")].length > 0) {
                             newChildren.push(child);
@@ -170,19 +176,33 @@
          * for the topic tree.
          */
         getOutput: function(node) {
+            return "window.topictree =" +
+                this._getOutput(node) + ";";
+        },
+
+        _getOutput: function(node) {
             var output = "{";
 
             for (var p in node) {
                 if (p === 'c') {
                     output += "c:[";
                     node.c.forEach(function(child) {
-                        output += this.getOutput(child) + ",";
+                        output += this._getOutput(child) + ",";
                     }.bind(this));
                     output = output.substring(0, output.length - 1);
                     output += "],";
                 } else {
                     if (typeof node[p] !== "number") {
-                        output += p + ":\"" + node[p].replace(/\\/g, "\\\\").replace(/\"/g, "\\\"")  + "\",";
+                        output += p + ":\"" + node[p]
+                            // Replace a slash with 2 slashes
+                            .replace(/\\/g, "\\\\")
+                            // Replace whitespace with a space
+                            .replace(/\r\n/g, " ")
+                            .replace(/\n/g, " ")
+                            .replace(/\r/g, " ")
+                            .replace(/\t/g, " ")
+                            // Replace quotes with \"
+                            .replace(/\"/g, "\\\"")  + "\",";
                     } else {
                         output += p + ":" + node[p] + ",";
                     }
@@ -201,10 +221,21 @@
             return value;
         },
         getShortValue: function(prop, value) {
+            // propertyValueMap has entries like: ["kind", "Article", 0],
             var found = null;
             this.propertyValueMap.forEach(function(map) {
                 if (map[0] === prop && map[1] === value) {
                     found = map[2];
+                }
+            });
+            return found;
+        },
+        getLongValue: function(prop, value) {
+            // propertyValueMap has entries like: ["kind", "Article", 0],
+            var found = null;
+            this.propertyValueMap.forEach(function(map) {
+                if (map[0] === prop && map[2] === value) {
+                    found = map[1];
                 }
             });
             return found;
