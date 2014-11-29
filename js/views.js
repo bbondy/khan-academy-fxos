@@ -394,6 +394,9 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                 video.src = "";
                 video.load();
             }
+            if (this.youtubePlayerTimer) {
+                clearInterval(this.youtubePlayerTimer);
+            }
             this.cleanedUp = true;
         },
         onClickTranscript: function(obj) {
@@ -405,114 +408,181 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
         getInitialState: function() {
             return { showOfflineImage: false };
         },
-        componentDidMount: function() {
-            // Add an event listener to track watched time
-            var video = this.refs.video.getDOMNode();
-
-            var canPlay = (e) => {
-                if (this.initSecondWatched) {
-                    video.currentTime = this.initSecondWatched;
-                    Util.log('set current time to: ' + video.currentTime);
-                    delete this.initSecondWatched;
-                }
-                Util.warn("Video error: %o", e);
-                if (this.state.showOfflineImage) {
-                    Util.log("Video has no source.", e);
-                    this.stopAnimatingPoints(false);
-                    this.setState({showOfflineImage: false});
-                }
-            };
-            video.addEventListener("canplay", canPlay);
-
-            // Called when network state changes
-            video.addEventListener("progress", () => {
-                if (!this.isMounted()) {
-                    return;
-                }
-                Util.log("Network state changed: ", video.networkState);
-            });
-
-            video.addEventListener("timeupdate", (e) => {
-                if (!this.isMounted()) {
-                    return;
-                }
-                // Sometimes a 'timeupdate' event will come before a 'play' event when
-                // resuming a paused video. We need to get the play event before reporting
-                // seconds watched to properly update the secondsWatched though.
-                if (this.isPlaying) {
-                    this.reportSecondsWatched();
-
-                    var video = this.refs.video.getDOMNode();
-                    var totalSeconds = Math.round(video.currentTime);
-                    var node = $("li[data-time='" + totalSeconds + "']");
-                    var ul = $("ul");
-                    if (node.length > 0) {
-                        var scrollOffset = node.get(0).offsetTop -
-                            $("ul.transcript").get(0).offsetTop;
-                        $("ul.transcript").stop(true, true).animate({
-                            scrollTop: scrollOffset
-                        }, 400);
-                    }
-                }
-            }, true);
-
-            video.addEventListener("play", (e) => {
-                // Update lastWatchedTimeSinceLastUpdate so that we
-                // don't count paused time towards secondsWatched
-                Util.warn("Video play: %o", e);
-                this.lastWatchedTimeSinceLastUpdate = new Date();
-                this.isPlaying = true;
-                this.animatePoints();
-            }, true);
-
-            video.addEventListener("pause", (e) => {
-                this.updateSecondsWatched();
-                this.isPlaying = false;
+        _canPlayYoutube: function() {
+            if (this.initSecondWatched) {
+                this.player.seekTo(this.initSecondWatched);
+                Util.log('set current time to: ' + this.initSecondWatched);
+                delete this.initSecondWatched;
+            }
+            if (this.state.showOfflineImage) {
+                Util.log("Video has no source.", e);
                 this.stopAnimatingPoints(false);
-            }, true);
-            video.addEventListener("stop", (e) => {
-                this.updateSecondsWatched();
-                this.isPlaying = false;
-                this.stopAnimatingPoints(true);
-            }, true);
-            video.addEventListener("ended", (e) => {
-                // If we're full screen, exit out.
-                document.mozCancelFullScreen();
-            });
-            video.addEventListener("error", (e) => {
-                Util.warn("Video error: %o", e);
-                if (video.networkState === HTMLMediaElement.NETWORK_NO_SOURCE) {
-                    Util.log("Video has no source.", e);
-                    this.stopAnimatingPoints(false);
-                    if (!this.state.downloadedUrl && !this.cleanedUp) {
-                        this.setState({showOfflineImage: true});
+                this.setState({showOfflineImage: false});
+            }
+        },
+        _canPlayHTML5: function() {
+            var video = this.refs.video.getDOMNode();
+            if (this.initSecondWatched) {
+                video.currentTime = this.initSecondWatched;
+                Util.log('set current time to: ' + video.currentTime);
+                delete this.initSecondWatched;
+            }
+            if (this.state.showOfflineImage) {
+                Util.log("Video has no source.", e);
+                this.stopAnimatingPoints(false);
+                this.setState({showOfflineImage: false});
+            }
+        },
+        _onPlay: function(e) {
+            // Update lastWatchedTimeSinceLastUpdate so that we
+            // don't count paused time towards secondsWatched
+            Util.warn("Video play: %o", e);
+            this.lastWatchedTimeSinceLastUpdate = new Date();
+            this.isPlaying = true;
+            this.animatePoints();
+        },
+        _onPause: function(e) {
+            this.updateSecondsWatched();
+            this.isPlaying = false;
+            this.stopAnimatingPoints(false);
+        },
+        _onStop: function(e) {
+            this.updateSecondsWatched();
+            this.isPlaying = false;
+            this.stopAnimatingPoints(true);
+        },
+        _onEnded: function(e) {
+            // If we're full screen, exit out.
+            document.mozCancelFullScreen();
+        },
+        _onNetworkProgress: function(e) {
+            if (!this.isMounted()) {
+                return;
+            }
+            var video = this.refs.video.getDOMNode();
+            Util.log("Network state changed: ", video.networkState);
+        },
+        _onError: function(e) {
+            Util.warn("Video error: %o", e);
+            if (!this.refs.video) {
+                return;
+            }
+
+            var video = this.refs.video.getDOMNode();
+            if (video.networkState === HTMLMediaElement.NETWORK_NO_SOURCE) {
+                Util.log("Video has no source.", e);
+                this.stopAnimatingPoints(false);
+                if (!this.state.downloadedUrl && !this.cleanedUp) {
+                    this.setState({showOfflineImage: true});
+                }
+            }
+
+            if (!e.target || !e.target.error ||
+                    e.target.error.code === undefined) {
+                return;
+            }
+
+            // video playback failed - show a message saying why
+            switch (e.target.error.code) {
+                case e.target.error.MEDIA_ERR_ABORTED:
+                    Util.warn("video error: You aborted the video playback.");
+                break;
+                case e.target.error.MEDIA_ERR_NETWORK:
+                    Util.warn("video error: A network error caused the video download to fail part-way.");
+                break;
+                case e.target.error.MEDIA_ERR_DECODE:
+                    Util.warn("The video playback was aborted due to a corruption problem or because the video used features your browser did not support.");
+                break;
+                case e.target.error.MEDIA_ERR_SRC_NOT_SUPPORTED:
+                    Util.warn("The video could not be loaded, either because the server or network failed or because the format is not supported.");
+                    break;
+                default:
+                    Util.warn("An unknown error occurred.");
+                    break;
+           }
+        },
+        _onTimeupdateHTML5: function(e) {
+            if (!this.isMounted()) {
+                return;
+            }
+            // Sometimes a 'timeupdate' event will come before a 'play' event when
+            // resuming a paused video. We need to get the play event before reporting
+            // seconds watched to properly update the secondsWatched though.
+            if (this.isPlaying && this.refs.video) {
+                var video = this.refs.video.getDOMNode();
+                this.reportSecondsWatched(video.currentTime, video.duration);
+                this._onScrollTranscriptTo(video.currentTime);
+            }
+        },
+        _onScrollTranscriptTo: function(scrollTime) {
+            scrollTime |= scrollTime;
+            var node = $("li[data-time='" + scrollTime + "']");
+            var ul = $("ul");
+            if (node.length > 0) {
+                var scrollOffset = node.get(0).offsetTop -
+                    $("ul.transcript").get(0).offsetTop;
+                $("ul.transcript").stop(true, true).animate({
+                    scrollTop: scrollOffset
+                }, 400);
+            }
+        },
+        youtubePlayerStates: {
+            unstarted: -1,
+            ended: 0,
+            playing: 1,
+            paused: 2,
+            buffering: 3,
+            videoCued: 5
+        },
+        componentDidMount: function() {
+            if (models.AppOptions.get("useYouTubePlayer") &&
+                    !this.props.video.isDownloaded()) {
+                Util.log("Loading Youtube player for YID: " + this.props.video.getYoutubeId());
+                this.player = new YT.Player('player', {
+                    width: '900',
+                    height: '506',
+                    videoId: this.props.video.getYoutubeId(),
+                    events: {
+                        onReady: () => {
+                            this._canPlayYoutube();
+                        },
+                        onError: function() {
+                        },
+                        onStateChange: (e) => {
+                            var state = e.data;
+                            Util.log('on youtube player state changed: :' + state);
+                            if (state === this.youtubePlayerStates.cued) {
+                            } else if (state === this.youtubePlayerStates.paused) {
+                                this._onPause();
+                            } else if (state === this.youtubePlayerStates.playing) {
+                                this._onPlay();
+                            } else if (state === this.youtubePlayerStates.buffering) {
+                                this.stopAnimatingPoints(false);
+                            }
+                        }
+
                     }
-                }
-
-                if (!e.target || !e.target.error ||
-                        e.target.error.code === undefined) {
-                    return;
-                }
-
-                // video playback failed - show a message saying why
-                switch (e.target.error.code) {
-                    case e.target.error.MEDIA_ERR_ABORTED:
-                        Util.warn("video error: You aborted the video playback.");
-                    break;
-                    case e.target.error.MEDIA_ERR_NETWORK:
-                        Util.warn("video error: A network error caused the video download to fail part-way.");
-                    break;
-                    case e.target.error.MEDIA_ERR_DECODE:
-                        Util.warn("The video playback was aborted due to a corruption problem or because the video used features your browser did not support.");
-                    break;
-                    case e.target.error.MEDIA_ERR_SRC_NOT_SUPPORTED:
-                        Util.warn("The video could not be loaded, either because the server or network failed or because the format is not supported.");
-                        break;
-                    default:
-                        Util.warn("An unknown error occurred.");
-                        break;
-               }
-            }, true);
+                });
+                this.youtubePlayerTimer = setInterval(() => {
+                    if (this.player.getCurrentTime && this.player.getDuration && this.isPlaying) {
+                        Util.log("currentTime: " + this.player.getCurrentTime());
+                        Util.log("duration: " + this.player.getDuration());
+                        this.reportSecondsWatched(this.player.getCurrentTime(), this.player.getDuration());
+                        this._onScrollTranscriptTo(this.player.getCurrentTime());
+                    }
+                }, 1000);
+            } else {
+                // Add an event listener to track watched time
+                var video = this.refs.video.getDOMNode();
+                video.addEventListener("canplay", this._canPlayHTML5.bind(this));
+                video.addEventListener("progress", this._onNetworkProgress.bind(this));
+                video.addEventListener("timeupdate", this._onTimeupdateHTML5);
+                video.addEventListener("play", this._onPlay.bind(this), true);
+                video.addEventListener("pause", this._onPause.bind(this), true);
+                video.addEventListener("stop", this._onStop.bind(this), true);
+                video.addEventListener("ended", this._onEnded.bind(this), true);
+                video.addEventListener("error", this._onError.bind(this), true);
+            }
         },
 
         // Updates the secondsWatched variable with the difference between the current
@@ -555,22 +625,17 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
 
         // Reports the seconds watched to the server if it hasn't been reported recently
         // or if the lastSecondWatched is at the end of the video.
-        reportSecondsWatched: function() {
+        reportSecondsWatched: function(currentTime, duration) {
             if (!models.CurrentUser.isSignedIn()) {
                 return;
             }
 
-            if (!this.refs.video) {
-                return;
-            }
-
             // Report watched time to the server
-            var video = this.refs.video.getDOMNode();
-            this.lastSecondWatched = Math.round(video.currentTime);
+            this.lastSecondWatched = Math.round(currentTime);
             this.updateSecondsWatched();
             var currentTime = new Date();
             var secondsSinceLastReport = (currentTime.getTime() - this.lastReportedTime.getTime()) / 1000;
-            if (secondsSinceLastReport >= this.MIN_SECONDS_BETWEEN_REPORTS || this.lastSecondWatched >= (video.duration | 0)) {
+            if (secondsSinceLastReport >= this.MIN_SECONDS_BETWEEN_REPORTS || this.lastSecondWatched >= (duration | 0)) {
                 this.lastReportedTime = new Date();
                 models.CurrentUser.reportVideoProgress(this.props.video,
                         this.props.video.getYoutubeId(),
@@ -617,16 +682,22 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
               'video-has-transcript': !!this.state.transcript
             });
 
+            var control;
+            if (this.state.showOfflineImage) {
+                control = <div className="video-placeholder" onClick={this.onReloadVideo}/>;
+            } else if (models.AppOptions.get("useYouTubePlayer")) {
+                control = <div id="player"/>;
+            } else {
+                control = <video className={videoClass} src={videoSrc} ref="video" preload="auto"
+                                 type={this.props.video.getContentMimeType()} controls></video>;
+            }
+
             // The overlay div helps with a bug where html5 video sometimes doesn't render properly.
             // I'm not sure exactly why but I guess maybe it pushes out the painting to its own layer
             // or something along those lines.
             // http://fastly.kastatic.org/KA-youtube-converted/wx2gI8iwMCA.mp4/wx2gI8iwMCA.mp4
             return <div className="video-viewer-container">
-                {this.state.showOfflineImage?
-                 <div className="video-placeholder" onClick={this.onReloadVideo}/> :
-                 <video className={videoClass} src={videoSrc} ref="video" preload="auto"
-                        type={this.props.video.getContentMimeType()} controls>
-                 </video>}
+                {control}
                  <div className="video-info-bar">{pointsDiv}</div>
                  <div id="overlay"></div>
                 {transcriptViewer}

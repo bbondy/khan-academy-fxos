@@ -94,6 +94,7 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
             assert.ok(_(videoItems).some(function(videoItem) {
                 return videoItem.props.video.getTitle() === "Harlow monkey experiments";
             }));
+            models.AppOptions.set("useYouTubePlayer", false);
 
             // Test that video view render with transcripts
             models.AppOptions.set("showTranscripts", true);

@@ -381,7 +381,7 @@ ul li a p.video-title, ul li a p.article-title {
 }
 
 
-video {
+video, #player {
     width: 100%;
     max-height: calc(100% - 5rem);
 }
