@@ -534,19 +534,26 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
             buffering: 3,
             videoCued: 5
         },
+        shouldUseYoutubePlayer: function() {
+            return models.AppOptions.get("useYouTubePlayer") &&
+                !this.props.video.isDownloaded();
+        },
         componentDidMount: function() {
-            if (models.AppOptions.get("useYouTubePlayer") &&
-                    !this.props.video.isDownloaded()) {
+            if (this.shouldUseYoutubePlayer()) {
                 Util.log("Loading Youtube player for YID: " + this.props.video.getYoutubeId());
                 this.player = new YT.Player('player', {
                     width: '900',
                     height: '506',
                     videoId: this.props.video.getYoutubeId(),
+                    playerVars: { modestbranding: 1, showinfo: 0 },
                     events: {
                         onReady: () => {
+                            console.log("ok showing the player and hiding the throbber!!!");
+                            $(".throbber").hide();
                             this._canPlayYoutube();
                         },
                         onError: function() {
+                            console.log('onError!');
                         },
                         onStateChange: (e) => {
                             var state = e.data;
@@ -563,6 +570,7 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
 
                     }
                 });
+                console.log('this.player: %o', this.player);
                 this.youtubePlayerTimer = setInterval(() => {
                     if (this.player.getCurrentTime && this.player.getDuration && this.isPlaying) {
                         Util.log("currentTime: " + this.player.getCurrentTime());
@@ -685,8 +693,11 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
             var control;
             if (this.state.showOfflineImage) {
                 control = <div className="video-placeholder" onClick={this.onReloadVideo}/>;
-            } else if (models.AppOptions.get("useYouTubePlayer")) {
-                control = <div id="player"/>;
+            } else if (this.shouldUseYoutubePlayer()) {
+                control = <div>
+                        <div className="throbber"/>
+                        <div className={videoClass} id="player"/>
+                    </div>;
             } else {
                 control = <video className={videoClass} src={videoSrc} ref="video" preload="auto"
                                  type={this.props.video.getContentMimeType()} controls></video>;
