@@ -381,16 +381,25 @@ ul li a p.video-title, ul li a p.article-title {
 }
 
 
+div.throbber {
+    width: 10rem;
+    height: 10rem;
+    margin-left: 1rem;
+    margin-top: 1rem;
+    background:url('/img/throbber-full.gif') no-repeat center center;
+    background-size: 10rem;
+}
+
 video, #player {
     width: 100%;
     max-height: calc(100% - 5rem);
 }
 
-video.video-has-transcript {
+video.video-has-transcript, #player.video-has-transcript {
     max-height: 50%;
 }
 
-video ~ !.transcript {
+video ~ !.transcript,  #player ~ !.transcript{
     max-height; 100%;
 }
 
