@@ -14,6 +14,12 @@ define(["util"], function(Util) {
             return $.Deferred().resolve().promise();
         },
         /**
+         * Returns true if storage is available on the device
+         */
+        isEnabled: function() {
+            return !!this.sdcard;
+        },
+        /**
          * Returns a promise which when resolved contains an array of binary data
          */
         readAsBlob: function(filename) {

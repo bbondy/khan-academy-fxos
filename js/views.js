@@ -850,39 +850,47 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
 
             ////////////////////
             // Context sensitive actions first
-            if (!this.props.isPaneShowing &&
-                    this.props.model && this.props.model.isContent()) {
-                if (this.props.model.isDownloaded()) {
-                    var text = document.webL10n.get(this.props.model.isVideo() ? "delete-downloaded-video" : "delete-downloaded-article");
-                    items.push(<li className="hot-item">
-                            <a href="#" onClick={Util.partial(this.props.onClickDeleteDownloadedContent, this.props.model)}>{{text}}</a>
-                        </li>);
-                } else {
-                    var text = document.webL10n.get(this.props.model.isVideo() ? "download-video" : "download-article");
-                    items.push(<li className="hot-item">
-                            <a href="#" className={this.props.model.isVideo() ? "download-video-link" : "download-article-link"} onClick={Util.partial(this.props.onClickDownloadContent, this.props.model)}>{{text}}</a>
-                        </li>);
+            if (Storage.isEnabled()) {
+                if (!this.props.isPaneShowing &&
+                        this.props.model && this.props.model.isContent()) {
+                    if (this.props.model.isDownloaded()) {
+                        var text = document.webL10n.get(this.props.model.isVideo() ? "delete-downloaded-video" : "delete-downloaded-article");
+                        items.push(<li className="hot-item">
+                                <a href="#" onClick={Util.partial(this.props.onClickDeleteDownloadedContent, this.props.model)}>{{text}}</a>
+                            </li>);
+                    } else {
+                        var text = document.webL10n.get(this.props.model.isVideo() ? "download-video" : "download-article");
+                        items.push(<li className="hot-item">
+                                <a href="#" className={this.props.model.isVideo() ? "download-video-link" : "download-article-link"} onClick={Util.partial(this.props.onClickDownloadContent, this.props.model)}>{{text}}</a>
+                            </li>);
+                    }
                 }
             }
+
             if (!this.props.isPaneShowing &&
                     this.props.model &&
                     this.props.model.isContent() &&
                     this.props.model.getKAUrl()) {
                 var viewOnKAMessage = document.webL10n.get("open-in-website");
                 items.push(<li><a href="#" className="open-in-website-link" onClick={Util.partial(this.props.onClickViewOnKA, this.props.model)}>{{viewOnKAMessage}}</a></li>);
-                var shareMessage = document.webL10n.get("share");
-                items.push(<li><a href="#" className="share-link" onClick={Util.partial(this.props.onClickShare, this.props.model)}>{{shareMessage}}</a></li>);
+
+                if (window.MozActivity) {
+                    var shareMessage = document.webL10n.get("share");
+                    items.push(<li><a href="#" className="share-link" onClick={Util.partial(this.props.onClickShare, this.props.model)}>{{shareMessage}}</a></li>);
+                }
             }
 
-            if (models.TempAppState.get("isDownloadingTopic")) {
-                items.push(<li className="hot-item">
-                        <a href="#" data-l10n-id="cancel-downloading" onClick={Util.partial(this.props.onClickCancelDownloadContent, this.props.model)}>Cancel Downloading</a>
-                    </li>);
-            } else if(!this.props.isPaneShowing &&
-                        this.props.model && this.props.model.isTopic()) {
-                items.push(<li className="hot-item">
-                        <a href="#" data-l10n-id="download-topic" onClick={Util.partial(this.props.onClickDownloadContent, this.props.model)}>Download Topic</a>
-                    </li>);
+            if (Storage.isEnabled()) {
+                if (models.TempAppState.get("isDownloadingTopic")) {
+                    items.push(<li className="hot-item">
+                            <a href="#" data-l10n-id="cancel-downloading" onClick={Util.partial(this.props.onClickCancelDownloadContent, this.props.model)}>Cancel Downloading</a>
+                        </li>);
+                } else if(!this.props.isPaneShowing &&
+                            this.props.model && this.props.model.isTopic()) {
+                    items.push(<li className="hot-item">
+                            <a href="#" data-l10n-id="download-topic" onClick={Util.partial(this.props.onClickDownloadContent, this.props.model)}>Download Topic</a>
+                        </li>);
+                }
             }
 
             ////////////////////
@@ -901,7 +909,7 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
             if (!this.props.isSettingsShowing) {
                 items.push(<li><a data-l10n-id="view-settings" className="view-settings-link" href="#" onClick={this.props.onClickSettings}>View Settings</a></li>);
             }
-            if (!this.props.isDownloadsShowing) {
+            if (!this.props.isDownloadsShowing && Storage.isEnabled()) {
                 items.push(<li><a data-l10n-id="view-downloads" className="view-downloads-link" href="#" onClick={this.props.onClickDownloads}>View Downloads</a></li>);
             }
 
@@ -1204,24 +1212,26 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                 wasLastDownloads: false
             });
         },
+        _openUrl: function(url) {
+            if (window.MozActivity) {
+                new MozActivity({
+                    name: "view",
+                    data: {
+                        type: "url",
+                        url: url
+                    }
+                });
+            } else {
+                window.open(url, '_blank');
+            }
+
+        },
         onClickSupport: function(model) {
             var url = "https://khanacademy.zendesk.com/hc/communities/public/topics/200155074-Mobile-Discussions";
-            new MozActivity({
-                name: "view",
-                data: {
-                    type: "url",
-                    url: url
-                }
-            });
+            this._openUrl(url);
         },
         onClickViewOnKA: function(model) {
-            new MozActivity({
-                name: "view",
-                data: {
-                    type: "url",
-                    url: model.getKAUrl()
-                }
-            });
+            this._openUrl(model.getKAUrl());
         },
         onClickShare: function(model) {
             new MozActivity({
