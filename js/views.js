@@ -545,7 +545,11 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                     width: '900',
                     height: '506',
                     videoId: this.props.video.getYoutubeId(),
-                    playerVars: { modestbranding: 1, showinfo: 0 },
+                    playerVars: {
+                        modestbranding: 1,
+                        showinfo: 0,
+                        origin: location.protocol + "//" + location.hostname
+                    },
                     events: {
                         onReady: () => {
                             console.log("ok showing the player and hiding the throbber!!!");
@@ -961,6 +965,8 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
             this.props.options.set("useYouTubePlayer", event.target.checked);
             this.props.options.save();
         },
+        // YouTube player option is currently disabled due to a bug w/ the
+        // API when on the actual device.  Callbacks aren't always called.
         render: function() {
             return <div className="settings topic-list-container">
 
@@ -982,6 +988,7 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                 <span></span>
                 </label>
 
+                {/*
                 <div data-l10n-id="use-youtube-player">Use YouTube player</div>
                 <label className="pack-switch">
                 <input ref="useYouTubePlayer"
@@ -990,7 +997,7 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                        onChange={this.handleUseYouTubePlayerChange}></input>
                 <span></span>
                 </label>
-
+                */}
             </div>;
         }
     });
