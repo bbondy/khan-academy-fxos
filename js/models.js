@@ -108,7 +108,7 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
             var d = $.Deferred();
 
             // Check if we have a local downloaded copy of the topic tree
-            Util.log("loading topic tree from storage");
+            Util.log("loading topic tree from storage: " + this.getTopicTreeFilename());
             this.allContentItems.length = 0;
             var topicTreePromise = Storage.readText(this.getTopicTreeFilename());
             topicTreePromise.done((topicTree) => {
