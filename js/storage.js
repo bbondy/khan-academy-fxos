@@ -7,7 +7,7 @@ define(["util"], function(Util) {
          * Must be called before any other API.
          */
         init: function() {
-            if (!navigator.getDeviceStorage) {
+            if (!navigator.getDeviceStorage || !Util.isFirefoxOS()) {
                 return $.Deferred().resolve().promise();
             }
             this.sdcard = navigator.getDeviceStorage("sdcard");
