@@ -72,3 +72,4 @@ If you would like help getting setup feel free to contact [Brian R. Bondy](http:
 - [Rodrigo Silveira](http://blog.rodms.com) - Portuguese app translation
 - [Romain Sertelon](https://www.bluepyth.fr/) - French app translation
 - [Pablo Solares Acebal]( http://pablo.edicionescamelot.com) - Spanish translation
+- [Sashoto Seeam](sashoto.wordpress.com) - Bengali translation
