@@ -30,6 +30,10 @@
     "pt": {
       "name": "Khan Academy",
       "description": "A Khan Academy te permite aprender quase tudo sem pagar nada"
+    },
+    "bn": {
+      "name": "Khan Academy",
+      "description": "খান অ্যাকাডেমি থেকে আপনি বিনামূল্যে প্রায় সব কিছুই শিখতেই পারবেন"
     }
   },
   "default_locale": "en",
