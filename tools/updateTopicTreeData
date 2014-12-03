@@ -12,3 +12,4 @@ rm data/topic-tree-fr.json
 rm data/topic-tree-es.json
 rm data/topic-tree-pt.json
 rm data/topic-tree-tr.json
+rm data/topic-tree-bn.json
