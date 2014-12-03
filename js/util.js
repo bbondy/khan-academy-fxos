@@ -32,7 +32,7 @@ define([], function() {
         /**
          * We don't need to list en here since that is the default
          */
-        supportedLocales: ["boxes", "es", "fr", "pt", "bn"],
+        supportedLocales: ["boxes", "es", "fr", "pt", "tr", "bn"],
         /**
          * Obtains the phone's locale or null for the default locale (en-US)
          *
