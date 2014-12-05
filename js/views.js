@@ -552,12 +552,11 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                     },
                     events: {
                         onReady: () => {
-                            console.log("ok showing the player and hiding the throbber!!!");
                             $(".throbber").hide();
                             this._canPlayYoutube();
                         },
                         onError: function() {
-                            console.log('onError!');
+                            Util.error('onError!');
                         },
                         onStateChange: (e) => {
                             var state = e.data;
@@ -574,7 +573,6 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
 
                     }
                 });
-                console.log('this.player: %o', this.player);
                 this.youtubePlayerTimer = setInterval(() => {
                     if (this.player.getCurrentTime && this.player.getDuration && this.isPlaying) {
                         Util.log("currentTime: " + this.player.getCurrentTime());
@@ -974,7 +972,9 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
             this.props.options.save();
         },
         handleSetPlaybackSpeedChange: function(event) {
-            this.props.options.set("setPlayBackSpeed", event.target.checked);
+            // Convert a value like: 0, 1, 2, 3 to 50, 100, 150, 200
+            var percentage = 50 + event.target.value * 50;
+            this.props.options.set("playbackSpeed", percentage);
             this.props.options.save();
         },
         // YouTube player option is currently disabled due to a bug w/ the
@@ -1000,14 +1000,17 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                 <span></span>
                 </label>
 
-                <div data-l10n-id="set-playback">Set video playback speed</div>
+                <div data-l10n-id="set-playback-speed">Set playback speed</div>
+                <label class="icon"></label>
                 <label className="bb-docs">
-                <section role="slider" aria-valuemin="50" aria-valuenow="100" aria-valuemax="200" aria-valuetext="slider description">
-                    <label class="icon">50%</label>
-                    <label class="icon">200%</label>
-                    <input ref="setPlayBackSpeed"
+                <section role="slider">
+                    <input ref="setPlaybackSpeed"
+                           id="set-playback-speed"
                            type="range"
+                           min="0" max="3"
+                           value={(this.props.options.get("playbackSpeed") - 50) / 50}
                            onChange={this.handleSetPlaybackSpeedChange}></input>
+                    <label class="icon">{this.props.options.get("playbackSpeed")}%</label>
                     <span></span>
                 </section>
                 </label>

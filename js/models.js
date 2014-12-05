@@ -768,7 +768,8 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
         defaults: {
             showDownloadsOnly: false,
             showTranscripts: true,
-            useYouTubePlayer: false
+            useYouTubePlayer: false,
+            playbackSpeed: 100
         },
         sync: function(method, model, options) {
             if (method === "create" || method === "update") {

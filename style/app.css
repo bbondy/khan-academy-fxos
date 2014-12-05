@@ -603,3 +603,8 @@ span.fa-arrows-alt {
     z-index: 100;
     vertical-align:middle
 }
+
+#set-playback-speed {
+    float: left;
+    width: 20rem;
+}
