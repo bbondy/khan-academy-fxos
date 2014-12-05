@@ -973,6 +973,10 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
             this.props.options.set("useYouTubePlayer", event.target.checked);
             this.props.options.save();
         },
+        handleSetPlaybackSpeedChange: function(event) {
+            this.props.options.set("setPlayBackSpeed", event.target.checked);
+            this.props.options.save();
+        },
         // YouTube player option is currently disabled due to a bug w/ the
         // API when on the actual device.  Callbacks aren't always called.
         render: function() {
@@ -994,6 +998,18 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                        checked={this.props.options.get("showTranscripts")}
                        onChange={this.handleShowTranscriptsChange}></input>
                 <span></span>
+                </label>
+
+                <div data-l10n-id="set-playback">Set video playback speed</div>
+                <label className="bb-docs">
+                <section role="slider" aria-valuemin="50" aria-valuenow="100" aria-valuemax="200" aria-valuetext="slider description">
+                    <label class="icon">50%</label>
+                    <label class="icon">200%</label>
+                    <input ref="setPlayBackSpeed"
+                           type="range"
+                           onChange={this.handleSetPlaybackSpeedChange}></input>
+                    <span></span>
+                </section>
                 </label>
 
                 {/*
