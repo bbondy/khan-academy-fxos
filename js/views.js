@@ -1074,27 +1074,27 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                     <div>
                     <span className="span2">
                         <div className="badge-category-count">{models.CurrentUser.get("userInfo").badgeCounts[5]}</div>
-                        <img className="badge-category-icon" title="Challenge Patches" src="img/badges/master-challenge-blue-60x60.png"/>
+                        <img className="badge-category-icon" title="Challenge Patches" src="/img/badges/master-challenge-blue-60x60.png"/>
                     </span>
                     <span className="span2">
                         <div className="badge-category-count">{models.CurrentUser.get("userInfo").badgeCounts[4]}</div>
-                        <img className="badge-category-icon" title="Black Hole Badges" src="img/badges/eclipse-60x60.png"/>
+                        <img className="badge-category-icon" title="Black Hole Badges" src="/img/badges/eclipse-60x60.png"/>
                     </span>
                     <span className="span2">
                         <div className="badge-category-count">{models.CurrentUser.get("userInfo").badgeCounts[3]}</div>
-                        <img className="badge-category-icon" title="Sun Badges" src="img/badges/sun-60x60.png"/>
+                        <img className="badge-category-icon" title="Sun Badges" src="/img/badges/sun-60x60.png"/>
                     </span>
                     <span className="span2">
                         <div className="badge-category-count">{models.CurrentUser.get("userInfo").badgeCounts[2]}</div>
-                        <img className="badge-category-icon" title="Earth Badges" src="img/badges/earth-60x60.png"/>
+                        <img className="badge-category-icon" title="Earth Badges" src="/img/badges/earth-60x60.png"/>
                     </span>
                     <span className="span2">
                         <div className="badge-category-count">{models.CurrentUser.get("userInfo").badgeCounts[1]}</div>
-                        <img className="badge-category-icon" title="Moon Badges" src="img/badges/moon-60x60.png"/>
+                        <img className="badge-category-icon" title="Moon Badges" src="/img/badges/moon-60x60.png"/>
                     </span>
                     <span className="span2">
                         <div className="badge-category-count">{models.CurrentUser.get("userInfo").badgeCounts[0]}</div>
-                        <img className="badge-category-icon" title="Meteorite Badges" src="img/badges/meteorite-60x60.png"/>
+                        <img className="badge-category-icon" title="Meteorite Badges" src="/img/badges/meteorite-60x60.png"/>
                     </span>
                     </div> : null }
             </div>;

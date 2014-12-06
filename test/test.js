@@ -21,12 +21,30 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
     var mountNode = document.getElementById("app");
     $(mountNode).empty();
 
-    QUnit.asyncTest("models.AppOptions.fetch defaults", function(assert) {
-        expect(3);
+    QUnit.asyncTest("models.AppOptions.fetch defaults and reset", function(assert) {
+        expect(12);
         models.AppOptions.fetch().done(function() {
             assert.strictEqual(models.AppOptions.get("showDownloadsOnly"), false);
             assert.strictEqual(models.AppOptions.get("showTranscripts"), true);
+            assert.strictEqual(models.AppOptions.get("useYouTubePlayer"), false);
+            assert.strictEqual(models.AppOptions.get("playbackSpeed"), 100);
+
+            // Change settings
+            models.AppOptions.set("showDownloadsOnly", true);
+            models.AppOptions.set("showTranscripts", false);
+            models.AppOptions.set("useYouTubePlayer", true);
+            models.AppOptions.set("playbackSpeed", 200);
+            assert.strictEqual(models.AppOptions.get("showDownloadsOnly"), true);
+            assert.strictEqual(models.AppOptions.get("showTranscripts"), false);
             assert.strictEqual(models.AppOptions.get("useYouTubePlayer"), true);
+            assert.strictEqual(models.AppOptions.get("playbackSpeed"), 200);
+
+            // Now reset back to default
+            models.AppOptions.reset();
+            assert.strictEqual(models.AppOptions.get("showDownloadsOnly"), false);
+            assert.strictEqual(models.AppOptions.get("showTranscripts"), true);
+            assert.strictEqual(models.AppOptions.get("useYouTubePlayer"), false);
+            assert.strictEqual(models.AppOptions.get("playbackSpeed"), 100);
             QUnit.start();
         });
     });
@@ -102,9 +120,14 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
             Simulate.click(link.getDOMNode());
             // Check to make sure the sidebar contains: Download Video, Open in Website, Share
             var sidebar = TestUtils.findRenderedComponentWithType(mainView, Views.Sidebar);
-            TestUtils.findRenderedDOMComponentWithClass(sidebar, "download-video-link");
+            if (Util.isFirefoxOS()) {
+                TestUtils.findRenderedDOMComponentWithClass(sidebar, "download-video-link");
+                TestUtils.findRenderedDOMComponentWithClass(sidebar, "share-link");
+            } else {
+                assert.strictEqual(TestUtils.scryRenderedDOMComponentsWithClass(sidebar, "download-video-link").length, 0);
+                assert.strictEqual(TestUtils.scryRenderedDOMComponentsWithClass(sidebar, "share-link").length, 0);
+            }
             TestUtils.findRenderedDOMComponentWithClass(sidebar, "open-in-website-link");
-            TestUtils.findRenderedDOMComponentWithClass(sidebar, "share-link");
             TestUtils.findRenderedDOMComponentWithTag(mainView, "video");
             if (models.CurrentUser.isSignedIn()) {
                 TestUtils.findRenderedDOMComponentWithClass(mainView, "energy-points"); // Only if signed in
@@ -137,7 +160,11 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
             Simulate.click(link.getDOMNode());
             TestUtils.findRenderedDOMComponentWithTag(mainView, "article");
             var sidebar = TestUtils.findRenderedComponentWithType(mainView, Views.Sidebar);
-            TestUtils.findRenderedDOMComponentWithClass(sidebar, "download-article-link");
+            if (Util.isFirefoxOS()) {
+                TestUtils.findRenderedDOMComponentWithClass(sidebar, "download-article-link");
+            } else {
+                assert.strictEqual(TestUtils.scryRenderedDOMComponentsWithClass(sidebar, "download-article-link").length, 0);
+            }
             //assert.strictEqual(TestUtils.scryRenderedDOMComponentsWithClass(sidebar, "open-in-website-link").length, 0);
             //assert.strictEqual(TestUtils.scryRenderedDOMComponentsWithClass(sidebar, "share-link").length, 0);
             var articleViewer = TestUtils.findRenderedComponentWithType(mainView, Views.ArticleViewer);
@@ -152,10 +179,12 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
 
             // View downloads works
             sidebar = TestUtils.findRenderedComponentWithType(mainView, Views.Sidebar);
-            var viewDownloadsLink = TestUtils.findRenderedDOMComponentWithClass(sidebar, "view-downloads-link").getDOMNode();
-            Simulate.click(viewDownloadsLink);
-            TestUtils.findRenderedDOMComponentWithClass(mainView, "downloads").getDOMNode();
-            clickBack();
+            if (Util.isFirefoxOS()) {
+                var viewDownloadsLink = TestUtils.findRenderedDOMComponentWithClass(sidebar, "view-downloads-link").getDOMNode();
+                Simulate.click(viewDownloadsLink);
+                TestUtils.findRenderedDOMComponentWithClass(mainView, "downloads").getDOMNode();
+                clickBack();
+            }
 
             // Open support link exists
             sidebar = TestUtils.findRenderedComponentWithType(mainView, Views.Sidebar);
