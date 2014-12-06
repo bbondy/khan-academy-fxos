@@ -608,3 +608,7 @@ span.fa-arrows-alt {
     float: left;
     width: 20rem;
 }
+
+#reset-button {
+    width: 20rem;
+}
