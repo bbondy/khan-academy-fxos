@@ -131,7 +131,7 @@
             }
         },
 
-        minify: function(node, logWarnings) {
+        minify: function(node, logWarnings, logVideos) {
             var newChildren = [];
             if (node.children) {
                 node.children.forEach(function(child) {
@@ -141,6 +141,10 @@
                         // Also remove empty nodes, do this after minification because since we filter out some
                         // types of content items, it might only be empty after minification.
                         if (child[this.getShortName("kind")] !== this.getShortValue("kind", "Topic")) {
+                            if (logVideos) {
+                                console.log(child[this.getShortName("youtube_id")] + ":\t" + child[this.getShortName("translated_title")]);
+                            }
+
                             // Exclude video items that have no download url
                             if (child[this.getShortName("kind")] !== this.getShortValue("kind", "Video") ||
                                     child[this.getShortName("download_urls")]) {
