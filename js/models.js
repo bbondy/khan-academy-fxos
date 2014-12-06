@@ -771,6 +771,10 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
             useYouTubePlayer: false,
             playbackSpeed: 100
         },
+        reset: function() {
+            this.clear().set(this.defaults);
+            this.save();
+        },
         sync: function(method, model, options) {
             if (method === "create" || method === "update") {
                 localStorage.setItem(this._name, JSON.stringify(this.toJSON()));
