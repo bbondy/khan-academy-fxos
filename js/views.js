@@ -977,6 +977,11 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
             this.props.options.set("playbackSpeed", percentage);
             this.props.options.save();
         },
+        handleReset: function(event) {
+            if (confirm(document.webL10n.get("confirm-reset"))) {
+                this.props.options.reset();
+            }
+        },
         // YouTube player option is currently disabled due to a bug w/ the
         // API when on the actual device.  Callbacks aren't always called.
         render: function() {
@@ -1014,6 +1019,10 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                     <span></span>
                 </section>
                 </label>
+
+                <button id="reset-button"
+                        data-l10n-id="reset-setting"
+                        onClick={this.handleReset}>Reset</button>
 
                 {/*
                 <div data-l10n-id="use-youtube-player">Use YouTube player</div>
