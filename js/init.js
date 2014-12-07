@@ -10,6 +10,7 @@ require.config({
         "notifications": "notifications",
         "cache": "cache",
         "test": "../test/test",
+        "test-react": "../test/test-react",
         "sinon": "../test/sinon-1.1.0.3",
 
         // Third party libs
@@ -29,8 +30,9 @@ require.config({
 
 var initModules = [];
 if (window.isTest) {
-    initModules.push('sinon');
+    initModules.push('test-react');
     initModules.push('test');
+    initModules.push('sinon');
 } else {
     initModules.push('main');
 }
