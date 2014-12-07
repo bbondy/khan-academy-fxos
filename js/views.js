@@ -990,6 +990,7 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                 <div data-l10n-id="show-downloads-only">Show downloads only</div>
                 <label className="pack-switch">
                 <input ref="showDownloadsOnly"
+                       className="show-downloads-setting"
                        type="checkbox"
                        checked={this.props.options.get("showDownloadsOnly")}
                        onChange={this.handleShowDownloadsChange}></input>
@@ -999,6 +1000,7 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                 <div data-l10n-id="show-transcripts">Show transcripts</div>
                 <label className="pack-switch">
                 <input ref="showTranscripts"
+                       className="show-transcripts-setting"
                        type="checkbox"
                        checked={this.props.options.get("showTranscripts")}
                        onChange={this.handleShowTranscriptsChange}></input>
@@ -1010,6 +1012,7 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                 <label className="bb-docs">
                 <section role="slider">
                     <input ref="setPlaybackSpeed"
+                           className="set-playback-speed-setting"
                            id="set-playback-speed"
                            type="range"
                            min="0" max="3"
@@ -1021,6 +1024,7 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                 </label>
 
                 <button id="reset-button"
+                        className="reset-button"
                         data-l10n-id="reset-setting"
                         onClick={this.handleReset}>Reset</button>
 

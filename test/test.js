@@ -24,6 +24,7 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
     QUnit.asyncTest("models.AppOptions.fetch defaults and reset", function(assert) {
         expect(12);
         models.AppOptions.fetch().done(function() {
+            models.AppOptions.reset();
             assert.strictEqual(models.AppOptions.get("showDownloadsOnly"), false);
             assert.strictEqual(models.AppOptions.get("showTranscripts"), true);
             assert.strictEqual(models.AppOptions.get("useYouTubePlayer"), false);
@@ -151,6 +152,7 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
             Simulate.click(link.getDOMNode());
             videoViewer = TestUtils.findRenderedComponentWithType(mainView, Views.VideoViewer);
             assert.ok(!videoViewer.transcriptPromise);
+            models.AppOptions.set("showTranscripts", true);
             clickBack();
 
             // Test that an article renders
@@ -170,11 +172,42 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
             var articleViewer = TestUtils.findRenderedComponentWithType(mainView, Views.ArticleViewer);
             return articleViewer.p1;
         }).then(function() {
+
             // View setings works
+            models.AppOptions.reset();
             sidebar = TestUtils.findRenderedComponentWithType(mainView, Views.Sidebar);
             var viewSettingsLink = TestUtils.findRenderedDOMComponentWithClass(sidebar, "view-settings-link").getDOMNode();
             Simulate.click(viewSettingsLink);
             TestUtils.findRenderedDOMComponentWithClass(mainView, "settings").getDOMNode();
+
+            // showDownloadsOnly setting
+            var showDownloadsSetting = TestUtils.findRenderedDOMComponentWithClass(mainView, "show-downloads-setting").getDOMNode();
+            assert.strictEqual(models.AppOptions.get("showDownloadsOnly"), false);
+            Simulate.change(showDownloadsSetting, { target: { checked: true} });
+            assert.strictEqual(models.AppOptions.get("showDownloadsOnly"), true);
+
+            // showTranscripts setting
+            var showTranscriptsSetting = TestUtils.findRenderedDOMComponentWithClass(mainView, "show-transcripts-setting").getDOMNode();
+            assert.strictEqual(models.AppOptions.get("showTranscripts"), true);
+            Simulate.change(showTranscriptsSetting, { target: { checked: false} });
+            assert.strictEqual(models.AppOptions.get("showTranscripts"), false);
+
+            // setPlaybackSpeed
+            var playbackSpeedSetting = TestUtils.findRenderedDOMComponentWithClass(mainView, "set-playback-speed-setting").getDOMNode();
+            assert.strictEqual(models.AppOptions.get("playbackSpeed"), 100);
+            Simulate.change(playbackSpeedSetting, { target: { value: 3} });
+            assert.strictEqual(models.AppOptions.get("playbackSpeed"), 200);
+
+            // test the reset button
+            var resetButton = TestUtils.findRenderedDOMComponentWithClass(mainView, "reset-button").getDOMNode();
+            var oldConfirm = window.confirm;
+            window.confirm = function() { return true; };
+            Simulate.click(resetButton);
+            assert.strictEqual(models.AppOptions.get("playbackSpeed"), 100);
+            assert.strictEqual(models.AppOptions.get("showTranscripts"), true);
+            assert.strictEqual(models.AppOptions.get("showDownloadsOnly"), false);
+            window.confirm = oldConfirm;
+
             clickBack();
 
             // View downloads works
