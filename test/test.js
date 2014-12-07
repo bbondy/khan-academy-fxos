@@ -101,7 +101,7 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
     });
 
     // Languages in which topic trees should be tested for
-    var languages = ["en", "fr", "es", "pt"];
+    var languages = ["en", "fr", "es", "pt", "tr", "bn"];
     QUnit.asyncTest("testUtil", function(assert) {
         assert.strictEqual(Util.numberWithCommas("1234567890"),"1,234,567,890");
         var oneAdder = Util.partial(function(x, y) { return x + y; }, 1);
