@@ -769,7 +769,7 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
             showDownloadsOnly: false,
             showTranscripts: true,
             useYouTubePlayer: false,
-            playbackSpeed: 100
+            playbackRate: 100
         },
         reset: function() {
             this.clear().set(this.defaults);
