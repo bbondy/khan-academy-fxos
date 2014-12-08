@@ -592,8 +592,8 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                 video.addEventListener("stop", this._onStop.bind(this), true);
                 video.addEventListener("ended", this._onEnded.bind(this), true);
                 video.addEventListener("error", this._onError.bind(this), true);
-                video.defaultPlaybackRate = models.AppOptions.get("playbackSpeed") / 100;
-                video.playbackRate = models.AppOptions.get("playbackSpeed") / 100;
+                video.defaultPlaybackRate = models.AppOptions.get("playbackRate") / 100;
+                video.playbackRate = models.AppOptions.get("playbackRate") / 100;
             }
         },
 
@@ -973,10 +973,10 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
             this.props.options.set("useYouTubePlayer", event.target.checked);
             this.props.options.save();
         },
-        handleSetPlaybackSpeedChange: function(event) {
+        handleSetPlaybackRateChange: function(event) {
             // Convert a value like: 0, 1, 2, 3 to 50, 100, 150, 200
             var percentage = 50 + event.target.value * 50;
-            this.props.options.set("playbackSpeed", percentage);
+            this.props.options.set("playbackRate", percentage);
             this.props.options.save();
         },
         handleReset: function(event) {
@@ -1011,13 +1011,13 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                 <label class="icon"></label>
                 <label className="bb-docs">
                 <section role="slider">
-                    <input ref="setPlaybackSpeed"
+                    <input ref="setPlaybackRate"
                            id="set-playback-speed"
                            type="range"
                            min="0" max="3"
-                           value={(this.props.options.get("playbackSpeed") - 50) / 50}
-                           onChange={this.handleSetPlaybackSpeedChange}></input>
-                    <label class="icon">{this.props.options.get("playbackSpeed")}%</label>
+                           value={(this.props.options.get("playbackRate") - 50) / 50}
+                           onChange={this.handleSetPlaybackRateChange}></input>
+                    <label class="icon">{this.props.options.get("playbackRate")}%</label>
                     <span></span>
                 </section>
                 </label>
