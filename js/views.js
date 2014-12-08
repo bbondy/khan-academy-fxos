@@ -592,6 +592,8 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                 video.addEventListener("stop", this._onStop.bind(this), true);
                 video.addEventListener("ended", this._onEnded.bind(this), true);
                 video.addEventListener("error", this._onError.bind(this), true);
+                video.defaultPlaybackRate = models.AppOptions.get("playbackSpeed") / 100;
+                video.playbackRate = models.AppOptions.get("playbackSpeed") / 100;
             }
         },
 
