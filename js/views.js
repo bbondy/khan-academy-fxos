@@ -14,6 +14,10 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
      * which are the children of the clicked item.
      */
     var TopicListItem = React.createClass({
+        propTypes: {
+            topic: React.PropTypes.object.isRequired,
+            onClickTopic: React.PropTypes.func.isRequired
+        },
         getInitialState: function() {
             return {};
         },
@@ -46,6 +50,10 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
      */
     var VideoListItem = React.createClass({
         componentDidMount: function() {
+        },
+        propTypes: {
+            video: React.PropTypes.object.isRequired,
+            onClickVideo: React.PropTypes.func.isRequired
         },
         render: function() {
             var videoNodeClass = cx({
@@ -99,6 +107,10 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
      * When clicked, it will render the article corresponding to this list item.
      */
     var ArticleListItem = React.createClass({
+        propTypes: {
+            article: React.PropTypes.object.isRequired,
+            onClickArticle: React.PropTypes.func.isRequired
+        },
         render: function() {
             var articleNodeClass = cx({
               'article-node': true,
@@ -146,6 +158,10 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
      * at before.
      */
     var BackButton = React.createClass({
+        propTypes: {
+            model: React.PropTypes.object.isRequired,
+            onClickBack: React.PropTypes.func.isRequired
+        },
         render: function() {
             return <div>
                 <a className="icon-back-link " href="javascript:void(0)" onClick={Util.partial(this.props.onClickBack, this.props.model)}>
@@ -178,6 +194,11 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
      */
     var TopicViewer = React.createClass({
         componentDidMount: function() {
+        },
+        propTypes: {
+            topic: React.PropTypes.object.isRequired,
+            onClickTopic: React.PropTypes.func.isRequired,
+            onClickContentItem: React.PropTypes.func.isRequired
         },
         render: function() {
             var topics;
@@ -221,6 +242,11 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
      * This always contains only a list of VideoListItems, or ARticleListItems.
      */
     var ContentListViewer = React.createClass({
+        propTypes: {
+            collection: React.PropTypes.object.isRequired,
+            onClickContentItem: React.PropTypes.func.isRequired,
+            onClickTranscript: React.PropTypes.func.isRequired
+        },
         render: function() {
             var contentItems;
             if (this.props.collection.models) {
@@ -253,6 +279,9 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
      * When clicekd, it willl fast forward the video to that transcript item.
      */
     var TranscriptItem = React.createClass({
+        propTypes: {
+            transcriptItem: React.PropTypes.object.isRequired
+        },
         render: function() {
             var totalSeconds = this.props.transcriptItem.start_time / 1000 | 0;
             var startMinute = totalSeconds / 60 | 0;
@@ -271,6 +300,10 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
      * Represents the entire transcript, which is a list of TranscriptItems.
      */
     var TranscriptViewer = React.createClass({
+        propTypes: {
+            collection: React.PropTypes.object.isRequired,
+            onClickTranscript: React.PropTypes.func.isRequired
+        },
         render: function() {
             if (!this.props.collection) {
                 return null;
@@ -289,6 +322,9 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
      * display it to the user.
      */
     var ArticleViewer = React.createClass({
+        propTypes: {
+            article: React.PropTypes.object.isRequired
+        },
         mixins: [Util.BackboneMixin],
         getBackboneModels: function() {
             return [this.props.article];
@@ -344,6 +380,9 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
      * display it to the user.
      */
     var VideoViewer = React.createClass({
+        propTypes: {
+            video: React.PropTypes.object.isRequired
+        },
         componentWillMount: function() {
             Util.log("VideoViewer will mount");
             if (models.AppOptions.get("showTranscripts")) {
@@ -724,6 +763,10 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
      * and a title.
      */
     var AppHeader = React.createClass({
+        propTypes: {
+            model: React.PropTypes.object.isRequired,
+            isPaneShowing: React.PropTypes.bool.isRequired
+        },
         render: function() {
                 var backButton;
                 if (this.props.model && (this.props.isPaneShowing ||
@@ -777,6 +820,10 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
      * Represents the topic search input item which is right below the header.
      */
     var TopicSearch = React.createClass({
+        propTypes: {
+            model: React.PropTypes.object.isRequired,
+            onTopicSearch: React.PropTypes.func.isRequired
+        },
         getInitialState: function() {
             return {value: ''};
         },
@@ -843,6 +890,24 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
      * The sidebar drawer comes up when you click on the menu from the top header.
      */
     var Sidebar = React.createClass({
+        propTypes: {
+            model: React.PropTypes.object.isRequired,
+            isPaneShowing: React.PropTypes.bool.isRequired,
+            isSettingsShowing: React.PropTypes.bool.isRequired,
+            isProfileShowing: React.PropTypes.bool.isRequired,
+            isDownloadsShowing: React.PropTypes.bool.isRequired,
+            onClickDeleteDownloadedContent: React.PropTypes.func.isRequired,
+            onClickDownloadContent: React.PropTypes.func.isRequired,
+            onClickViewOnKA: React.PropTypes.func.isRequired,
+            onClickShare: React.PropTypes.func.isRequired,
+            onClickSignin: React.PropTypes.func.isRequired,
+            onClickCancelDownloadContent: React.PropTypes.func.isRequired,
+            onClickProfile: React.PropTypes.func.isRequired,
+            onClickSettings: React.PropTypes.func.isRequired,
+            onClickDownloads: React.PropTypes.func.isRequired,
+            onClickSupport: React.PropTypes.func.isRequired,
+            onClickSignout: React.PropTypes.func.isRequired
+        },
         render: function() {
             var items = [];
 
@@ -939,6 +1004,9 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
      * ContentListViewer for now.
      */
     var DownloadsViewer = React.createClass({
+        propTypes: {
+            onClickContentItem: React.PropTypes.func.isRequired
+        },
         render: function() {
             if (!Downloads.contentList.length) {
                 return <div className="downloads">
@@ -959,6 +1027,9 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
      * global state.
      */
     var SettingsViewer = React.createClass({
+        propTypes: {
+            options: React.PropTypes.object.isRequired
+        },
         handleShowDownloadsChange: function(event) {
             this.props.options.set("showDownloadsOnly", event.target.checked);
             this.props.options.save();
@@ -1047,6 +1118,10 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
      * ContentListViewer for now.
      */
     var SearchResultsViewer = React.createClass({
+        propTypes: {
+            collection: React.PropTypes.object.isRequired,
+            onClickContentItem: React.PropTypes.func.isRequired
+        },
         render: function() {
             var control = <ContentListViewer collection={this.props.collection}
                                              onClickContentItem={this.props.onClickContentItem} />;
@@ -1113,6 +1188,10 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
      * for the overall top level view (which is nice and clean ;)).
      */
     var MainView = React.createClass({
+        propTypes: {
+            // Optional because it's not specified until the topic tree is loaded
+            model: React.PropTypes.object
+        },
         mixins: [Util.BackboneMixin, Util.LocalizationMixin],
         getBackboneModels: function() {
             return [new models.ContentList(models.TopicTree.allContentItems),
