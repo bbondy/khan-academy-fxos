@@ -8,24 +8,24 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
             assert.strictEqual(models.AppOptions.get("showDownloadsOnly"), false);
             assert.strictEqual(models.AppOptions.get("showTranscripts"), true);
             assert.strictEqual(models.AppOptions.get("useYouTubePlayer"), false);
-            assert.strictEqual(models.AppOptions.get("playbackSpeed"), 100);
+            assert.strictEqual(models.AppOptions.get("playbackRate"), 100);
 
             // Change settings
             models.AppOptions.set("showDownloadsOnly", true);
             models.AppOptions.set("showTranscripts", false);
             models.AppOptions.set("useYouTubePlayer", true);
-            models.AppOptions.set("playbackSpeed", 200);
+            models.AppOptions.set("playbackRate", 200);
             assert.strictEqual(models.AppOptions.get("showDownloadsOnly"), true);
             assert.strictEqual(models.AppOptions.get("showTranscripts"), false);
             assert.strictEqual(models.AppOptions.get("useYouTubePlayer"), true);
-            assert.strictEqual(models.AppOptions.get("playbackSpeed"), 200);
+            assert.strictEqual(models.AppOptions.get("playbackRate"), 200);
 
             // Now reset back to default
             models.AppOptions.reset();
             assert.strictEqual(models.AppOptions.get("showDownloadsOnly"), false);
             assert.strictEqual(models.AppOptions.get("showTranscripts"), true);
             assert.strictEqual(models.AppOptions.get("useYouTubePlayer"), false);
-            assert.strictEqual(models.AppOptions.get("playbackSpeed"), 100);
+            assert.strictEqual(models.AppOptions.get("playbackRate"), 100);
             QUnit.start();
         });
     });
