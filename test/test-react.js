@@ -164,18 +164,18 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
             Simulate.change(showTranscriptsSetting, { target: { checked: false} });
             assert.strictEqual(models.AppOptions.get("showTranscripts"), false);
 
-            // setPlaybackSpeed
-            var playbackSpeedSetting = TestUtils.findRenderedDOMComponentWithClass(mainView, "set-playback-speed-setting").getDOMNode();
-            assert.strictEqual(models.AppOptions.get("playbackSpeed"), 100);
-            Simulate.change(playbackSpeedSetting, { target: { value: 3} });
-            assert.strictEqual(models.AppOptions.get("playbackSpeed"), 200);
+            // setPlaybackRate
+            var playbackRateSetting = TestUtils.findRenderedDOMComponentWithClass(mainView, "set-playback-speed-setting").getDOMNode();
+            assert.strictEqual(models.AppOptions.get("playbackRate"), 100);
+            Simulate.change(playbackRateSetting, { target: { value: 3} });
+            assert.strictEqual(models.AppOptions.get("playbackRate"), 200);
 
             // test the reset button
             var resetButton = TestUtils.findRenderedDOMComponentWithClass(mainView, "reset-button").getDOMNode();
             var oldConfirm = window.confirm;
             window.confirm = function() { return true; };
             Simulate.click(resetButton);
-            assert.strictEqual(models.AppOptions.get("playbackSpeed"), 100);
+            assert.strictEqual(models.AppOptions.get("playbackRate"), 100);
             assert.strictEqual(models.AppOptions.get("showTranscripts"), true);
             assert.strictEqual(models.AppOptions.get("showDownloadsOnly"), false);
             window.confirm = oldConfirm;
