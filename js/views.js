@@ -1085,6 +1085,7 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                 <label className="bb-docs">
                 <section role="slider">
                     <input ref="setPlaybackRate"
+                           className="set-playback-speed-setting"
                            id="set-playback-speed"
                            type="range"
                            min="0" max="3"
