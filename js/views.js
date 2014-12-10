@@ -430,6 +430,7 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                 // Do a reset to make sure all data is cleared right away.
                 // Otherwise the app degrades and doesn't play videos anymore
                 // after about 15 minutes of use while viewing videos.
+                this.videojs.dispose();
                 video.src = "";
                 video.load();
             }
@@ -710,6 +711,12 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
             }
         },
 
+        componentDidUpdate: function() {
+            this.videojs = videojs("video-player", { width: '100%', height: '100%'}, function(){
+                Util.log("Videojs player is initialized and ready.");
+            });
+        },
+
         render: function() {
             var transcriptViewer;
             if (!!this.state.transcript) {
@@ -730,7 +737,9 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
             }
 
             var videoClass = cx({
-              'video-has-transcript': !!this.state.transcript
+              'video-has-transcript': !!this.state.transcript,
+              'video-js': true,
+              'vjs-default-skin': true
             });
 
             var control;
@@ -742,7 +751,7 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                         <div className={videoClass} id="player"/>
                     </div>;
             } else {
-                control = <video className={videoClass} src={videoSrc} ref="video" preload="auto"
+                control = <video id="video-player" className={videoClass} src={videoSrc} ref="video" preload="auto"
                                  type={this.props.video.getContentMimeType()} controls></video>;
             }
 
