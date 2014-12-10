@@ -740,11 +740,16 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                 pointsDiv = <div className="energy-points energy-points-video pull-right">{pointsString}</div>;
             }
 
-            var videoClass = cx({
+            var videoClassObj = {
               'video-has-transcript': !!this.state.transcript,
               'video-js': true,
               'vjs-default-skin': true
-            });
+            };
+            var parentDomain = this.props.video && this.props.video.getParentDomain();
+            if (parentDomain) {
+                videoClassObj[parentDomain.getId()] = true;
+            }
+            var videoClass = cx(videoClassObj);
 
             var control;
             if (this.state.showOfflineImage) {
