@@ -106,6 +106,11 @@ header.topic-header {
     background-color: #3C5466 !important;
 }
 
+.vjs-default-skin .vjs-volume-level,
+.vjs-default-skin .vjs-play-progress {
+    background-color: #cc6666
+}
+
 /**
  * New and noteworthy x29232c6b (we don't show this on purpose)
  */
@@ -135,6 +140,12 @@ ul li.x7a488390 div.color-block, header.topic-header.x7a488390 {
   background-color: #156278 !important;
 }
 
+.vjs-default-skin.x7a488390 .vjs-volume-level,
+.vjs-default-skin.x7a488390 .vjs-play-progress {
+    background-color: #156278
+}
+
+
 /**
  * Science "xb92336a2"
  */
@@ -157,6 +168,11 @@ ul li div.subway-icon.xb92336a2 div.pipe.in-progress {
 }
 ul li.xb92336a2 div.color-block, header.topic-header.xb92336a2 {
   background-color: #822F3D !important;
+}
+
+.vjs-default-skin.xb92336a2 .vjs-volume-level,
+.vjs-default-skin.xb92336a2 .vjs-play-progress {
+    background-color: #822F3D
 }
 
 /**
@@ -184,6 +200,12 @@ ul li.x5ca94af1 div.color-block, header.topic-header.x5ca94af1 {
   background-color: #BB7B31 !important;
 }
 
+.vjs-default-skin.x5ca94af1 .vjs-volume-level,
+.vjs-default-skin.x5ca94af1 .vjs-play-progress {
+    background-color: #BB7B31
+}
+
+
 /**
  * Arts and humanities "x905db83d"
  */
@@ -205,6 +227,11 @@ ul li div.subway-icon.x905db83d div.pipe.in-progress {
 
 ul li.x905db83d div.color-block, header.topic-header.x905db83d {
   background-color: #C43931 !important;
+}
+
+.vjs-default-skin.x905db83d .vjs-volume-level,
+.vjs-default-skin.x905db83d .vjs-play-progress {
+    background-color: #C43931
 }
 
 /**
@@ -232,6 +259,11 @@ ul li.x45aed616 div.color-block, header.topic-header.x45aed616 {
   background-color: #568F3D !important;
 }
 
+.vjs-default-skin.x45aed616 .vjs-volume-level,
+.vjs-default-skin.x45aed616 .vjs-play-progress {
+    background-color: #568F3D;
+}
+
 /**
  * Test Prep "x7626d097"
  */
@@ -255,6 +287,11 @@ ul li div.subway-icon.x7626d097 div.pipe.in-progress {
 
 ul li.x7626d097 div.color-block, header.topic-header.x7626d097 {
   background-color: #512D60 !important;
+}
+
+.vjs-default-skin.x7626d097 .vjs-volume-level,
+.vjs-default-skin.x7626d097 .vjs-play-progress {
+    background-color: #568F3D;
 }
 
 /**
@@ -282,6 +319,11 @@ ul li.x54390c7e div.color-block, header.topic-header.x54390c7e {
   background-color: #399B7C !important;
 }
 
+.vjs-default-skin.x54390c7e .vjs-volume-level,
+.vjs-default-skin.x54390c7e .vjs-play-progress {
+    background-color: #399B7C;
+}
+
 /**
  * Talks and interviews "xd1039e22"
  */
@@ -307,6 +349,11 @@ ul li.xd1039e22 div.color-block, header.topic-header.xd1039e22 {
   background-color: #3C5466 !important;
 }
 
+.vjs-default-skin.xd1039e22 .vjs-volume-level,
+.vjs-default-skin.xd1039e22 .vjs-play-progress {
+    background-color: #3C5466;
+}
+
 /**
  * Coach and classroom resources "x6a4a5e33"
  */
@@ -330,6 +377,11 @@ ul li div.subway-icon.x6a4a5e33 div.pipe.in-progress {
 
 ul li.x6a4a5e33 div.color-block, header.topic-header.x6a4a5e33 {
   background-color: #3C5466;
+}
+
+.vjs-default-skin.x6a4a5e33 .vjs-volume-level,
+.vjs-default-skin.x6a4a5e33 .vjs-play-progress {
+    background-color: #3C5466;
 }
 
 /**
