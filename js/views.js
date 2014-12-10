@@ -426,17 +426,18 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                 URL.revokeObjectURL(this.state.downloadedUrl);
             }
             if (this.refs.video) {
-                if (this.videojs) {
-                    this.videojs.dispose();
-                }
+                // TODO(bbondy): this may not be needed anymore with videojs
+                // I need to test on the device itself again.
                 // Do a reset to make sure all data is cleared right away.
                 // Otherwise the app degrades and doesn't play videos anymore
                 // after about 15 minutes of use while viewing videos.
-                var video = this.refs.video.getDOMNode();
+                //var video = this.refs.video.getDOMNode();
+                /*
                 if (video) {
                     video.src = "";
                     video.load();
                 }
+                */
             }
             if (this.youtubePlayerTimer) {
                 clearInterval(this.youtubePlayerTimer);
