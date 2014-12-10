@@ -390,16 +390,16 @@ div.throbber {
     background-size: 10rem;
 }
 
-video, #player {
+#video-player, #player {
     width: 100%;
     max-height: calc(100% - 5rem);
 }
 
-video.video-has-transcript, #player.video-has-transcript {
+#video-player.video-has-transcript, #player.video-has-transcript {
     max-height: 50%;
 }
 
-video ~ !.transcript,  #player ~ !.transcript{
+#video-player ~ !.transcript,  #player ~ !.transcript {
     max-height; 100%;
 }
 
@@ -532,6 +532,7 @@ article {
 }
 
 .energy-points-video {
+    margin-top: 1rem;
 }
 
 label.pack-switch {
@@ -612,3 +613,6 @@ span.fa-arrows-alt {
 #reset-button {
     width: 20rem;
 }
+
+.vjs-default-skin .vjs-control-bar { font-size: 144% }
+.vjs-control[role="button"] { background-color: none; }
