@@ -431,13 +431,22 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                 // Do a reset to make sure all data is cleared right away.
                 // Otherwise the app degrades and doesn't play videos anymore
                 // after about 15 minutes of use while viewing videos.
-                //var video = this.refs.video.getDOMNode();
-                /*
+
+                var video = this._getVideoDOMNode();
                 if (video) {
-                    video.src = "";
-                    video.load();
+                    video.removeEventListener("canplay", this._canPlayHTML5);
+                    video.removeEventListener("progress", this._onNetworkProgress);
+                    video.removeEventListener("timeupdate", this._onTimeupdateHTML5);
+                    video.removeEventListener("play", this._onPlay);
+                    video.removeEventListener("pause", this._onPause);
+                    video.removeEventListener("stop", this._onStop);
+                    video.removeEventListener("ended", this._onEnded);
+                    video.removeEventListener("error", this._onError);
+
+                    if (this.videojs) {
+                        this.videojs.dispose();
+                    }
                 }
-                */
             }
             if (this.youtubePlayerTimer) {
                 clearInterval(this.youtubePlayerTimer);
@@ -446,7 +455,7 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
         },
         onClickTranscript: function(obj) {
             var startSecond = obj.start_time / 1000 | 0;
-            var video = this.refs.video.getDOMNode();
+            var video = this._getVideoDOMNode();
             video.currentTime = startSecond;
             video.play();
         },
@@ -466,7 +475,7 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
             }
         },
         _canPlayHTML5: function() {
-            var video = this.refs.video.getDOMNode();
+            var video = this._getVideoDOMNode();
             if (this.initSecondWatched) {
                 video.currentTime = this.initSecondWatched;
                 Util.log('set current time to: ' + video.currentTime);
@@ -504,7 +513,7 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
             if (!this.isMounted()) {
                 return;
             }
-            var video = this.refs.video.getDOMNode();
+            var video = this._getVideoDOMNode();
             Util.log("Network state changed: ", video.networkState);
         },
         _onError: function(e) {
@@ -513,7 +522,7 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                 return;
             }
 
-            var video = this.refs.video.getDOMNode();
+            var video = this._getVideoDOMNode();
             if (video.networkState === HTMLMediaElement.NETWORK_NO_SOURCE) {
                 Util.log("Video has no source.", e);
                 this.stopAnimatingPoints(false);
@@ -546,6 +555,9 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                     break;
            }
         },
+        _getVideoDOMNode: function() {
+            return document.getElementsByTagName("video")[0];
+        },
         _onTimeupdateHTML5: function(e) {
             if (!this.isMounted()) {
                 return;
@@ -554,7 +566,7 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
             // resuming a paused video. We need to get the play event before reporting
             // seconds watched to properly update the secondsWatched though.
             if (this.isPlaying && this.refs.video) {
-                var video = this.refs.video.getDOMNode();
+                var video = this._getVideoDOMNode();
                 this.reportSecondsWatched(video.currentTime, video.duration);
                 this._onScrollTranscriptTo(video.currentTime);
             }
@@ -627,18 +639,21 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                     }
                 }, 1000);
             } else {
-                // Add an event listener to track watched time
-                var video = this.refs.video.getDOMNode();
-                video.addEventListener("canplay", this._canPlayHTML5.bind(this));
-                video.addEventListener("progress", this._onNetworkProgress.bind(this));
-                video.addEventListener("timeupdate", this._onTimeupdateHTML5);
-                video.addEventListener("play", this._onPlay.bind(this), true);
-                video.addEventListener("pause", this._onPause.bind(this), true);
-                video.addEventListener("stop", this._onStop.bind(this), true);
-                video.addEventListener("ended", this._onEnded.bind(this), true);
-                video.addEventListener("error", this._onError.bind(this), true);
-                video.defaultPlaybackRate = models.AppOptions.get("playbackRate") / 100;
-                video.playbackRate = models.AppOptions.get("playbackRate") / 100;
+                this.videojs = videojs("video-player", { width: '100%', height: '100%'}, () => {
+                    Util.log("Videojs player is initialized and ready.");
+                    // Add an event listener to track watched time
+                    var video = this._getVideoDOMNode();
+                    video.addEventListener("canplay", this._canPlayHTML5.bind(this));
+                    video.addEventListener("progress", this._onNetworkProgress.bind(this));
+                    video.addEventListener("timeupdate", this._onTimeupdateHTML5);
+                    video.addEventListener("play", this._onPlay.bind(this), true);
+                    video.addEventListener("pause", this._onPause.bind(this), true);
+                    video.addEventListener("stop", this._onStop.bind(this), true);
+                    video.addEventListener("ended", this._onEnded.bind(this), true);
+                    video.addEventListener("error", this._onError.bind(this), true);
+                    video.defaultPlaybackRate = models.AppOptions.get("playbackRate") / 100;
+                    video.playbackRate = models.AppOptions.get("playbackRate") / 100;
+                });
             }
         },
 
@@ -712,14 +727,11 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
         onReloadVideo: function() {
             Util.log("Calling video load!");
             if (this.refs.video) {
-               this.refs.video.getDOMNode().load();
+               this._getVideoDOMNode().load();
             }
         },
 
         componentDidUpdate: function() {
-            this.videojs = videojs("video-player", { width: '100%', height: '100%'}, function(){
-                Util.log("Videojs player is initialized and ready.");
-            });
         },
 
         render: function() {
