@@ -750,7 +750,7 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                         {"earned" : this.props.video.getPoints(), "available": this.availablePoints});
             var pointsDiv;
             if (models.CurrentUser.isSignedIn()) {
-                pointsDiv = <div className="energy-points energy-points-video pull-right">{pointsString}</div>;
+                pointsDiv = <div className="energy-points energy-points-video">{pointsString}</div>;
             }
 
             var videoClassObj = {
