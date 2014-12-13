@@ -82,8 +82,8 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
             }
             var subwayIconClass = cx(subwayIconClassObj);
             var pipeClass = cx(pipeClassObj);
-            var videoClass = cx(videoClassObj);
-            return <li className={videoClass}>
+            this.videoClass = cx(videoClassObj);
+            return <li className={this.videoClass}>
                 <div className={subwayIconClass}>
                     <a href="javascript:void(0)"
                        onClick={Util.partial(this.props.onClickVideo,
@@ -425,31 +425,20 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                 Util.log("Revoking: " + this.state.downloadedUrl);
                 URL.revokeObjectURL(this.state.downloadedUrl);
             }
-            if (this.refs.video) {
-                // TODO(bbondy): this may not be needed anymore with videojs
-                // I need to test on the device itself again.
-                // Do a reset to make sure all data is cleared right away.
-                // Otherwise the app degrades and doesn't play videos anymore
-                // after about 15 minutes of use while viewing videos.
+            var video = this._getVideoDOMNode();
+            if (video) {
+                video.removeEventListener("canplay", this._canPlayHTML5);
+                video.removeEventListener("progress", this._onNetworkProgress);
+                video.removeEventListener("timeupdate", this._onTimeupdateHTML5);
+                video.removeEventListener("play", this._onPlay);
+                video.removeEventListener("pause", this._onPause);
+                video.removeEventListener("stop", this._onStop);
+                video.removeEventListener("ended", this._onEnded);
+                video.removeEventListener("error", this._onError);
 
-                var video = this._getVideoDOMNode();
-                if (video) {
-                    video.removeEventListener("canplay", this._canPlayHTML5);
-                    video.removeEventListener("progress", this._onNetworkProgress);
-                    video.removeEventListener("timeupdate", this._onTimeupdateHTML5);
-                    video.removeEventListener("play", this._onPlay);
-                    video.removeEventListener("pause", this._onPause);
-                    video.removeEventListener("stop", this._onStop);
-                    video.removeEventListener("ended", this._onEnded);
-                    video.removeEventListener("error", this._onError);
-
-                    if (this.videojs) {
-                        this.videojs.dispose();
-                    }
+                if (this.videojs) {
+                    this.videojs.dispose();
                 }
-            }
-            if (this.youtubePlayerTimer) {
-                clearInterval(this.youtubePlayerTimer);
             }
             this.cleanedUp = true;
         },
@@ -518,7 +507,8 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
         },
         _onError: function(e) {
             Util.warn("Video error: %o", e);
-            if (!this.refs.video) {
+            var video = this._getVideoDOMNode();
+            if (!video) {
                 return;
             }
 
@@ -565,7 +555,8 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
             // Sometimes a 'timeupdate' event will come before a 'play' event when
             // resuming a paused video. We need to get the play event before reporting
             // seconds watched to properly update the secondsWatched though.
-            if (this.isPlaying && this.refs.video) {
+            var video = this._getVideoDOMNode();
+            if (this.isPlaying && video) {
                 var video = this._getVideoDOMNode();
                 this.reportSecondsWatched(video.currentTime, video.duration);
                 this._onScrollTranscriptTo(video.currentTime);
@@ -583,78 +574,27 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                 }, 400);
             }
         },
-        youtubePlayerStates: {
-            unstarted: -1,
-            ended: 0,
-            playing: 1,
-            paused: 2,
-            buffering: 3,
-            videoCued: 5
-        },
-        shouldUseYoutubePlayer: function() {
-            return models.AppOptions.get("useYouTubePlayer") &&
-                !this.props.video.isDownloaded();
-        },
         componentDidMount: function() {
-            if (this.shouldUseYoutubePlayer()) {
-                Util.log("Loading Youtube player for YID: " + this.props.video.getYoutubeId());
-                this.player = new YT.Player('player', {
-                    width: '900',
-                    height: '506',
-                    videoId: this.props.video.getYoutubeId(),
-                    playerVars: {
-                        modestbranding: 1,
-                        showinfo: 0,
-                        origin: location.protocol + "//" + location.hostname
-                    },
-                    events: {
-                        onReady: () => {
-                            $(".throbber").hide();
-                            this._canPlayYoutube();
-                        },
-                        onError: function() {
-                            Util.error('onError!');
-                        },
-                        onStateChange: (e) => {
-                            var state = e.data;
-                            Util.log('on youtube player state changed: :' + state);
-                            if (state === this.youtubePlayerStates.cued) {
-                            } else if (state === this.youtubePlayerStates.paused) {
-                                this._onPause();
-                            } else if (state === this.youtubePlayerStates.playing) {
-                                this._onPlay();
-                            } else if (state === this.youtubePlayerStates.buffering) {
-                                this.stopAnimatingPoints(false);
-                            }
-                        }
+            $("#video-placeholder").html(
+                '<video width="640" height="264" type="' + this.props.video.getContentMimeType() + '"' +
+                      ' id="video-player" class="' + this.videoClass + '" preload="auto" src="' + this.videoSrc + '" controls>' +
+                '</video>');
 
-                    }
-                });
-                this.youtubePlayerTimer = setInterval(() => {
-                    if (this.player.getCurrentTime && this.player.getDuration && this.isPlaying) {
-                        Util.log("currentTime: " + this.player.getCurrentTime());
-                        Util.log("duration: " + this.player.getDuration());
-                        this.reportSecondsWatched(this.player.getCurrentTime(), this.player.getDuration());
-                        this._onScrollTranscriptTo(this.player.getCurrentTime());
-                    }
-                }, 1000);
-            } else {
-                this.videojs = videojs("video-player", { width: '100%', height: '100%'}, () => {
-                    Util.log("Videojs player is initialized and ready.");
-                    // Add an event listener to track watched time
-                    var video = this._getVideoDOMNode();
-                    video.addEventListener("canplay", this._canPlayHTML5.bind(this));
-                    video.addEventListener("progress", this._onNetworkProgress.bind(this));
-                    video.addEventListener("timeupdate", this._onTimeupdateHTML5);
-                    video.addEventListener("play", this._onPlay.bind(this), true);
-                    video.addEventListener("pause", this._onPause.bind(this), true);
-                    video.addEventListener("stop", this._onStop.bind(this), true);
-                    video.addEventListener("ended", this._onEnded.bind(this), true);
-                    video.addEventListener("error", this._onError.bind(this), true);
-                    video.defaultPlaybackRate = models.AppOptions.get("playbackRate") / 100;
-                    video.playbackRate = models.AppOptions.get("playbackRate") / 100;
-                });
-            }
+            this.videojs = videojs("video-player", { width: '100%', height: '100%'}, () => {
+                Util.log("Videojs player is initialized and ready.");
+                // Add an event listener to track watched time
+                var video = this._getVideoDOMNode();
+                video.addEventListener("canplay", this._canPlayHTML5.bind(this));
+                video.addEventListener("progress", this._onNetworkProgress.bind(this));
+                video.addEventListener("timeupdate", this._onTimeupdateHTML5);
+                video.addEventListener("play", this._onPlay.bind(this), true);
+                video.addEventListener("pause", this._onPause.bind(this), true);
+                video.addEventListener("stop", this._onStop.bind(this), true);
+                video.addEventListener("ended", this._onEnded.bind(this), true);
+                video.addEventListener("error", this._onError.bind(this), true);
+                video.defaultPlaybackRate = models.AppOptions.get("playbackRate") / 100;
+                video.playbackRate = models.AppOptions.get("playbackRate") / 100;
+            });
         },
 
         // Updates the secondsWatched variable with the difference between the current
@@ -726,8 +666,9 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
 
         onReloadVideo: function() {
             Util.log("Calling video load!");
-            if (this.refs.video) {
-               this._getVideoDOMNode().load();
+            var video = this._getVideoDOMNode();
+            if (video) {
+               video.load();
             }
         },
 
@@ -741,11 +682,11 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                                                      onClickTranscript={this.onClickTranscript} />;
             }
 
-            var videoSrc = this.props.video.getDownloadUrl();
+            this.videoSrc = this.props.video.getDownloadUrl();
             if (this.state.downloadedUrl) {
-                videoSrc = this.state.downloadedUrl;
+                this.videoSrc = this.state.downloadedUrl;
             }
-            Util.log('video rendered with url: ' + videoSrc);
+            Util.log('video rendered with url: ' + this.videoSrc);
             var pointsString = document.webL10n.get("points-so-far",
                         {"earned" : this.props.video.getPoints(), "available": this.availablePoints});
             var pointsDiv;
@@ -762,19 +703,13 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
             if (parentDomain) {
                 videoClassObj[parentDomain.getId()] = true;
             }
-            var videoClass = cx(videoClassObj);
+            this.videoClass = cx(videoClassObj);
 
             var control;
             if (this.state.showOfflineImage) {
                 control = <div className="video-placeholder" onClick={this.onReloadVideo}/>;
-            } else if (this.shouldUseYoutubePlayer()) {
-                control = <div>
-                        <div className="throbber"/>
-                        <div className={videoClass} id="player"/>
-                    </div>;
             } else {
-                control = <video id="video-player" className={videoClass} src={videoSrc} ref="video" preload="auto"
-                                 type={this.props.video.getContentMimeType()} controls></video>;
+                control = <div className={this.videoClass} id="video-placeholder"/>
             }
 
             // The overlay div helps with a bug where html5 video sometimes doesn't render properly.
@@ -1071,10 +1006,6 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
             this.props.options.set("showTranscripts", event.target.checked);
             this.props.options.save();
         },
-        handleUseYouTubePlayerChange: function(event) {
-            this.props.options.set("useYouTubePlayer", event.target.checked);
-            this.props.options.save();
-        },
         handleSetPlaybackRateChange: function(event) {
             // Convert a value like: 0, 1, 2, 3 to 50, 100, 150, 200
             var percentage = 50 + event.target.value * 50;
@@ -1131,17 +1062,6 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                         className="reset-button"
                         data-l10n-id="reset-setting"
                         onClick={this.handleReset}>Reset</button>
-
-                {/*
-                <div data-l10n-id="use-youtube-player">Use YouTube player</div>
-                <label className="pack-switch">
-                <input ref="useYouTubePlayer"
-                       type="checkbox"
-                       checked={this.props.options.get("useYouTubePlayer")}
-                       onChange={this.handleUseYouTubePlayerChange}></input>
-                <span></span>
-                </label>
-                */}
             </div>;
         }
     });

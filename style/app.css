@@ -442,20 +442,19 @@ div.throbber {
     background-size: 10rem;
 }
 
-#video-player, #player {
+#video-placeholder {
+    height: calc(100% - 7.7rem);
+}
+#video-placeholder.video-has-transcript {
+    height: 50%;
+}
+
+#video-player {
     width: 100%;
-    max-height: calc(100% - 5rem);
+    height: 100%;
 }
 
-#video-player.video-has-transcript, #player.video-has-transcript {
-    max-height: 50%;
-}
-
-#video-player ~ !.transcript,  #player ~ !.transcript {
-    max-height; 100%;
-}
-
-.video-placeholder {
+img.video-placeholder {
     width: 100%;
     background:url('/img/offline.png') no-repeat center center;
     max-height: 50%;
@@ -584,8 +583,10 @@ article {
 }
 
 .energy-points-video {
-    margin-top: 1rem;
-    margin-left: 1rem;
+    margin-top: 0.2rem;
+    margin-bottom: 0.2rem;
+    margin-right: 1rem;
+    float: right;
 }
 
 label.pack-switch {
@@ -661,11 +662,22 @@ span.fa-arrows-alt {
 #set-playback-speed {
     float: left;
     width: 20rem;
+    margin-top: 1rem;
+    -moz-appearance: none;
+    border: 0;
 }
 
 #reset-button {
     width: 20rem;
+    margin-top: 2rem;
+    display: block;
 }
 
 .vjs-default-skin .vjs-control-bar { font-size: 144% }
 .vjs-control[role="button"] { background-color: none; }
+
+@media (max-width: 440px) {
+  .vjs-volume-control, .vjs-mute-control {
+      display: none;
+  }
+}

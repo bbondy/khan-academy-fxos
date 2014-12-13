@@ -768,7 +768,6 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
         defaults: {
             showDownloadsOnly: false,
             showTranscripts: true,
-            useYouTubePlayer: false,
             playbackRate: 100
         },
         reset: function() {
