@@ -704,7 +704,8 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
             var videoClassObj = {
               'video-has-transcript': !!this.state.transcript,
               'video-js': true,
-              'vjs-default-skin': true
+              'vjs-default-skin': true,
+              'signed-in': models.CurrentUser.isSignedIn()
             };
             var parentDomain = this.props.video && this.props.video.getParentDomain();
             if (parentDomain) {
