@@ -436,7 +436,15 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                 video.removeEventListener("ended", this._onEnded);
                 video.removeEventListener("error", this._onError);
 
+                // This clears out the video buffer.  Without it playing videos
+                // for around 10 minutes in the app causes future videos to never
+                // load.
+                Util.log("Clearing video buffer");
+                video.src = "";
+                video.load();
+
                 if (this.videojs) {
+                    Util.log("Disposing videojs");
                     this.videojs.dispose();
                 }
             }
@@ -471,7 +479,6 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                 delete this.initSecondWatched;
             }
             if (this.state.showOfflineImage) {
-                Util.log("Video has no source.", e);
                 this.stopAnimatingPoints(false);
                 this.setState({showOfflineImage: false});
             }
