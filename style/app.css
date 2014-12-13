@@ -443,10 +443,14 @@ div.throbber {
 }
 
 #video-placeholder {
-    height: calc(100% - 7.7rem);
+    height: calc(100% - 5rem);
 }
+#video-placeholder.video-has-transcript.signed-in,
 #video-placeholder.video-has-transcript {
     height: 50%;
+}
+#video-placeholder.signed-in {
+    height: calc(100% - 7.7rem);
 }
 
 #video-player {
@@ -680,4 +684,14 @@ span.fa-arrows-alt {
   .vjs-volume-control, .vjs-mute-control {
       display: none;
   }
+}
+
+.vjs-default-skin .vjs-volume-level {
+    height: 1em !important;
+    top: -0.2em !important;
+}
+
+.vjs-volume-handle {
+    top: -0.2em !important;
+    height: 1.5em !important;
 }
