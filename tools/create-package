@@ -1,2 +1,32 @@
-rm ka-fxos.zip
-zip -r ka-fxos.zip ./ -x "*.git*" -x "*node_modules*" -x "*.DS_Store" -x "*.module-cache*" -x "tools*" -x "style/*.html" -x "test/*"
+rm -Rf output/
+mkdir output
+
+zip -r output/ka-fxos-base.zip ./ -x "*.git*" -x "*node_modules*" -x "*.DS_Store" -x "*.module-cache*" -x "tools*" -x "style/*.html" -x "test/*" -x "data/*"
+
+# English only archive
+cp output/ka-fxos-base.zip output/ka-fxos-en.zip
+zip -r output/ka-fxos-en.zip "data/topic-tree.min.js"
+
+# Bengali only archive
+cp output/ka-fxos-base.zip output/ka-fxos-bn.zip
+zip -r output/ka-fxos-bn.zip "data/topic-tree-bn.min.js"
+
+# Spanish only archive
+cp output/ka-fxos-base.zip output/ka-fxos-es.zip
+zip -r output/ka-fxos-es.zip "data/topic-tree-es.min.js"
+
+# French only archive
+cp output/ka-fxos-base.zip output/ka-fxos-fr.zip
+zip -r output/ka-fxos-fr.zip "data/topic-tree-fr.min.js"
+
+# Portuguese only archive
+cp output/ka-fxos-base.zip output/ka-fxos-pt.zip
+zip -r output/ka-fxos-pt.zip "data/topic-tree-pt.min.js"
+
+# Turkish only archive
+cp output/ka-fxos-base.zip output/ka-fxos-tr.zip
+zip -r output/ka-fxos-tr.zip "data/topic-tree-tr.min.js"
+
+# All files
+cp output/ka-fxos-base.zip output/ka-fxos.zip
+zip -r output/ka-fxos.zip data/*

@@ -29,5 +29,8 @@ secrets.json
 
 build/
 
+# Built packages
+output/
+
 # Marketplace submission file
 ka-fxos.zip
