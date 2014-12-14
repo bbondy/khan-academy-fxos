@@ -385,6 +385,7 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
         },
         componentWillMount: function() {
             Util.log("VideoViewer will mount");
+            this.videoCreatedPromise = $.Deferred();
             if (models.AppOptions.get("showTranscripts")) {
                 this.transcriptPromise = $.Deferred();
                 APIClient.getVideoTranscript(this.props.video.getYoutubeId()).done((transcript) => {
@@ -553,7 +554,10 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
            }
         },
         _getVideoDOMNode: function() {
-            return document.getElementsByTagName("video")[0];
+            if (!this.videoNode) {
+                return null;
+            }
+            return this.videoNode.get(0);
         },
         _onTimeupdateHTML5: function(e) {
             if (!this.isMounted()) {
@@ -582,12 +586,13 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
             }
         },
         componentDidMount: function() {
-            $("#video-placeholder").html(
-                '<video width="640" height="264" type="' + this.props.video.getContentMimeType() + '"' +
-                      ' id="video-player" class="' + this.videoClass + '" preload="auto" src="' + this.videoSrc + '" controls>' +
+            var videoMountNode = this.refs.videoPlaceholder.getDOMNode();
+            this.videoNode = $('<video width="640" height="264" type="' + this.props.video.getContentMimeType() + '"' +
+                ' id="video-player" class="' + this.videoClass + '" preload="auto" src="' + this.videoSrc + '" controls>' +
                 '</video>');
+            $(videoMountNode).append(this.videoNode);
 
-            this.videojs = videojs("video-player", { width: '100%', height: '100%'}, () => {
+            this.videojs = videojs(this.videoNode.get(0)/*"video-player"*/, { width: '100%', height: '100%'}, () => {
                 Util.log("Videojs player is initialized and ready.");
                 // Add an event listener to track watched time
                 var video = this._getVideoDOMNode();
@@ -601,6 +606,7 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                 video.addEventListener("error", this._onError.bind(this), true);
                 video.defaultPlaybackRate = models.AppOptions.get("playbackRate") / 100;
                 video.playbackRate = models.AppOptions.get("playbackRate") / 100;
+                this.videoCreatedPromise.resolve();
             });
         },
 
@@ -717,7 +723,7 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
             if (this.state.showOfflineImage) {
                 control = <div className="video-placeholder" onClick={this.onReloadVideo}/>;
             } else {
-                control = <div className={this.videoClass} id="video-placeholder"/>
+                control = <div className={this.videoClass} ref="videoPlaceholder" id="video-placeholder"/>
             }
 
             // The overlay div helps with a bug where html5 video sometimes doesn't render properly.

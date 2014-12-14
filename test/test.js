@@ -2,7 +2,7 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
         function(React, Util, models, APIClient, Storage, Downloads, Cache, Minify, Notifications, Status, Views) {
 
     QUnit.asyncTest("models.AppOptions.fetch defaults and reset", function(assert) {
-        expect(12);
+        expect(9);
         models.AppOptions.fetch().done(function() {
             models.AppOptions.reset();
             assert.strictEqual(models.AppOptions.get("showDownloadsOnly"), false);

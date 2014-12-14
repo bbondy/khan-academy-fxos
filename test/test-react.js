@@ -100,13 +100,16 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
                 assert.strictEqual(TestUtils.scryRenderedDOMComponentsWithClass(sidebar, "share-link").length, 0);
             }
             TestUtils.findRenderedDOMComponentWithClass(sidebar, "open-in-website-link");
-            TestUtils.findRenderedDOMComponentWithTag(mainView, "video");
+            var videoViewer = TestUtils.findRenderedComponentWithType(mainView, Views.VideoViewer);
+            return videoViewer.videoCreatedPromise;
+        }).then(function() {
             if (models.CurrentUser.isSignedIn()) {
                 TestUtils.findRenderedDOMComponentWithClass(mainView, "energy-points"); // Only if signed in
             } else {
                 assert.strictEqual(TestUtils.scryRenderedDOMComponentsWithClass(mainView, "energy-points").length, 0);
             }
             var videoViewer = TestUtils.findRenderedComponentWithType(mainView, Views.VideoViewer);
+            assert.ok(videoViewer._getVideoDOMNode());
             return videoViewer.transcriptPromise;
         }).then(function() {
             var videoViewer = TestUtils.findRenderedComponentWithType(mainView, Views.VideoViewer);
