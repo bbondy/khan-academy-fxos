@@ -504,9 +504,9 @@ article {
     margin-right: 1rem;
 }
 
-.profile {
+.topic-list-container.settings, .profile {
     overflow-y: scroll;
-    height: calc(100% - 8rem);
+    height: calc(100% - 8rem) !important;
 }
 
 .sidebar .hot-item {
