@@ -5,6 +5,10 @@ Khan Academy's Firefox OS app source is [Mozilla Public License Version 2.0](htt
 
 You can download the Khan Academy Firefox OS app on your device at the [Firefox Marketplace](https://marketplace.firefox.com/app/khan-academy).
 
+The Khan Academy app also functions as a:
+- Firefox web app for Desktop on OSX, Windows, and Linux are also available at the same link. (No downloads support because Desktop has no Storage API yet)
+- Firefox web app for Android.
+
 ## About the source
 
 Everything is built using JavaScript.
