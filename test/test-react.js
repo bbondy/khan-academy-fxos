@@ -1,5 +1,5 @@
-require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "cache", "minify", "notifications", "status", "views"],
-        function(React, Util, models, APIClient, Storage, Downloads, Cache, Minify, Notifications, Status, Views) {
+require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "cache", "minify", "notifications", "status", "views", "video", "article"],
+        function(React, Util, models, APIClient, Storage, Downloads, Cache, Minify, Notifications, Status, Views, VideoViews, ArticleViews) {
 
     var TestUtils = React.addons.TestUtils;
     var Simulate = TestUtils.Simulate;
@@ -100,7 +100,7 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
                 assert.strictEqual(TestUtils.scryRenderedDOMComponentsWithClass(sidebar, "share-link").length, 0);
             }
             TestUtils.findRenderedDOMComponentWithClass(sidebar, "open-in-website-link");
-            var videoViewer = TestUtils.findRenderedComponentWithType(mainView, Views.VideoViewer);
+            var videoViewer = TestUtils.findRenderedComponentWithType(mainView, VideoViews.VideoViewer);
             return videoViewer.videoCreatedPromise;
         }).then(function() {
             if (models.CurrentUser.isSignedIn()) {
@@ -108,13 +108,13 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
             } else {
                 assert.strictEqual(TestUtils.scryRenderedDOMComponentsWithClass(mainView, "energy-points").length, 0);
             }
-            var videoViewer = TestUtils.findRenderedComponentWithType(mainView, Views.VideoViewer);
+            var videoViewer = TestUtils.findRenderedComponentWithType(mainView, VideoViews.VideoViewer);
             assert.ok(videoViewer._getVideoDOMNode());
             return videoViewer.transcriptPromise;
         }).then(function() {
-            var videoViewer = TestUtils.findRenderedComponentWithType(mainView, Views.VideoViewer);
-            var transcriptViewer = TestUtils.findRenderedComponentWithType(videoViewer, Views.TranscriptViewer);
-            var transcriptItems = TestUtils.scryRenderedComponentsWithType(transcriptViewer, Views.TranscriptItem);
+            var videoViewer = TestUtils.findRenderedComponentWithType(mainView, VideoViews.VideoViewer);
+            var transcriptViewer = TestUtils.findRenderedComponentWithType(videoViewer, VideoViews.TranscriptViewer);
+            var transcriptItems = TestUtils.scryRenderedComponentsWithType(transcriptViewer, VideoViews.TranscriptItem);
             assert.ok(transcriptItems.length > 0);
             clickBack();
 
@@ -124,7 +124,7 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
             var videoItems = TestUtils.scryRenderedComponentsWithType(mainView, Views.VideoListItem);
             link = TestUtils.scryRenderedDOMComponentsWithTag(videoItems[0], "a")[0];
             Simulate.click(link.getDOMNode());
-            videoViewer = TestUtils.findRenderedComponentWithType(mainView, Views.VideoViewer);
+            videoViewer = TestUtils.findRenderedComponentWithType(mainView, VideoViews.VideoViewer);
             assert.ok(!videoViewer.transcriptPromise);
             models.AppOptions.set("showTranscripts", true);
             clickBack();
@@ -143,7 +143,7 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
             }
             //assert.strictEqual(TestUtils.scryRenderedDOMComponentsWithClass(sidebar, "open-in-website-link").length, 0);
             //assert.strictEqual(TestUtils.scryRenderedDOMComponentsWithClass(sidebar, "share-link").length, 0);
-            var articleViewer = TestUtils.findRenderedComponentWithType(mainView, Views.ArticleViewer);
+            var articleViewer = TestUtils.findRenderedComponentWithType(mainView, ArticleViews.ArticleViewer);
             return articleViewer.p1;
         }).then(function() {
 
