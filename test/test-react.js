@@ -1,5 +1,5 @@
-require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "cache", "minify", "notifications", "status", "views", "video", "article"],
-        function(React, Util, models, APIClient, Storage, Downloads, Cache, Minify, Notifications, Status, Views, VideoViews, ArticleViews) {
+require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "cache", "minify", "notifications", "status", "views", "video", "article", "topic"],
+        function(React, Util, models, APIClient, Storage, Downloads, Cache, Minify, Notifications, Status, Views, VideoViews, ArticleViews, TopicViews) {
 
     var TestUtils = React.addons.TestUtils;
     var Simulate = TestUtils.Simulate;
@@ -45,7 +45,7 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
             });
 
             // Make sure topic tree items display
-            var topicItems = TestUtils.scryRenderedComponentsWithType(mainView, Views.TopicListItem);
+            var topicItems = TestUtils.scryRenderedComponentsWithType(mainView, TopicViews.TopicListItem);
             assert.ok(topicItems.length >= 10);
             assert.ok(_(topicItems).some(function(topicItem) {
                 return topicItem.props.topic.getTitle() === "Math";
@@ -57,7 +57,7 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
             // Make sure topic tree navigation works
             var link = TestUtils.findRenderedDOMComponentWithTag(topicItems[0], "a");
             Simulate.click(link.getDOMNode());
-            topicItems = TestUtils.scryRenderedComponentsWithType(mainView, Views.TopicListItem);
+            topicItems = TestUtils.scryRenderedComponentsWithType(mainView, TopicViews.TopicListItem);
             assert.ok(_(topicItems).some(function(topicItem) {
                 return topicItem.props.topic.getTitle() === "Arithmetic";
             }));
@@ -67,7 +67,7 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
 
             //Make sure that the back button works
             clickBack();
-            topicItems = TestUtils.scryRenderedComponentsWithType(mainView, Views.TopicListItem);
+            topicItems = TestUtils.scryRenderedComponentsWithType(mainView, TopicViews.TopicListItem);
             assert.ok(_(topicItems).some(function(topicItem) {
                 return topicItem.props.topic.getTitle() === "Math";
             }));
@@ -77,7 +77,7 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
 
             // Test topic search
             search("monkey");
-            var videoItems = TestUtils.scryRenderedComponentsWithType(mainView, Views.VideoListItem);
+            var videoItems = TestUtils.scryRenderedComponentsWithType(mainView, TopicViews.VideoListItem);
             //assert.ok(videoItems.length >= 2);
             assert.ok(_(videoItems).some(function(videoItem) {
                 return videoItem.props.video.getTitle() === "Monkeys for a party";
@@ -121,7 +121,7 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
             // Make sure a video with transcript option off has no transcript promise
             models.AppOptions.set("showTranscripts", false);
             search("monkey");
-            var videoItems = TestUtils.scryRenderedComponentsWithType(mainView, Views.VideoListItem);
+            var videoItems = TestUtils.scryRenderedComponentsWithType(mainView, TopicViews.VideoListItem);
             link = TestUtils.scryRenderedDOMComponentsWithTag(videoItems[0], "a")[0];
             Simulate.click(link.getDOMNode());
             videoViewer = TestUtils.findRenderedComponentWithType(mainView, VideoViews.VideoViewer);
@@ -131,7 +131,7 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
 
             // Test that an article renders
             search("Oscillation with angular velocity");
-            var articleItem = TestUtils.findRenderedComponentWithType(mainView, Views.ArticleListItem);
+            var articleItem = TestUtils.findRenderedComponentWithType(mainView, TopicViews.ArticleListItem);
             link = TestUtils.scryRenderedDOMComponentsWithTag(articleItem, "a")[0];
             Simulate.click(link.getDOMNode());
             TestUtils.findRenderedDOMComponentWithTag(mainView, "article");
