@@ -1,5 +1,5 @@
-define(["react", "util", "models", "apiclient", "cache", "storage", "downloads", "views"],
-        function(React, Util, models, APIClient, Cache, Storage, Downloads, Views) {
+define(["react", "util", "models", "apiclient", "cache", "storage", "downloads", "chrome"],
+        function(React, Util, models, APIClient, Cache, Storage, Downloads, chromeViews) {
 
   /*
     // I thought this was supposed to be needed, but it seems to not be needed
@@ -31,7 +31,7 @@ define(["react", "util", "models", "apiclient", "cache", "storage", "downloads",
     });
 
 
-    var MainView = Views.MainView;
+    var MainView = chromeViews.MainView;
     var mountNode = document.getElementById("app");
 
     // Render the main app chrome

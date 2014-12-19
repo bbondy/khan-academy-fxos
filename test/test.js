@@ -1,5 +1,5 @@
-require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "cache", "minify", "notifications", "status", "views"],
-        function(React, Util, models, APIClient, Storage, Downloads, Cache, Minify, Notifications, Status, Views) {
+require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "cache", "minify", "notifications", "status"],
+        function(React, Util, models, APIClient, Storage, Downloads, Cache, Minify, Notifications, Status) {
 
     QUnit.asyncTest("models.AppOptions.fetch defaults and reset", function(assert) {
         expect(9);
