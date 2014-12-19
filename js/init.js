@@ -20,7 +20,15 @@ require.config({
         "jsx": "./lib/jsx-min",
         "underscore": "./lib/underscore-min",
         "jquery": "./lib/jquery-min",
-        "backbone": "./lib/backbone-min"
+        "backbone": "./lib/backbone-min",
+
+        // Views
+        "article": "./views/article",
+        "chrome": "./views/chrome",
+        "search": "./views/search",
+        "topic": "./views/topic",
+        "video": "./views/video",
+        "pane": "./views/pane",
     }
 });
 

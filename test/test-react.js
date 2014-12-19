@@ -1,23 +1,23 @@
-require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "cache", "minify", "notifications", "status", "views", "video", "article", "topic"],
-        function(React, Util, models, APIClient, Storage, Downloads, Cache, Minify, Notifications, Status, Views, VideoViews, ArticleViews, TopicViews) {
+require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "cache", "minify", "notifications", "status", "chrome", "video", "article", "topic", "search"],
+        function(React, Util, models, APIClient, Storage, Downloads, Cache, Minify, Notifications, Status, chromeViews, videoViews, articleViews, topicViews, searchViews) {
 
     var TestUtils = React.addons.TestUtils;
     var Simulate = TestUtils.Simulate;
     var mainView;
 
     var clickBack = function() {
-        var backButton = TestUtils.findRenderedComponentWithType(mainView, Views.BackButton);
+        var backButton = TestUtils.findRenderedComponentWithType(mainView, chromeViews.BackButton);
         var backLink = TestUtils.findRenderedDOMComponentWithTag(backButton, "a").getDOMNode();
         Simulate.click(backLink);
     };
 
     var search = function(term) {
-        var topicSearch = TestUtils.findRenderedComponentWithType(mainView, Views.TopicSearch);
+        var topicSearch = TestUtils.findRenderedComponentWithType(mainView, searchViews.TopicSearch);
         var input = TestUtils.findRenderedDOMComponentWithTag(topicSearch, "input").getDOMNode();
         Simulate.change(input, { target: { value: term} });
     };
 
-    var MainView = React.createFactory(Views.MainView);
+    var MainView = React.createFactory(chromeViews.MainView);
     var mountNode = document.getElementById("app");
     $(mountNode).empty();
 
@@ -45,7 +45,7 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
             });
 
             // Make sure topic tree items display
-            var topicItems = TestUtils.scryRenderedComponentsWithType(mainView, TopicViews.TopicListItem);
+            var topicItems = TestUtils.scryRenderedComponentsWithType(mainView, topicViews.TopicListItem);
             assert.ok(topicItems.length >= 10);
             assert.ok(_(topicItems).some(function(topicItem) {
                 return topicItem.props.topic.getTitle() === "Math";
@@ -57,7 +57,7 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
             // Make sure topic tree navigation works
             var link = TestUtils.findRenderedDOMComponentWithTag(topicItems[0], "a");
             Simulate.click(link.getDOMNode());
-            topicItems = TestUtils.scryRenderedComponentsWithType(mainView, TopicViews.TopicListItem);
+            topicItems = TestUtils.scryRenderedComponentsWithType(mainView, topicViews.TopicListItem);
             assert.ok(_(topicItems).some(function(topicItem) {
                 return topicItem.props.topic.getTitle() === "Arithmetic";
             }));
@@ -67,7 +67,7 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
 
             //Make sure that the back button works
             clickBack();
-            topicItems = TestUtils.scryRenderedComponentsWithType(mainView, TopicViews.TopicListItem);
+            topicItems = TestUtils.scryRenderedComponentsWithType(mainView, topicViews.TopicListItem);
             assert.ok(_(topicItems).some(function(topicItem) {
                 return topicItem.props.topic.getTitle() === "Math";
             }));
@@ -77,7 +77,7 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
 
             // Test topic search
             search("monkey");
-            var videoItems = TestUtils.scryRenderedComponentsWithType(mainView, TopicViews.VideoListItem);
+            var videoItems = TestUtils.scryRenderedComponentsWithType(mainView, topicViews.VideoListItem);
             //assert.ok(videoItems.length >= 2);
             assert.ok(_(videoItems).some(function(videoItem) {
                 return videoItem.props.video.getTitle() === "Monkeys for a party";
@@ -91,7 +91,7 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
             link = TestUtils.scryRenderedDOMComponentsWithTag(videoItems[0], "a")[0];
             Simulate.click(link.getDOMNode());
             // Check to make sure the sidebar contains: Download Video, Open in Website, Share
-            var sidebar = TestUtils.findRenderedComponentWithType(mainView, Views.Sidebar);
+            var sidebar = TestUtils.findRenderedComponentWithType(mainView, chromeViews.Sidebar);
             if (Util.isFirefoxOS()) {
                 TestUtils.findRenderedDOMComponentWithClass(sidebar, "download-video-link");
                 TestUtils.findRenderedDOMComponentWithClass(sidebar, "share-link");
@@ -100,7 +100,7 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
                 assert.strictEqual(TestUtils.scryRenderedDOMComponentsWithClass(sidebar, "share-link").length, 0);
             }
             TestUtils.findRenderedDOMComponentWithClass(sidebar, "open-in-website-link");
-            var videoViewer = TestUtils.findRenderedComponentWithType(mainView, VideoViews.VideoViewer);
+            var videoViewer = TestUtils.findRenderedComponentWithType(mainView, videoViews.VideoViewer);
             return videoViewer.videoCreatedPromise;
         }).then(function() {
             if (models.CurrentUser.isSignedIn()) {
@@ -108,34 +108,34 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
             } else {
                 assert.strictEqual(TestUtils.scryRenderedDOMComponentsWithClass(mainView, "energy-points").length, 0);
             }
-            var videoViewer = TestUtils.findRenderedComponentWithType(mainView, VideoViews.VideoViewer);
+            var videoViewer = TestUtils.findRenderedComponentWithType(mainView, videoViews.VideoViewer);
             assert.ok(videoViewer._getVideoDOMNode());
             return videoViewer.transcriptPromise;
         }).then(function() {
-            var videoViewer = TestUtils.findRenderedComponentWithType(mainView, VideoViews.VideoViewer);
-            var transcriptViewer = TestUtils.findRenderedComponentWithType(videoViewer, VideoViews.TranscriptViewer);
-            var transcriptItems = TestUtils.scryRenderedComponentsWithType(transcriptViewer, VideoViews.TranscriptItem);
+            var videoViewer = TestUtils.findRenderedComponentWithType(mainView, videoViews.VideoViewer);
+            var transcriptViewer = TestUtils.findRenderedComponentWithType(videoViewer, videoViews.TranscriptViewer);
+            var transcriptItems = TestUtils.scryRenderedComponentsWithType(transcriptViewer, videoViews.TranscriptItem);
             assert.ok(transcriptItems.length > 0);
             clickBack();
 
             // Make sure a video with transcript option off has no transcript promise
             models.AppOptions.set("showTranscripts", false);
             search("monkey");
-            var videoItems = TestUtils.scryRenderedComponentsWithType(mainView, TopicViews.VideoListItem);
+            var videoItems = TestUtils.scryRenderedComponentsWithType(mainView, topicViews.VideoListItem);
             link = TestUtils.scryRenderedDOMComponentsWithTag(videoItems[0], "a")[0];
             Simulate.click(link.getDOMNode());
-            videoViewer = TestUtils.findRenderedComponentWithType(mainView, VideoViews.VideoViewer);
+            videoViewer = TestUtils.findRenderedComponentWithType(mainView, videoViews.VideoViewer);
             assert.ok(!videoViewer.transcriptPromise);
             models.AppOptions.set("showTranscripts", true);
             clickBack();
 
             // Test that an article renders
             search("Oscillation with angular velocity");
-            var articleItem = TestUtils.findRenderedComponentWithType(mainView, TopicViews.ArticleListItem);
+            var articleItem = TestUtils.findRenderedComponentWithType(mainView, topicViews.ArticleListItem);
             link = TestUtils.scryRenderedDOMComponentsWithTag(articleItem, "a")[0];
             Simulate.click(link.getDOMNode());
             TestUtils.findRenderedDOMComponentWithTag(mainView, "article");
-            var sidebar = TestUtils.findRenderedComponentWithType(mainView, Views.Sidebar);
+            var sidebar = TestUtils.findRenderedComponentWithType(mainView, chromeViews.Sidebar);
             if (Util.isFirefoxOS()) {
                 TestUtils.findRenderedDOMComponentWithClass(sidebar, "download-article-link");
             } else {
@@ -143,13 +143,13 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
             }
             //assert.strictEqual(TestUtils.scryRenderedDOMComponentsWithClass(sidebar, "open-in-website-link").length, 0);
             //assert.strictEqual(TestUtils.scryRenderedDOMComponentsWithClass(sidebar, "share-link").length, 0);
-            var articleViewer = TestUtils.findRenderedComponentWithType(mainView, ArticleViews.ArticleViewer);
+            var articleViewer = TestUtils.findRenderedComponentWithType(mainView, articleViews.ArticleViewer);
             return articleViewer.p1;
         }).then(function() {
 
             // View setings works
             models.AppOptions.reset();
-            sidebar = TestUtils.findRenderedComponentWithType(mainView, Views.Sidebar);
+            sidebar = TestUtils.findRenderedComponentWithType(mainView, chromeViews.Sidebar);
             var viewSettingsLink = TestUtils.findRenderedDOMComponentWithClass(sidebar, "view-settings-link").getDOMNode();
             Simulate.click(viewSettingsLink);
             TestUtils.findRenderedDOMComponentWithClass(mainView, "settings").getDOMNode();
@@ -185,7 +185,7 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
             clickBack();
 
             // View downloads works
-            sidebar = TestUtils.findRenderedComponentWithType(mainView, Views.Sidebar);
+            sidebar = TestUtils.findRenderedComponentWithType(mainView, chromeViews.Sidebar);
             if (Util.isFirefoxOS()) {
                 var viewDownloadsLink = TestUtils.findRenderedDOMComponentWithClass(sidebar, "view-downloads-link").getDOMNode();
                 Simulate.click(viewDownloadsLink);
@@ -194,7 +194,7 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
             }
 
             // Open support link exists
-            sidebar = TestUtils.findRenderedComponentWithType(mainView, Views.Sidebar);
+            sidebar = TestUtils.findRenderedComponentWithType(mainView, chromeViews.Sidebar);
             TestUtils.findRenderedDOMComponentWithClass(sidebar, "open-support-link");
 
             ////////////////////
@@ -208,7 +208,7 @@ require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "ca
             }
 
             // Make sure View Profile works correctly
-            sidebar = TestUtils.findRenderedComponentWithType(mainView, Views.Sidebar);
+            sidebar = TestUtils.findRenderedComponentWithType(mainView, chromeViews.Sidebar);
             var viewProfileLink = TestUtils.findRenderedDOMComponentWithClass(sidebar, "view-profile-link").getDOMNode();
             Simulate.click(viewProfileLink);
             TestUtils.findRenderedDOMComponentWithClass(mainView, "profile").getDOMNode();
