@@ -24,6 +24,7 @@ require.config({
 
         // Views
         "article": "./views/article",
+        "exercise": "./views/exercise",
         "chrome": "./views/chrome",
         "search": "./views/search",
         "topic": "./views/topic",
