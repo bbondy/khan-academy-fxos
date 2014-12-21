@@ -5,7 +5,8 @@
 
     var Minify = {
         // Topic tree items with thees kinds will be ignored
-        excludedKinds: ["Exercise"],
+        // Example value would be "Exercise".
+        excludedKinds: [],
 
         // Topic tree items with these ids will be ignored
         // new and noteworthy "x29232c6b"
@@ -42,7 +43,8 @@
         propertyValueMap: [
             ["kind", "Article", 0],
             ["kind", "Topic", 1],
-            ["kind", "Video", 2]
+            ["kind", "Video", 2],
+            ["kind", "Exercise", 3]
         ],
 
         // Things specified in the endpoint that I may need eventually
@@ -196,7 +198,7 @@
                     output = output.substring(0, output.length - 1);
                     output += "],";
                 } else {
-                    if (typeof node[p] !== "number") {
+                    if (typeof node[p] !== "number" && node[p] !== null) {
                         output += p + ":\"" + node[p]
                             // Replace a slash with 2 slashes
                             .replace(/\\/g, "\\\\")
