@@ -62,7 +62,8 @@ input[type="checkbox"] {
 }
 
 ul > li.video-item > a,
-ul > li.article-item > a {
+ul > li.article-item > a,
+ul > li.exercise-item > a {
     margin-top: -2px;
 }
 
@@ -93,6 +94,9 @@ ul li div.subway-icon div.video-node {
 }
 ul li div.subway-icon div.article-node {
     background-image: url('/img/progress-icons/subway-sprites-article-default.svg');
+}
+ul li div.subway-icon div.exercise-node {
+    background-image: url('/img/progress-icons/subway-sprites-exercise-default.svg');
 }
 
 div.color-block {
@@ -126,6 +130,10 @@ ul li div.subway-icon.x7a488390 div.article-node {
     background-image: url('/img/progress-icons/subway-sprites-article-math.svg');
 }
 
+ul li div.subway-icon.x7a488390 div.exercise-node {
+    background-image: url('/img/progress-icons/subway-sprites-exercise-math.svg');
+}
+
 ul li div.subway-icon.x7a488390 div.pipe.completed,
 ul li div.subway-icon.x7a488390 div.pipe.in-progress {
     background-color: #3daccc;
@@ -157,6 +165,10 @@ ul li div.subway-icon.xb92336a2 div.article-node {
     background-image: url('/img/progress-icons/subway-sprites-article-science.svg');
 }
 
+ul li div.subway-icon.xb92336a2 div.exercise-node {
+    background-image: url('/img/progress-icons/subway-sprites-exercise-science.svg');
+}
+
 ul li div.subway-icon.xb92336a2 div.pipe.completed,
 ul li div.subway-icon.xb92336a2 div.pipe.in-progress {
     background-color: #b8475f;
@@ -184,6 +196,9 @@ ul li div.subway-icon.x5ca94af1 div.video-node {
 
 ul li div.subway-icon.x5ca94af1 div.article-node {
     background-image: url('/img/progress-icons/subway-sprites-article-economics.svg');
+}
+ul li div.subway-icon.x5ca94af1 div.exercise-node {
+    background-image: url('/img/progress-icons/subway-sprites-exercise-economics.svg');
 }
 
 ul li div.subway-icon.x5ca94af1 div.pipe.completed,
@@ -215,6 +230,9 @@ ul li div.subway-icon.x905db83d div.video-node {
 ul li div.subway-icon.x905db83d div.article-node {
     background-image: url('/img/progress-icons/subway-sprites-article-humanities.svg');
 }
+ul li div.subway-icon.x905db83d div.exercise-node {
+    background-image: url('/img/progress-icons/subway-sprites-exercise-humanities.svg');
+}
 ul li div.subway-icon.x905db83d div.pipe.completed,
 ul li div.subway-icon.x905db83d div.pipe.in-progress {
     background-color: #fb483f;
@@ -243,6 +261,9 @@ ul li div.subway-icon.x45aed616 div.video-node {
 
 ul li div.subway-icon.x45aed616 div.article-node {
     background-image: url('/img/progress-icons/subway-sprites-article-cs.svg');
+}
+ul li div.subway-icon.x45aed616 div.exercise-node {
+    background-image: url('/img/progress-icons/subway-sprites-exercise-cs.svg');
 }
 
 ul li div.subway-icon.x45aed616 div.pipe.completed,
@@ -273,6 +294,9 @@ ul li div.subway-icon.x7626d097 div.video-node {
 
 ul li div.subway-icon.x7626d097 div.article-node {
     background-image: url('/img/progress-icons/subway-sprites-article-testPrep.svg');
+}
+ul li div.subway-icon.x7626d097 div.exercise-node {
+    background-image: url('/img/progress-icons/subway-sprites-exercise-testPrep.svg');
 }
 
 ul li div.subway-icon.x7626d097 div.pipe.completed,
@@ -305,6 +329,10 @@ ul li div.subway-icon.x54390c7e div.article-node {
     background-image: url('/img/progress-icons/subway-sprites-article-partnerContent.svg');
 }
 
+ul li div.subway-icon.x54390c7e div.exercise-node {
+    background-image: url('/img/progress-icons/subway-sprites-exercise-partnerContent.svg');
+}
+
 ul li div.subway-icon.x54390c7e div.pipe.completed,
 ul li div.subway-icon.x54390c7e div.pipe.in-progress {
     background-color: #4ac9a3;
@@ -333,6 +361,10 @@ ul li div.subway-icon.xd1039e22 div.video-node {
 
 ul li div.subway-icon.xd1039e22 div.article-node {
     background-image: url('/img/progress-icons/subway-sprites-article-default.svg');
+}
+
+ul li div.subway-icon.xd1039e22 div.exercise-node {
+    background-image: url('/img/progress-icons/subway-sprites-exercise-default.svg');
 }
 
 ul li div.subway-icon.xd1039e22 div.pipe.completed,
@@ -365,6 +397,10 @@ ul li div.subway-icon.x6a4a5e33 div.article-node {
     background-image: url('/img/progress-icons/subway-sprites-article-default.svg');
 }
 
+ul li div.subway-icon.x6a4a5e33 div.exercise-node {
+    background-image: url('/img/progress-icons/subway-sprites-exercise-default.svg');
+}
+
 ul li div.subway-icon.x6a4a5e33 div.pipe.completed,
 ul li div.subway-icon.x6a4a5e33 div.pipe.in-progress {
     background-color: #577996;
@@ -389,12 +425,14 @@ ul li.x6a4a5e33 div.color-block, header.topic-header.x6a4a5e33 {
  */
 
 ul li div.subway-icon div.video-node.completed,
-ul li div.subway-icon div.article-node.completed {
+ul li div.subway-icon div.article-node.completed,
+ul li div.subway-icon div.exercise-node.completed {
     background-position: 50% 100%;
 }
 
 ul li div.subway-icon div.video-node.in-progress,
-ul li div.subway-icon div.article-node.in-progress {
+ul li div.subway-icon div.article-node.in-progress,
+ul li div.subway-icon div.exercise-node.in-progress {
     background-position: 0% 50%;
 }
 
@@ -428,7 +466,9 @@ ul li div div.pipe.in-progress {
     background-color: #3daccc;
 }
 
-ul li a p.video-title, ul li a p.article-title {
+ul li a p.video-title,
+ul li a p.article-title,
+ul li a p.exercise-title {
     padding-left: 45px !important;
 }
 
