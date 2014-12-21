@@ -50,10 +50,22 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
             return this.getKind() === "Article";
         },
         /**
+         * Checks if the topic tree item is an article list
+         */
+        isExerciseList: function() {
+            return false;
+        },
+        /**
+         * Checks if the topic tree item is an article
+         */
+        isExercise: function() {
+            return this.getKind() === "Exercise";
+        },
+        /**
          * Checks if the topic tree item is a content item
          */
         isContent: function() {
-            return this.isVideo() || this.isArticle();
+            return this.isVideo() || this.isArticle() || this.isExercise();
         },
         /**
          * Checks if the topic tree item is a content list
@@ -305,7 +317,8 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
                 });
                 var contentItems = _(topic[Minify.getShortName("children")]).filter(function(item) {
                     return item[Minify.getShortName("kind")] === Minify.getShortValue("kind", "Video") ||
-                        item[Minify.getShortName("kind")] === Minify.getShortValue("kind", "Article");
+                        item[Minify.getShortName("kind")] === Minify.getShortValue("kind", "Article") ||
+                        item[Minify.getShortName("kind")] === Minify.getShortValue("kind", "Exercise");
                 });
                 response.downloadCount = 0;
                 response.topics = new TopicList(topics, {parse: true});
@@ -375,6 +388,8 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
 
     var ArticleModel = ContentModel.extend({});
 
+    var ExerciseModel = ContentModel.extend({});
+
     var TopicList = TopicTreeCollection.extend({
         model: TopicModel,
     });
@@ -396,6 +411,13 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
     var ArticleList = ContentList.extend({
         model: ArticleModel,
         isArticleList: function() {
+            return true;
+        }
+    });
+
+    var ExerciseList = ContentList.extend({
+        model: ExerciseModel,
+        isExerciseList: function() {
             return true;
         }
     });
@@ -797,10 +819,12 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
         ContentModel,
         VideoModel,
         ArticleModel,
+        ExerciseModel,
         TopicList,
         ContentList,
         VideoList,
         ArticleList,
+        ExerciseList,
         TopicTree,
         AppOptions: new AppOptionsModel(),
         TempAppState: new TempAppStateModel(),
