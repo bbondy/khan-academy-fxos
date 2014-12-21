@@ -1,15 +1,13 @@
 "use strict";
 
 define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "cache", "storage",
-        "downloads", "notifications", "status", "video", "article", "topic", "search", "pane"],
+        "downloads", "notifications", "status", "video", "article", "exercise", "topic", "search", "pane"],
         function(React, Util, models, APIClient, Cache, Storage,
-            Downloads, Notifications, Status, videoViews, articleViews, topicViews, searchViews, paneViews) {
+            Downloads, Notifications, Status, videoViews, articleViews, exerciseViews, topicViews, searchViews, paneViews) {
     var cx = React.addons.classSet;
     var VideoViewer = videoViews.VideoViewer;
     var ArticleViewer = articleViews.ArticleViewer;
-    var TopicListItem = topicViews.TopicListItem;
-    var VideoListItem = topicViews.VideoListItem;
-    var ArticleListItem = topicViews.ArticleListItem;
+    var ExerciseViewer = exerciseViews.ExerciseViewer;
     var TopicViewer = topicViews.TopicViewer;
     var ContentListViewer = topicViews.ContentListViewer;
     var TopicSearch = searchViews.TopicSearch;
@@ -543,6 +541,8 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                 control = <VideoViewer  video={this.getCurrentModel()}/>;
             } else if (currentModel.isArticle()) {
                 control = <ArticleViewer  article={currentModel}/>;
+            } else if (currentModel.isExercise()) {
+                control = <ExerciseViewer  exercise={currentModel}/>;
             } else {
                 Util.error("Unrecognized content item!");
             }

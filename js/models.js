@@ -17,7 +17,8 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
          * Obtains the translated title of the topic tree item
          */
         getTitle: function() {
-            return this.get(Minify.getShortName("translated_title"));
+            return this.get(Minify.getShortName("translated_title")) ||
+                this.get(Minify.getShortName("translated_display_name"));
         },
         /**
          * Checks if the topic tree item is a topic

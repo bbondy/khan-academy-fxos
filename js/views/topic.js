@@ -150,6 +150,59 @@ define([window.isTest ? "react-dev" : "react", "util", "models"],
     });
 
     /**
+     * Represents a single exercise item in the topic list.
+     * This renders the list item and not the actual exercise.
+     * When clicked, it will render the exercise corresponding to this list item.
+     */
+    var ExerciseListItem = React.createClass({
+        propTypes: {
+            exercise: React.PropTypes.object.isRequired,
+            onClickExercise: React.PropTypes.func.isRequired
+        },
+        render: function() {
+            var exerciseNodeClass = cx({
+              'exercise-node': true,
+              'completed': this.props.exercise.isCompleted(),
+              'in-progress': this.props.exercise.isStarted()
+            });
+            var pipeClassObj = {
+                'pipe': true,
+                'completed': this.props.exercise.isCompleted(),
+                'in-progress': this.props.exercise.isStarted()
+            };
+            var subwayIconClassObj = {
+                'subway-icon': true
+            };
+            var exerciseClassObj = {
+                'exercise-item': true,
+                'faded': models.AppOptions.get("showDownloadsOnly") &&
+                    !this.props.exercise.isDownloaded()
+            };
+            var parentDomain = this.props.exercise.getParentDomain();
+            subwayIconClassObj[parentDomain.getId()] = true;
+            exerciseClassObj[parentDomain.getId()] = true;
+            pipeClassObj[parentDomain.getId()] = true;
+            var subwayIconClass = cx(subwayIconClassObj);
+            var pipeClass = cx(pipeClassObj);
+            var exerciseClass = cx(exerciseClassObj);
+            console.log('---');
+            console.log(this.props.exercise);
+            console.log(this.props.exercise.getTitle());
+            return <li className={exerciseClass}>
+                <div className={subwayIconClass}>
+                    <a href="javascript:void(0)" onClick={Util.partial(this.props.onClickExercise, this.props.exercise)}>
+                        <div className={exerciseNodeClass}/>
+                    </a>
+                    <div className={pipeClass}/>
+                </div>
+                <a href="javascript:void(0)" onClick={Util.partial(this.props.onClickExercise, this.props.exercise)}>
+                    <p className="exercise-title">{this.props.exercise.getTitle()}</p>
+                </a>
+            </li>;
+        }
+    });
+
+    /**
      * Represents a single topic and it displays a list of all of its children.
      * Each child of the list is a TopicListItem, VideoListItem, or ArticleListItem.
      */
@@ -178,10 +231,14 @@ define([window.isTest ? "react-dev" : "react", "util", "models"],
                         return <VideoListItem video={contentItem}
                                               onClickVideo={this.props.onClickContentItem}
                                               key={contentItem.getId()} />;
+                    } else if (contentItem.isArticle()) {
+                        return <ArticleListItem article={contentItem}
+                                                onClickArticle={this.props.onClickContentItem}
+                                                key={contentItem.getId()} />;
                     }
-                    return <ArticleListItem article={contentItem}
-                                            onClickArticle={this.props.onClickContentItem}
-                                            key={contentItem.getId()} />;
+                    return <ExerciseListItem exercise={contentItem}
+                                             onClickExercise={this.props.onClickContentItem}
+                                             key={contentItem.getId()} />;
                 });
             }
 
@@ -216,10 +273,14 @@ define([window.isTest ? "react-dev" : "react", "util", "models"],
                         return <VideoListItem video={contentItem}
                                               onClickVideo={this.props.onClickContentItem}
                                               key={contentItem.getId()} />;
+                    } else if(contentItem.isArticle()) {
+                        return <ArticleListItem article={contentItem}
+                                                onClickArticle={this.props.onClickContentItem}
+                                                key={contentItem.getId()} />;
                     }
-                    return <ArticleListItem article={contentItem}
-                                            onClickArticle={this.props.onClickContentItem}
-                                            key={contentItem.getId()} />;
+                    return <ExerciseListItem exercise={contentItem}
+                                             onClickExercise={this.props.onClickContentItem}
+                                             key={contentItem.getId()} />;
                 });
             }
 
@@ -239,6 +300,7 @@ define([window.isTest ? "react-dev" : "react", "util", "models"],
         TopicListItem,
         VideoListItem,
         ArticleListItem,
+        ExerciseListItem,
         TopicViewer,
         ContentListViewer,
     };
