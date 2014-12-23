@@ -245,6 +245,24 @@ define(["oauth", "util"], function(_oauth, Util) {
             return this._basicAPICall(this.API_V1_BASE + "/articles/" + articleId);
         },
         /**
+         * Obtains an exercise
+         *
+         * @param exerciseId The id of the exercise to obtain information on.
+         * @return a promise with the status and other information
+         */
+        getExercise: function(exerciseId) {
+            return this._basicAPICall(this.API_V1_BASE + "/exercises/" + exerciseId);
+        },
+        /**
+         * Obtains an exercise
+         *
+         * @param exerciseId The id of the exercise to obtain information on.
+         * @return a promise with the status and other information
+         */
+        getAssessmentItem: function(assessmentId) {
+            return this._basicAPICall(this.API_V1_BASE + "/assessment_items/" + assessmentId);
+        },
+        /**
          * Marks an article as read.
          *
          * @param articleId The id of the article to mark as completed.
