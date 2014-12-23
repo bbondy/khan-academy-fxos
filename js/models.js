@@ -382,6 +382,14 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
         },
         getDuration: function() {
             return this.get(Minify.getShortName("duration"));
+        },
+        // A newer perseus style exercise
+        isPerseusExercise:function() {
+            return this.get(Minify.getShortName("file_name")) === null;
+        },
+        // An older style exercise pointed to by the khan-exercises submodule
+        isKhanExercisesExercise: function() {
+            return !!this.get(Minify.getShortName("file_name"));
         }
     });
 
