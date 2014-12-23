@@ -735,3 +735,8 @@ span.fa-arrows-alt {
     top: -0.2em !important;
     height: 1.5em !important;
 }
+
+iframe {
+    width: 100%;
+    height: 100%;
+}

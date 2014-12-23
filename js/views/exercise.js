@@ -26,6 +26,12 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "s
         componentWillUnmount: function() {
         },
         render: function() {
+            if (this.state.error) {
+                return <div>Could not load exercise</div>;
+            } else if (this.props.exercise.isKhanExercisesExercise()) {
+                var path = `/khan-exercises/exercises/${this.props.exercise.getFilename()}`;
+                return <iframe src={path}/>;
+            }
             Util.log("render exercise: :%o", this.props.exercise);
             return <div>TODO: Render exercise :)</div>;
         }

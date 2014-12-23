@@ -383,6 +383,9 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
         getDuration: function() {
             return this.get(Minify.getShortName("duration"));
         },
+        getFilename: function() {
+            return this.get(Minify.getShortName("file_name"));
+        },
         // A newer perseus style exercise
         isPerseusExercise:function() {
             return this.get(Minify.getShortName("file_name")) === null;
