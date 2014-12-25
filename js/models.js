@@ -791,6 +791,7 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
     // changing.
     var TempAppStateModel = Backbone.Model.extend({
         defaults: {
+            currentDownloadRequest: null,
             isTopicDownloading: false
         }
     });
