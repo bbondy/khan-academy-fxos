@@ -70,6 +70,12 @@ define(["util", "storage", "models", "apiclient"],
          */
         cancelDownloading: function() {
             models.TempAppState.set("isDownloadingTopic", false);
+            var currentRequest = models.TempAppState.get("currentDownloadRequest");
+            // Cancel the XHR if it exists (it may not, in the case of article downloads).
+            if (currentRequest) {
+                currentRequest.abort();
+                models.TempAppState.set("currentDownloadRequest", null);
+            }
             if (this.currentProgress) {
                 this.currentProgress(undefined, undefined, true);
             }
@@ -111,15 +117,12 @@ define(["util", "storage", "models", "apiclient"],
                         if (onProgress) {
                             onProgress(contentItem, downloadedCount);
                         }
-                        // Check for cancel
-                        if (!models.TempAppState.get("isDownloadingTopic")) {
-                            d.resolve(topic, downloadedCount);
-                            delete this.currentProgress;
-                            return;
-                        }
                         setTimeout(downloadOneAtATime, 1000);
-                    }).fail(() => {
-                        d.reject();
+                    }).fail((isCancel) => {
+                        if (isCancel) {
+                            delete this.currentProgress;
+                        }
+                        d.reject(isCancel);
                     });
                 } catch (e) {
                     // done, no more items in the generator
@@ -162,10 +165,14 @@ define(["util", "storage", "models", "apiclient"],
                 req.onload = () => {
                     handleContentLoaded(req.response);
                 };
+                req.onabort = (e) => {
+                    d.reject(true);
+                };
                 req.onerror = (e) => {
-                    d.reject();
+                    d.reject(false);
                 };
                 req.send();
+                models.TempAppState.set("currentDownloadRequest", req);
             } else if (contentItem.isArticle()) {
                 if (contentItem.get("content")) {
                     // Articles have a content property with the html we want to
