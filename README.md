@@ -74,6 +74,7 @@ If you would like help getting setup feel free to contact [Brian R. Bondy](http:
 
 - [Brian R. Bondy](http://www.brianbondy.com) - Lead app developer
 - [Farez](http://farez.ca/) - App contributor (Playback speed)
+- [Max Li](http://www.maxli.org) - App contributor
 - [Rodrigo Silveira](http://blog.rodms.com) - Portuguese app translation
 - [Romain Sertelon](https://www.bluepyth.fr/) - French app translation
 - [Pablo Solares Acebal]( http://pablo.edicionescamelot.com) - Spanish translation
