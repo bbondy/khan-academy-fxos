@@ -473,9 +473,15 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                 }
                 Status.stop();
                 Notifications.info(title, message);
-            }).fail(() => {
-                var title = document.webL10n.get("download-aborted");
-                var message = document.webL10n.get("content-items-downloaded-failure");
+            }).fail((isCancel) => {
+                var message, title;
+                if (isCancel) {
+                    title = document.webL10n.get("download-canceled");
+                    message = document.webL10n.get("content-items-downloaded-cancel");
+                } else {
+                    title = document.webL10n.get("download-aborted");
+                    message = document.webL10n.get("content-items-downloaded-failure");
+                }
                 Status.stop();
                 Notifications.info(title, message);
             });
