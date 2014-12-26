@@ -20,6 +20,11 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "s
             return { };
         },
         componentWillMount: function() {
+            if (this.props.exercise.isPerseusExercise()) {
+                APIClient.getExerciseByName(this.props.exercise.getName()).done((result) => {
+                    console.log("got exercise: %o", result);
+                });
+            }
         },
         componentDidMount: function() {
         },
