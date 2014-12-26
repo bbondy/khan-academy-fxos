@@ -360,6 +360,9 @@ define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Sto
         getPoints: function() {
             return this.get("points") || 0;
         },
+        getName: function() {
+            return this.get(Minify.getShortName("name"));
+        },
         getKAUrl: function() {
             var value = this.get(Minify.getShortName("ka_url"));
             if (!value) {

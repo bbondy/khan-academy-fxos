@@ -250,8 +250,8 @@ define(["oauth", "util"], function(_oauth, Util) {
          * @param exerciseId The id of the exercise to obtain information on.
          * @return a promise with the status and other information
          */
-        getExercise: function(exerciseId) {
-            return this._basicAPICall(this.API_V1_BASE + "/exercises/" + exerciseId);
+        getExerciseByName: function(exerciseName) {
+            return this._basicAPICall(this.API_V1_BASE + "/exercises/" + exerciseName);
         },
         /**
          * Obtains an exercise
