@@ -1,3 +1,6 @@
 [submodule "khan-exercises"]
 	path = khan-exercises
 	url = http://github.com/bbondy/khan-exercises
+[submodule "perseus"]
+	path = perseus
+	url = https://github.com/Khan/perseus
