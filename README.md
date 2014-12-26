@@ -16,6 +16,8 @@ Everything is built using JavaScript.
 
 ## Getting setup
 
+    git clone --recursive https://github.com/bbondy/khan-academy-fxos
+
 Copy `./secrets.json.sample` to `./secrets.json`, fill in the info with your API key.  
 Note that reporting user points will not work unless you have an annointed key.
 
