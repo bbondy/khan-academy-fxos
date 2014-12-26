@@ -19,10 +19,23 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "s
         getInitialState: function() {
             return { };
         },
+        refreshRandomAssessment: function() {
+            var count = this.exercise.all_assessment_items.length;
+            var randomIndex = Math.floor(Math.random() * count);
+            var randomAssessmentId = this.exercise.all_assessment_items[randomIndex].id;
+            APIClient.getAssessmentItem(randomAssessmentId).done((result) => {
+                console.log("got assessment item: %o: item data: %o", result, JSON.parse(result.item_data));
+                this.setState({
+                    perseusItemData: JSON.parse(result.item_data)
+                });
+            });
+        },
         componentWillMount: function() {
             if (this.props.exercise.isPerseusExercise()) {
                 APIClient.getExerciseByName(this.props.exercise.getName()).done((result) => {
+                    this.exercise = result;
                     console.log("got exercise: %o", result);
+                    this.refreshRandomAssessment();
                 });
             }
         },
@@ -36,6 +49,10 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "s
             } else if (this.props.exercise.isKhanExercisesExercise()) {
                 var path = `/khan-exercises/exercises/${this.props.exercise.getFilename()}`;
                 return <iframe src={path}/>;
+            } else if(this.state.perseusItemData) {
+                console.log(this.state.perseusItemData);
+                window.p = this.state.perseusItemData;
+                return <div>{this.state.perseusItemData.question.content}</div>
             }
             Util.log("render exercise: :%o", this.props.exercise);
             return <div>TODO: Render exercise :)</div>;
