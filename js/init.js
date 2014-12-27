@@ -21,6 +21,7 @@ require.config({
         "underscore": "./lib/underscore-min",
         "jquery": "./lib/jquery-min",
         "backbone": "./lib/backbone-min",
+        "perseus": "../webapp/javascript/perseus-package/perseus-2",
 
         // Views
         "article": "./views/article",
@@ -30,7 +31,23 @@ require.config({
         "topic": "./views/topic",
         "video": "./views/video",
         "pane": "./views/pane",
-    }
+    },
+    shim: {
+        jquery: {
+          exports: '$'
+        },
+        underscore: {
+          deps: ["jquery"],
+          exports: '_'
+        },
+        backbone: {
+          deps:["underscore", "jquery"],
+          exports: 'Backbone'
+        },
+        waitSeconds: 15
+   }
+
+
 });
 
 // Uncomment to visually test localization.
@@ -45,5 +62,15 @@ if (window.isTest) {
 } else {
     initModules.push('main');
 }
-requirejs(initModules);
 
+window.Khan = {};
+window.KhanUtil = Khan.KhanUtil = {};
+window.Exercises = {
+    cluesEnabled: false
+};
+
+// Localization shim within perseus, we want to do nothing for it
+// since we aren't repsonsible for its localization
+$._ = function(x) { return x; };
+
+requirejs(initModules);
