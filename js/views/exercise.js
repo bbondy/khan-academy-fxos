@@ -1,8 +1,9 @@
 "use strict";
 
-define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "storage"],
-        function(React, Util, models, APIClient, Storage) {
+define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "storage", "perseus"],
+        function(React, Util, models, APIClient, Storage, perseus) {
     var cx = React.addons.classSet;
+    var Renderer = perseus.Renderer;
 
     /**
      * Represents a single exercise, it will load the exercise dynamically and
@@ -50,9 +51,8 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "s
                 var path = `/khan-exercises/exercises/${this.props.exercise.getFilename()}`;
                 return <iframe src={path}/>;
             } else if(this.state.perseusItemData) {
-                console.log(this.state.perseusItemData);
-                window.p = this.state.perseusItemData;
-                return <div>{this.state.perseusItemData.question.content}</div>
+                return <Renderer content={this.state.perseusItemData.question.content}
+                                 ignoreMissingWidgets={true}/>
             }
             Util.log("render exercise: :%o", this.props.exercise);
             return <div>TODO: Render exercise :)</div>;
