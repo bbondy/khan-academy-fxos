@@ -441,7 +441,7 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                 }
             }
 
-            var onProgress = (model, count, cancelling) => {
+            var onProgress = (count, cancelling) => {
                 if (cancelling) {
                     Status.update(document.webL10n.get("canceling-download"));
                     return;

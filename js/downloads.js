@@ -77,14 +77,12 @@ define(["util", "storage", "models", "apiclient"],
                 models.TempAppState.set("currentDownloadRequest", null);
             }
             if (this.currentProgress) {
-                this.currentProgress(undefined, undefined, true);
+                this.currentProgress(undefined, true);
             }
         },
         /**
          * Used to download either a single content item for all content
          * items underneath the specified topic.
-         * onProgress callback is only used for topics and is called for
-         * each content item.
          */
         download: function(model, onProgress) {
             if (model.isContent()) {
@@ -104,7 +102,7 @@ define(["util", "storage", "models", "apiclient"],
             var downloadedCount = 0;
             models.TempAppState.set("isDownloadingTopic", true);
             if (onProgress) {
-                onProgress(null, 0);
+                onProgress(0);
             }
             var predicate = (model) => !model.isDownloaded();
             var seq = topic.enumChildrenGenerator(predicate);
@@ -115,7 +113,7 @@ define(["util", "storage", "models", "apiclient"],
                     this.downloadContent(contentItem).done(() => {
                         downloadedCount++;
                         if (onProgress) {
-                            onProgress(contentItem, downloadedCount);
+                            onProgress(downloadedCount);
                         }
                         setTimeout(downloadOneAtATime, 1000);
                     }).fail((isCancel) => {
@@ -141,7 +139,7 @@ define(["util", "storage", "models", "apiclient"],
         downloadContent: function(contentItem, onProgress) {
             var d = $.Deferred();
             if (onProgress) {
-                onProgress(null, 0);
+                onProgress(0);
             }
 
             var filename = contentItem.getId();
@@ -150,7 +148,7 @@ define(["util", "storage", "models", "apiclient"],
                 Storage.writeBlob(filename, blob).done(() => {
                     this._addDownloadToManifest(contentItem);
                     if (onProgress) {
-                        onProgress(contentItem, 1);
+                        onProgress(1);
                     }
                     d.resolve(contentItem, 1);
                 }).fail(() => {
