@@ -17,15 +17,14 @@ require.config({
         "sinon": "../test/sinon-1.1.0.3",
 
         // Third party libs
-        "text": "./lib/text-min",
-        //"react": "./lib/react-with-addons-min",
-        "react": "./lib/react-with-addons-dev",
-        "jsx": "./lib/jsx-min",
-        "underscore": "./lib/underscore-min",
-        "jquery": "./lib/jquery-min",
-        "backbone": "./lib/backbone-min",
+        "react": "../bower_components/react/react-with-addons",
+        //"react": "../bower_components/react/react-with-addons.min",
+        "underscore": "../bower_components/underscore/underscore-min",
+        "jquery": "../bower_components/jquery/dist/jquery.min",
+        "backbone": "../bower_components/backbone/backbone",
         "perseus": "../webapp/javascript/perseus-package/perseus-2",
-        "katex": "./lib/katex",
+        "katex": "../bower_components/katex/katex",
+        "videojs": "../bower_components/videojs/dist/video-js/video",
 
         // Views
         "article": "./views/article",
@@ -50,6 +49,9 @@ require.config({
         backbone: {
           deps:["underscore", "jquery"],
           exports: 'Backbone'
+        },
+        videojs: {
+          exports: 'videojs'
         },
         waitSeconds: 15
    }
