@@ -161,6 +161,8 @@ require(["jquery", "underscore", "react", "util", "models", "apiclient", "storag
             assert.ok(!t.isVideo());
             assert.ok(!t.isArticleList());
             assert.ok(!t.isArticle());
+            assert.ok(!t.isExerciseList());
+            assert.ok(!t.isExercise());
             assert.ok(!t.isContent());
             assert.ok(!t.isContentList());
             assert.strictEqual(t.getKind(), "Topic");
@@ -170,8 +172,9 @@ require(["jquery", "underscore", "react", "util", "models", "apiclient", "storag
         var assertValidContent = (c) => {
             assert.ok(!c.isTopic());
             assert.ok(!c.isVideoList());
-            assert.ok(c.isVideo() ^ c.isArticle());
+            assert.ok(c.isVideo() ^ c.isArticle() ^ c.isExercise());
             assert.ok(!c.isArticleList());
+            assert.ok(!c.isExerciseList());
             assert.ok(c.isContent());
             assert.ok(!c.isContentList());
             assert.ok(c.getParentDomain());
@@ -181,6 +184,8 @@ require(["jquery", "underscore", "react", "util", "models", "apiclient", "storag
                 assert.strictEqual(c.getKind(), "Video");
             } else if (c.isArticle()) {
                 assert.strictEqual(c.getKind(), "Article");
+            } else if (c.isExercise()) {
+                assert.strictEqual(c.getKind(), "Exercise");
             }
         };
 
