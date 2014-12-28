@@ -1,5 +1,5 @@
-define(["react", "util", "models", "apiclient", "cache", "storage", "downloads", "chrome"],
-        function(React, Util, models, APIClient, Cache, Storage, Downloads, chromeViews) {
+define(["jquery", "react", "util", "models", "apiclient", "cache", "storage", "downloads", "chrome"],
+        function($, React, Util, models, APIClient, Cache, Storage, Downloads, chromeViews) {
 
   /*
     // I thought this was supposed to be needed, but it seems to not be needed

@@ -1,6 +1,6 @@
 "use strict";
 
-define([], function() {
+define(["jquery", "underscore"], function($, _) {
     /**
      * Various utility functions
      */

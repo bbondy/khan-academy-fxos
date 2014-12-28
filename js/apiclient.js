@@ -1,6 +1,6 @@
 "use strict";
 
-define(["oauth", "util"], function(_oauth, Util) {
+define(["jquery", "underscore", "oauth", "util"], function($, _, _oauth, Util) {
     /**
      * Client side library for the KA API
      */

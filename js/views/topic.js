@@ -1,7 +1,6 @@
 "use strict";
 
-define([window.isTest ? "react-dev" : "react", "util", "models"],
-        function(React, Util, models) {
+define(["react", "underscore", "util", "models"], function(React, _, Util, models) {
     var cx = React.addons.classSet;
 
     /**

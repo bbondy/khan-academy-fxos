@@ -1,9 +1,15 @@
 "use strict";
 
-define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "storage", "perseus"],
-        function(React, Util, models, APIClient, Storage, perseus) {
+// Perseus module uses React directly and uses $._ directly for
+// localization, so we do this as a hack to get it to work
+function perseusPrep($, React) {
+    window.React = React;
+    $._ = function(x) { return x; };
+}
+
+define(["jquery", "react", "util", "models", "apiclient", "storage"],
+        function($, React, Util, models, APIClient, Storage) {
     var cx = React.addons.classSet;
-    var Renderer = perseus.Renderer;
 
     /**
      * Represents a single exercise, it will load the exercise dynamically and
@@ -39,6 +45,12 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "s
                     this.refreshRandomAssessment();
                 });
             }
+
+            perseusPrep($, React);
+            require(["perseus"], (perseus) => {
+                this.Renderer = perseus.Renderer;
+                this.forceUpdate();
+            });
         },
         componentDidMount: function() {
         },
@@ -50,8 +62,8 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "s
             } else if (this.props.exercise.isKhanExercisesExercise()) {
                 var path = `/khan-exercises/exercises/${this.props.exercise.getFilename()}`;
                 return <iframe src={path}/>;
-            } else if(this.state.perseusItemData) {
-                return <Renderer content={this.state.perseusItemData.question.content}
+            } else if(this.Renderer && this.state.perseusItemData) {
+                return <this.Renderer content={this.state.perseusItemData.question.content}
                                  ignoreMissingWidgets={true}/>
             }
             Util.log("render exercise: :%o", this.props.exercise);

@@ -1,9 +1,11 @@
 "use strict";
 
-define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "cache", "storage",
-        "downloads", "notifications", "status", "video", "article", "exercise", "topic", "search", "pane"],
-        function(React, Util, models, APIClient, Cache, Storage,
-            Downloads, Notifications, Status, videoViews, articleViews, exerciseViews, topicViews, searchViews, paneViews) {
+define(["jquery", "react", "util", "models", "apiclient", "cache", "storage",
+        "downloads", "notifications", "status", "video", "article", "exercise",
+        "topic", "search", "pane"],
+       function($, React, Util, models, APIClient, Cache, Storage,
+                Downloads, Notifications, Status, videoViews, articleViews, exerciseViews,
+                topicViews, searchViews, paneViews) {
     var cx = React.addons.classSet;
     var VideoViewer = videoViews.VideoViewer;
     var ArticleViewer = articleViews.ArticleViewer;

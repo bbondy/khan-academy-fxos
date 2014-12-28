@@ -10,8 +10,7 @@
  * init will not wait for the result.
  */
 
-define(["util", "models"],
-        function(Util, models) {
+define(["jquery", "util", "models"], function($, Util, models) {
 
     var TEN_MINUTES = 1000 * 60 * 10;
     var Cache = {

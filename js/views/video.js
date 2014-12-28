@@ -1,8 +1,7 @@
 "use strict";
 
-define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "storage",
-        "downloads", "notifications", "status", "video"],
-        function(React, Util, models, APIClient, Storage, Downloads, Notifications, Status) {
+define(["jquery", "react", "underscore", "util", "models", "apiclient", "storage", "downloads", "notifications", "status", "video"],
+        function($, React, _, Util, models, APIClient, Storage, Downloads, Notifications, Status) {
     var cx = React.addons.classSet;
 
     /**

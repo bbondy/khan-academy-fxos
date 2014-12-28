@@ -7,8 +7,8 @@
  *   - Provides the ability to delete those downloads
  */
 
-define(["util", "storage", "models", "apiclient"],
-        function(Util, Storage, models, APIClient) {
+define(["jquery", "underscore", "util", "storage", "models", "apiclient"],
+        function($, underscore, Util, Storage, models, APIClient) {
 
     var Downloads = {
         /**

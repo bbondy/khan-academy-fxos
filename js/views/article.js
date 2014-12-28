@@ -1,6 +1,6 @@
 "use strict";
 
-define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "storage"],
+define(["react", "util", "models", "apiclient", "storage"],
         function(React, Util, models, APIClient, Storage) {
     var cx = React.addons.classSet;
 

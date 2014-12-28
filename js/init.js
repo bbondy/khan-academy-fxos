@@ -1,6 +1,7 @@
 require.config({
     baseUrl: '/build',
     paths: {
+        // Modules
         "util": "util",
         "downloads": "downloads",
         "apiclient": "apiclient",
@@ -9,19 +10,22 @@ require.config({
         "models": "models",
         "notifications": "notifications",
         "cache": "cache",
+
+        // Modules to test the app
         "test": "../test/test",
         "test-react": "../test/test-react",
         "sinon": "../test/sinon-1.1.0.3",
 
         // Third party libs
         "text": "./lib/text-min",
-        "react": "./lib/react-with-addons-min",
-        "react-dev": "./lib/react-with-addons-dev",
+        //"react": "./lib/react-with-addons-min",
+        "react": "./lib/react-with-addons-dev",
         "jsx": "./lib/jsx-min",
         "underscore": "./lib/underscore-min",
         "jquery": "./lib/jquery-min",
         "backbone": "./lib/backbone-min",
         "perseus": "../webapp/javascript/perseus-package/perseus-2",
+        "katex": "./lib/katex",
 
         // Views
         "article": "./views/article",
@@ -39,6 +43,9 @@ require.config({
         underscore: {
           deps: ["jquery"],
           exports: '_'
+        },
+        perseus: {
+            deps: ["react", "katex", "jquery"],
         },
         backbone: {
           deps:["underscore", "jquery"],
@@ -71,6 +78,6 @@ window.Exercises = {
 
 // Localization shim within perseus, we want to do nothing for it
 // since we aren't repsonsible for its localization
-$._ = function(x) { return x; };
+//$._ = function(x) { return x; };
 
 requirejs(initModules);

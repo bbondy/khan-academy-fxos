@@ -1,5 +1,5 @@
-require(["react-dev", "util", "models", "apiclient", "storage", "downloads", "cache", "minify", "notifications", "status", "chrome", "video", "article", "topic", "search"],
-        function(React, Util, models, APIClient, Storage, Downloads, Cache, Minify, Notifications, Status, chromeViews, videoViews, articleViews, topicViews, searchViews) {
+require(["jquery", "underscore", "react", "util", "models", "apiclient", "storage", "downloads", "cache", "minify", "notifications", "status", "chrome", "video", "article", "topic", "search"],
+        function($, _, React, Util, models, APIClient, Storage, Downloads, Cache, Minify, Notifications, Status, chromeViews, videoViews, articleViews, topicViews, searchViews) {
 
     var TestUtils = React.addons.TestUtils;
     var Simulate = TestUtils.Simulate;
