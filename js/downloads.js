@@ -133,7 +133,7 @@ define(["util", "storage", "models", "apiclient"],
         downloadContent: function(contentItem, onProgress, downloadNumber) {
             var d = $.Deferred();
             if (onProgress) {
-                onProgress(downloadNumber);
+                onProgress(downloadNumber, 0);
             }
 
             var filename = contentItem.getId();
@@ -142,7 +142,7 @@ define(["util", "storage", "models", "apiclient"],
                 Storage.writeBlob(filename, blob).done(() => {
                     this._addDownloadToManifest(contentItem);
                     if (onProgress) {
-                        onProgress(downloadNumber + 1);
+                        onProgress(downloadNumber + 1, 0);
                     }
                     d.resolve(contentItem, 1);
                 }).fail(() => {
@@ -162,6 +162,10 @@ define(["util", "storage", "models", "apiclient"],
                 };
                 req.onerror = (e) => {
                     d.reject(false);
+                };
+                req.onprogress = (e) => {
+                    var percent = Math.floor(e.loaded * 100 / e.total);
+                    onProgress(downloadNumber, percent);
                 };
                 req.send();
                 models.TempAppState.set("currentDownloadRequest", req);

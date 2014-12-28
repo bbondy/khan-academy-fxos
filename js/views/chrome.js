@@ -441,14 +441,14 @@ define([window.isTest ? "react-dev" : "react", "util", "models", "apiclient", "c
                 }
             }
 
-            var onProgress = (count, cancelling) => {
+            var onProgress = (count, currentProgress, cancelling) => {
                 if (cancelling) {
                     Status.update(document.webL10n.get("canceling-download"));
                     return;
                 }
                 count = Util.numberWithCommas(count);
                 var progressMessage = document.webL10n.get("downloading-progress",
-                            {"count" : count, "totalCount": totalCount, "totalCountStr": totalCountStr});
+                            {"count" : count, "totalCount": totalCount, "totalCountStr": totalCountStr, "currentProgress": currentProgress});
                 Status.update(progressMessage);
             };
             Status.start();
