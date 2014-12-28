@@ -86,7 +86,7 @@ define(["util", "storage", "models", "apiclient"],
          */
         download: function(model, onProgress) {
             if (model.isContent()) {
-                return this.downloadContent(model, onProgress);
+                return this.downloadContent(model, onProgress, 0);
             } else if (model.isTopic()) {
                 return this.downloadTopic(model, onProgress);
             }
@@ -101,20 +101,14 @@ define(["util", "storage", "models", "apiclient"],
             var d = $.Deferred();
             var downloadedCount = 0;
             models.TempAppState.set("isDownloadingTopic", true);
-            if (onProgress) {
-                onProgress(0);
-            }
             var predicate = (model) => !model.isDownloaded();
             var seq = topic.enumChildrenGenerator(predicate);
             var downloadOneAtATime = () => {
                 try {
                     var contentItem = seq.next().value;
                     // Allow at most one download at a time.
-                    this.downloadContent(contentItem).done(() => {
+                    this.downloadContent(contentItem, onProgress, downloadedCount).done(() => {
                         downloadedCount++;
-                        if (onProgress) {
-                            onProgress(downloadedCount);
-                        }
                         setTimeout(downloadOneAtATime, 1000);
                     }).fail((isCancel) => {
                         if (isCancel) {
@@ -136,10 +130,10 @@ define(["util", "storage", "models", "apiclient"],
          * Downloads the file at the specified URL and stores it to the
          * specified filename.
          */
-        downloadContent: function(contentItem, onProgress) {
+        downloadContent: function(contentItem, onProgress, downloadNumber) {
             var d = $.Deferred();
             if (onProgress) {
-                onProgress(0);
+                onProgress(downloadNumber);
             }
 
             var filename = contentItem.getId();
@@ -148,7 +142,7 @@ define(["util", "storage", "models", "apiclient"],
                 Storage.writeBlob(filename, blob).done(() => {
                     this._addDownloadToManifest(contentItem);
                     if (onProgress) {
-                        onProgress(1);
+                        onProgress(downloadNumber + 1);
                     }
                     d.resolve(contentItem, 1);
                 }).fail(() => {
