@@ -1,7 +1,6 @@
 "use strict";
 
-define([window.isTest ? "react-dev" : "react", "topic"],
-        function(React, topicViews) {
+define(["react", "topic"], function(React, topicViews) {
     var cx = React.addons.classSet;
     var ContentListViewer = topicViews.ContentListViewer;
 

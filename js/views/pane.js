@@ -1,6 +1,6 @@
 "use strict";
 
-define([window.isTest ? "react-dev" : "react", "util", "models", "downloads", "topic"],
+define(["react", "util", "models", "downloads", "topic"],
         function(React, Util, models, Downloads, topicViews) {
     var cx = React.addons.classSet;
     var ContentListViewer = topicViews.ContentListViewer;

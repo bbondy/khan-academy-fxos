@@ -840,5 +840,5 @@ try {
 		return options;
 	}
 
-})(window, document, jQuery);
+})(window, document, $);
 

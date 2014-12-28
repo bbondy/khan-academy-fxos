@@ -1,4 +1,5 @@
-define(["util", "apiclient", "storage", "minify"], function(Util, APIClient, Storage, _Minify) {
+define(["jquery", "underscore", "backbone", "util", "apiclient", "storage", "minify"],
+       function($, _, Backbone, Util, APIClient, Storage, _Minify) {
     var TopicTreeBase = {
         /**
          * Gets the ID of the topic tree item
