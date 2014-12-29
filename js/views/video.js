@@ -31,7 +31,7 @@ define(["jquery", "react", "underscore", "util", "models", "apiclient", "storage
      */
     var TranscriptViewer = React.createClass({
         propTypes: {
-            collection: React.PropTypes.object.isRequired,
+            collection: React.PropTypes.array.isRequired,
             onClickTranscript: React.PropTypes.func.isRequired
         },
         render: function() {
