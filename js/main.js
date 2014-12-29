@@ -48,7 +48,6 @@ define(["jquery", "react", "util", "models", "apiclient", "cache", "storage", "d
         // We don't want to have to wait for results, so just start this and don't wait
         models.CurrentUser.init();
 
-        console.log("setting main view props");
         // Start showing the topic tree
         mainView.setProps({model: models.TopicTree.root});
         mainView.setState({currentModel: models.TopicTree.root});
