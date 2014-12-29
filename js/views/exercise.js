@@ -31,7 +31,7 @@ define(["jquery", "react", "util", "models", "apiclient", "storage"],
             var randomIndex = Math.floor(Math.random() * count);
             var randomAssessmentId = this.exercise.all_assessment_items[randomIndex].id;
             APIClient.getAssessmentItem(randomAssessmentId).done((result) => {
-                console.log("got assessment item: %o: item data: %o", result, JSON.parse(result.item_data));
+                Util.log("got assessment item: %o: item data: %o", result, JSON.parse(result.item_data));
                 this.setState({
                     perseusItemData: JSON.parse(result.item_data)
                 });
@@ -41,7 +41,7 @@ define(["jquery", "react", "util", "models", "apiclient", "storage"],
             if (this.props.exercise.isPerseusExercise()) {
                 APIClient.getExerciseByName(this.props.exercise.getName()).done((result) => {
                     this.exercise = result;
-                    console.log("got exercise: %o", result);
+                    Util.log("got exercise: %o", result);
                     this.refreshRandomAssessment();
                 });
             }

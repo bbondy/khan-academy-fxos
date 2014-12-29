@@ -184,9 +184,7 @@ define(["react", "underscore", "util", "models"], function(React, _, Util, model
             var subwayIconClass = cx(subwayIconClassObj);
             var pipeClass = cx(pipeClassObj);
             var exerciseClass = cx(exerciseClassObj);
-            console.log('---');
-            console.log(this.props.exercise);
-            console.log(this.props.exercise.getTitle());
+            Util.log("Exercise: %o", this.props.exercise);
             return <li className={exerciseClass}>
                 <div className={subwayIconClass}>
                     <a href="javascript:void(0)" onClick={Util.partial(this.props.onClickExercise, this.props.exercise)}>
