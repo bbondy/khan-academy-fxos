@@ -25,6 +25,7 @@ require.config({
         "perseus": "../webapp/javascript/perseus-package/perseus-2",
         "katex": "../bower_components/katex/build/katex.min",
         "videojs": "../bower_components/videojs/dist/video-js/video",
+        "kas": "../bower_components/KAS/kas",
 
         // Views
         "article": "./views/article",
@@ -42,6 +43,9 @@ require.config({
         underscore: {
           deps: ["jquery"],
           exports: '_'
+        },
+        kas: {
+            exports: 'KAS'
         },
         katex: {
           exports: 'katex'
