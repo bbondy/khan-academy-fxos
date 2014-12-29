@@ -35,7 +35,7 @@ define(["jquery", "react", "util", "models", "apiclient", "cache", "storage", "d
     var mountNode = document.getElementById("app");
 
     // Render the main app chrome
-    var mainView = React.renderComponent(<MainView/>, mountNode);
+    var mainView = React.render(<MainView/>, mountNode);
 
     // Init everything
     Storage.init().then(function(){
