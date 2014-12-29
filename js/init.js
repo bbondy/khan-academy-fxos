@@ -23,7 +23,7 @@ require.config({
         "jquery": "../bower_components/jquery/dist/jquery.min",
         "backbone": "../bower_components/backbone/backbone",
         "perseus": "../webapp/javascript/perseus-package/perseus-2",
-        "katex": "../bower_components/katex/katex",
+        "katex": "../bower_components/katex/build/katex.min",
         "videojs": "../bower_components/videojs/dist/video-js/video",
 
         // Views
@@ -42,6 +42,9 @@ require.config({
         underscore: {
           deps: ["jquery"],
           exports: '_'
+        },
+        katex: {
+          exports: 'katex'
         },
         perseus: {
             deps: ["react", "katex", "jquery"],

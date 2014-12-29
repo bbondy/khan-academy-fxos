@@ -2,13 +2,14 @@
 
 // Perseus module uses React directly and uses $._ directly for
 // localization, so we do this as a hack to get it to work
-function perseusPrep($, React) {
+function perseusPrep($, React, katex) {
     window.React = React;
     $._ = function(x) { return x; };
+    window.katex = katex
 }
 
-define(["jquery", "react", "util", "models", "apiclient", "storage"],
-        function($, React, Util, models, APIClient, Storage) {
+define(["jquery", "react", "util", "models", "apiclient", "storage", "katex"],
+        function($, React, Util, models, APIClient, Storage, katex) {
     var cx = React.addons.classSet;
 
     /**
@@ -46,7 +47,7 @@ define(["jquery", "react", "util", "models", "apiclient", "storage"],
                 });
             }
 
-            perseusPrep($, React);
+            perseusPrep($, React, katex);
             require(["perseus"], (perseus) => {
                 this.Renderer = perseus.Renderer;
                 this.forceUpdate();
