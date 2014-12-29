@@ -62,7 +62,7 @@ define(["jquery", "react", "util", "models", "apiclient", "cache", "storage",
      */
     var AppHeader = React.createClass({
         propTypes: {
-            model: React.PropTypes.object.isRequired,
+            model: React.PropTypes.object,
             isPaneShowing: React.PropTypes.bool.isRequired
         },
         render: function() {
@@ -155,12 +155,12 @@ define(["jquery", "react", "util", "models", "apiclient", "cache", "storage",
                         this.props.model && this.props.model.isContent()) {
                     if (this.props.model.isDownloaded()) {
                         var text = document.webL10n.get(this.props.model.isVideo() ? "delete-downloaded-video" : "delete-downloaded-article");
-                        items.push(<li className="hot-item">
+                        items.push(<li key="delete-downloaded-video" className="hot-item">
                                 <a href="#" onClick={Util.partial(this.props.onClickDeleteDownloadedContent, this.props.model)}>{{text}}</a>
                             </li>);
                     } else {
                         var text = document.webL10n.get(this.props.model.isVideo() ? "download-video" : "download-article");
-                        items.push(<li className="hot-item">
+                        items.push(<li key="download-video" className="hot-item">
                                 <a href="#" className={this.props.model.isVideo() ? "download-video-link" : "download-article-link"} onClick={Util.partial(this.props.onClickDownloadContent, this.props.model)}>{{text}}</a>
                             </li>);
                     }
@@ -172,22 +172,22 @@ define(["jquery", "react", "util", "models", "apiclient", "cache", "storage",
                     this.props.model.isContent() &&
                     this.props.model.getKAUrl()) {
                 var viewOnKAMessage = document.webL10n.get("open-in-website");
-                items.push(<li><a href="#" className="open-in-website-link" onClick={Util.partial(this.props.onClickViewOnKA, this.props.model)}>{{viewOnKAMessage}}</a></li>);
+                items.push(<li key="open-in-website"><a href="#" className="open-in-website-link" onClick={Util.partial(this.props.onClickViewOnKA, this.props.model)}>{{viewOnKAMessage}}</a></li>);
 
                 if (window.MozActivity) {
                     var shareMessage = document.webL10n.get("share");
-                    items.push(<li><a href="#" className="share-link" onClick={Util.partial(this.props.onClickShare, this.props.model)}>{{shareMessage}}</a></li>);
+                    items.push(<li key="share-link"><a href="#" className="share-link" onClick={Util.partial(this.props.onClickShare, this.props.model)}>{{shareMessage}}</a></li>);
                 }
             }
 
             if (Storage.isEnabled()) {
                 if (models.TempAppState.get("isDownloadingTopic")) {
-                    items.push(<li className="hot-item">
+                    items.push(<li key="cancel-downloading" className="hot-item">
                             <a href="#" data-l10n-id="cancel-downloading" onClick={Util.partial(this.props.onClickCancelDownloadContent, this.props.model)}>Cancel Downloading</a>
                         </li>);
                 } else if(!this.props.isPaneShowing &&
                             this.props.model && this.props.model.isTopic()) {
-                    items.push(<li className="hot-item">
+                    items.push(<li key="download-topic" className="hot-item">
                             <a href="#" data-l10n-id="download-topic" onClick={Util.partial(this.props.onClickDownloadContent, this.props.model)}>Download Topic</a>
                         </li>);
                 }
@@ -197,27 +197,27 @@ define(["jquery", "react", "util", "models", "apiclient", "cache", "storage",
             // Followed by sign in
             if (!models.CurrentUser.isSignedIn()) {
                 // If the user is not signed in, add that option first
-                items.push(<li><a data-l10n-id="sign-in" href="#" onClick={this.props.onClickSignin}>Sign In</a></li>);
+                items.push(<li key="sign-in"><a data-l10n-id="sign-in" href="#" onClick={this.props.onClickSignin}>Sign In</a></li>);
             }
 
             ////////////////////
             // Followed by view pane items
             if (models.CurrentUser.isSignedIn() && !this.props.isProfileShowing) {
                 // User is signed in, add all the signed in options here
-                items.push(<li><a  data-l10n-id="view-profile" className="view-profile-link" href="#" onClick={this.props.onClickProfile}>View Profile</a></li>);
+                items.push(<li key="view-profile"><a  data-l10n-id="view-profile" className="view-profile-link" href="#" onClick={this.props.onClickProfile}>View Profile</a></li>);
             }
             if (!this.props.isSettingsShowing) {
-                items.push(<li><a data-l10n-id="view-settings" className="view-settings-link" href="#" onClick={this.props.onClickSettings}>View Settings</a></li>);
+                items.push(<li key="view-settings"><a data-l10n-id="view-settings" className="view-settings-link" href="#" onClick={this.props.onClickSettings}>View Settings</a></li>);
             }
             if (!this.props.isDownloadsShowing && Storage.isEnabled()) {
-                items.push(<li><a data-l10n-id="view-downloads" className="view-downloads-link" href="#" onClick={this.props.onClickDownloads}>View Downloads</a></li>);
+                items.push(<li key="view-downloads"><a data-l10n-id="view-downloads" className="view-downloads-link" href="#" onClick={this.props.onClickDownloads}>View Downloads</a></li>);
             }
 
-            items.push(<li><a data-l10n-id="open-support" className="open-support-link" href="#" onClick={this.props.onClickSupport}>Open support website</a></li>);
+            items.push(<li key="open-support"><a data-l10n-id="open-support" className="open-support-link" href="#" onClick={this.props.onClickSupport}>Open support website</a></li>);
 
             // Add the signout button last
             if (models.CurrentUser.isSignedIn()) {
-                items.push(<li><a data-l10n-id="sign-out" href="#" onClick={this.props.onClickSignout}>Sign Out</a></li>);
+                items.push(<li key="sign-out"><a data-l10n-id="sign-out" href="#" onClick={this.props.onClickSignout}>Sign Out</a></li>);
             }
 
             return <section className="sidebar" data-type="sidebar">
@@ -257,7 +257,13 @@ define(["jquery", "react", "util", "models", "apiclient", "cache", "storage",
         },
         getInitialState: function() {
             return {
-                currentModel: this.props.model
+                currentModel: this.props.model || null,
+                isPaneShowing: false,
+                showProfile: false,
+                showDownloads: false,
+                showSettings: false,
+                wasLastDownloads: false,
+                lastModel: null,
             };
         },
         onClickContentItemFromDownloads: function(model) {
@@ -561,24 +567,28 @@ define(["jquery", "react", "util", "models", "apiclient", "cache", "storage",
                                            onTopicSearch={this.onTopicSearch}/>;
             }
 
+            var sidebar;
+            if (currentModel) {
+                sidebar = <Sidebar model={currentModel}
+                               onClickSignin={this.onClickSignin}
+                               onClickSignout={this.onClickSignout}
+                               onClickProfile={this.onClickProfile}
+                               onClickDownloads={this.onClickDownloads}
+                               onClickSettings={this.onClickSettings}
+                               onClickSupport={this.onClickSupport}
+                               onClickDownloadContent={this.onClickDownloadContent}
+                               onClickViewOnKA={this.onClickViewOnKA}
+                               onClickShare={this.onClickShare}
+                               onClickCancelDownloadContent={this.onClickCancelDownloadContent}
+                               onClickDeleteDownloadedContent={this.onClickDeleteDownloadedContent}
+                               isPaneShowing={this.isPaneShowing()}
+                               isDownloadsShowing={this.state.showDownloads}
+                               isProfileShowing={this.state.showProfile}
+                               isSettingsShowing={this.state.showSettings} />;
+            }
+
             return <section className="current" id="index" data-position="current">
-                <Sidebar model={currentModel}
-                         onClickSignin={this.onClickSignin}
-                         onClickSignout={this.onClickSignout}
-                         onClickProfile={this.onClickProfile}
-                         onClickDownloads={this.onClickDownloads}
-                         onClickSettings={this.onClickSettings}
-                         onClickSupport={this.onClickSupport}
-                         onClickDownloadContent={this.onClickDownloadContent}
-                         onClickViewOnKA={this.onClickViewOnKA}
-                         onClickShare={this.onClickShare}
-                         onClickCancelDownloadContent={this.onClickCancelDownloadContent}
-                         onClickDeleteDownloadedContent={this.onClickDeleteDownloadedContent}
-                         isPaneShowing={this.isPaneShowing()}
-                         isDownloadsShowing={this.state.showDownloads}
-                         isProfileShowing={this.state.showProfile}
-                         isSettingsShowing={this.state.showSettings}
-                         />
+                {sidebar}
                 <section id="main-content" role="region" className="skin-dark">
                     <AppHeader model={currentModel}
                                onClickBack={this.onClickBack}
