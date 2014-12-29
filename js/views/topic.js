@@ -219,7 +219,7 @@ define(["react", "underscore", "util", "models"], function(React, _, Util, model
                 topics = _(this.props.topic.get("topics").models).map((topic) => {
                     return <TopicListItem topic={topic}
                                           onClickTopic={this.props.onClickTopic}
-                                          key={topic.getId()}/>;
+                                          key={topic.getKey()}/>;
                 });
             }
 
@@ -229,15 +229,15 @@ define(["react", "underscore", "util", "models"], function(React, _, Util, model
                     if (contentItem.isVideo()) {
                         return <VideoListItem video={contentItem}
                                               onClickVideo={this.props.onClickContentItem}
-                                              key={contentItem.getId()} />;
+                                              key={contentItem.getKey()} />;
                     } else if (contentItem.isArticle()) {
                         return <ArticleListItem article={contentItem}
                                                 onClickArticle={this.props.onClickContentItem}
-                                                key={contentItem.getId()} />;
+                                                key={contentItem.getKey()} />;
                     }
                     return <ExerciseListItem exercise={contentItem}
                                              onClickExercise={this.props.onClickContentItem}
-                                             key={contentItem.getId()} />;
+                                             key={contentItem.getKey()} />;
                 });
             }
 

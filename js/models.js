@@ -8,6 +8,18 @@ define(["jquery", "underscore", "backbone", "util", "apiclient", "storage", "min
             return this.get(Minify.getShortName("id"));
         },
         /**
+         * Gets the slug of the topic tree item
+         */
+        getSlug: function() {
+            return this.get(Minify.getShortName("slug"));
+        },
+        /**
+         * Gets a best possible guess at a unique ID, usually based on the ID
+         */
+        getKey: function() {
+            return this.getId() || this.getSlug() || this.getTitle();
+        },
+        /**
          * Gets the kind of the topic tree item
          * Example values: Article, Topic, Video
          */
