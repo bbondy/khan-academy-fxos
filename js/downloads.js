@@ -65,6 +65,14 @@ define(["jquery", "underscore", "util", "storage", "models", "apiclient"],
                 model.set("downloadCount", downloadCount);
             }
         },
+
+        /**
+         * Returns whether there is a cancellable download in progress.
+         */
+        canCancelDownload: function() {
+            return models.TempAppState.get("isDownloadingTopic") || models.TempAppState.get("currentDownloadRequest");
+        },
+
         /**
          * Cancels downloading if it's in progress.
          */
