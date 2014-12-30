@@ -155,6 +155,7 @@ define(["jquery", "underscore", "util", "storage", "models", "apiclient"],
                 req.open("GET", url, true);
                 req.responseType = "arraybuffer";
                 req.onload = () => {
+                    models.TempAppState.set("currentDownloadRequest", null);
                     handleContentLoaded(req.response);
                 };
                 req.onabort = (e) => {

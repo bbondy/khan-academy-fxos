@@ -181,7 +181,7 @@ define(["jquery", "react", "util", "models", "apiclient", "cache", "storage",
             }
 
             if (Storage.isEnabled()) {
-                if (models.TempAppState.get("isDownloadingTopic")) {
+                if (models.TempAppState.get("isDownloadingTopic") || models.TempAppState.get("currentDownloadRequest")) {
                     items.push(<li key="cancel-downloading" className="hot-item">
                             <a href="#" data-l10n-id="cancel-downloading" onClick={Util.partial(this.props.onClickCancelDownloadContent, this.props.model)}>Cancel Downloading</a>
                         </li>);
