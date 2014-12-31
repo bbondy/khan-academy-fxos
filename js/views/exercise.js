@@ -2,15 +2,17 @@
 
 // Perseus module uses React directly and uses $._ directly for
 // localization, so we do this as a hack to get it to work
-function perseusPrep($, React, katex, KAS) {
+function perseusPrep($, React, katex, KAS, MathJax) {
     window.React = React;
     $._ = function(x) { return x; };
+    window.$_ = function(x) { return x; };
     window.katex = katex
     window.KAS = KAS;
+    window.MathJax = MathJax;
 }
 
-define(["jquery", "react", "util", "models", "apiclient", "storage", "katex", "kas"],
-        function($, React, Util, models, APIClient, Storage, katex, KAS) {
+define(["jquery", "react", "util", "models", "apiclient", "storage", "katex", "kas", "mathjax"],
+        function($, React, Util, models, APIClient, Storage, katex, KAS, MathJax) {
     var cx = React.addons.classSet;
 
     /**
@@ -48,10 +50,13 @@ define(["jquery", "react", "util", "models", "apiclient", "storage", "katex", "k
                 });
             }
 
-            perseusPrep($, React, katex, KAS);
-            require(["perseus"], (perseus) => {
-                this.Renderer = perseus.Renderer;
-                this.forceUpdate();
+            perseusPrep($, React, katex, KAS, MathJax);
+            require(["perseus"], (Perseus) => {
+                Perseus.init({}).then(() => {
+                    Util.log("Perseus init done");
+                    this.ItemRenderer = Perseus.ItemRenderer;
+                    this.forceUpdate();
+                });
             });
         },
         componentDidMount: function() {
@@ -59,17 +64,31 @@ define(["jquery", "react", "util", "models", "apiclient", "storage", "katex", "k
         componentWillUnmount: function() {
         },
         render: function() {
+            var content;
             if (this.state.error) {
-                return <div>Could not load exercise</div>;
+                content = <div>Could not load exercise</div>;
             } else if (this.props.exercise.isKhanExercisesExercise()) {
                 var path = `/khan-exercises/exercises/${this.props.exercise.getFilename()}`;
-                return <iframe src={path}/>;
-            } else if(this.Renderer && this.state.perseusItemData) {
-                return <this.Renderer content={this.state.perseusItemData.question.content}
-                                 ignoreMissingWidgets={true}/>
-            }
+                content = <iframe src={path}/>;
+            } else if(this.ItemRenderer && this.state.perseusItemData) {
+                content = <div>
+                              <this.ItemRenderer item={this.state.perseusItemData}
+                                                 problemNum={Math.floor(Math.random() * 50) + 1}
+                                                 initialHintsVisible={this.state.perseusItemData.hints.length}
+                                                 enabledFeatures={{
+                                                     highlight: true,
+                                                     toolTipFormats: true
+                                                 }} />
+                              <div id="workarea"/>
+                              <div id="solutionarea"/>
+                              <div id="hintsarea"/>
+                          </div>;
+                }
+
             Util.log("render exercise: :%o", this.props.exercise);
-            return <div>TODO: Render exercise :)</div>;
+            return <div className="exercise">
+                {content}
+            </div>;
         }
     });
 
