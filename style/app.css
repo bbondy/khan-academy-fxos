@@ -538,7 +538,7 @@ article {
     width: calc(100% - 2rem);
 }
 
-.profile, .downloads, .settings {
+.profile, .downloads, .settings, .exercise {
     margin-left: 1rem;
     margin-top: 1rem;
     margin-right: 1rem;
@@ -737,6 +737,15 @@ span.fa-arrows-alt {
 }
 
 iframe {
-    width: 100%;
+    border: 0;
     height: 100%;
+    width: 100%;
+}
+
+.exercise {
+    height: 100%;
+}
+
+#hintsarea {
+    display: none;
 }

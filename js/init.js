@@ -26,6 +26,7 @@ require.config({
         "katex": "../bower_components/katex/build/katex.min",
         "videojs": "../bower_components/videojs/dist/video-js/video",
         "kas": "../bower_components/KAS/kas",
+        "mathjax": "../bower_components/MathJax/MathJax",
 
         // Views
         "article": "./views/article",
@@ -59,6 +60,9 @@ require.config({
         },
         videojs: {
           exports: 'videojs'
+        },
+        mathjax: {
+          exports: 'MathJax'
         },
         waitSeconds: 15
    }
