@@ -44,6 +44,10 @@ define(["react", "util", "models", "downloads", "topic"],
             this.props.options.set("showTranscripts", event.target.checked);
             this.props.options.save();
         },
+        handleAutoUpdateTopicTreeChange: function(event) {
+            this.props.options.set("autoUpdateTopicTree", event.target.checked);
+            this.props.options.save();
+        },
         handleSetPlaybackRateChange: function(event) {
             // Convert a value like: 0, 1, 2, 3 to 50, 100, 150, 200
             var percentage = 50 + event.target.value * 50;
@@ -77,6 +81,16 @@ define(["react", "util", "models", "downloads", "topic"],
                        type="checkbox"
                        checked={this.props.options.get("showTranscripts")}
                        onChange={this.handleShowTranscriptsChange}></input>
+                <span></span>
+                </label>
+
+                <div data-l10n-id="auto-update-topic-tree">Automatically download new topics</div>
+                <label className="pack-switch">
+                <input ref="autoUpdateTopicTree"
+                       className="auto-update-topic-tree-setting"
+                       type="checkbox"
+                       checked={this.props.options.get("autoUpdateTopicTree")}
+                       onChange={this.handleAutoUpdateTopicTreeChange}></input>
                 <span></span>
                 </label>
 

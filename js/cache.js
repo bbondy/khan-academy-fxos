@@ -66,6 +66,8 @@ define(["jquery", "util", "models"], function($, Util, models) {
             var ONE_WEEK = 1000 * 60 * 60 * 24 * 7;
             if (this.lastTopicTreeRefresh && new Date() - this.lastTopicTreeRefresh < ONE_WEEK) {
                 Util.log('heartbeat: no need to refresh topic tree yet!');
+            } else if (!models.AppOptions.get("autoUpdateTopicTree")) {
+                Util.log('heartbeat: not refreshing the topic tree because of user preference!');
             } else {
                 Util.log('heartbeat: Refreshing topic tree!');
                 models.TopicTree.refreshTopicTreeInfo().done(() => {
