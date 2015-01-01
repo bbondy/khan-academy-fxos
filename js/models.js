@@ -817,6 +817,7 @@ define(["jquery", "underscore", "backbone", "util", "apiclient", "storage", "min
      */
     var AppOptionsModel = Backbone.Model.extend({
         defaults: {
+            autoUpdateTopicTree: true,
             showDownloadsOnly: false,
             showTranscripts: true,
             playbackRate: 100
