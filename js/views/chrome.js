@@ -118,7 +118,15 @@ define(["jquery", "react", "util", "models", "apiclient", "cache", "storage",
             if (!models.TempAppState.get("status")) {
                 return <div/>;
             }
-            return <div className="status-bar">{models.TempAppState.get("status")}</div>;
+            var cancelButton;
+            if (Downloads.canCancelDownload()) {
+                cancelButton = <a className="status-button" href="#" onClick={this.props.onClickCancelDownloadContent}>{String.fromCharCode(215)}</a>;
+            }
+
+            return <div className="status-bar">
+                    {models.TempAppState.get("status")}
+                    {cancelButton}
+                   </div>;
         }
     });
 
@@ -181,7 +189,7 @@ define(["jquery", "react", "util", "models", "apiclient", "cache", "storage",
             }
 
             if (Storage.isEnabled()) {
-                if (models.TempAppState.get("isDownloadingTopic") || models.TempAppState.get("currentDownloadRequest")) {
+                if (Downloads.canCancelDownload()) {
                     items.push(<li key="cancel-downloading" className="hot-item">
                             <a href="#" data-l10n-id="cancel-downloading" onClick={Util.partial(this.props.onClickCancelDownloadContent, this.props.model)}>Cancel Downloading</a>
                         </li>);
@@ -495,6 +503,9 @@ define(["jquery", "react", "util", "models", "apiclient", "cache", "storage",
             });
         },
         onClickCancelDownloadContent: function(model) {
+            if (!confirm(document.webL10n.get("cancel-download-warning"))) {
+                return;
+            }
             Downloads.cancelDownloading();
         },
         onClickDeleteDownloadedContent: function(video) {
@@ -600,7 +611,7 @@ define(["jquery", "react", "util", "models", "apiclient", "cache", "storage",
                                />
                         {topicSearch}
                         {control}
-                        <StatusBarViewer/>
+                        <StatusBarViewer onClickCancelDownloadContent={this.onClickCancelDownloadContent} />
                 </section>
             </section>;
         }
