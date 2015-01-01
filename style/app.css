@@ -668,6 +668,12 @@ li.faded p.article-title {
     z-index: 100;
 }
 
+.status-bar .status-button {
+    font-weight: bold;
+    color: white;
+    text-decoration: none;
+    float: right;
+}
 
 section[data-type="sidebar"] > nav > ul > li > a {
     border-bottom: 0.15rem solid #596068;
