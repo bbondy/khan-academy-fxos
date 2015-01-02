@@ -92,7 +92,7 @@ define(["jquery", "underscore", "util", "storage", "models", "apiclient"],
             } else if (model.isTopic()) {
                 return this.downloadTopic(model, onProgress);
             }
-            return $.Deferred().resolve().pormise();
+            return $.Deferred().resolve().promise();
         },
         /**
          * Downloads all content items recursively one at a time for
