@@ -33,12 +33,29 @@ define(["jquery", "react", "util", "models", "apiclient", "storage", "katex", "k
         refreshRandomAssessment: function() {
             var count = this.exercise.all_assessment_items.length;
             var randomIndex = Math.floor(Math.random() * count);
+            var randomAssessmentSHA1 = this.exercise.all_assessment_items[randomIndex].sha1;
             var randomAssessmentId = this.exercise.all_assessment_items[randomIndex].id;
+            var problemTypes = this.exercise.problem_types;
+            var problemTypeName = problemTypes[problemTypes.length - 1].name;
             APIClient.getAssessmentItem(randomAssessmentId).done((result) => {
                 Util.log("got assessment item: %o: item data: %o", result, JSON.parse(result.item_data));
                 this.setState({
                     perseusItemData: JSON.parse(result.item_data)
                 });
+                console.log("submitting exercise progres");
+                // test
+                var problemNumber = 2;
+                var attemptNumber = 1;
+                var isCorrect = true;
+                var hintsUsed = 0;
+                var secondsTaken = 10;
+                var problemType = "";
+                // TODO: Need to properly determine the problemNumber or else you get an out of order exception
+                // on the server side (500 HTTP status code).
+                APIClient.reportExerciseProgress(this.props.exercise.getName(), problemNumber,
+                                                 randomAssessmentSHA1, randomAssessmentId,
+                                                 secondsTaken, hintsUsed, isCorrect, attemptNumber,
+                                                 problemTypeName);
             });
         },
         componentWillMount: function() {
