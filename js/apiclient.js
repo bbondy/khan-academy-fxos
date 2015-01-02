@@ -298,45 +298,25 @@ define(["jquery", "underscore", "oauth", "util"], function($, _, _oauth, Util) {
             return this._basicAPICall(this.API_V1_BASE + `/user/videos/${youTubeId}/log`, extraParams, "POST");
         },
 
-        reportExerciseProgress: function(exerciseName, problemNumber, assessmentSHA, assessmentId, secondsTaken, hintsUsedCount, isCorrect, attemptNumber) {
+        reportExerciseProgress: function(exerciseName, problemNumber, assessmentSHA1, assessmentId, secondsTaken, hintsUsedCount, isCorrect, attemptNumber, problemType) {
             var extraParams = {
                 casing: "camel",
-                sha1: assessmentSHA,
+                sha1: assessmentSHA1,
                 seed: assessmentId,
-                seconds_taken: secondsTaken,
                 count_hints: hintsUsedCount,
                 complete: isCorrect ? 1 : 0,
-                attemptNumber: attemptNumber,
+                attempt_number: attemptNumber,
                 card: "{}",
                 attempt_content: [],
-                problem_type: "Type 2",//???
-                task_id: 5436994858516480,//???
+                problem_type: problemType,
+                task_id: "",
                 user_assessment_key: "",
                 skipped: 0,
-                opt_out: 0
+                opt_out: 0,
+                time_taken: secondsTaken,
+                user_mission_id: ""
             };
             return this._basicAPICall(this.API_INTERNAL_BASE + `/user/exercises/${exerciseName}/problems/${problemNumber}/attempt`, extraParams, "POST");
-            //https://www.khanacademy.org/api/internal/user/exercises/count-to-100/problems/14/attempt
-            //https://www.khanacademy.org/api/internal/user/exercises/count-to-100/problems/14/attempt?lang=en&_=1420051071066
-            /*
-            "sha1: " + assessmentSHA (assessmentItem.sha)
-            "seed: " + assessmentId (assessmentItem.id)
-            problem_type:Type 2???
-            casing: camel
-            complete: isCorrect ? '1' : '0'
-            count_hints: hintsUsedCount
-            time_taken: secondsTaken
-            attempt_number: attemptNumber (1)
-            attempt_content:[[{"choices":[{"content":"$60$","originalIndex":0,"isNoneOfTheAbove":false},{"content":"$90$","originalIndex":2,"isNoneOfTheAbove":false},{"content":"$40$","originalIndex":1,"isNoneOfTheAbove":false}],"noneOfTheAbove":false,"onePerLine":true,"multipleSelect":false,"values":[false,true,false],"widgetId":"radio 1","problemNum":14,"enabledFeatures":{"toolTipFormats":true,"useMathQuill":true},"apiOptions":{"fancyDropdowns":false,"staticRender":false,"enableOldAnswerTypes":false,"readOnly":false},"questionCompleted":false,"reviewModeRubric":null,"displayCount":null,"deselectEnabled":false,"noneOfTheAboveIndex":null,"noneOfTheAboveSelected":false}],[]]
-            task_id:5436994858516480???
-            user_mission_id:m:Brian R. Bondy:123abc123abc123abc???
-            card:???{"cardType":"problem","exerciseName":"count-to-100","leavesEarned":-1,"done":true,"growthHeader":"","assessmentMode":false,"includeSkipButton":false,"includeOptOutButton":false,"includeWorkedExampleButton":false,"showGrowthHeader":false,"showProblemsRemaining":false}
-            user_assessment_key:
-            skipped:0
-            opt_out:0
-            */
-
-
             /* Response:
             {
                 "streak": 10,
@@ -382,10 +362,9 @@ define(["jquery", "underscore", "oauth", "util"], function($, _, _oauth, Util) {
         API_BASE: "https://www.khanacademy.org/api",
         API_V1_BASE: "https://www.khanacademy.org/api/v1",
         API_INTERNAL_BASE: "https://www.khanacademy.org/api/internal",
-        //API_BASE: "http://192.168.1.131:8080/api",
-        //API_V1_BASE: "http://192.168.1.131:8080/api/v1",
         //API_BASE: "http://stable.ka.local:8080/api",
-        //API_V1_BASE: "http://stable.ka.local:8080/api/v1"
+        //API_V1_BASE: "http://stable.ka.local:8080/api/v1",
+        //API_INTERNAL_BASE: "http://stable.ka.local:8080/api/internal",
     };
 
     return APIClient;
