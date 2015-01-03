@@ -186,7 +186,7 @@ define(["jquery", "react", "util", "models", "apiclient", "cache", "storage",
                             <a href="#" data-l10n-id="cancel-downloading" onClick={Util.partial(this.props.onClickCancelDownloadContent, this.props.model)}>Cancel Downloading</a>
                         </li>);
                 } else if(!this.props.isPaneShowing &&
-                            this.props.model && this.props.model.isTopic()) {
+                            this.props.model && this.props.model.isTopic() && this.props.model.getChildNotDownloadedCount()) {
                     items.push(<li key="download-topic" className="hot-item">
                             <a href="#" data-l10n-id="download-topic" onClick={Util.partial(this.props.onClickDownloadContent, this.props.model)}>Download Topic</a>
                         </li>);
