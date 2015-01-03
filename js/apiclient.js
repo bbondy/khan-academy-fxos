@@ -281,6 +281,18 @@ define(["jquery", "underscore", "oauth", "util"], function($, _, _oauth, Util) {
             return this._basicAPICall(this.API_V1_BASE + "/user/videos");
         },
         /**
+         * Obtains more information on the user exercise
+         * For example:
+         *   - longest_streak: <num>
+         *   - mastered: true|false
+         *   - streak: <num>
+         *   - total_done: <num>
+         *   - total_correct: <num>
+         */
+        getUserExercises: function() {
+            return this._basicAPICall(this.API_INTERNAL_BASE + "/user/exercises");
+        },
+        /**
          * Reports progress and completion on a video.
          *
          * @param videoId The ID of the video to report progress on
