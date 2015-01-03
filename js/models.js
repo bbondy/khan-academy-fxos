@@ -5,7 +5,16 @@ define(["jquery", "underscore", "backbone", "util", "apiclient", "storage", "min
          * Gets the ID of the topic tree item
          */
         getId: function() {
+            if (this.isExercise()) {
+                return this.getProgressKey().substring(1);
+            }
             return this.get(Minify.getShortName("id"));
+        },
+        /**
+         * Gets the slug of the topic tree item
+         */
+        getProgressKey: function() {
+            return this.get(Minify.getShortName("progress_key"));
         },
         /**
          * Gets the slug of the topic tree item

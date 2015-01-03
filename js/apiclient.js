@@ -192,7 +192,7 @@ define(["jquery", "underscore", "oauth", "util"], function($, _, _oauth, Util) {
          */
         getUserProgress: function() {
             var extraParams = {
-                kind: "Video,Article"
+                kind: "Video,Article,Exercise"
             };
             return this._basicAPICall(this.API_V1_BASE + "/user/progress_summary", extraParams);
         },
