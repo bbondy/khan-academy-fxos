@@ -172,7 +172,7 @@ define(["jquery", "underscore", "oauth", "util"], function($, _, _oauth, Util) {
             $.oauth($.extend( {}, this.oauth, {
                 type: method,
                 url: url,
-                timeout: 45000,
+                timeout: 120000,
                 dataType,
                 success: (data) => {
                     d.resolve(data);
