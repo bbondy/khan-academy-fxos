@@ -42,20 +42,23 @@ define(["jquery", "react", "util", "models", "apiclient", "storage", "katex", "k
                 this.setState({
                     perseusItemData: JSON.parse(result.item_data)
                 });
-                console.log("submitting exercise progres");
                 // test
-                var problemNumber = 2;
+                var problemNumber = this.props.exercise.get("totalDone") + 1;
                 var attemptNumber = 1;
                 var isCorrect = true;
                 var hintsUsed = 0;
                 var secondsTaken = 10;
                 var problemType = "";
-                // TODO: Need to properly determine the problemNumber or else you get an out of order exception
+                console.log("submitting exercise progress for problemNumber: %i", problemNumber);
+                // TODO: Need to properly determine task id
                 // on the server side (500 HTTP status code).
+                // Also note this doesn't belong here, it's just for testing currently.
+                /*
                 APIClient.reportExerciseProgress(this.props.exercise.getName(), problemNumber,
                                                  randomAssessmentSHA1, randomAssessmentId,
                                                  secondsTaken, hintsUsed, isCorrect, attemptNumber,
                                                  problemTypeName);
+                                                 */
             });
         },
         componentWillMount: function() {
