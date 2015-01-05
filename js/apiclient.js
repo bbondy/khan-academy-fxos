@@ -251,7 +251,11 @@ define(["jquery", "underscore", "oauth", "util"], function($, _, _oauth, Util) {
          * @return a promise with the status and other information
          */
         getExerciseByName: function(exerciseName) {
-            return this._basicAPICall(`${this.API_V1_BASE}/exercises/${exerciseName}`);
+            return this._basicAPICall(`${this.API_INTERNAL_BASE}/exercises/${exerciseName}`);
+        },
+
+        getTaskIfnoByExerciseName: function(exerciseName) {
+            return this._basicAPICall(`${this.API_INTERNAL_BASE}/user/tasks/exercises/${exerciseName}`);
         },
 
         /**
@@ -320,7 +324,7 @@ define(["jquery", "underscore", "oauth", "util"], function($, _, _oauth, Util) {
             return this._basicAPICall(this.API_V1_BASE + `/user/videos/${youTubeId}/log`, extraParams, "POST");
         },
 
-        reportExerciseProgress: function(exerciseName, problemNumber, assessmentSHA1, assessmentId, secondsTaken, hintsUsedCount, isCorrect, attemptNumber, problemType) {
+        reportExerciseProgress: function(exerciseName, problemNumber, assessmentSHA1, assessmentId, secondsTaken, hintsUsedCount, isCorrect, attemptNumber, problemType, taskId) {
             var extraParams = {
                 casing: "camel",
                 sha1: assessmentSHA1,
@@ -331,7 +335,7 @@ define(["jquery", "underscore", "oauth", "util"], function($, _, _oauth, Util) {
                 card: "{}",
                 attempt_content: [],
                 problem_type: problemType,
-                task_id: "",
+                task_id: taskId,
                 user_assessment_key: "",
                 skipped: 0,
                 opt_out: 0,
