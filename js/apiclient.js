@@ -247,11 +247,21 @@ define(["jquery", "underscore", "oauth", "util"], function($, _, _oauth, Util) {
         /**
          * Obtains an exercise
          *
-         * @param exerciseId The id of the exercise to obtain information on.
+         * @param exerciseName The name of the exercise to obtain information on.
          * @return a promise with the status and other information
          */
         getExerciseByName: function(exerciseName) {
-            return this._basicAPICall(this.API_V1_BASE + "/exercises/" + exerciseName);
+            return this._basicAPICall(`${this.API_V1_BASE}/exercises/${exerciseName}`);
+        },
+
+        /**
+         * Obtains info on the user's missions
+         *
+         * @param exerciseName The name of the exercise to obtain task information for
+         * @return a promise with the task
+         */
+        getMissions: function(exerciseName) {
+            return this._basicAPICall(`${this.API_INTERNAL_BASE}/user/missions`);
         },
         /**
          * Obtains an exercise
