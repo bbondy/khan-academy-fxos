@@ -717,7 +717,7 @@ span.fa-arrows-alt {
     border: 0;
 }
 
-#reset-button {
+#reset-button, .submit-answer-button {
     width: 20rem;
     margin-top: 2rem;
     display: block;

@@ -33,33 +33,33 @@ define(["jquery", "react", "util", "models", "apiclient", "storage", "katex", "k
         refreshRandomAssessment: function() {
             var count = this.exercise.all_assessment_items.length;
             var randomIndex = Math.floor(Math.random() * count);
-            var randomAssessmentSHA1 = this.exercise.all_assessment_items[randomIndex].sha1;
-            var randomAssessmentId = this.exercise.all_assessment_items[randomIndex].id;
+            this.randomAssessmentSHA1 = this.exercise.all_assessment_items[randomIndex].sha1;
+            this.randomAssessmentId = this.exercise.all_assessment_items[randomIndex].id;
             var problemTypes = this.exercise.problem_types;
-            var problemTypeName = problemTypes[problemTypes.length - 1].name;
-            APIClient.getAssessmentItem(randomAssessmentId).done((result) => {
+            this.problemTypeName = problemTypes[problemTypes.length - 1].name;
+            APIClient.getAssessmentItem(this.randomAssessmentId).done((result) => {
                 Util.log("got assessment item: %o: item data: %o", result, JSON.parse(result.item_data));
                 this.setState({
                     perseusItemData: JSON.parse(result.item_data)
                 });
-                /*
-                var problemNumber = this.props.exercise.get("totalDone") + 1;
-                var attemptNumber = 1;
-                var isCorrect = true;
-                var hintsUsed = 0;
-                var secondsTaken = 10;
-                var problemType = "";
-                console.log("submitting exercise progress for problemNumber: %i", problemNumber);
-                // TODO: This doesn't belong here, it's just for testing currently.
-                APIClient.getTaskIfnoByExerciseName(this.props.exercise.getName()).done((info) => {
-                    var taskId = info.id;
-                    APIClient.reportExerciseProgress(this.props.exercise.getName(), problemNumber,
-                                                     randomAssessmentSHA1, randomAssessmentId,
-                                                     secondsTaken, hintsUsed, isCorrect, attemptNumber,
-                                                     problemTypeName, taskId);
+            });
+        },
+        onClickSubmitAnswer: function() {
+            var problemNumber = this.props.exercise.get("totalDone") + 1;
+            var attemptNumber = 1;
+            var isCorrect = true;
+            var hintsUsed = 0;
+            var secondsTaken = 10;
+            var problemType = "";
+            console.log("submitting exercise progress for problemNumber: %i", problemNumber);
+            // TODO: This doesn't belong here, it's just for testing currently.
+            APIClient.getTaskIfnoByExerciseName(this.props.exercise.getName()).done((info) => {
+            var taskId = info.id;
+            APIClient.reportExerciseProgress(this.props.exercise.getName(), problemNumber,
+                                             this.randomAssessmentSHA1, this.randomAssessmentId,
+                                             secondsTaken, hintsUsed, isCorrect, attemptNumber,
+                                             this.problemTypeName, taskId);
 
-                });
-                */
             });
         },
         componentWillMount: function() {
@@ -103,6 +103,11 @@ define(["jquery", "react", "util", "models", "apiclient", "storage", "katex", "k
                               <div id="workarea"/>
                               <div id="solutionarea"/>
                               <div id="hintsarea"/>
+
+                              <button className="submit-answer-button"
+                                      data-l10n-id="submit-answer"
+                                      onClick={this.onClickSubmitAnswer}>Submit Answer</button>
+
                           </div>;
                 }
 
