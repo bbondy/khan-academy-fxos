@@ -28,7 +28,9 @@ define(["jquery", "react", "util", "models", "apiclient", "storage", "katex", "k
             return [this.props.exercise];
         },
         getInitialState: function() {
-            return { };
+            return {
+                hintsUsed: 0
+            };
         },
         refreshRandomAssessment: function() {
             var count = this.exercise.all_assessment_items.length;
@@ -45,14 +47,15 @@ define(["jquery", "react", "util", "models", "apiclient", "storage", "katex", "k
             });
         },
         onClickSubmitAnswer: function() {
+            var score = this.refs.itemRenderer.scoreInput();
+            console.log(score);
             var problemNumber = this.props.exercise.get("totalDone") + 1;
-            var attemptNumber = 1;
-            var isCorrect = true;
-            var hintsUsed = 0;
-            var secondsTaken = 10;
-            var problemType = "";
+            var attemptNumber = 1; // TODO
+            var isCorrect = score.correct;
+            var hintsUsed = this.state.hintsUsed;
+            var secondsTaken = 10; //TODO
+            var problemType = ""; // TODO
             console.log("submitting exercise progress for problemNumber: %i", problemNumber);
-            // TODO: This doesn't belong here, it's just for testing currently.
             APIClient.getTaskIfnoByExerciseName(this.props.exercise.getName()).done((info) => {
             var taskId = info.id;
             APIClient.reportExerciseProgress(this.props.exercise.getName(), problemNumber,
@@ -93,7 +96,8 @@ define(["jquery", "react", "util", "models", "apiclient", "storage", "katex", "k
                 content = <iframe src={path}/>;
             } else if(this.ItemRenderer && this.state.perseusItemData) {
                 content = <div>
-                              <this.ItemRenderer item={this.state.perseusItemData}
+                              <this.ItemRenderer ref="itemRenderer"
+                                                 item={this.state.perseusItemData}
                                                  problemNum={Math.floor(Math.random() * 50) + 1}
                                                  initialHintsVisible={this.state.perseusItemData.hints.length}
                                                  enabledFeatures={{
