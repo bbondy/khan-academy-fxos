@@ -29,7 +29,8 @@ define(["jquery", "react", "util", "models", "apiclient", "storage", "katex", "k
         },
         getInitialState: function() {
             return {
-                hintsUsed: 0
+                hintsUsed: 0,
+                currentHint: -1
             };
         },
         refreshRandomAssessment: function() {
@@ -40,19 +41,25 @@ define(["jquery", "react", "util", "models", "apiclient", "storage", "katex", "k
             var problemTypes = this.exercise.problem_types;
             this.problemTypeName = problemTypes[problemTypes.length - 1].name;
             APIClient.getAssessmentItem(this.randomAssessmentId).done((result) => {
-                Util.log("got assessment item: %o: item data: %o", result, JSON.parse(result.item_data));
+                var assessment = JSON.parse(result.item_data);
+                Util.log("Got assessment item: %o: item data: %o", result, assessment);
                 this.setState({
-                    perseusItemData: JSON.parse(result.item_data)
+                    perseusItemData: assessment
                 });
+            });
+        },
+        onClickRequestHint: function() {
+            this.setState({
+                hintsUsed: this.state.hintsUsed + 1,
+                currentHint: this.state.currentHint + 1
             });
         },
         onClickSubmitAnswer: function() {
             var score = this.refs.itemRenderer.scoreInput();
-            console.log(score);
+            console.log('score: %o', score);
             var problemNumber = this.props.exercise.get("totalDone") + 1;
             var attemptNumber = 1; // TODO
             var isCorrect = score.correct;
-            var hintsUsed = this.state.hintsUsed;
             var secondsTaken = 10; //TODO
             var problemType = ""; // TODO
             console.log("submitting exercise progress for problemNumber: %i", problemNumber);
@@ -60,8 +67,8 @@ define(["jquery", "react", "util", "models", "apiclient", "storage", "katex", "k
             var taskId = info.id;
             APIClient.reportExerciseProgress(this.props.exercise.getName(), problemNumber,
                                              this.randomAssessmentSHA1, this.randomAssessmentId,
-                                             secondsTaken, hintsUsed, isCorrect, attemptNumber,
-                                             this.problemTypeName, taskId);
+                                             secondsTaken, this.state.hintsUsed, isCorrect,
+                                             attemptNumber, this.problemTypeName, taskId);
 
             });
         },
@@ -95,6 +102,13 @@ define(["jquery", "react", "util", "models", "apiclient", "storage", "katex", "k
                 var path = `/khan-exercises/exercises/${this.props.exercise.getFilename()}`;
                 content = <iframe src={path}/>;
             } else if(this.ItemRenderer && this.state.perseusItemData) {
+                var showHintsButton = this.state.perseusItemData.hints.length > this.state.hintsUsed;
+                var hint;
+                if (this.state.currentHint != -1 &&
+                        this.state.currentHint < this.state.perseusItemData.hints.length) {
+                    // TODO: There's probably some kind of hint rendered control, find it.
+                    hint = <div>{this.state.perseusItemData.hints[this.state.currentHint].content}</div>;
+                }
                 content = <div>
                               <this.ItemRenderer ref="itemRenderer"
                                                  item={this.state.perseusItemData}
@@ -111,6 +125,12 @@ define(["jquery", "react", "util", "models", "apiclient", "storage", "katex", "k
                               <button className="submit-answer-button"
                                       data-l10n-id="submit-answer"
                                       onClick={this.onClickSubmitAnswer}>Submit Answer</button>
+                              { !showHintsButton ? null :
+                              <button className="submit-answer-button"
+                                      data-l10n-id="submit-answer"
+                                      onClick={this.onClickRequestHint}>Hint</button>
+                              }
+                              {hint}
 
                           </div>;
                 }
