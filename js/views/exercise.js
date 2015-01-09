@@ -49,6 +49,7 @@ define(["jquery", "react", "util", "models", "apiclient", "storage", "katex", "k
             });
         },
         onClickRequestHint: function() {
+            this.refs.itemRenderer.showHint();
             this.setState({
                 hintsUsed: this.state.hintsUsed + 1,
                 currentHint: this.state.currentHint + 1
@@ -56,13 +57,13 @@ define(["jquery", "react", "util", "models", "apiclient", "storage", "katex", "k
         },
         onClickSubmitAnswer: function() {
             var score = this.refs.itemRenderer.scoreInput();
-            console.log('score: %o', score);
+            Util.log('score: %o', score);
             var problemNumber = this.props.exercise.get("totalDone") + 1;
             var attemptNumber = 1; // TODO
             var isCorrect = score.correct;
             var secondsTaken = 10; //TODO
             var problemType = ""; // TODO
-            console.log("submitting exercise progress for problemNumber: %i", problemNumber);
+            Util.log("submitting exercise progress for problemNumber: %i", problemNumber);
             APIClient.getTaskIfnoByExerciseName(this.props.exercise.getName()).done((info) => {
             var taskId = info.id;
             APIClient.reportExerciseProgress(this.props.exercise.getName(), problemNumber,
@@ -106,21 +107,18 @@ define(["jquery", "react", "util", "models", "apiclient", "storage", "katex", "k
                 var hint;
                 if (this.state.currentHint != -1 &&
                         this.state.currentHint < this.state.perseusItemData.hints.length) {
-                    // TODO: There's probably some kind of hint rendered control, find it.
-                    hint = <div>{this.state.perseusItemData.hints[this.state.currentHint].content}</div>;
                 }
                 content = <div>
                               <this.ItemRenderer ref="itemRenderer"
                                                  item={this.state.perseusItemData}
                                                  problemNum={Math.floor(Math.random() * 50) + 1}
-                                                 initialHintsVisible={this.state.perseusItemData.hints.length}
+                                                 initialHintsVisible={0}
                                                  enabledFeatures={{
                                                      highlight: true,
                                                      toolTipFormats: true
                                                  }} />
                               <div id="workarea"/>
                               <div id="solutionarea"/>
-                              <div id="hintsarea"/>
 
                               <button className="submit-answer-button"
                                       data-l10n-id="submit-answer"
@@ -131,6 +129,7 @@ define(["jquery", "react", "util", "models", "apiclient", "storage", "katex", "k
                                       onClick={this.onClickRequestHint}>Hint</button>
                               }
                               {hint}
+                              <div id="hintsarea"/>
 
                           </div>;
                 }
