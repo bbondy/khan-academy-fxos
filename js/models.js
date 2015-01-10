@@ -413,7 +413,7 @@ define(["jquery", "underscore", "backbone", "util", "apiclient", "storage", "min
         },
         // A newer perseus style exercise
         isPerseusExercise:function() {
-            return this.get(Minify.getShortName("file_name")) === null;
+            return !this.get(Minify.getShortName("file_name"));
         },
         // An older style exercise pointed to by the khan-exercises submodule
         isKhanExercisesExercise: function() {
