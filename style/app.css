@@ -49,7 +49,7 @@ section[role="region"] > header.fixed:first-child {
     position: relative;
 }
 
-input {
+input.app-chrome {
     padding-left: 1rem;
     padding-right: 1rem;
     width: 100%;

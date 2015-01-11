@@ -67,7 +67,7 @@ define(["react", "util", "models", "downloads", "topic"],
                 <div data-l10n-id="show-downloads-only">Show downloads only</div>
                 <label className="pack-switch">
                 <input ref="showDownloadsOnly"
-                       className="show-downloads-setting"
+                       className="show-downloads-setting app-chrome"
                        type="checkbox"
                        checked={this.props.options.get("showDownloadsOnly")}
                        onChange={this.handleShowDownloadsChange}></input>
@@ -77,7 +77,7 @@ define(["react", "util", "models", "downloads", "topic"],
                 <div data-l10n-id="show-transcripts">Show transcripts</div>
                 <label className="pack-switch">
                 <input ref="showTranscripts"
-                       className="show-transcripts-setting"
+                       className="show-transcripts-setting app-chrome"
                        type="checkbox"
                        checked={this.props.options.get("showTranscripts")}
                        onChange={this.handleShowTranscriptsChange}></input>
@@ -87,7 +87,7 @@ define(["react", "util", "models", "downloads", "topic"],
                 <div data-l10n-id="auto-update-topic-tree">Automatically download new topics</div>
                 <label className="pack-switch">
                 <input ref="autoUpdateTopicTree"
-                       className="auto-update-topic-tree-setting"
+                       className="auto-update-topic-tree-setting app-chrome"
                        type="checkbox"
                        checked={this.props.options.get("autoUpdateTopicTree")}
                        onChange={this.handleAutoUpdateTopicTreeChange}></input>
@@ -99,7 +99,7 @@ define(["react", "util", "models", "downloads", "topic"],
                 <label className="bb-docs">
                 <section role="slider">
                     <input ref="setPlaybackRate"
-                           className="set-playback-speed-setting"
+                           className="set-playback-speed-setting app-chrome"
                            id="set-playback-speed"
                            type="range"
                            min="0" max="3"

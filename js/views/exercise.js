@@ -108,7 +108,7 @@ define(["jquery", "react", "util", "models", "apiclient", "storage", "katex", "k
                 if (this.state.currentHint != -1 &&
                         this.state.currentHint < this.state.perseusItemData.hints.length) {
                 }
-                content = <div>
+                content = <div className="framework-perseus">
                               <this.ItemRenderer ref="itemRenderer"
                                                  item={this.state.perseusItemData}
                                                  problemNum={Math.floor(Math.random() * 50) + 1}
