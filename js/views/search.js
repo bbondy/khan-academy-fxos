@@ -49,7 +49,7 @@ define(["react", "topic"], function(React, topicViews) {
             }
             return <div>
                 <input ref="search"
-                       className="search"
+                       className="search app-chrome"
                        type="searh"
                        placeholder={text}
                        value={this.state.value}
