@@ -69,7 +69,9 @@ define(["jquery", "react", "util", "models", "apiclient", "storage", "katex", "k
             APIClient.reportExerciseProgress(this.props.exercise.getName(), problemNumber,
                                              this.randomAssessmentSHA1, this.randomAssessmentId,
                                              secondsTaken, this.state.hintsUsed, isCorrect,
-                                             attemptNumber, this.problemTypeName, taskId);
+                                             attemptNumber, this.problemTypeName, taskId).done(() => {
+                                                 this.refreshRandomAssessment();
+                                             });
 
             });
         },
