@@ -306,6 +306,9 @@ define(["jquery", "underscore", "oauth", "util"], function($, _, _oauth, Util) {
         getUserExercises: function() {
             return this._basicAPICall(this.API_INTERNAL_BASE + "/user/exercises");
         },
+        getUserExercise: function(exerciseName) {
+            return this._basicAPICall(`${this.API_INTERNAL_BASE}/user/exercises/${exerciseName}`);
+        },
         /**
          * Reports progress and completion on a video.
          *

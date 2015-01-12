@@ -58,21 +58,25 @@ define(["jquery", "react", "util", "models", "apiclient", "storage", "katex", "k
         onClickSubmitAnswer: function() {
             var score = this.refs.itemRenderer.scoreInput();
             Util.log('score: %o', score);
-            var problemNumber = this.props.exercise.get("totalDone") + 1;
             var attemptNumber = 1; // TODO
             var isCorrect = score.correct;
             var secondsTaken = 10; //TODO
             var problemType = ""; // TODO
-            Util.log("submitting exercise progress for problemNumber: %i", problemNumber);
-            APIClient.getTaskIfnoByExerciseName(this.props.exercise.getName()).done((info) => {
-            var taskId = info.id;
-            APIClient.reportExerciseProgress(this.props.exercise.getName(), problemNumber,
-                                             this.randomAssessmentSHA1, this.randomAssessmentId,
-                                             secondsTaken, this.state.hintsUsed, isCorrect,
-                                             attemptNumber, this.problemTypeName, taskId).done(() => {
-                                                 this.refreshRandomAssessment();
-                                             });
-
+            var data = {};
+            APIClient.getTaskIfnoByExerciseName(this.props.exercise.getName()).then((info) => {
+                data.taskId = info.id;
+                return APIClient.getUserExercise(this.props.exercise.getName());
+            }).then((info) => {
+                var problemNumber = info.total_done + 1;
+                Util.log("submitting exercise progress for problemNumber: %i", problemNumber);
+                console.log('taskId: ' + data.taskId);
+                console.log('problemNumber: ' + problemNumber);
+                return APIClient.reportExerciseProgress(this.props.exercise.getName(), problemNumber,
+                                                        this.randomAssessmentSHA1, this.randomAssessmentId,
+                                                        secondsTaken, this.state.hintsUsed, isCorrect,
+                                                        attemptNumber, this.problemTypeName, data.taskId);
+            }).done(() => {
+                this.refreshRandomAssessment();
             });
         },
         componentWillMount: function() {
