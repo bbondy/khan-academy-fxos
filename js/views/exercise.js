@@ -34,12 +34,18 @@ define(["jquery", "react", "util", "models", "apiclient", "storage", "katex", "k
             };
         },
         refreshRandomAssessment: function() {
-            var count = this.exercise.all_assessment_items.length;
-            var randomIndex = Math.floor(Math.random() * count);
-            this.randomAssessmentSHA1 = this.exercise.all_assessment_items[randomIndex].sha1;
-            this.randomAssessmentId = this.exercise.all_assessment_items[randomIndex].id;
+
+            // Pick a random problem type:
             var problemTypes = this.exercise.problem_types;
-            this.problemTypeName = problemTypes[problemTypes.length - 1].name;
+            var randomProblemTypeGroupIndex = Math.floor(Math.random() * problemTypes.length);
+            var randomProblemTypeGroup = this.exercise.problem_types[randomProblemTypeGroupIndex];
+            this.problemTypeName = randomProblemTypeGroup.name;
+
+            var randomProblemTypeIndex = Math.floor(Math.random() * randomProblemTypeGroup.items.length);
+
+            this.randomAssessmentSHA1 = randomProblemTypeGroup.items[randomProblemTypeIndex].sha1;
+            this.randomAssessmentId = randomProblemTypeGroup.items[randomProblemTypeIndex].id;
+
             APIClient.getAssessmentItem(this.randomAssessmentId).done((result) => {
                 var assessment = JSON.parse(result.item_data);
                 Util.log("Got assessment item: %o: item data: %o", result, assessment);
@@ -61,7 +67,6 @@ define(["jquery", "react", "util", "models", "apiclient", "storage", "katex", "k
             var attemptNumber = 1; // TODO
             var isCorrect = score.correct;
             var secondsTaken = 10; //TODO
-            var problemType = ""; // TODO
             var data = {};
             APIClient.getTaskIfnoByExerciseName(this.props.exercise.getName()).then((info) => {
                 data.taskId = info.id;
@@ -71,6 +76,7 @@ define(["jquery", "react", "util", "models", "apiclient", "storage", "katex", "k
                 Util.log("submitting exercise progress for problemNumber: %i", problemNumber);
                 console.log('taskId: ' + data.taskId);
                 console.log('problemNumber: ' + problemNumber);
+                console.log('problem type name: ' + this.problemTypeName);
                 return APIClient.reportExerciseProgress(this.props.exercise.getName(), problemNumber,
                                                         this.randomAssessmentSHA1, this.randomAssessmentId,
                                                         secondsTaken, this.state.hintsUsed, isCorrect,
@@ -89,9 +95,9 @@ define(["jquery", "react", "util", "models", "apiclient", "storage", "katex", "k
             }
 
             perseusPrep($, React, katex, KAS, MathJax);
-            require(["perseus"], (Perseus) => {
+            require(["perseus", "perseus2"], (Perseus, P2) => {
                 Perseus.init({}).then(() => {
-                    Util.log("Perseus init done");
+                    Util.log("Perseus init done %o, %o", Perseus, P2);
                     this.ItemRenderer = Perseus.ItemRenderer;
                     this.forceUpdate();
                 });
