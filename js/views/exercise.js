@@ -2,17 +2,18 @@
 
 // Perseus module uses React directly and uses $._ directly for
 // localization, so we do this as a hack to get it to work
-function perseusPrep($, React, katex, KAS, MathJax) {
+function perseusPrep($, React, katex, KAS, MathJax, Khan) {
     window.React = React;
     $._ = function(x) { return x; };
     window.$_ = function(x) { return x; };
     window.katex = katex
     window.KAS = KAS;
     window.MathJax = MathJax;
+    window.Khan = Khan;
 }
 
-define(["jquery", "react", "util", "models", "apiclient", "storage", "katex", "kas", "mathjax"],
-        function($, React, Util, models, APIClient, Storage, katex, KAS, MathJax) {
+define(["jquery", "react", "util", "models", "apiclient", "storage", "katex", "kas", "mathjax", "../khan-exercises/khan-exercise"],
+        function($, React, Util, models, APIClient, Storage, katex, KAS, MathJax, Khan_) {
     var cx = React.addons.classSet;
 
     /**
@@ -94,10 +95,10 @@ define(["jquery", "react", "util", "models", "apiclient", "storage", "katex", "k
                 });
             }
 
-            perseusPrep($, React, katex, KAS, MathJax);
-            require(["perseus", "perseus2"], (Perseus, P2) => {
+            perseusPrep($, React, katex, KAS, MathJax, Khan);
+            require(["perseus"], (Perseus) => {
                 Perseus.init({}).then(() => {
-                    Util.log("Perseus init done %o, %o", Perseus, P2);
+                    Util.log("Perseus init done %o, %o", Perseus);
                     this.ItemRenderer = Perseus.ItemRenderer;
                     this.forceUpdate();
                 });
