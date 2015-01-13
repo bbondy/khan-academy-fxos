@@ -83,8 +83,6 @@ if (window.isTest) {
     initModules.push('main');
 }
 
-window.Khan = {};
-window.KhanUtil = Khan.KhanUtil = {};
 window.Exercises = {
     cluesEnabled: false
 };
