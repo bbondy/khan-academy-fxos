@@ -138,7 +138,7 @@ define(["jquery", "react", "util", "models", "apiclient", "storage", "katex", "k
                                       onClick={this.onClickSubmitAnswer}>Submit Answer</button>
                               { !showHintsButton ? null :
                               <button className="submit-answer-button"
-                                      data-l10n-id="submit-answer"
+                                      data-l10n-id="hint"
                                       onClick={this.onClickRequestHint}>Hint</button>
                               }
                               {hint}
