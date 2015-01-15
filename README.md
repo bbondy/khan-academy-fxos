@@ -12,7 +12,7 @@ The Khan Academy app also functions as a:
 ## About the source
 
 Everything is built using JavaScript.
-[React](http://facebook.github.io/react/) is used for views and [Backbone](http://backbonejs.org/) is used for models.
+[React](http://facebook.github.io/react/) is used for views and [Backbone](http://backbonejs.org/) is used for models.  The video player is using [VideoJS](http://www.videojs.com/).
 
 ## Getting setup
 
