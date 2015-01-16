@@ -13,14 +13,15 @@ define(["react", "topic"], function(React, topicViews) {
             onTopicSearch: React.PropTypes.func.isRequired
         },
         getInitialState: function() {
-            return {value: ''};
-        },
-        componentWillReceiveProps: function() {
-            this.state.value = '';
+            return {
+                searchValue: ''
+            };
         },
         onChange: function(event) {
             var topicSearch = event.target.value;
-            this.setState({value: topicSearch});
+            this.setState({
+                searchValue: topicSearch
+            });
             this.props.onTopicSearch(topicSearch);
         },
         handleFocus: function(event) {
@@ -37,11 +38,6 @@ define(["react", "topic"], function(React, topicViews) {
         },
 
         render: function() {
-            var style = {
-                width: "100%",
-                height: "3em;",
-                position: "relative"
-            };
             var text = document.webL10n.get("search");
             if (this.props.model.getTitle()) {
                 text = document.webL10n.get("search-topic",
@@ -52,9 +48,8 @@ define(["react", "topic"], function(React, topicViews) {
                        className="search app-chrome"
                        type="searh"
                        placeholder={text}
-                       value={this.state.value}
+                       value={this.state.searchValue}
                        required=""
-                       style={style}
                        onChange={this.onChange}
                        onFocus={this.handleFocus}
                        onBlur={this.handleBlur}
