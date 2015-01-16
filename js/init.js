@@ -87,8 +87,4 @@ window.Exercises = {
     cluesEnabled: false
 };
 
-// Localization shim within perseus, we want to do nothing for it
-// since we aren't repsonsible for its localization
-//$._ = function(x) { return x; };
-
 requirejs(initModules);
