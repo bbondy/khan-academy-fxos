@@ -28,15 +28,17 @@ https://github.com/Khan/khan-api/wiki/Khan-Academy-API-Authentication
 
 You need [Nodejs](http://nodejs.org) installed to run the following commands (please run them in the order given).
 
-* Install react-tools by running `npm install -g react-tools`. This includes `jsx`.
+    npm install
+    gulp
 
-* Make sure you're using at least 0.12.0 by running `jsx --version`.
-
-The first time you get setup, run `./tools/rebuild`.  Then run `./tools/runserver`.  
+To run a web server instead of using the Firefox emulator, run: `./tools/runserver`.  
 This will start a local python HTTP server on port 8092.  
-It will also start watching js and jsx changes and transpile everything in the `./js` directory to the `./build` directory.  In this way React and ES6 features can be used.
 
-Due to using JavaScript generators, if you want to test in Chrome you'll have to enable Chrome experimental JavaScript features.
+Running gulp will:
+- convert the JSX React source which lives inside js/ andp ut it inside /build.
+- Convert the LESS stylesheets in style/less into CSS and store it in /build/css
+- Run lint on the source files
+- Start watching for changes and will re-run all of that again when changes are made.
 
 ## Running tests
 
