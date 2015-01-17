@@ -5,12 +5,21 @@ var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
 var rename = require('gulp-rename');
 var react = require('gulp-react');
+var flowtype = require('gulp-flowtype');
 
 // Lint Task
 gulp.task('lint', function() {
     return gulp.src('build/**/*.js')
         .pipe(jshint({
             esnext: true
+        }))
+        .pipe(jshint.reporter('default'));
+});
+
+gulp.task('typecheck', function() {
+    return gulp.src('js/**/*.js')
+        .pipe(flowtype({
+            declarations: './flowtypes',
         }))
         .pipe(jshint.reporter('default'));
 });
@@ -27,7 +36,9 @@ gulp.task('less', function() {
 gulp.task('react', function() {
     return gulp.src('./js/**/*.js')
         .pipe(react({
-            harmony: true
+            harmony: true,
+            // Skip Flow type annotations!
+            stripTypes: true
         }))
         .pipe(gulp.dest('./build'));
 
@@ -51,4 +62,6 @@ gulp.task('watch', function() {
 });
 
 // Default Task
+// Not including Flow typechecking by default because it takes so painfully long.
+// Maybe because of my code layout or otheriwse, needto figure it out before enabling by default.
 gulp.task('default', ['react', 'less', 'lint', 'watch']);

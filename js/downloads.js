@@ -1,3 +1,5 @@
+/* @flow */
+
 "use strict";
 
 /**
@@ -146,7 +148,9 @@ define(["jquery", "underscore", "util", "storage", "models", "apiclient"],
 
             var filename = contentItem.getId();
             var handleContentLoaded = (contentData) => {
-                var blob = new Blob([contentData], {type: contentItem.getContentMimeType()});
+                var blob = new window.Blob([contentData], {
+                    type: contentItem.getContentMimeType()
+                });
                 Storage.writeBlob(filename, blob).done(() => {
                     this._addDownloadToManifest(contentItem);
                     if (onProgress) {

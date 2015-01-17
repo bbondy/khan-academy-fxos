@@ -67,6 +67,9 @@ require.config({
         mathjax: {
           exports: 'MathJax'
         },
+        minify: {
+          exports: 'Minify'
+        },
         waitSeconds: 15
    }
 

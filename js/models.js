@@ -1,5 +1,10 @@
+/* @flow weak */
+// Using weak only because flow doesn't support generators and yield syntax
+
+"strict";
+
 define(["jquery", "underscore", "backbone", "util", "apiclient", "storage", "minify"],
-       function($, _, Backbone, Util, APIClient, Storage, _Minify) {
+       function($, _, Backbone, Util, APIClient, Storage, Minify) {
     var TopicTreeBase = {
         /**
          * Gets the ID of the topic tree item
@@ -156,7 +161,7 @@ define(["jquery", "underscore", "backbone", "util", "apiclient", "storage", "min
             // one we shipped with for the instaled app.
             topicTreePromise.fail(() => {
                 var filename = `/data/topic-tree`;
-                lang = Util.getLang();
+                var lang = Util.getLang();
                 if (lang) {
                     filename += "-" + lang;
                 }
@@ -224,10 +229,9 @@ define(["jquery", "underscore", "backbone", "util", "apiclient", "storage", "min
          * It will only iterate over all of the content items once, but will
          * iterate over the passed in ids multiple times.
          * @param ids An array of content item ids to look for
-         * @param filteredList a list of filtered items to look through.
          *   If not specified all content items will be searched
          */
-        getContentItemsByIds: function(ids, filteredList) {
+        getContentItemsByIds: function(ids) {
             return _(this.allContentItems).filter(function(model) {
                 return ids.indexOf(model.getId()) !== -1;
             });
