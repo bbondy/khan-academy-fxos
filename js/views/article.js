@@ -2,8 +2,6 @@
 
 define(["react", "util", "models", "apiclient", "storage"],
         function(React, Util, models, APIClient, Storage) {
-    var cx = React.addons.classSet;
-
     /**
      * Represents a single article, it will load the article dynamically and
      * display it to the user.

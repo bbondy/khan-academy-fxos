@@ -11,7 +11,6 @@ define(["jquery", "react", "util", "models", "apiclient", "cache", "storage",
     var ArticleViewer = articleViews.ArticleViewer;
     var ExerciseViewer = exerciseViews.ExerciseViewer;
     var TopicViewer = topicViews.TopicViewer;
-    var ContentListViewer = topicViews.ContentListViewer;
     var TopicSearch = searchViews.TopicSearch;
     var SearchResultsViewer = searchViews.SearchResultsViewer;
     var DownloadsViewer = paneViews.DownloadsViewer;

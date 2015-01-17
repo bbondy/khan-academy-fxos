@@ -8,25 +8,25 @@ define(["jquery", "underscore"], function($, _) {
         /**
          * Wrapper around console.log
          */
-        log: function(message, ...rest) {
+        log: function() {
             if (typeof console !== 'undefined') {
-                console.log(message, ...rest);
+                console.log(Array.prototype.slice.call(arguments));
             }
         },
         /**
          * Wrapper around console.warn
          */
-        warn: function(message, ...rest) {
+        warn: function() {
             if (typeof console !== 'undefined') {
-                console.warn(message, ...rest);
+                console.warn(Array.prototype.slice.call(arguments));
             }
         },
         /**
          * Wrapper around console.error
          */
-        error: function(message, ...rest) {
+        error: function(rest) {
             if (typeof console !== 'undefined') {
-                console.error(message, ...rest);
+                console.error(Array.prototype.slice.call(arguments));
             }
         },
         /**

@@ -55,7 +55,7 @@ define(["jquery", "underscore", "util", "storage", "models", "apiclient"],
         },
         _setDownloaded: function(model, downloaded) {
             model.setDownloaded(downloaded);
-            while (model = model.getParent()) {
+            while (model = model.getParent()) { // jshint ignore:line
                 var downloadCount = model.get("downloadCount");
                 if (downloaded) {
                     downloadCount++;
@@ -233,7 +233,7 @@ define(["jquery", "underscore", "util", "storage", "models", "apiclient"],
             this._writeManifest();
         },
         manifestFilename: "download-manifest.json"
-    }
+    };
 
     return Downloads;
 

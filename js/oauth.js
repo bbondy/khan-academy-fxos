@@ -1,3 +1,4 @@
+/* jshint ignore:start */
 /*
  * A JavaScript implementation of the Secure Hash Algorithm, SHA-1, as defined
  * in FIPS PUB 180-1
@@ -842,3 +843,4 @@ try {
 
 })(window, document, $);
 
+/* jshint ignore:end */

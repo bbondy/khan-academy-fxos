@@ -139,7 +139,7 @@ define(["jquery", "react", "underscore", "util", "models", "apiclient", "storage
                 delete this.initSecondWatched;
             }
             if (this.state.showOfflineImage) {
-                Util.log("Video has no source.", e);
+                Util.log("Video has no source.");
                 this.stopAnimatingPoints(false);
                 this.setState({showOfflineImage: false});
             }
@@ -193,7 +193,7 @@ define(["jquery", "react", "underscore", "util", "models", "apiclient", "storage
             }
 
             var video = this._getVideoDOMNode();
-            if (video.networkState === HTMLMediaElement.NETWORK_NO_SOURCE) {
+            if (video.networkState === window.HTMLMediaElement.NETWORK_NO_SOURCE) {
                 Util.log("Video has no source.", e);
                 this.stopAnimatingPoints(false);
                 if (!this.state.downloadedUrl && !this.cleanedUp) {
@@ -248,7 +248,6 @@ define(["jquery", "react", "underscore", "util", "models", "apiclient", "storage
         _onScrollTranscriptTo: function(scrollTime) {
             scrollTime |= scrollTime;
             var node = $("li[data-time='" + scrollTime + "']");
-            var ul = $("ul");
             if (node.length > 0) {
                 var scrollOffset = node.get(0).offsetTop -
                     $("ul.transcript").get(0).offsetTop;
@@ -395,7 +394,7 @@ define(["jquery", "react", "underscore", "util", "models", "apiclient", "storage
             if (this.state.showOfflineImage) {
                 control = <div className="video-placeholder" onClick={this.onReloadVideo}/>;
             } else {
-                control = <div className={this.videoClass} ref="videoPlaceholder" id="video-placeholder"/>
+                control = <div className={this.videoClass} ref="videoPlaceholder" id="video-placeholder"/>;
             }
 
             // The overlay div helps with a bug where html5 video sometimes doesn't render properly.
