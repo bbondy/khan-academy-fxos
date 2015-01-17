@@ -30,6 +30,9 @@ You need [Nodejs](http://nodejs.org) installed to run the following commands (pl
 
     npm install
     bower install
+    cd bower_components/katex
+    make
+    cd ../../
     gulp
 
 To run a web server instead of using the Firefox emulator, run: `./tools/runserver`.  
