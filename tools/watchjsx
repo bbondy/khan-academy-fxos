@@ -1,1 +1,0 @@
-jsx --harmony -w js/ build/

@@ -1,3 +1,5 @@
+/* jshint ignore:start */
+
 /**
  * Copyright (c) 2011-2013 Fabien Cazenave, Mozilla.
  *
@@ -20,7 +22,6 @@
  * IN THE SOFTWARE.
  */
 
-/*jshint browser: true, devel: true, es5: true, globalstrict: true */
 'use strict';
 
 document.webL10n = (function(window, document, undefined) {
@@ -1168,4 +1169,4 @@ if (window._ === undefined) {
   var _ = document.webL10n.get;
 }
 
-
+/* jshint ignore:end */

@@ -1,7 +1,6 @@
 "use strict";
 
 define(["react", "topic"], function(React, topicViews) {
-    var cx = React.addons.classSet;
     var ContentListViewer = topicViews.ContentListViewer;
 
     /**

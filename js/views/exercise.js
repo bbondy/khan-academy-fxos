@@ -2,20 +2,17 @@
 
 // Perseus module uses React directly and uses $._ directly for
 // localization, so we do this as a hack to get it to work
-function perseusPrep($, React, katex, KAS, MathJax, Khan) {
+function perseusPrep($, React, katex, KAS, MathJax) {
     window.React = React;
     $._ = function(x) { return x; };
     window.$_ = function(x) { return x; };
-    window.katex = katex
+    window.katex = katex;
     window.KAS = KAS;
     window.MathJax = MathJax;
-    window.Khan = Khan;
 }
 
 define(["jquery", "react", "util", "models", "apiclient", "storage", "katex", "kas", "mathjax", "../khan-exercises/khan-exercise"],
         function($, React, Util, models, APIClient, Storage, katex, KAS, MathJax, Khan_) {
-    var cx = React.addons.classSet;
-
     /**
      * Represents a single exercise, it will load the exercise dynamically and
      * display it to the user.
@@ -95,7 +92,7 @@ define(["jquery", "react", "util", "models", "apiclient", "storage", "katex", "k
                 });
             }
 
-            perseusPrep($, React, katex, KAS, MathJax, Khan);
+            perseusPrep($, React, katex, KAS, MathJax);
             require(["perseus"], (Perseus) => {
                 Perseus.init({}).then(() => {
                     Util.log("Perseus init done %o, %o", Perseus);
@@ -118,7 +115,7 @@ define(["jquery", "react", "util", "models", "apiclient", "storage", "katex", "k
             } else if(this.ItemRenderer && this.state.perseusItemData) {
                 var showHintsButton = this.state.perseusItemData.hints.length > this.state.hintsUsed;
                 var hint;
-                if (this.state.currentHint != -1 &&
+                if (this.state.currentHint !== -1 &&
                         this.state.currentHint < this.state.perseusItemData.hints.length) {
                 }
                 content = <div className="framework-perseus">
