@@ -1,3 +1,17 @@
+@mathDomainColor: #3daccc;
+@scienceDomainColor: #b8475f;
+@economicsAndFinanceDomainColor: #ec9d46;
+@artsAndHumanitiesDomainColor: #fb483f;
+@computingDomainColor: #70b950;
+@testPrepDomainColor: #88599e;
+@partnerContentDomainColor: #4ac9a3;
+@talksAndInterviewsDomainColor: #577996;
+@coachAndClassDomainColor: #577996;
+
+@white: #fff;
+@gray: #cdcdcd;
+@black: #000;
+
 html {
     font-size: 10px;
 }
@@ -34,7 +48,7 @@ section[data-type="list"] {
     width: 100%;
     overflow-y: scroll !important;
     height: calc(100% - 8rem);
-    background-color: white;
+    background-color: @white;
 }
 
 section[role="region"] > header:first-child h1 {
@@ -142,11 +156,11 @@ ul li div.subway-icon.x7a488390 div.exercise-node {
 
 ul li div.subway-icon.x7a488390 div.pipe.completed,
 ul li div.subway-icon.x7a488390 div.pipe.in-progress {
-    background-color: #3daccc;
+    background-color: @mathDomainColor;
 }
 
 [data-type="list"] li.x7a488390 > a:active:after {
-    background-color: #3daccc;
+    background-color: @mathDomainColor;
     opacity: 0.3;
 }
 
@@ -177,11 +191,11 @@ ul li div.subway-icon.xb92336a2 div.exercise-node {
 
 ul li div.subway-icon.xb92336a2 div.pipe.completed,
 ul li div.subway-icon.xb92336a2 div.pipe.in-progress {
-    background-color: #b8475f;
+    background-color: @scienceDomainColor;
 }
 
 [data-type="list"] li.xb92336a2 > a:active:after {
-    background-color: #b8475f;
+    background-color: @scienceDomainColor;
     opacity: 0.3;
 }
 ul li.xb92336a2 div.color-block, header.topic-header.xb92336a2 {
@@ -209,11 +223,11 @@ ul li div.subway-icon.x5ca94af1 div.exercise-node {
 
 ul li div.subway-icon.x5ca94af1 div.pipe.completed,
 ul li div.subway-icon.x5ca94af1 div.pipe.in-progress {
-    background-color: #ec9d46;
+    background-color: @economicsAndFinanceDomainColor;
 }
 
 [data-type="list"] li.x5ca94af1 > a:active:after {
-    background-color: #ec9d46;
+    background-color: @economicsAndFinanceDomainColor;
     opacity: 0.3;
 }
 
@@ -241,11 +255,11 @@ ul li div.subway-icon.x905db83d div.exercise-node {
 }
 ul li div.subway-icon.x905db83d div.pipe.completed,
 ul li div.subway-icon.x905db83d div.pipe.in-progress {
-    background-color: #fb483f;
+    background-color: @artsAndHumanitiesDomainColor;
 }
 
 [data-type="list"] li.x905db83d > a:active:after {
-    background-color: #fb483f;
+    background-color: @artsAndHumanitiesDomainColor;
     opacity: 0.3;
 }
 
@@ -274,11 +288,11 @@ ul li div.subway-icon.x45aed616 div.exercise-node {
 
 ul li div.subway-icon.x45aed616 div.pipe.completed,
 ul li div.subway-icon.x45aed616 div.pipe.in-progress {
-    background-color: #70b950;
+    background-color: @computingDomainColor;
 }
 
 [data-type="list"] li.x45aed616 > a:active:after {
-    background-color: #70b950;
+    background-color: @computingDomainColor;
     opacity: 0.3;
 }
 
@@ -307,11 +321,11 @@ ul li div.subway-icon.x7626d097 div.exercise-node {
 
 ul li div.subway-icon.x7626d097 div.pipe.completed,
 ul li div.subway-icon.x7626d097 div.pipe.in-progress {
-    background-color: #88599e;
+    background-color: @testPrepDomainColor;
 }
 
 [data-type="list"] li.x7626d097 > a:active:after {
-    background-color: #88599e;
+    background-color: @testPrepDomainColor;
     opacity: 0.3;
 }
 
@@ -341,11 +355,11 @@ ul li div.subway-icon.x54390c7e div.exercise-node {
 
 ul li div.subway-icon.x54390c7e div.pipe.completed,
 ul li div.subway-icon.x54390c7e div.pipe.in-progress {
-    background-color: #4ac9a3;
+    background-color: @partnerContentDomainColor;
 }
 
 [data-type="list"] li.x54390c7e > a:active:after {
-    background-color: #4ac9a3;
+    background-color: @partnerContentDomainColor;
     opacity: 0.3;
 
 }
@@ -375,11 +389,11 @@ ul li div.subway-icon.xd1039e22 div.exercise-node {
 
 ul li div.subway-icon.xd1039e22 div.pipe.completed,
 ul li div.subway-icon.xd1039e22 div.pipe.in-progress {
-    background-color: #577996;
+    background-color: @talksAndInterviewsDomainColor;
 }
 
 [data-type="list"] li.xd1039e22 > a:active:after {
-    background-color: #577996;
+    background-color: @talksAndInterviewsDomainColor;
     opacity: 0.3;
 }
 
@@ -409,11 +423,11 @@ ul li div.subway-icon.x6a4a5e33 div.exercise-node {
 
 ul li div.subway-icon.x6a4a5e33 div.pipe.completed,
 ul li div.subway-icon.x6a4a5e33 div.pipe.in-progress {
-    background-color: #577996;
+    background-color: @coachAndClassDomainColor;
 }
 
 [data-type="list"] li.x6a4a5e33 > a:active:after {
-    background-color: #577996;
+    background-color: @coachAndClassDomainColor;
     opacity: 0.3;
 }
 
@@ -456,7 +470,7 @@ ul li:last-child:first-child div div.pipe {
 }
 
 ul li div div.pipe {
-    background-color: #cdcdcd;
+    background-color: @gray;
     position: absolute;
     right: auto;
     left: 18px;
@@ -469,7 +483,7 @@ ul li div div.pipe {
 
 ul li div div.pipe.completed,
 ul li div div.pipe.in-progress {
-    background-color: #3daccc;
+    background-color: @mathDomainColor;
 }
 
 ul li a p.video-title,
@@ -509,7 +523,7 @@ img.video-placeholder {
     background:url('/img/offline.png') no-repeat center center;
     max-height: 50%;
     height: 50%;
-    background-color: black;
+    background-color: @black;
 }
 
 .transcript {
@@ -701,7 +715,7 @@ section[role="region"] > header:first-child h1 {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: #fff;
+    background-color: @white;
     opacity: 0.01;
     z-index: 10000;
     pointer-events: none;
