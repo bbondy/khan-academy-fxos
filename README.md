@@ -36,7 +36,7 @@ To run a web server instead of using the Firefox emulator, run: `./tools/runserv
 This will start a local python HTTP server on port 8092.  
 
 Running gulp will:
-- convert the JSX React source which lives inside js/ andp ut it inside /build.
+- convert the JSX React source which lives inside js/ and put it inside /build.
 - Convert the LESS stylesheets in style/less into CSS and store it in /build/css
 - Run lint on the source files
 - Start watching for changes and will re-run all of that again when changes are made.
