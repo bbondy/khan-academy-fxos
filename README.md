@@ -29,6 +29,7 @@ https://github.com/Khan/khan-api/wiki/Khan-Academy-API-Authentication
 You need [Nodejs](http://nodejs.org) installed to run the following commands (please run them in the order given).
 
     npm install
+    bower install
     gulp
 
 To run a web server instead of using the Firefox emulator, run: `./tools/runserver`.  
