@@ -45,6 +45,9 @@ require.config({
           deps: ["jquery"],
           exports: '_'
         },
+        oauth:{
+          deps: ["jquery"],
+        },
         kas: {
             exports: 'KAS'
         },
