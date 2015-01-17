@@ -45,18 +45,18 @@ section[role="region"] > header:first-child h1 {
 }
 
 section[data-type="list"] {
-    width: 100%;
-    overflow-y: scroll !important;
-    height: calc(100% - 8rem);
     background-color: @white;
+    height: calc(100% - 8rem);
+    overflow-y: scroll !important;
+    width: 100%;
 }
 
 section[role="region"] > header:first-child h1 {
     text-align: left;
 }
 [data-type="list"] ul {
-    padding-left: 0;
     padding-bottom: 2rem;
+    padding-left: 0;
 }
 
 section[role="region"] > header.fixed:first-child {
@@ -64,17 +64,17 @@ section[role="region"] > header.fixed:first-child {
 }
 
 input.app-chrome {
+    box-sizing: border-box;
+    font-size: 1.7rem; // p.alt
     padding-left: 1rem;
     padding-right: 1rem;
     width: 100%;
-    box-sizing: border-box;
-    font-size: 1.7rem; // p.alt
 }
 
 input.app-chrome.search {
-    width: 100%;
-    height: 3em;
     position: relative;
+    height: 3em;
+    width: 100%;
 }
 
 input[type="checkbox"] {
@@ -90,22 +90,22 @@ ul > li.exercise-item > a {
 
 ul li div.subway-icon {
     display: block;
-    position: absolute;
     height: 100%;
+    position: absolute;
 }
 
 
 ul li div.subway-icon div {
-    height: 25px;
-    width: 25px;
     background-size: 25px 75px;
+    bottom: auto;
+    height: 25px;
+    left: 8px;
+    margin-top: -12px;
     overflow: hidden;
     position: absolute;
     top: 50%;
     right: auto;
-    bottom: auto;
-    left: 8px;
-    margin-top: -12px;
+    width: 25px;
     z-index: 20;
 }
 
@@ -120,10 +120,10 @@ ul li div.subway-icon div.exercise-node {
 }
 
 div.color-block {
+    background-color: #3C5466;
+    height: 100%;
     float: left;
     width: 12px;
-    height: 100%;
-    background-color: #3C5466;
 }
 
 header.topic-header {
@@ -471,14 +471,14 @@ ul li:last-child:first-child div div.pipe {
 
 ul li div div.pipe {
     background-color: @gray;
+    bottom: -1px;
+    left: 18px;
+    height: 100%;
     position: absolute;
     right: auto;
-    left: 18px;
+    top: 0;
     width: 4px;
     z-index: 10;
-    bottom: -1px;
-    height: 100%;
-    top: 0;
 }
 
 ul li div div.pipe.completed,
@@ -494,12 +494,12 @@ ul li a p.exercise-title {
 
 
 div.throbber {
-    width: 10rem;
+    background-size: 10rem;
+    background:url('/img/throbber-full.gif') no-repeat center center;
     height: 10rem;
     margin-left: 1rem;
     margin-top: 1rem;
-    background:url('/img/throbber-full.gif') no-repeat center center;
-    background-size: 10rem;
+    width: 10rem;
 }
 
 #video-placeholder {
@@ -514,59 +514,59 @@ div.throbber {
 }
 
 #video-player {
-    width: 100%;
     height: 100%;
+    width: 100%;
 }
 
 img.video-placeholder {
-    width: 100%;
+    background-color: @black;
     background:url('/img/offline.png') no-repeat center center;
     max-height: 50%;
     height: 50%;
-    background-color: @black;
+    width: 100%;
 }
 
 .transcript {
+    box-sizing: border-box;
     max-height: 50%;
+    overflow-y: scroll !important;
     padding-left: 1rem;
     padding-right: 1rem;
-    overflow-y: scroll !important;
     width: 100%;
-    box-sizing: border-box;
 }
 
 .transcript li {
-    padding-top: 0.7rem;
-    padding-bottom: 0.7rem;
     border-bottom: solid 0.1rem #e7e7e7;
     color: rgb(51, 51, 51);
     font-size: 1.3rem; // p.micro
+    padding-top: 0.7rem;
+    padding-bottom: 0.7rem;
 }
 
 .transcript li > span:first-child {
-    width: 3rem;
     margin-right: 0.5rem;
+    width: 3rem;
 }
 
 article {
+    height: calc(100% - 8rem);
     overflow-y: scroll !important;
     overflow-x: scroll !important;
-    position: absolute;
-    height: calc(100% - 8rem);
     padding-left: 1rem;
     padding-right: 1rem;
+    position: absolute;
     width: calc(100% - 2rem);
 }
 
 .profile, .downloads, .settings, .exercise {
     margin-left: 1rem;
-    margin-top: 1rem;
     margin-right: 1rem;
+    margin-top: 1rem;
 }
 
 .topic-list-container.settings, .profile {
-    overflow-y: scroll;
     height: calc(100% - 8rem) !important;
+    overflow-y: scroll;
 }
 
 .sidebar .hot-item {
@@ -578,20 +578,20 @@ article {
 }
 
 .profile .badge-category-icon {
-    width: 4rem;
-    height: 4rem;
+    bottom: auto;
     display: block;
+    margin: -2rem auto 0;
+    height: 4rem;
+    left: auto;
     position: relative;
     top: auto;
     right: auto;
-    bottom: auto;
-    left: auto;
-    margin: -2rem auto 0;
+    width: 4rem;
 }
 
 .profile .avatar {
-    width: 200px;
     height: 200px;
+    width: 200px;
 }
 
 .profile .badge-category-count {
@@ -606,14 +606,14 @@ article {
 }
 
 .profile span.span2 {
-    width: 4rem;
     display: inline-block;
     margin-right: 0.5rem;
+    width: 4rem;
 }
 
 .transcript a {
-    text-decoration: none;
     color: black;
+    text-decoration: none;
 }
 
 .transcript-item div {
@@ -630,15 +630,15 @@ article {
 }
 
 .energy-points {
-    display: inline;
     background: #005a88;
-    font-size: 1.3rem; // p.micro
-    text-align: center;
-    padding: 2px 5px 3px;
-    color: white;
-    font-family: 'Proxima Nova',sans-serif;
-    text-shadow: none;
     border-radius: 5px;
+    color: white;
+    display: inline;
+    text-align: center;
+    font-family: 'Proxima Nova',sans-serif;
+    font-size: 1.3rem; // p.micro
+    padding: 2px 5px 3px;
+    text-shadow: none;
 }
 
 .username, .points-header, .energy-points.energy-points-profile {
@@ -647,10 +647,10 @@ article {
 }
 
 .energy-points-video {
-    margin-top: 0.2rem;
+    float: right;
     margin-bottom: 0.2rem;
     margin-right: 1rem;
-    float: right;
+    margin-top: 0.2rem;
 }
 
 label.pack-switch {
@@ -689,10 +689,10 @@ li.faded p.article-title {
 }
 
 .status-bar .status-button {
-    font-weight: bold;
     color: white;
-    text-decoration: none;
     float: right;
+    font-weight: bold;
+    text-decoration: none;
 }
 
 section[data-type="sidebar"] > nav > ul > li > a {
@@ -704,43 +704,43 @@ section[role="region"] > header:first-child h1 {
 }
 
 .app-loading {
-    height: 50%;
-    background:url('/img/throbber-full.gif') no-repeat center center;
     background-size: 10rem;
+    background:url('/img/throbber-full.gif') no-repeat center center;
+    height: 50%;
 }
 
 #overlay {
+    background-color: @white;
+    height: 100%;
+    left: 0;
+    opacity: 0.01;
+    pointer-events: none;
     position: fixed;
     top: 0;
-    left: 0;
     width: 100%;
-    height: 100%;
-    background-color: @white;
-    opacity: 0.01;
     z-index: 10000;
-    pointer-events: none;
 }
 
 span.fa-arrows-alt {
-    padding: 0.1rem;
     margin-right: 1rem;
     margin-left: 1rem;
-    z-index: 100;
+    padding: 0.1rem;
     vertical-align:middle
+    z-index: 100;
 }
 
 #set-playback-speed {
-    float: left;
-    width: 20rem;
-    margin-top: 1rem;
     -moz-appearance: none;
     border: 0;
+    float: left;
+    margin-top: 1rem;
+    width: 20rem;
 }
 
 #reset-button, .submit-answer-button {
-    width: 20rem;
-    margin-top: 2rem;
     display: block;
+    margin-top: 2rem;
+    width: 20rem;
 }
 
 .vjs-default-skin .vjs-control-bar { font-size: 144% }
@@ -758,8 +758,8 @@ span.fa-arrows-alt {
 }
 
 .vjs-volume-handle {
-    top: -0.2em !important;
     height: 1.5em !important;
+    top: -0.2em !important;
 }
 
 iframe {
