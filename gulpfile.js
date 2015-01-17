@@ -20,6 +20,14 @@ gulp.task('typecheck', function() {
     return gulp.src('js/**/*.js')
         .pipe(flowtype({
             declarations: './flowtypes',
+            background: false,    // Watch/Server mode
+            all: false,           // Check all files regardless
+            lib: '',              // Library directory
+            module: '',           // Module mode
+            stripRoot: false,     // Relative vs Absolute paths
+            weak: false,          // Force weak check
+            showAllErrors: false, // Show more than 50 errors
+            killFlow: false,
         }))
         .pipe(jshint.reporter('default'));
 });
