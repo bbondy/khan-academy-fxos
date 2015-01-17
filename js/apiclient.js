@@ -1,3 +1,5 @@
+/* @flow */
+
 "use strict";
 
 define(["jquery", "underscore", "oauth", "util"], function($, _, _oauth, Util) {

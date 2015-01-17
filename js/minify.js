@@ -1,7 +1,9 @@
+/* @flow */
+
 "use strict";
 
 // Can be used for both Node miodules and AMD
-(function(global) {
+(function(global: any) {
 
     var Minify = {
         // Topic tree items with thees kinds will be ignored

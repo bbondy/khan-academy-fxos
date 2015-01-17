@@ -1,3 +1,7 @@
+/* @flow */
+
+"strict";
+
 define(["jquery", "react", "util", "models", "apiclient", "cache", "storage", "downloads", "chrome"],
         function($, React, Util, models, APIClient, Cache, Storage, Downloads, chromeViews) {
 
