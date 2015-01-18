@@ -1,4 +1,20 @@
 [ignore]
+.*/KAS/*
+.*/bower_components/*
+.*/build/*
+.*/data/*
+.*/fonts/*
+.*/icons/*
+.*/img/*
+.*/khan-exercises/*
+.*/locales/*
+.*/node_modules/*
+.*/output/*
+.*/perseus/*
+.*/style/*
+.*/test/*
+.*/tools/*
+.*/webapp/*
 
 [include]
 
