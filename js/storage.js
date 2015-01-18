@@ -28,11 +28,11 @@ define(["util"], function(Util) {
                 return d.reject().promise();
             }
             var request = this.sdcard.get(filename);
-            request.onsuccess = function () {
+            request.onsuccess = function() {
                 var file = this.result;
                 d.resolve(file);
             };
-            request.onerror = function () {
+            request.onerror = function() {
                 Util.warn("Unable to get the file %s: %o", filename, this.error);
                 d.reject();
             };
@@ -48,7 +48,7 @@ define(["util"], function(Util) {
                 return d.reject().promise();
             }
             var request = this.sdcard.get(filename);
-            request.onsuccess = function () {
+            request.onsuccess = function() {
                 var file = this.result;
                 var fileReader = new FileReader();
                 fileReader.readAsText(file.slice());
@@ -56,7 +56,7 @@ define(["util"], function(Util) {
                     d.resolve(fileReader.result);
                 };
             };
-            request.onerror = function () {
+            request.onerror = function() {
                 Util.warn("Unable to get the file %s: %o", filename, this.error);
                 d.reject();
             };
@@ -73,10 +73,10 @@ define(["util"], function(Util) {
                 return d.reject().promise();
             }
             var request = this.sdcard.delete(filename);
-            request.onsuccess = function () {
+            request.onsuccess = function() {
                 d.resolve();
             };
-            request.onerror = function () {
+            request.onerror = function() {
                 if (this.error.name === "NotFoundError") {
                     d.resolve();
                 } else {
@@ -101,18 +101,18 @@ define(["util"], function(Util) {
             var d = $.Deferred();
             this.delete(filename).always(() => {
                 if (!this.sdcard) {
-                    Util.log('rejected!');
+                    Util.log("rejected!");
                     return d.reject().promise();
                 }
 
                 var request = this.sdcard.addNamed(blob, filename);
-                request.onsuccess = function () {
-                    Util.log(filename + ' was written successfully!');
+                request.onsuccess = function() {
+                    Util.log(filename + " was written successfully!");
                     d.resolve();
                 };
                 // An error typically occur if a file with the same name already exist
-                request.onerror = function () {
-                    Util.warn('Unable to write the file: %o', this.error);
+                request.onerror = function() {
+                    Util.warn("Unable to write the file: %o", this.error);
                     d.reject();
                 };
             });

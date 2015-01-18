@@ -6,15 +6,28 @@ var uglify = require('gulp-uglify');
 var rename = require('gulp-rename');
 var react = require('gulp-react');
 var flowtype = require('gulp-flowtype');
+var jsxcs = require('gulp-jsxcs');
+var gutil = require('gulp-util');
 
 // Lint Task
-gulp.task('lint', function() {
+gulp.task('prelint', function() {
+    return gulp.src('js/**/*.js')
+        .pipe(jsxcs().on('error', function(err) {
+            console.log(err.toString());
+        }))
+        .pipe(jshint.reporter('default'));
+});
+
+// Lint Task
+gulp.task('postlint', function() {
     return gulp.src('build/**/*.js')
         .pipe(jshint({
             esnext: true
         }))
         .pipe(jshint.reporter('default'));
 });
+
+
 
 gulp.task('typecheck', function() {
     return gulp.src('js/**/*.js')
@@ -64,12 +77,12 @@ gulp.task('releasify', function() {
 
 // Watch Files For Changes
 gulp.task('watch', function() {
-    gulp.watch('js/**/*.js', ['typecheck', 'react']);
-    gulp.watch('build/**/*.js', ['lint']);
+    gulp.watch('js/**/*.js', ['prelint', 'typecheck', 'react']);
+    gulp.watch('build/**/*.js', ['postlint']);
     gulp.watch('style/**/*.less', ['less']);
 });
 
 // Default Task
 // Not including Flow typechecking by default because it takes so painfully long.
 // Maybe because of my code layout or otheriwse, needto figure it out before enabling by default.
-gulp.task('default', ['typecheck', 'react', 'less', 'lint', 'watch']);
+gulp.task('default', ['prelint', 'typecheck', 'react', 'less', 'postlint', 'watch']);

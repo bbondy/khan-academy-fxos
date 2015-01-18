@@ -9,7 +9,7 @@ define(["jquery", "underscore"], function($, _) {
          * Wrapper around console.log
          */
         log: function() {
-            if (typeof console !== 'undefined') {
+            if (typeof console !== "undefined") {
                 console.log(Array.prototype.slice.call(arguments));
             }
         },
@@ -17,7 +17,7 @@ define(["jquery", "underscore"], function($, _) {
          * Wrapper around console.warn
          */
         warn: function() {
-            if (typeof console !== 'undefined') {
+            if (typeof console !== "undefined") {
                 console.warn(Array.prototype.slice.call(arguments));
             }
         },
@@ -25,7 +25,7 @@ define(["jquery", "underscore"], function($, _) {
          * Wrapper around console.error
          */
         error: function(rest) {
-            if (typeof console !== 'undefined') {
+            if (typeof console !== "undefined") {
                 console.error(Array.prototype.slice.call(arguments));
             }
         },
@@ -66,7 +66,7 @@ define(["jquery", "underscore"], function($, _) {
          * @return true if the bandwidth is metered.
          */
         isFirefoxOS: function() {
-            return window.location.protocol === 'app:';
+            return window.location.protocol === "app:";
         },
         /**
          * Determines if the connection is metered (pay per use)
@@ -117,8 +117,8 @@ define(["jquery", "underscore"], function($, _) {
             if (params.length && params[0] !== "?") {
                 params = "?" + params;
             }
-            var match = RegExp('[?&]' + name + '=([^&]*)').exec(params);
-            return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+            var match = RegExp("[?&]" + name + "=([^&]*)").exec(params);
+            return match && decodeURIComponent(match[1].replace(/\+/g, " "));
         },
         /**
          * Adds a query parameter to the specified url
@@ -153,12 +153,12 @@ define(["jquery", "underscore"], function($, _) {
          *
          * @return The same function with one of the specified parameters found.
          */
-        partial: function( fn /*, args...*/) {
-          var aps = Array.prototype.slice;
-          var args = aps.call(arguments, 1);
-          return function() {
-              return fn.apply(this, args.concat(aps.call(arguments)));
-          };
+        partial: function(fn /*, args...*/) {
+            var aps = Array.prototype.slice;
+            var args = aps.call(arguments, 1);
+            return function() {
+                return fn.apply(this, args.concat(aps.call(arguments)));
+            };
         },
         // An example generic Mixin that you can add to any component that should react
         // to changes in a Backbone component. The use cases we've identified thus far
@@ -169,21 +169,21 @@ define(["jquery", "underscore"], function($, _) {
         // using this mixin correctly (it should be near the top of your component
         // hierarchy) this should not be an issue.
         // https://github.com/facebook/react/blob/1be9a9e/examples/todomvc-backbone/js/app.js#L148-L171
-        BackboneMixin : {
-          componentDidMount: function() {
-            // Whenever there may be a change in the Backbone data, trigger a reconcile.
-            this.getBackboneModels().forEach(function(model) {
-              model.on('add change remove', this.forceUpdate.bind(this, null), this);
-            }, this);
-          },
+        BackboneMixin: {
+            componentDidMount: function() {
+                // Whenever there may be a change in the Backbone data, trigger a reconcile.
+                this.getBackboneModels().forEach(function(model) {
+                    model.on("add change remove", this.forceUpdate.bind(this, null), this);
+                }, this);
+            },
 
-          componentWillUnmount: function() {
-            // Ensure that we clean up any dangling references when the component is
-            // destroyed.
-            this.getBackboneModels().forEach(function(model) {
-              model.off(null, null, this);
-            }, this);
-          }
+            componentWillUnmount: function() {
+                // Ensure that we clean up any dangling references when the component is
+                // destroyed.
+                this.getBackboneModels().forEach(function(model) {
+                    model.off(null, null, this);
+                }, this);
+            }
         },
 
         /**

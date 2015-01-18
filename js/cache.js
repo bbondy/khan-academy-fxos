@@ -29,7 +29,7 @@ define(["jquery", "util", "models"], function($, Util, models) {
                 this.lastUserInfoRefresh = Date.parse(this.lastUserInfoRefresh);
             }
             this.lastTopicTreeRefresh = localStorage.getItem(this.heartbeatTopicTreeName);
-            if (this.lastTopicTreeRefresh ) {
+            if (this.lastTopicTreeRefresh) {
                 this.lastTopicTreeRefresh = Date.parse(this.lastTopicTreeRefresh);
             }
 
@@ -45,20 +45,20 @@ define(["jquery", "util", "models"], function($, Util, models) {
          */
         heartbeat: function() {
             if (Util.isMeteredConnection()) {
-                Util.log('skipping heartbeat due to metered connection!');
+                Util.log("skipping heartbeat due to metered connection!");
                 return;
             }
 
             if (Util.isBandwidthCapped()) {
-                Util.log('skipping heartbeat due to capped bandwidth!');
+                Util.log("skipping heartbeat due to capped bandwidth!");
                 return;
             }
 
             var TWELVE_HOURS = 1000 * 60 * 60 * 12;
             if (this.lastUserInfoRefresh && new Date() - this.lastUserInfoRefresh < TWELVE_HOURS) {
-                Util.log('heartbeat: no need to refresh user info yet!');
+                Util.log("heartbeat: no need to refresh user info yet!");
             } else {
-                Util.log('heartbeat: Refreshing logged in info!');
+                Util.log("heartbeat: Refreshing logged in info!");
                 models.CurrentUser.refreshLoggedInInfo(true).done(() => {
                     this.lastUserInfoRefresh = new Date();
                     localStorage.setItem(this.heartbeatUserInfoName, this.lastUserInfoRefresh);
@@ -67,11 +67,11 @@ define(["jquery", "util", "models"], function($, Util, models) {
 
             var ONE_WEEK = 1000 * 60 * 60 * 24 * 7;
             if (this.lastTopicTreeRefresh && new Date() - this.lastTopicTreeRefresh < ONE_WEEK) {
-                Util.log('heartbeat: no need to refresh topic tree yet!');
+                Util.log("heartbeat: no need to refresh topic tree yet!");
             } else if (!models.AppOptions.get("autoUpdateTopicTree")) {
-                Util.log('heartbeat: not refreshing the topic tree because of user preference!');
+                Util.log("heartbeat: not refreshing the topic tree because of user preference!");
             } else {
-                Util.log('heartbeat: Refreshing topic tree!');
+                Util.log("heartbeat: Refreshing topic tree!");
                 models.TopicTree.refreshTopicTreeInfo().done(() => {
                     this.lastTopicTreeRefresh = new Date();
                     localStorage.setItem(this.heartbeatTopicTreeName, this.lastTopicTreeRefresh);

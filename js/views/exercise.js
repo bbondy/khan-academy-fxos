@@ -61,7 +61,7 @@ define(["jquery", "react", "util", "models", "apiclient", "storage", "katex", "k
         },
         onClickSubmitAnswer: function() {
             var score = this.refs.itemRenderer.scoreInput();
-            Util.log('score: %o', score);
+            Util.log("score: %o", score);
             var attemptNumber = 1; // TODO
             var isCorrect = score.correct;
             var secondsTaken = 10; //TODO
@@ -72,9 +72,9 @@ define(["jquery", "react", "util", "models", "apiclient", "storage", "katex", "k
             }).then((info) => {
                 var problemNumber = info.total_done + 1;
                 Util.log("submitting exercise progress for problemNumber: %i", problemNumber);
-                console.log('taskId: ' + data.taskId);
-                console.log('problemNumber: ' + problemNumber);
-                console.log('problem type name: ' + this.problemTypeName);
+                console.log("taskId: " + data.taskId);
+                console.log("problemNumber: " + problemNumber);
+                console.log("problem type name: " + this.problemTypeName);
                 return APIClient.reportExerciseProgress(this.props.exercise.getName(), problemNumber,
                                                         this.randomAssessmentSHA1, this.randomAssessmentId,
                                                         secondsTaken, this.state.hintsUsed, isCorrect,
@@ -112,7 +112,7 @@ define(["jquery", "react", "util", "models", "apiclient", "storage", "katex", "k
             } else if (this.props.exercise.isKhanExercisesExercise()) {
                 var path = `/khan-exercises/exercises/${this.props.exercise.getFilename()}`;
                 content = <iframe src={path}/>;
-            } else if(this.ItemRenderer && this.state.perseusItemData) {
+            } else if (this.ItemRenderer && this.state.perseusItemData) {
                 var showHintsButton = this.state.perseusItemData.hints.length > this.state.hintsUsed;
                 var hint;
                 if (this.state.currentHint !== -1 &&
@@ -140,9 +140,8 @@ define(["jquery", "react", "util", "models", "apiclient", "storage", "katex", "k
                               }
                               {hint}
                               <div id="hintsarea"/>
-
                           </div>;
-                }
+            }
 
             Util.log("render exercise: :%o", this.props.exercise);
             return <div className="exercise">

@@ -15,7 +15,7 @@ define(["react", "util", "models", "apiclient", "storage"],
             return [this.props.article];
         },
         getInitialState: function() {
-            return { };
+            return {};
         },
         componentWillMount: function() {
             if (this.props.article.isDownloaded()) {

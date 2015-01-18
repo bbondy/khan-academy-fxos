@@ -221,7 +221,7 @@ define(["jquery", "underscore", "util", "storage", "models", "apiclient"],
          */
         _addDownloadToManifest: function(model) {
             this._setDownloaded(model, true);
-            Util.log('adding model to manifest: ');
+            Util.log("adding model to manifest: ");
             Util.log(model);
             this.contentList.push(model);
             this._writeManifest();
@@ -231,7 +231,7 @@ define(["jquery", "underscore", "util", "storage", "models", "apiclient"],
          */
         _removeDownloadFromManifest: function(model) {
             this._setDownloaded(model, false);
-            Util.log('removing model from manifest: ');
+            Util.log("removing model from manifest: ");
             Util.log(model);
             this.contentList.remove(model);
             this._writeManifest();

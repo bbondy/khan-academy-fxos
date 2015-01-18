@@ -14,7 +14,9 @@ define(function() {
             if (!window.Notification) {
                 return;
             }
-            var notification = new Notification(title, { body: message });
+            var notification = new Notification(title, {
+                body: message
+            });
             notification.onclick = clickCallback;
         }
     };
