@@ -332,7 +332,7 @@ define(["jquery", "underscore", "backbone", "util", "apiclient", "storage", "min
          *  contentItems: A backbone collection: ContentList which contains ContentModel instances
          *  topics: A backbone collection: TopicList which contains TopicModel instances
          */
-        parse: function(response){
+        parse: function(response) {
             var parseTopicChildren = (topic) => {
                 _(topic[Minify.getShortName("children")]).each((item) => {
                     item.parent = this;//response;
@@ -625,7 +625,7 @@ define(["jquery", "underscore", "backbone", "util", "apiclient", "storage", "min
                     video.unset("points");
                 }
             });
-            Util.log('getUserVideos entities: %o', this.get("userVideos"));
+            Util.log("getUserVideos entities: %o", this.get("userVideos"));
         },
         _syncUserExerciseProgressToTopicTree: function(set) {
             // Get a list of the Ids we'll be searching for in TopicTree models
@@ -653,7 +653,7 @@ define(["jquery", "underscore", "backbone", "util", "apiclient", "storage", "min
                     exercise.unset("streak");
                 }
             });
-            Util.log('getUserExercises entities: %o', this.get("userExercises"));
+            Util.log("getUserExercises entities: %o", this.get("userExercises"));
         },
         _saveUserInfo: function() {
             if (this.get("userInfo")) {
@@ -782,7 +782,7 @@ define(["jquery", "underscore", "backbone", "util", "apiclient", "storage", "min
         reportArticleRead: function(article) {
             var d = $.Deferred();
             APIClient.reportArticleRead(article.getId()).done((result) => {
-                Util.log('reported article complete: %o', result);
+                Util.log("reported article complete: %o", result);
                 article.set({
                     completed: true
                 });
@@ -807,7 +807,7 @@ define(["jquery", "underscore", "backbone", "util", "apiclient", "storage", "min
                     Util.warn("Video progress report returned null results!");
                     return;
                 }
-                Util.log('reportVideoProgress result: %o', result);
+                Util.log("reportVideoProgress result: %o", result);
 
                 var lastPoints = video.getPoints() || 0;
                 var newPoints = lastPoints + result.points_earned;
@@ -864,7 +864,9 @@ define(["jquery", "underscore", "backbone", "util", "apiclient", "storage", "min
                 });
                 var isNew = !foundUserVideo;
                 foundUserVideo = foundUserVideo || {
-                    video: { id: video.getId() },
+                    video: {
+                        id: video.getId()
+                    },
                     duration: video.getDuration()
                 };
                 foundUserVideo["points"] = newPoints;
@@ -952,6 +954,6 @@ define(["jquery", "underscore", "backbone", "util", "apiclient", "storage", "min
         TopicTree,
         AppOptions: new AppOptionsModel(),
         TempAppState: new TempAppStateModel(),
-        CurrentUser
+        CurrentUser,
     };
 });

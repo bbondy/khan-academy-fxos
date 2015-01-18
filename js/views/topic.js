@@ -20,8 +20,8 @@ define(["react", "underscore", "util", "models"], function(React, _, Util, model
         },
         render: function() {
             var topicClassObj = {
-                'topic-item': true,
-                'faded': models.AppOptions.get("showDownloadsOnly") &&
+                "topic-item": true,
+                faded: models.AppOptions.get("showDownloadsOnly") &&
                     this.props.topic.get("downloadCount") === 0
             };
             var parentDomain = this.props.topic.getParentDomain();
@@ -54,21 +54,21 @@ define(["react", "underscore", "util", "models"], function(React, _, Util, model
         },
         render: function() {
             var videoNodeClass = cx({
-              'video-node': true,
-              'completed': this.props.video.isCompleted(),
-              'in-progress': this.props.video.isStarted()
+              "video-node": true,
+              completed: this.props.video.isCompleted(),
+              "in-progress": this.props.video.isStarted()
             });
             var pipeClassObj = {
-                'pipe': true,
-                'completed': this.props.video.isCompleted(),
-                'in-progress': this.props.video.isStarted()
+                pipe: true,
+                completed: this.props.video.isCompleted(),
+                "in-progress": this.props.video.isStarted()
             };
             var subwayIconClassObj = {
-                'subway-icon': true
+                "subway-icon": true
             };
             var videoClassObj = {
-                'video-item': true,
-                'faded': models.AppOptions.get("showDownloadsOnly") &&
+                "video-item": true,
+                faded: models.AppOptions.get("showDownloadsOnly") &&
                     !this.props.video.isDownloaded()
             };
             var parentDomain = this.props.video.getParentDomain();
@@ -110,21 +110,21 @@ define(["react", "underscore", "util", "models"], function(React, _, Util, model
         },
         render: function() {
             var articleNodeClass = cx({
-              'article-node': true,
-              'completed': this.props.article.isCompleted(),
-              'in-progress': this.props.article.isStarted()
+              "article-node": true,
+              completed: this.props.article.isCompleted(),
+              "in-progress": this.props.article.isStarted()
             });
             var pipeClassObj = {
-                'pipe': true,
-                'completed': this.props.article.isCompleted(),
-                'in-progress': this.props.article.isStarted()
+                pipe: true,
+                completed: this.props.article.isCompleted(),
+                "in-progress": this.props.article.isStarted()
             };
             var subwayIconClassObj = {
-                'subway-icon': true
+                "subway-icon": true
             };
             var articleClassObj = {
-                'article-item': true,
-                'faded': models.AppOptions.get("showDownloadsOnly") &&
+                "article-item": true,
+                faded: models.AppOptions.get("showDownloadsOnly") &&
                     !this.props.article.isDownloaded()
             };
             var parentDomain = this.props.article.getParentDomain();
@@ -160,21 +160,21 @@ define(["react", "underscore", "util", "models"], function(React, _, Util, model
         },
         render: function() {
             var exerciseNodeClass = cx({
-              'exercise-node': true,
-              'completed': this.props.exercise.isCompleted(),
-              'in-progress': this.props.exercise.isStarted()
+              "exercise-node": true,
+              completed: this.props.exercise.isCompleted(),
+              "in-progress": this.props.exercise.isStarted()
             });
             var pipeClassObj = {
-                'pipe': true,
-                'completed': this.props.exercise.isCompleted(),
-                'in-progress': this.props.exercise.isStarted()
+                pipe: true,
+                completed: this.props.exercise.isCompleted(),
+                "in-progress": this.props.exercise.isStarted()
             };
             var subwayIconClassObj = {
-                'subway-icon': true
+                "subway-icon": true
             };
             var exerciseClassObj = {
-                'exercise-item': true,
-                'faded': models.AppOptions.get("showDownloadsOnly") &&
+                "exercise-item": true,
+                faded: models.AppOptions.get("showDownloadsOnly") &&
                     !this.props.exercise.isDownloaded()
             };
             var parentDomain = this.props.exercise.getParentDomain();
@@ -270,7 +270,7 @@ define(["react", "underscore", "util", "models"], function(React, _, Util, model
                         return <VideoListItem video={contentItem}
                                               onClickVideo={this.props.onClickContentItem}
                                               key={contentItem.getId()} />;
-                    } else if(contentItem.isArticle()) {
+                    } else if (contentItem.isArticle()) {
                         return <ArticleListItem article={contentItem}
                                                 onClickArticle={this.props.onClickContentItem}
                                                 key={contentItem.getId()} />;

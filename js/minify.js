@@ -17,25 +17,25 @@
         // Map property names to a shorter version
         // [new prop name, old prop name]
         propertyNameMap: {
-            "readable_id": "a",
-            "id": "i",
-            "children": "c",
-            "date_added": "d",
-            "file_name": "f",
-            "sha": "h",
-            "ka_url": "k",
-            "name": "n",
-            "progress_key": "p",
-            "render_type": "r",
-            "slug": "s",
-            "translated_title": "t",
-            "download_urls": "u",
-            "keywords": "y",
-            "duration": "D",
-            "translated_description": "E",
-            "kind": "K",
-            "translated_display_name": "T",
-            "youtube_id": "Y"
+            readable_id: "a",
+            id: "i",
+            children: "c",
+            date_added: "d",
+            file_name: "f",
+            sha: "h",
+            ka_url: "k",
+            name: "n",
+            progress_key: "p",
+            render_type: "r",
+            slug: "s",
+            translated_title: "t",
+            download_urls: "u",
+            keywords: "y",
+            duration: "D",
+            translated_description: "E",
+            kind: "K",
+            translated_display_name: "T",
+            youtube_id: "Y"
         },
 
         // Map common property values to a shorter version
@@ -127,7 +127,7 @@
             for (var name in this.propertyNameMap) {
                 if (this.propertyNameMap.hasOwnProperty(name)) {
                     var value = this.propertyNameMap[name];
-                    if (typeof node[name] !== 'undefined') {
+                    if (typeof node[name] !== "undefined") {
                         node[value] = node[name];
                         delete node[name];
                     }
@@ -155,7 +155,7 @@
                                 newChildren.push(child);
                             } else if (child[this.getShortName("kind")] === this.getShortValue("kind", "Video")) {
                                 if (logWarnings) {
-                                    if (typeof console !== 'undefined') {
+                                    if (typeof console !== "undefined") {
                                         console.log("Warning: Excluding because of no vidoe URL: " +
                                             child[this.getShortName("id")] +
                                             ", " + child[this.getShortName("translated_title")]);
@@ -192,7 +192,7 @@
             var output = "{";
 
             for (var p in node) {
-                if (p === 'c') {
+                if (p === "c") {
                     output += "c:[";
                     node.c.forEach(function(child) {
                         output += this._getOutput(child) + ",";
