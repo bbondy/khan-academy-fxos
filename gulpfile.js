@@ -64,7 +64,7 @@ gulp.task('releasify', function() {
 
 // Watch Files For Changes
 gulp.task('watch', function() {
-    gulp.watch('js/**/*.js', ['react']);
+    gulp.watch('js/**/*.js', ['typecheck', 'react']);
     gulp.watch('build/**/*.js', ['lint']);
     gulp.watch('style/**/*.less', ['less']);
 });
@@ -72,4 +72,4 @@ gulp.task('watch', function() {
 // Default Task
 // Not including Flow typechecking by default because it takes so painfully long.
 // Maybe because of my code layout or otheriwse, needto figure it out before enabling by default.
-gulp.task('default', ['react', 'less', 'lint', 'watch']);
+gulp.task('default', ['typecheck', 'react', 'less', 'lint', 'watch']);
