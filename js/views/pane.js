@@ -1,7 +1,9 @@
+/* @flow */
+
 "use strict";
 
-define(["react", "util", "models", "downloads", "topic"],
-        function(React, Util, models, Downloads, topicViews) {
+define(["l10n", "react", "util", "models", "downloads", "topic"],
+        function(l10n, React, Util, models, Downloads, topicViews) {
     var ContentListViewer = topicViews.ContentListViewer;
 
     /**
@@ -54,7 +56,7 @@ define(["react", "util", "models", "downloads", "topic"],
             this.props.options.save();
         },
         handleReset: function(event) {
-            if (confirm(document.webL10n.get("confirm-reset"))) {
+            if (confirm(l10n.get("confirm-reset"))) {
                 this.props.options.reset();
             }
         },
@@ -125,7 +127,7 @@ define(["react", "util", "models", "downloads", "topic"],
         componentWillMount: function() {
         },
         render: function() {
-            var pointsString = document.webL10n.get("points");
+            var pointsString = l10n.get("points");
             // TODO(bbondy): The title attributes on the images need to change
             // because you can't hover with your finger on FxOS Maybe just
             // when you tap it, it gives you the name underneath or something

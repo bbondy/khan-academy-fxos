@@ -1,3 +1,5 @@
+/* @flow */
+
 "use strict";
 
 // Perseus module uses React directly and uses $._ directly for

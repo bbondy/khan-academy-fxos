@@ -1,9 +1,11 @@
+/* @flow */
+
 "use strict";
 
-define(["jquery", "react", "util", "models", "apiclient", "cache", "storage",
+define(["l10n", "jquery", "react", "util", "models", "apiclient", "cache", "storage",
         "downloads", "notifications", "status", "video", "article", "exercise",
         "topic", "search", "pane"],
-       function($, React, Util, models, APIClient, Cache, Storage,
+       function(l10n, $, React, Util, models, APIClient, Cache, Storage,
                 Downloads, Notifications, Status, videoViews, articleViews, exerciseViews,
                 topicViews, searchViews, paneViews) {
     var cx = React.addons.classSet;
@@ -66,21 +68,22 @@ define(["jquery", "react", "util", "models", "apiclient", "cache", "storage",
         },
         render: function() {
             var backButton;
-            if (this.props.model && (this.props.isPaneShowing ||
-                    this.props.model.isContent() ||
-                    this.props.model.isTopic() && !this.props.model.isRoot() ||
-                    this.props.model.isContentList())) {
+            var model = this.props.model;
+            if (model && (this.props.isPaneShowing ||
+                    model.isContent() ||
+                    model.isTopic() && !model.isRoot() ||
+                    model.isContentList())) {
                 backButton = <BackButton model={this.props.model}
                                          onClickBack={this.props.onClickBack}/>;
             }
 
             var styleObj = {
                 fixed: true,
-                "topic-header": this.props.model && !this.props.model.isRoot() &&
+                "topic-header": model && !model.isRoot() &&
                     !this.props.isPaneShowing &&
-                    (this.props.model.isTopic() || this.props.model.isContent())
+                    (model.isTopic() || model.isContent())
             };
-            var parentDomain = this.props.model && this.props.model.getParentDomain();
+            var parentDomain = model && model.getParentDomain();
             if (parentDomain && !this.props.isPaneShowing) {
                 styleObj[parentDomain.getId()] = true;
             }
@@ -88,19 +91,19 @@ define(["jquery", "react", "util", "models", "apiclient", "cache", "storage",
 
             var title = "Khan Academy";
             if (this.props.isDownloadsShowing) {
-                title = document.webL10n.get("view-downloads");
+                title = l10n.get("view-downloads");
             } else if (this.props.isProfileShowing) {
-                title = document.webL10n.get("view-profile");
+                title = l10n.get("view-profile");
             } else if (this.props.isSettingsShowing) {
-                title = document.webL10n.get("view-settings");
-            } else if (this.props.model && this.props.model.getTitle()) {
-                title = this.props.model.getTitle();
-            } else if (this.props.model && this.props.model.isContentList()) {
-                title = document.webL10n.get("search");
+                title = l10n.get("view-settings");
+            } else if (model && model.getTitle()) {
+                title = model.getTitle();
+            } else if (model && model.isContentList()) {
+                title = l10n.get("search");
             }
 
             var menuButton;
-            if (this.props.model) {
+            if (model) {
                 menuButton = <MenuButton/>;
             }
 
@@ -161,12 +164,12 @@ define(["jquery", "react", "util", "models", "apiclient", "cache", "storage",
                 if (!this.props.isPaneShowing &&
                         this.props.model && this.props.model.isContent()) {
                     if (this.props.model.isDownloaded()) {
-                        var text = document.webL10n.get(this.props.model.isVideo() ? "delete-downloaded-video" : "delete-downloaded-article");
+                        var text = l10n.get(this.props.model.isVideo() ? "delete-downloaded-video" : "delete-downloaded-article");
                         items.push(<li key="delete-downloaded-video" className="hot-item">
                                 <a href="#" onClick={Util.partial(this.props.onClickDeleteDownloadedContent, this.props.model)}>{{text}}</a>
                             </li>);
                     } else {
-                        var text = document.webL10n.get(this.props.model.isVideo() ? "download-video" : "download-article");
+                        var text = l10n.get(this.props.model.isVideo() ? "download-video" : "download-article");
                         items.push(<li key="download-video" className="hot-item">
                                 <a href="#" className={this.props.model.isVideo() ? "download-video-link" : "download-article-link"} onClick={Util.partial(this.props.onClickDownloadContent, this.props.model)}>{{text}}</a>
                             </li>);
@@ -178,11 +181,11 @@ define(["jquery", "react", "util", "models", "apiclient", "cache", "storage",
                     this.props.model &&
                     this.props.model.isContent() &&
                     this.props.model.getKAUrl()) {
-                var viewOnKAMessage = document.webL10n.get("open-in-website");
+                var viewOnKAMessage = l10n.get("open-in-website");
                 items.push(<li key="open-in-website"><a href="#" className="open-in-website-link" onClick={Util.partial(this.props.onClickViewOnKA, this.props.model)}>{{viewOnKAMessage}}</a></li>);
 
                 if (window.MozActivity) {
-                    var shareMessage = document.webL10n.get("share");
+                    var shareMessage = l10n.get("share");
                     items.push(<li key="share-link"><a href="#" className="share-link" onClick={Util.partial(this.props.onClickShare, this.props.model)}>{{shareMessage}}</a></li>);
                 }
             }
@@ -394,7 +397,7 @@ define(["jquery", "react", "util", "models", "apiclient", "cache", "storage",
         },
         _openUrl: function(url) {
             if (window.MozActivity) {
-                new MozActivity({
+                new window.MozActivity({
                     name: "view",
                     data: {
                         type: "url",
@@ -414,7 +417,7 @@ define(["jquery", "react", "util", "models", "apiclient", "cache", "storage",
             this._openUrl(model.getKAUrl());
         },
         onClickShare: function(model) {
-            new MozActivity({
+            new window.MozActivity({
                 name: "share",
                 data: {
                     type: "url",
@@ -430,17 +433,17 @@ define(["jquery", "react", "util", "models", "apiclient", "cache", "storage",
 
             // Check for errors
             if (totalCount === 0) {
-                alert(document.webL10n.get("already-downloaded"));
+                alert(l10n.get("already-downloaded"));
                 return;
             } else if (models.TempAppState.get("isDownloadingTopic")) {
-                alert(document.webL10n.get("already-downloading"));
+                alert(l10n.get("already-downloading"));
                 return;
             } else if (Util.isMeteredConnection()) {
-                if (!confirm(document.webL10n.get("metered-connection-warning"))) {
+                if (!confirm(l10n.get("metered-connection-warning"))) {
                     return;
                 }
             } else if (Util.isBandwidthCapped()) {
-                if (!confirm(document.webL10n.get("limited-bandwidth-warning"))) {
+                if (!confirm(l10n.get("limited-bandwidth-warning"))) {
                     return;
                 }
             }
@@ -450,7 +453,7 @@ define(["jquery", "react", "util", "models", "apiclient", "cache", "storage",
 
             // Prompt to download remaining
             if (model.isTopic()) {
-                if (!confirm(document.webL10n.get("download-remaining", {
+                if (!confirm(l10n.get("download-remaining", {
                             totalCount: totalCount,
                             totalCountStr: totalCountStr
                         }))) {
@@ -460,11 +463,11 @@ define(["jquery", "react", "util", "models", "apiclient", "cache", "storage",
 
             var onProgress = (count, currentProgress, cancelling) => {
                 if (cancelling) {
-                    Status.update(document.webL10n.get("canceling-download"));
+                    Status.update(l10n.get("canceling-download"));
                     return;
                 }
                 count = Util.numberWithCommas(count);
-                var progressMessage = document.webL10n.get("downloading-progress", {
+                var progressMessage = l10n.get("downloading-progress", {
                     count: count,
                     totalCount: totalCount,
                     totalCountStr: totalCountStr,
@@ -476,15 +479,15 @@ define(["jquery", "react", "util", "models", "apiclient", "cache", "storage",
             var message;
             var title;
             Downloads.download(model, onProgress).done((model, count) => {
-                var title = document.webL10n.get("download-complete");
+                var title = l10n.get("download-complete");
                 var contentTitle = model.getTitle();
                 if (model.isContent()) {
                     if (model.isVideo()) {
-                        message = document.webL10n.get("video-complete-body", {
+                        message = l10n.get("video-complete-body", {
                             title: contentTitle
                         });
                     } else {
-                        message = document.webL10n.get("article-complete-body", {
+                        message = l10n.get("article-complete-body", {
                             title: contentTitle
                         });
                     }
@@ -492,7 +495,7 @@ define(["jquery", "react", "util", "models", "apiclient", "cache", "storage",
                     // TODO: We don't want commas here so we should change the source
                     // strings for all locales for count and countStr
                     // count = Util.numberWithCommas(count);
-                    message = document.webL10n.get("content-items-downloaded-succesfully", {
+                    message = l10n.get("content-items-downloaded-succesfully", {
                         count: count,
                         title: contentTitle
                     });
@@ -501,18 +504,18 @@ define(["jquery", "react", "util", "models", "apiclient", "cache", "storage",
                 Notifications.info(title, message);
             }).fail((isCancel) => {
                 if (isCancel) {
-                    title = document.webL10n.get("download-canceled");
-                    message = document.webL10n.get("content-items-downloaded-cancel");
+                    title = l10n.get("download-canceled");
+                    message = l10n.get("content-items-downloaded-cancel");
                 } else {
-                    title = document.webL10n.get("download-aborted");
-                    message = document.webL10n.get("content-items-downloaded-failure");
+                    title = l10n.get("download-aborted");
+                    message = l10n.get("content-items-downloaded-failure");
                 }
                 Status.stop();
                 Notifications.info(title, message);
             });
         },
         onClickCancelDownloadContent: function(model) {
-            if (!confirm(document.webL10n.get("cancel-download-warning"))) {
+            if (!confirm(l10n.get("cancel-download-warning"))) {
                 return;
             }
             Downloads.cancelDownloading();

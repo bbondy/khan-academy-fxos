@@ -25,7 +25,8 @@
 
 'use strict';
 
-document.webL10n = (function(window, document, undefined) {
+define(() => {
+
   var gL10nData = {};
   var gTextData = '';
   var gTextProp = 'textContent';
@@ -1163,11 +1164,6 @@ document.webL10n = (function(window, document, undefined) {
       }
     }
   };
-}) (window, document);
-
-// gettext-like shortcut for document.webL10n.get
-if (window._ === undefined) {
-  var _ = document.webL10n.get;
-}
+});
 
 /* jshint ignore:end */

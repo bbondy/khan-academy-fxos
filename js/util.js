@@ -1,6 +1,6 @@
 "use strict";
 
-define(["jquery", "underscore"], function($, _) {
+define(["l10n", "jquery", "underscore"], function(l10n, $, _) {
     /**
      * Various utility functions
      */
@@ -48,7 +48,7 @@ define(["jquery", "underscore"], function($, _) {
                 return "boxes";
             }
 
-            var lang = document.webL10n.getLanguage().substring(0, 2);
+            var lang = l10n.getLanguage().substring(0, 2);
             if (this.supportedLocales.indexOf(lang) === -1) {
                 return null;
             }
@@ -191,10 +191,10 @@ define(["jquery", "underscore"], function($, _) {
          */
         LocalizationMixin: {
             componentDidMount: function() {
-                window.document.webL10n.translate(this.getDOMNode());
+                l10n.translate(this.getDOMNode());
             },
             componentDidUpdate: function() {
-                window.document.webL10n.translate(this.getDOMNode());
+                l10n.translate(this.getDOMNode());
             }
         },
 
