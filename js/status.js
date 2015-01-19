@@ -1,3 +1,5 @@
+/* @flow */
+
 "use strict";
 
 define(["models"], function(models) {

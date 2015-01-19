@@ -1,3 +1,5 @@
+/* @flow */
+
 "use strict";
 
 define(["react", "underscore", "util", "models"], function(React, _, Util, models) {
@@ -79,8 +81,8 @@ define(["react", "underscore", "util", "models"], function(React, _, Util, model
             }
             var subwayIconClass = cx(subwayIconClassObj);
             var pipeClass = cx(pipeClassObj);
-            this.videoClass = cx(videoClassObj);
-            return <li className={this.videoClass}>
+            var videoClass = cx(videoClassObj);
+            return <li className={videoClass}>
                 <div className={subwayIconClass}>
                     <a href="javascript:void(0)"
                        onClick={Util.partial(this.props.onClickVideo,

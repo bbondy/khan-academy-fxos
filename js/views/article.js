@@ -1,3 +1,5 @@
+/* @flow */
+
 "use strict";
 
 define(["react", "util", "models", "apiclient", "storage"],
