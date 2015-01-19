@@ -1,3 +1,5 @@
+/* @flow */
+
 "use strict";
 
 define(["util"], function(Util) {
@@ -91,7 +93,7 @@ define(["util"], function(Util) {
          * Writes out the specified data as text in the specified file.
          */
         writeText: function(filename, data) {
-            var blob = new Blob([data], {type: "text/plain"});
+            var blob = new window.Blob([data], {type: "text/plain"});
             return this.writeBlob(filename, blob);
         },
         /**

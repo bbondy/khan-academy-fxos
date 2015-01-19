@@ -1,3 +1,5 @@
+/* @flow weak */
+
 require.config({
     baseUrl: "/build",
     paths: {

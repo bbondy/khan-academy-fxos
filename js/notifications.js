@@ -1,3 +1,5 @@
+/* @flow */
+
 "use strict";
 
 define(function() {
@@ -14,7 +16,7 @@ define(function() {
             if (!window.Notification) {
                 return;
             }
-            var notification = new Notification(title, {
+            var notification = new window.Notification(title, {
                 body: message
             });
             notification.onclick = clickCallback;
