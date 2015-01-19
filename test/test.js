@@ -1,5 +1,5 @@
-require(["jquery", "underscore", "react", "util", "models", "apiclient", "storage", "downloads", "cache", "minify", "notifications", "status"],
-        function($, _, React, Util, models, APIClient, Storage, Downloads, Cache, Minify, Notifications, Status) {
+require(["l10n", "jquery", "underscore", "react", "util", "models", "apiclient", "storage", "downloads", "cache", "minify", "notifications", "status"],
+        function(l10n, $, _, React, Util, models, APIClient, Storage, Downloads, Cache, Minify, Notifications, Status) {
 
     QUnit.asyncTest("models.AppOptions.fetch defaults and reset", function(assert) {
         expect(9);
@@ -322,18 +322,18 @@ require(["jquery", "underscore", "react", "util", "models", "apiclient", "storag
     });
 
     QUnit.test("testLocalization", function(assert) {
-        document.webL10n.setAsyncLoading(false);
-        document.webL10n.setExactLangOnly(true);
-        var enDict = document.webL10n.getData();
+        l10n.setAsyncLoading(false);
+        l10n.setExactLangOnly(true);
+        var enDict = l10n.getData();
         var otherLanguages = languages.slice(1);
 
         // Make sure each localization file has an associated string
         otherLanguages.forEach(function(lang) {
-            document.webL10n.setLanguage(lang);
+            l10n.setLanguage(lang);
             for (var s in enDict) {
                 if (enDict.hasOwnProperty(s)) {
 
-                    var translated = document.webL10n.get(s);
+                    var translated = l10n.get(s);
                     if (!translated) {
                         console.error("Not localized! lang: %s, prop: %s, en-associated: %o",
                             lang, s, enDict[s], lang);

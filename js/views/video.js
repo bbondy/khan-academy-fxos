@@ -1,7 +1,10 @@
+/* @flow weak */
+// weak for mozCancelFullScreen
+
 "use strict";
 
-define(["jquery", "react", "underscore", "util", "models", "apiclient", "storage", "downloads", "notifications", "status", "videojs"],
-        function($, React, _, Util, models, APIClient, Storage, Downloads, Notifications, Status, videojs) {
+define(["l10n", "jquery", "react", "underscore", "util", "models", "apiclient", "storage", "downloads", "notifications", "status", "videojs"],
+        function(l10n, $, React, _, Util, models, APIClient, Storage, Downloads, Notifications, Status, videojs) {
     var cx = React.addons.classSet;
 
     /**
@@ -66,15 +69,19 @@ define(["jquery", "react", "underscore", "util", "models", "apiclient", "storage
                     }
                     // This will cause a second re-render but that's OK
                     this.setState({transcript: transcript});
-                    this.transcriptPromise.resolve();
+                    if (this.transcriptPromise) {
+                        this.transcriptPromise.resolve();
+                    }
                 }).fail((e) => {
-                    this.transcriptPromise.reject(e);
+                    if (this.transcriptPromise) {
+                        this.transcriptPromise.reject(e);
+                    }
                 });
             }
 
             if (this.props.video.isDownloaded()) {
                 Storage.readAsBlob(this.props.video.getId()).done((result) => {
-                    var download_url = URL.createObjectURL(result);
+                    var download_url = window.URL.createObjectURL(result);
                     this.setState({downloadedUrl: download_url, showOfflineImage: false});
                 });
             }
@@ -96,7 +103,7 @@ define(["jquery", "react", "underscore", "util", "models", "apiclient", "storage
         componentWillUnmount: function() {
             if (this.state.downloadedUrl) {
                 Util.log("Revoking: " + this.state.downloadedUrl);
-                URL.revokeObjectURL(this.state.downloadedUrl);
+                window.URL.revokeObjectURL(this.state.downloadedUrl);
             }
             var video = this._getVideoDOMNode();
             if (video) {
@@ -117,7 +124,6 @@ define(["jquery", "react", "underscore", "util", "models", "apiclient", "storage
                 video.load();
 
                 if (this.videojs) {
-                    Util.log("Disposing videojs");
                     this.videojs.dispose();
                 }
             }
@@ -126,29 +132,19 @@ define(["jquery", "react", "underscore", "util", "models", "apiclient", "storage
         onClickTranscript: function(obj) {
             var startSecond = obj.start_time / 1000 | 0;
             var video = this._getVideoDOMNode();
-            video.currentTime = startSecond;
-            video.play();
+            if (video) {
+                video.currentTime = startSecond;
+                video.play();
+            }
         },
         getInitialState: function() {
             return {
                 showOfflineImage: false
             };
         },
-        _canPlayYoutube: function() {
-            if (this.initSecondWatched) {
-                this.player.seekTo(this.initSecondWatched);
-                Util.log("set current time to: " + this.initSecondWatched);
-                delete this.initSecondWatched;
-            }
-            if (this.state.showOfflineImage) {
-                Util.log("Video has no source.");
-                this.stopAnimatingPoints(false);
-                this.setState({showOfflineImage: false});
-            }
-        },
         _canPlayHTML5: function() {
             var video = this._getVideoDOMNode();
-            if (this.initSecondWatched) {
+            if (video && this.initSecondWatched) {
                 video.currentTime = this.initSecondWatched;
                 Util.log("set current time to: " + video.currentTime);
                 delete this.initSecondWatched;
@@ -178,14 +174,19 @@ define(["jquery", "react", "underscore", "util", "models", "apiclient", "storage
         },
         _onEnded: function(e) {
             // If we're full screen, exit out.
-            document.mozCancelFullScreen();
+            var cancelFullScreen = document.mozCancelFullScreen;
+            if (typeof cancelFullScreen === "function") {
+                cancelFullScreen();
+            }
         },
         _onNetworkProgress: function(e) {
             if (!this.isMounted()) {
                 return;
             }
             var video = this._getVideoDOMNode();
-            Util.log("Network state changed: ", video.networkState);
+            if (video) {
+                Util.log("Network state changed: ", video.networkState);
+            }
         },
         _onError: function(e) {
             Util.warn("Video error: %o", e);
@@ -195,7 +196,7 @@ define(["jquery", "react", "underscore", "util", "models", "apiclient", "storage
             }
 
             var video = this._getVideoDOMNode();
-            if (video.networkState === window.HTMLMediaElement.NETWORK_NO_SOURCE) {
+            if (video && video.networkState === window.HTMLMediaElement.NETWORK_NO_SOURCE) {
                 Util.log("Video has no source.", e);
                 this.stopAnimatingPoints(false);
                 if (!this.state.downloadedUrl && !this.cleanedUp) {
@@ -241,8 +242,7 @@ define(["jquery", "react", "underscore", "util", "models", "apiclient", "storage
             // resuming a paused video. We need to get the play event before reporting
             // seconds watched to properly update the secondsWatched though.
             var video = this._getVideoDOMNode();
-            if (this.isPlaying && video) {
-                var video = this._getVideoDOMNode();
+            if (video && this.isPlaying) {
                 this.reportSecondsWatched(video.currentTime, video.duration);
                 this._onScrollTranscriptTo(video.currentTime);
             }
@@ -258,31 +258,52 @@ define(["jquery", "react", "underscore", "util", "models", "apiclient", "storage
                 }, 400);
             }
         },
+
+        videoClass: null,
+        videoSrc: null,
+        videoNode: null,
+        videoId: null,
+        initSecondWatched: 0,
+        lastSecondWatched: 0,
+        secondsWatched: 0,
+        lastReportedTime: new Date(),
+        lastWatchedTimeSinceLastUpdate: new Date(),
+        pointsPerReport: 0,
+        pointsObj: {},
+        isPlaying: false,
+        videoCreatedPromise: null,
+        transcriptPromise: null,
+        cleanedUp: false,
+        videojs: null,
+
         componentDidMount: function() {
             var videoMountNode = this.refs.videoPlaceholder.getDOMNode();
             this.videoNode = $("<video width='640' height='264' type='" + this.props.video.getContentMimeType() + "'" +
                 " id='video-player' class='" + this.videoClass + "' preload='auto' src='" + this.videoSrc + "' controls>" +
                 "</video>");
             $(videoMountNode).append(this.videoNode);
-
-            this.videojs = videojs(this.videoNode.get(0)/*"video-player"*/, {
+            this.videojs = videojs(this._getVideoDOMNode(), {
                     width: "100%",
                     height: "100%"
             }, () => {
                 Util.log("Videojs player is initialized and ready.");
                 // Add an event listener to track watched time
                 var video = this._getVideoDOMNode();
-                video.addEventListener("canplay", this._canPlayHTML5.bind(this));
-                video.addEventListener("progress", this._onNetworkProgress.bind(this));
-                video.addEventListener("timeupdate", this._onTimeupdateHTML5);
-                video.addEventListener("play", this._onPlay.bind(this), true);
-                video.addEventListener("pause", this._onPause.bind(this), true);
-                video.addEventListener("stop", this._onStop.bind(this), true);
-                video.addEventListener("ended", this._onEnded.bind(this), true);
-                video.addEventListener("error", this._onError.bind(this), true);
-                video.defaultPlaybackRate = models.AppOptions.get("playbackRate") / 100;
-                video.playbackRate = models.AppOptions.get("playbackRate") / 100;
-                this.videoCreatedPromise.resolve();
+                if (video) {
+                    video.addEventListener("canplay", this._canPlayHTML5.bind(this));
+                    video.addEventListener("progress", this._onNetworkProgress.bind(this));
+                    video.addEventListener("timeupdate", this._onTimeupdateHTML5);
+                    video.addEventListener("play", this._onPlay.bind(this), true);
+                    video.addEventListener("pause", this._onPause.bind(this), true);
+                    video.addEventListener("stop", this._onStop.bind(this), true);
+                    video.addEventListener("ended", this._onEnded.bind(this), true);
+                    video.addEventListener("error", this._onError.bind(this), true);
+                    video.defaultPlaybackRate = models.AppOptions.get("playbackRate") / 100;
+                    video.playbackRate = models.AppOptions.get("playbackRate") / 100;
+                }
+                if (this.videoCreatedPromise) {
+                    this.videoCreatedPromise.resolve();
+                }
             });
         },
 
@@ -312,7 +333,7 @@ define(["jquery", "react", "underscore", "util", "models", "apiclient", "storage
                 duration: this.MIN_SECONDS_BETWEEN_REPORTS * 1000,
                 step: (num) => {
                     this.pointsObj.num = Math.ceil(num);
-                    var pointsString = document.webL10n.get("points-so-far", {
+                    var pointsString = l10n.get("points-so-far", {
                             earned: this.pointsObj.num,
                             available: this.availablePoints
                     });
@@ -363,9 +384,6 @@ define(["jquery", "react", "underscore", "util", "models", "apiclient", "storage
             }
         },
 
-        componentDidUpdate: function() {
-        },
-
         render: function() {
             var transcriptViewer;
             if (!!this.state.transcript) {
@@ -378,7 +396,7 @@ define(["jquery", "react", "underscore", "util", "models", "apiclient", "storage
                 this.videoSrc = this.state.downloadedUrl;
             }
             Util.log("video rendered with url: " + this.videoSrc);
-            var pointsString = document.webL10n.get("points-so-far", {
+            var pointsString = l10n.get("points-so-far", {
                 earned: this.props.video.getPoints(),
                 available: this.availablePoints
             });

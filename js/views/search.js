@@ -1,6 +1,8 @@
+/* @flow */
+
 "use strict";
 
-define(["react", "topic"], function(React, topicViews) {
+define(["l10n", "react", "topic"], function(l10n, React, topicViews) {
     var ContentListViewer = topicViews.ContentListViewer;
 
     /**
@@ -37,9 +39,9 @@ define(["react", "topic"], function(React, topicViews) {
         },
 
         render: function() {
-            var text = document.webL10n.get("search");
+            var text = l10n.get("search");
             if (this.props.model.getTitle()) {
-                text = document.webL10n.get("search-topic", {
+                text = l10n.get("search-topic", {
                     topic: this.props.model.getTitle()
                 });
             }

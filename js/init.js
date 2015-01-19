@@ -12,6 +12,7 @@ require.config({
         models: "models",
         notifications: "notifications",
         cache: "cache",
+        l10n: "l10n",
 
         // Modules to test the app
         test: "../test/test",
