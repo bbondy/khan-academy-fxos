@@ -1,6 +1,7 @@
-/* @flow weak */
+/* @flow */
 
-require.config({
+var amdrequire: any = require;
+amdrequire.config({
     baseUrl: "/build",
     paths: {
         // Modules
