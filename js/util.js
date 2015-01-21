@@ -1,3 +1,5 @@
+/* @flow */
+
 "use strict";
 
 define(["l10n", "jquery", "underscore"], function(l10n, $, _) {
@@ -24,7 +26,7 @@ define(["l10n", "jquery", "underscore"], function(l10n, $, _) {
         /**
          * Wrapper around console.error
          */
-        error: function(rest) {
+        error: function() {
             if (typeof console !== "undefined") {
                 console.error(Array.prototype.slice.call(arguments));
             }
@@ -38,7 +40,7 @@ define(["l10n", "jquery", "underscore"], function(l10n, $, _) {
          *
          * @return the locale
          */
-        getLang: function() {
+        getLang: function(): ?string {
             if (!this.isFirefoxOS()) {
                 return null;
             }
@@ -65,7 +67,7 @@ define(["l10n", "jquery", "underscore"], function(l10n, $, _) {
          *
          * @return true if the bandwidth is metered.
          */
-        isFirefoxOS: function() {
+        isFirefoxOS: function() : boolean {
             return window.location.protocol === "app:";
         },
         /**
@@ -73,7 +75,7 @@ define(["l10n", "jquery", "underscore"], function(l10n, $, _) {
          *
          * @return true if the bandwidth is metered.
          */
-        isMeteredConnection: function() {
+        isMeteredConnection: function(): boolean {
             var connection = navigator.connection || navigator.mozConnection;
             if (!connection) {
                 return false;
@@ -85,7 +87,7 @@ define(["l10n", "jquery", "underscore"], function(l10n, $, _) {
          *
          * @return true if the bandwidth is capped.
          */
-        isBandwidthCapped: function() {
+        isBandwidthCapped: function(): boolean {
             var connection = navigator.connection || navigator.mozConnection;
             if (!connection) {
                 return false;
@@ -108,9 +110,9 @@ define(["l10n", "jquery", "underscore"], function(l10n, $, _) {
          * @param name The name of the parameter to obtain
          * @param params Optional, specifies the parameters to parse, if
          *   not specified, uses window.location.search.
-         * @return The obtained parameter value
+         * @return The obtained parameter value or null if not found
          */
-        getParameterByName: function(name, params) {
+        getParameterByName: function(name: string, params): ?string {
             if (_.isUndefined(params)) {
                 params = window.location.search;
             }
@@ -130,7 +132,7 @@ define(["l10n", "jquery", "underscore"], function(l10n, $, _) {
          *
          * TODO: Handle fragments
          */
-        appendQueryParam: function(url, name, value) {
+        appendQueryParam: function(url: string, name: string, value: string): string {
             if (url.indexOf("?") === -1) {
                 url += "?";
             } else {
@@ -142,9 +144,9 @@ define(["l10n", "jquery", "underscore"], function(l10n, $, _) {
          * Formats a number with thousand separators
          * http://stackoverflow.com/a/2901298/3153
          */
-        numberWithCommas: function(x) {
+        numberWithCommas: function(x: string) : string {
             if (_.isUndefined(x)) {
-                return 0;
+                return "0";
             }
             return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         },
@@ -206,9 +208,9 @@ define(["l10n", "jquery", "underscore"], function(l10n, $, _) {
          *
          * @param filename The URL to load
          */
-        loadScript: function(filename) {
+        loadScript: function(filename: string) {
             var d = $.Deferred();
-            var s = document.createElement("script");
+            var s: any = document.createElement("script");
             s.type = "text/javascript";
             s.src = filename;
             s.onload = () => {

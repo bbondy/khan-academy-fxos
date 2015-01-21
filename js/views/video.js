@@ -1,5 +1,4 @@
-/* @flow weak */
-// weak for mozCancelFullScreen
+/* @flow  */
 
 "use strict";
 
@@ -174,7 +173,8 @@ define(["l10n", "jquery", "react", "underscore", "util", "models", "apiclient", 
         },
         _onEnded: function(e) {
             // If we're full screen, exit out.
-            var cancelFullScreen = document.mozCancelFullScreen;
+            var doc: any = document;
+            var cancelFullScreen = doc.mozCancelFullScreen;
             if (typeof cancelFullScreen === "function") {
                 cancelFullScreen();
             }
