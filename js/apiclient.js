@@ -75,7 +75,7 @@ define(["jquery", "underscore", "oauth", "util"], function($, _, _oauth, Util) {
         /**
          * Determines based on the known oauth info, if the user is signed in.
          */
-        isSignedIn: function() {
+        isSignedIn: function(): boolean {
             return !!(this.oauth.consumerKey &&
                 this.oauth.consumerSecret &&
                 this.oauth.token &&
@@ -210,7 +210,7 @@ define(["jquery", "underscore", "oauth", "util"], function($, _, _oauth, Util) {
          * @param jsOnly true if the installed file to load is pure JavaScript.
          * @return a promise with the topic tree
          */
-        getInstalledTopicTree: function(jsOnly) {
+        getInstalledTopicTree: function(jsOnly: boolean) {
             var filename = `/data/topic-tree`;
             var lang = Util.getLang();
             if (lang) {
@@ -234,7 +234,7 @@ define(["jquery", "underscore", "oauth", "util"], function($, _, _oauth, Util) {
          * @param youTubeId The id of the youtube video to obtain the transcript for.
          * @return a promise with the transcript
          */
-        getVideoTranscript: function(youTubeId) {
+        getVideoTranscript: function(youTubeId: string) {
             var url = this.API_V1_BASE + `/videos/${youTubeId}/transcript`;
             return this._basicAPICall(url);
         },
@@ -244,7 +244,7 @@ define(["jquery", "underscore", "oauth", "util"], function($, _, _oauth, Util) {
          * @param articleId The id of the article to obtain information on.
          * @return a promise with the status and other information
          */
-        getArticle: function(articleId) {
+        getArticle: function(articleId: string) {
             return this._basicAPICall(this.API_V1_BASE + "/articles/" + articleId);
         },
         /**
@@ -253,12 +253,12 @@ define(["jquery", "underscore", "oauth", "util"], function($, _, _oauth, Util) {
          * @param exerciseName The name of the exercise to obtain information on.
          * @return a promise with the status and other information
          */
-        getExerciseByName: function(exerciseName) {
+        getExerciseByName: function(exerciseName: string) {
             var url = `${this.API_INTERNAL_BASE}/exercises/${exerciseName}`;
             return this._basicAPICall(url);
         },
 
-        getTaskIfnoByExerciseName: function(exerciseName) {
+        getTaskIfnoByExerciseName: function(exerciseName: string) {
             var url = `${this.API_INTERNAL_BASE}/user/tasks/exercises/${exerciseName}`;
             return this._basicAPICall(url);
         },
@@ -269,7 +269,7 @@ define(["jquery", "underscore", "oauth", "util"], function($, _, _oauth, Util) {
          * @param exerciseName The name of the exercise to obtain task information for
          * @return a promise with the task
          */
-        getMissions: function(exerciseName) {
+        getMissions: function(exerciseName: string) {
             var url = `${this.API_INTERNAL_BASE}/user/missions`;
             return this._basicAPICall(url);
         },
@@ -279,7 +279,7 @@ define(["jquery", "underscore", "oauth", "util"], function($, _, _oauth, Util) {
          * @param exerciseId The id of the exercise to obtain information on.
          * @return a promise with the status and other information
          */
-        getAssessmentItem: function(assessmentId) {
+        getAssessmentItem: function(assessmentId: string) {
             return this._basicAPICall(this.API_V1_BASE + "/assessment_items/" + assessmentId);
         },
         /**
@@ -288,7 +288,7 @@ define(["jquery", "underscore", "oauth", "util"], function($, _, _oauth, Util) {
          * @param articleId The id of the article to mark as completed.
          * @return a promise with the status and other information
          */
-        reportArticleRead: function(articleId) {
+        reportArticleRead: function(articleId: string) {
             return this._basicAPICall(this.API_V1_BASE + `/user/article/${articleId}/log`, undefined, "POST");
         },
         /**
@@ -326,7 +326,11 @@ define(["jquery", "underscore", "oauth", "util"], function($, _, _oauth, Util) {
          * @param lastSecondWatched The last second watched of the video (for resume support)
          * @return a promise with some extra information like the points earned.
          */
-        reportVideoProgress: function(videoId, youTubeId, duration, secondsWatched, lastSecondWatched) {
+        reportVideoProgress: function(videoId: string,
+                                      youTubeId: string,
+                                      duration: string,
+                                      secondsWatched: string,
+                                      lastSecondWatched: string) {
             var extraParams = {
                 seconds_watched: secondsWatched.toString(),
                 last_second_watched: lastSecondWatched.toString()
@@ -334,7 +338,16 @@ define(["jquery", "underscore", "oauth", "util"], function($, _, _oauth, Util) {
             return this._basicAPICall(this.API_V1_BASE + `/user/videos/${youTubeId}/log`, extraParams, "POST");
         },
 
-        reportExerciseProgress: function(exerciseName, problemNumber, assessmentSHA1, assessmentId, secondsTaken, hintsUsedCount, isCorrect, attemptNumber, problemType, taskId) {
+        reportExerciseProgress: function(exerciseName: string,
+                                        problemNumber: string,
+                                        assessmentSHA1: string,
+                                        assessmentId: string,
+                                        secondsTaken: number,
+                                        hintsUsedCount: number,
+                                        isCorrect: boolean,
+                                        attemptNumber: number,
+                                        problemType: string,
+                                        taskId: string) {
             var extraParams = {
                 casing: "camel",
                 sha1: assessmentSHA1,
