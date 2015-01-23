@@ -3,11 +3,16 @@ var jshint = require('gulp-jshint');
 var less = require('gulp-less');
 var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
+var path = require('path');
 var rename = require('gulp-rename');
 var react = require('gulp-react');
 var flowtype = require('gulp-flowtype');
+var source = require('vinyl-source-stream');
 var jsxcs = require('gulp-jsxcs');
 var gutil = require('gulp-util');
+var jest = require('gulp-jest');
+var browserify = require('browserify');
+var reactify = require('reactify');
 
 // Lint Task
 gulp.task('prelint', function() {
@@ -49,19 +54,26 @@ gulp.task('typecheck', function() {
 gulp.task('less', function() {
     return gulp.src('./style/**/*.less')
         .pipe(less({
-            paths: ['./style']
+            paths: [ path.join(__dirname, 'style') ]
         }))
         .pipe(gulp.dest('./build/css'));
 });
 
 gulp.task('react', function() {
-    return gulp.src('./js/**/*.js')
+    return browserify('./js/main.js')
+        .transform({
+            'strip-types': true,
+            es6: true}, reactify)
+        .bundle()
+        .pipe(source('bundle.js'))
+        .pipe(gulp.dest('./build'));
+        /*
         .pipe(react({
             harmony: true,
             // Skip Flow type annotations!
             stripTypes: true
         }))
-        .pipe(gulp.dest('./build'));
+        */
 
 });
 
@@ -73,6 +85,24 @@ gulp.task('releasify', function() {
         .pipe(rename('all.min.js'))
         .pipe(uglify())
         .pipe(gulp.dest('dist'));
+});
+
+// Test
+gulp.task('test', function() {
+    return gulp.src('__tests__').pipe(jest({
+        //testDirectoryName: "__test__",
+        testPathIgnorePatterns: [
+            "perseus",
+            "bower_compoennts",
+            "node_modules",
+            "spec/support"
+        ],
+        moduleFileExtensions: [
+            "js",
+            "json",
+            "react"
+        ]
+    }));
 });
 
 // Watch Files For Changes
