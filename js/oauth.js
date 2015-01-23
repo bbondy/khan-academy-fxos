@@ -10,6 +10,8 @@
  * See http://pajhome.org.uk/crypt/md5 for details.
  */
 
+var $ = require("jquery");
+
 /*
  * Configurable variables. You may need to tweak these to be compatible with
  * the server-side, but the defaults work in most cases.
