@@ -50,7 +50,7 @@ var Minify = {
     // but don't need now
     uneededProps: ["sha", "date_added", "readable_id", "slug", "render_type"],
 
-    stripKnownUrls: function(node) {
+    stripKnownUrls: function(node: any) {
         if (node.kind !== "Video") {
             return;
         }
@@ -69,7 +69,7 @@ var Minify = {
         }
     },
 
-    removeUneededProps: function(node) {
+    removeUneededProps: function(node: any) {
         // We only use the id on domains and for content items
         if (node.kind !== "Video" && node.kind !== "Article" &&
                 node.render_type !== "Domain") {
@@ -86,7 +86,7 @@ var Minify = {
         }
     },
 
-    removeEmptyStringProperties: function(node) {
+    removeEmptyStringProperties: function(node: any) {
         for (var x in node) {
             if (!node[x] && typeof node[x] === "string") {
                 delete node[x];
@@ -94,7 +94,7 @@ var Minify = {
         }
     },
 
-    translateNodePropertyValues: function(node) {
+    translateNodePropertyValues: function(node: any) {
         this.propertyValueMap.forEach(function(map) {
             var name = map[0];
             var oldPropValue = map[1];
@@ -105,7 +105,7 @@ var Minify = {
         });
     },
 
-    clearUneededDownloadUrls: function(node) {
+    clearUneededDownloadUrls: function(node: any) {
         var downloadUrl;
         if (node.download_urls) {
             for (var d in node.download_urls) {
@@ -120,7 +120,7 @@ var Minify = {
         }
     },
 
-    translateNodePropertyNames: function(node) {
+    translateNodePropertyNames: function(node: any) {
         for (var name in this.propertyNameMap) {
             if (this.propertyNameMap.hasOwnProperty(name)) {
                 var value = this.propertyNameMap[name];
@@ -132,7 +132,7 @@ var Minify = {
         }
     },
 
-    minify: function(node, logWarnings, logVideos) {
+    minify: function(node: any, logWarnings: boolean, logVideos: boolean) {
         var newChildren = [];
         if (node.children) {
             node.children.forEach(function(child) {
@@ -180,12 +180,12 @@ var Minify = {
      * Returns JS not JSON, which is about 100KB smaller
      * for the topic tree.
      */
-    getOutput: function(node) {
+    getOutput: function(node: any): string {
         return "window.topictree =" +
             this._getOutput(node) + ";";
     },
 
-    _getOutput: function(node): string {
+    _getOutput: function(node: any): string {
         var output = "{";
 
         for (var p in node) {
@@ -235,7 +235,7 @@ var Minify = {
         });
         return found;
     },
-    getLongValue: function(prop, value) {
+    getLongValue: function(prop: string, value: number): ?string {
         // propertyValueMap has entries like: ["kind", "Article", 0],
         var found = null;
         this.propertyValueMap.forEach(function(map) {

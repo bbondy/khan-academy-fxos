@@ -59,7 +59,7 @@ var Downloads = {
         });
         return d.promise();
     },
-    _setDownloaded: function(model, downloaded) {
+    _setDownloaded: function(model: any, downloaded: boolean) {
         model.setDownloaded(downloaded);
         while (model = model.getParent()) { // jshint ignore:line
             var downloadCount = model.get("downloadCount");
@@ -110,7 +110,7 @@ var Downloads = {
      * Downloads all content items recursively one at a time for
      * the current topic
      */
-    downloadTopic: function(topic, onProgress) {
+    downloadTopic: function(topic: any, onProgress: any) {
         this.currentProgress = onProgress;
         var d = $.Deferred();
         var downloadedCount = 0;
@@ -209,7 +209,7 @@ var Downloads = {
      * Removes a download from the list of downloaded files and
      * removes the file on disk.
      */
-    deleteContent: function(contentItem) {
+    deleteContent: function(contentItem: any): any {
         var d = $.Deferred();
         var filename = contentItem.getId();
         Storage.delete(filename).done(() => {
@@ -223,7 +223,7 @@ var Downloads = {
     /**
      * Adds the specified model to the list of downloaded files
      */
-    _addDownloadToManifest: function(model) {
+    _addDownloadToManifest: function(model: any): any {
         this._setDownloaded(model, true);
         Util.log("adding model to manifest: ");
         Util.log(model);
@@ -233,7 +233,7 @@ var Downloads = {
     /**
      * Remove the specified model from the list of downloaded files
      */
-    _removeDownloadFromManifest: function(model) {
+    _removeDownloadFromManifest: function(model: any): any {
         this._setDownloaded(model, false);
         Util.log("removing model from manifest: ");
         Util.log(model);
