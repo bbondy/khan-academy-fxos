@@ -22,7 +22,7 @@ var APIClient = {
     /**
      * Load oauth info from local storage.
      */
-    _loadAuth: function() {
+    _loadAuth: function(): void {
         var oauth = localStorage.getItem(this._localStorageAuthName);
         if (oauth) {
             this.oauth = JSON.parse(oauth);
@@ -156,7 +156,7 @@ var APIClient = {
      *
      * @return a promise with the results of the API call
      */
-    _basicAPICall: function(url, extraParams, method, dataType): any {
+    _basicAPICall: function(url: string, extraParams: any= undefined, method:?string = undefined, dataType:?string = undefined): any {
         extraParams = extraParams || {};
         dataType = dataType || "json";
         if (_.isUndefined(method)) {
@@ -301,7 +301,7 @@ var APIClient = {
      *
      * @return a promise with the results
      */
-    getUserVideos: function() {
+    getUserVideos: function(): any {
         return this._basicAPICall(this.API_V1_BASE + "/user/videos");
     },
     /**
@@ -313,10 +313,10 @@ var APIClient = {
      *   - total_done: <num>
      *   - total_correct: <num>
      */
-    getUserExercises: function() {
+    getUserExercises: function(): any {
         return this._basicAPICall(this.API_INTERNAL_BASE + "/user/exercises");
     },
-    getUserExercise: function(exerciseName: string) {
+    getUserExercise: function(exerciseName: string): any {
         var url = `${this.API_INTERNAL_BASE}/user/exercises/${exerciseName}`;
         return this._basicAPICall(url);
     },
@@ -334,7 +334,7 @@ var APIClient = {
                                   youTubeId: string,
                                   duration: string,
                                   secondsWatched: string,
-                                  lastSecondWatched: string) {
+                                  lastSecondWatched: string): any {
         var extraParams = {
             seconds_watched: secondsWatched.toString(),
             last_second_watched: lastSecondWatched.toString()
@@ -351,7 +351,7 @@ var APIClient = {
                                     isCorrect: boolean,
                                     attemptNumber: number,
                                     problemType: string,
-                                    taskId: string) {
+                                    taskId: string): any {
         var extraParams = {
             casing: "camel",
             sha1: assessmentSHA1,

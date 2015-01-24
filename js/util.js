@@ -6,6 +6,45 @@ var $ = require("jquery"),
     _ = require("underscore"),
     l10n = require("./l10n");
 
+// An example generic Mixin that you can add to any component that should react
+// to changes in a Backbone component. The use cases we've identified thus far
+// are for Collections -- since they trigger a change event whenever any of
+// their constituent items are changed there's no need to reconcile for regular
+// models. One caveat: this relies on getBackboneModels() to always return the
+// same model instances throughout the lifecycle of the component. If you're
+// using this mixin correctly (it should be near the top of your component
+// hierarchy) this should not be an issue.
+// https://github.com/facebook/react/blob/1be9a9e/examples/todomvc-backbone/js/app.js#L148-L171
+var BackboneMixin: any = {
+    componentDidMount: function() {
+        // Whenever there may be a change in the Backbone data, trigger a reconcile.
+        this.getBackboneModels().forEach(function(model) {
+            model.on("add change remove", this.forceUpdate.bind(this, null), this);
+        }, this);
+    },
+
+    componentWillUnmount: function() {
+        // Ensure that we clean up any dangling references when the component is
+        // destroyed.
+        this.getBackboneModels().forEach(function(model) {
+            model.off(null, null, this);
+        }, this);
+    }
+};
+
+
+/**
+ * Mixin to help with localization
+ */
+var LocalizationMixin: any = {
+    componentDidMount: function() {
+        l10n.translate(this.getDOMNode());
+    },
+    componentDidUpdate: function() {
+        l10n.translate(this.getDOMNode());
+    }
+};
+
 /**
  * Various utility functions
  */
@@ -115,7 +154,7 @@ var Util = {
      *   not specified, uses window.location.search.
      * @return The obtained parameter value or null if not found
      */
-    getParameterByName: function(name: string, params: any): ?string {
+    getParameterByName: function(name: string, params: any = undefined): ?string {
         if (_.isUndefined(params)) {
             params = window.location.search;
         }
@@ -147,7 +186,7 @@ var Util = {
      * Formats a number with thousand separators
      * http://stackoverflow.com/a/2901298/3153
      */
-    numberWithCommas: function(x: string) : string {
+    numberWithCommas: function(x: number) : string {
         if (_.isUndefined(x)) {
             return "0";
         }
@@ -165,43 +204,9 @@ var Util = {
             return fn.apply(this, args.concat(aps.call(arguments)));
         };
     },
-    // An example generic Mixin that you can add to any component that should react
-    // to changes in a Backbone component. The use cases we've identified thus far
-    // are for Collections -- since they trigger a change event whenever any of
-    // their constituent items are changed there's no need to reconcile for regular
-    // models. One caveat: this relies on getBackboneModels() to always return the
-    // same model instances throughout the lifecycle of the component. If you're
-    // using this mixin correctly (it should be near the top of your component
-    // hierarchy) this should not be an issue.
-    // https://github.com/facebook/react/blob/1be9a9e/examples/todomvc-backbone/js/app.js#L148-L171
-    BackboneMixin: {
-        componentDidMount: function() {
-            // Whenever there may be a change in the Backbone data, trigger a reconcile.
-            this.getBackboneModels().forEach(function(model) {
-                model.on("add change remove", this.forceUpdate.bind(this, null), this);
-            }, this);
-        },
 
-        componentWillUnmount: function() {
-            // Ensure that we clean up any dangling references when the component is
-            // destroyed.
-            this.getBackboneModels().forEach(function(model) {
-                model.off(null, null, this);
-            }, this);
-        }
-    },
-
-    /**
-     * Mixin to help with localization
-     */
-    LocalizationMixin: {
-        componentDidMount: function() {
-            l10n.translate(this.getDOMNode());
-        },
-        componentDidUpdate: function() {
-            l10n.translate(this.getDOMNode());
-        }
-    },
+    BackboneMixin,
+    LocalizationMixin,
 
     /**
      * Loads a script from the specified installed file path.
