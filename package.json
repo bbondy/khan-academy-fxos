@@ -10,6 +10,7 @@
     "backbone": "^1.1.2",
     "browserify": "^8.1.1",
     "connect": "^3.3.2",
+    "es6-default-params": "^0.4.3",
     "gulp": "^3.8.10",
     "gulp-concat": "^2.4.3",
     "gulp-flowtype": "^0.4.1",

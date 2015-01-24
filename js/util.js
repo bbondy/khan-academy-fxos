@@ -197,7 +197,7 @@ var Util = {
      *
      * @return The same function with one of the specified parameters found.
      */
-    partial: function(fn: function /*, args...*/): function {
+    partial: function(fn: any): any {
         var aps = Array.prototype.slice;
         var args = aps.call(arguments, 1);
         return function() {
