@@ -61,7 +61,9 @@ gulp.task('less', function() {
 });
 
 gulp.task('react', function() {
-    return browserify('./js/main.js')
+    return browserify('./js/main.js', {
+            debug: true
+        })
         .transform({
             'strip-types': true,
             es6: true}, reactify)
