@@ -29,7 +29,7 @@ var ExerciseViewer = React.createClass({
         exercise: React.PropTypes.object.isRequired
     },
     mixins: [Util.BackboneMixin],
-    getBackboneModels: function() {
+    getBackboneModels: function(): Array<any> {
         return [this.props.exercise];
     },
     getInitialState: function() {
@@ -126,7 +126,7 @@ var ExerciseViewer = React.createClass({
     },
     componentWillUnmount: function() {
     },
-    render: function() {
+    render: function(): any {
         var content;
         if (this.state.error) {
             content = <div>Could not load exercise</div>;

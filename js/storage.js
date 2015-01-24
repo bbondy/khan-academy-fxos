@@ -20,13 +20,13 @@ var Storage = {
     /**
      * Returns true if storage is available on the device
      */
-    isEnabled: function() {
+    isEnabled: function(): boolean {
         return !!this.sdcard;
     },
     /**
      * Returns a promise which when resolved contains an array of binary data
      */
-    readAsBlob: function(filename) {
+    readAsBlob: function(filename: string) {
         var d = $.Deferred();
         if (!this.sdcard) {
             return d.reject().promise();
@@ -46,7 +46,7 @@ var Storage = {
     /**
      * Returns a promise which when resolved contains a string of data
      */
-    readText: function(filename) {
+    readText: function(filename: string) {
         var d = $.Deferred();
         if (!this.sdcard) {
             return d.reject().promise();
@@ -71,7 +71,7 @@ var Storage = {
      * Deletes the specified file from sdstorage.
      * Resolves if the file no longer exists, wehther or not it was deleted.
      */
-    delete: function(filename) {
+    delete: function(filename: string) {
         var d = $.Deferred();
         if (!this.sdcard) {
             return d.reject().promise();
@@ -94,14 +94,14 @@ var Storage = {
     /**
      * Writes out the specified data as text in the specified file.
      */
-    writeText: function(filename, data) {
+    writeText: function(filename: string, data: any): any {
         var blob = new window.Blob([data], {type: "text/plain"});
         return this.writeBlob(filename, blob);
     },
     /**
      * Writes out the specified blob in the specified file.
      */
-    writeBlob: function(filename, blob) {
+    writeBlob: function(filename: string, blob: any): any {
         var d = $.Deferred();
         this.delete(filename).always(() => {
             if (!this.sdcard) {

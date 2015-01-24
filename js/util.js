@@ -115,7 +115,7 @@ var Util = {
      *   not specified, uses window.location.search.
      * @return The obtained parameter value or null if not found
      */
-    getParameterByName: function(name: string, params): ?string {
+    getParameterByName: function(name: string, params: any): ?string {
         if (_.isUndefined(params)) {
             params = window.location.search;
         }
@@ -158,7 +158,7 @@ var Util = {
      *
      * @return The same function with one of the specified parameters found.
      */
-    partial: function(fn /*, args...*/) {
+    partial: function(fn: function /*, args...*/): function {
         var aps = Array.prototype.slice;
         var args = aps.call(arguments, 1);
         return function() {

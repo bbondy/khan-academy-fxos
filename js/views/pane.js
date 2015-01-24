@@ -6,7 +6,7 @@ var l10n = require("../l10n"),
     React = require("react/addons"),
     Util = require("../util"),
     models = require("../models"),
-    downloads = require("../downloads"),
+    Downloads = require("../downloads"),
     topicViews = require("./topic");
 
 var ContentListViewer = topicViews.ContentListViewer;
@@ -19,7 +19,7 @@ var DownloadsViewer = React.createClass({
     propTypes: {
         onClickContentItem: React.PropTypes.func.isRequired
     },
-    render: function() {
+    render: function(): any {
         if (!Downloads.contentList.length) {
             return <div className="downloads">
                 <div data-l10n-id="no-downloads">You have no downloads yet!</div>
@@ -42,32 +42,32 @@ var SettingsViewer = React.createClass({
     propTypes: {
         options: React.PropTypes.object.isRequired
     },
-    handleShowDownloadsChange: function(event) {
+    handleShowDownloadsChange: function(event: any) {
         this.props.options.set("showDownloadsOnly", event.target.checked);
         this.props.options.save();
     },
-    handleShowTranscriptsChange: function(event) {
+    handleShowTranscriptsChange: function(event: any) {
         this.props.options.set("showTranscripts", event.target.checked);
         this.props.options.save();
     },
-    handleAutoUpdateTopicTreeChange: function(event) {
+    handleAutoUpdateTopicTreeChange: function(event: any) {
         this.props.options.set("autoUpdateTopicTree", event.target.checked);
         this.props.options.save();
     },
-    handleSetPlaybackRateChange: function(event) {
+    handleSetPlaybackRateChange: function(event: any) {
         // Convert a value like: 0, 1, 2, 3 to 50, 100, 150, 200
         var percentage = 50 + event.target.value * 50;
         this.props.options.set("playbackRate", percentage);
         this.props.options.save();
     },
-    handleReset: function(event) {
+    handleReset: function(event: any) {
         if (confirm(l10n.get("confirm-reset"))) {
             this.props.options.reset();
         }
     },
     // YouTube player option is currently disabled due to a bug w/ the
     // API when on the actual device.  Callbacks aren't always called.
-    render: function() {
+    render: function(): any {
         return <div className="settings topic-list-container">
 
             <div data-l10n-id="show-downloads-only">Show downloads only</div>
@@ -131,7 +131,7 @@ var SettingsViewer = React.createClass({
 var ProfileViewer = React.createClass({
     componentWillMount: function() {
     },
-    render: function() {
+    render: function(): any {
         var pointsString = l10n.get("points");
         // TODO(bbondy): The title attributes on the images need to change
         // because you can't hover with your finger on FxOS Maybe just

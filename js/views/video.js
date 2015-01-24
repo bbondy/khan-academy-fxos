@@ -25,7 +25,7 @@ var TranscriptItem = React.createClass({
     propTypes: {
         transcriptItem: React.PropTypes.object.isRequired
     },
-    render: function() {
+    render: function(): any {
         var totalSeconds = this.props.transcriptItem.start_time / 1000 | 0;
         var startMinute = totalSeconds / 60 | 0;
         var startSecond = totalSeconds % 60 | 0;
@@ -47,7 +47,7 @@ var TranscriptViewer = React.createClass({
         collection: React.PropTypes.array.isRequired,
         onClickTranscript: React.PropTypes.func.isRequired
     },
-    render: function() {
+    render: function(): any {
         if (!this.props.collection) {
             return null;
         }
@@ -139,7 +139,7 @@ var VideoViewer = React.createClass({
         }
         this.cleanedUp = true;
     },
-    onClickTranscript: function(obj) {
+    onClickTranscript: function(obj: any) {
         var startSecond = obj.start_time / 1000 | 0;
         var video = this._getVideoDOMNode();
         if (video) {
@@ -164,7 +164,7 @@ var VideoViewer = React.createClass({
             this.setState({showOfflineImage: false});
         }
     },
-    _onPlay: function(e) {
+    _onPlay: function(e: any) {
         // Update lastWatchedTimeSinceLastUpdate so that we
         // don't count paused time towards secondsWatched
         Util.warn("Video play: %o", e);
@@ -172,17 +172,17 @@ var VideoViewer = React.createClass({
         this.isPlaying = true;
         this.animatePoints();
     },
-    _onPause: function(e) {
+    _onPause: function(e: any) {
         this.updateSecondsWatched();
         this.isPlaying = false;
         this.stopAnimatingPoints(false);
     },
-    _onStop: function(e) {
+    _onStop: function(e: any) {
         this.updateSecondsWatched();
         this.isPlaying = false;
         this.stopAnimatingPoints(true);
     },
-    _onEnded: function(e) {
+    _onEnded: function(e: any) {
         // If we're full screen, exit out.
         var doc: any = document;
         var cancelFullScreen = doc.mozCancelFullScreen;
@@ -190,7 +190,7 @@ var VideoViewer = React.createClass({
             cancelFullScreen();
         }
     },
-    _onNetworkProgress: function(e) {
+    _onNetworkProgress: function(e: any) {
         if (!this.isMounted()) {
             return;
         }
@@ -199,7 +199,7 @@ var VideoViewer = React.createClass({
             Util.log("Network state changed: ", video.networkState);
         }
     },
-    _onError: function(e) {
+    _onError: function(e: any) {
         Util.warn("Video error: %o", e);
         var video = this._getVideoDOMNode();
         if (!video) {
@@ -239,13 +239,13 @@ var VideoViewer = React.createClass({
             break;
         }
     },
-    _getVideoDOMNode: function() {
+    _getVideoDOMNode: function(): any {
         if (!this.videoNode) {
             return null;
         }
         return this.videoNode.get(0);
     },
-    _onTimeupdateHTML5: function(e) {
+    _onTimeupdateHTML5: function(e: any) {
         if (!this.isMounted()) {
             return;
         }
@@ -258,7 +258,7 @@ var VideoViewer = React.createClass({
             this._onScrollTranscriptTo(video.currentTime);
         }
     },
-    _onScrollTranscriptTo: function(scrollTime) {
+    _onScrollTranscriptTo: function(scrollTime: number) {
         scrollTime |= scrollTime;
         var node = $("li[data-time='" + scrollTime + "']");
         if (node.length > 0) {
@@ -354,13 +354,13 @@ var VideoViewer = React.createClass({
     },
 
     // Stop the current animation and jump to the end
-    stopAnimatingPoints: function(jumpToEnd) {
+    stopAnimatingPoints: function(jumpToEnd: boolean) {
         $(this.pointsObj).stop(true, jumpToEnd);
     },
 
     // Reports the seconds watched to the server if it hasn't been reported recently
     // or if the lastSecondWatched is at the end of the video.
-    reportSecondsWatched: function(currentTime, duration) {
+    reportSecondsWatched: function(currentTime: Date, duration: number) {
         if (!models.CurrentUser.isSignedIn()) {
             return;
         }
@@ -395,7 +395,7 @@ var VideoViewer = React.createClass({
         }
     },
 
-    render: function() {
+    render: function(): any {
         var transcriptViewer;
         if (!!this.state.transcript) {
             transcriptViewer = <TranscriptViewer collection={this.state.transcript}

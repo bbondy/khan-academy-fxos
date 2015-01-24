@@ -3,7 +3,7 @@
 "use strict";
 
 var React = require("react/addons"),
-    Util = require("util"),
+    Util = require("../util"),
     models = require("../models"),
     APIClient = require("../apiclient"),
     Storage = require("../storage");
@@ -17,7 +17,7 @@ var ArticleViewer = React.createClass({
         article: React.PropTypes.object.isRequired
     },
     mixins: [Util.BackboneMixin],
-    getBackboneModels: function() {
+    getBackboneModels: function(): Array<any> {
         return [this.props.article];
     },
     getInitialState: function() {
@@ -52,7 +52,7 @@ var ArticleViewer = React.createClass({
     componentWillUnmount: function() {
         clearTimeout(this.timerId);
     },
-    render: function() {
+    render: function(): any {
         Util.log("render article: :%o", this.props.article);
         if (this.state.articleDownloadError) {
             return <img className="video-placeholder" src="img/offline.png"/>;

@@ -185,7 +185,7 @@ var Minify = {
             this._getOutput(node) + ";";
     },
 
-    _getOutput: function(node) {
+    _getOutput: function(node): string {
         var output = "{";
 
         for (var p in node) {
@@ -218,14 +218,14 @@ var Minify = {
         output += "}";
         return output;
     },
-    getShortName: function(name) {
+    getShortName: function(name: string): string {
         var value = this.propertyNameMap[name];
         if (typeof value === "undefined") {
             return name;
         }
         return value;
     },
-    getShortValue: function(prop, value) {
+    getShortValue: function(prop: string, value: string): ?number {
         // propertyValueMap has entries like: ["kind", "Article", 0],
         var found = null;
         this.propertyValueMap.forEach(function(map) {

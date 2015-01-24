@@ -16,17 +16,17 @@ var Status = {
      * This function hides the status async.
      * @param delay The amount of time to wait before hiding the status
      */
-    stop: function(delay) {
+    stop: function(delay: ?number = 0) {
         setTimeout(() => {
             models.TempAppState.set("status", "");
             models.TempAppState.set("showingStatus", false);
-        }, delay || 0);
+        }, delay);
     },
     /**
      * Updates the displayed status message
      * @param message The status message to show.
      */
-    update: function(message) {
+    update: function(message: string) {
         if (models.TempAppState.get("showingStatus")) {
             models.TempAppState.set("status", message);
         }

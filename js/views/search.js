@@ -22,27 +22,27 @@ var TopicSearch = React.createClass({
             searchValue: ""
         };
     },
-    onChange: function(event) {
+    onChange: function(event: any) {
         var topicSearch = event.target.value;
         this.setState({
             searchValue: topicSearch
         });
         this.props.onTopicSearch(topicSearch);
     },
-    handleFocus: function(event) {
+    handleFocus: function(event: any) {
         setTimeout(() => {
             $("html, body").stop(true, true).animate({
                 scrollTop: $(this.refs.search.getDOMNode()).offset().top
             }, 500);
         }, 500);
     },
-    handleBlur: function(event) {
+    handleBlur: function(event: any) {
         $("html, body").stop(true, true).animate({
             scrollTop: 0
         }, 700);
     },
 
-    render: function() {
+    render: function(): any {
         var text = l10n.get("search");
         if (this.props.model.getTitle()) {
             text = l10n.get("search-topic", {
@@ -74,7 +74,7 @@ var SearchResultsViewer = React.createClass({
         collection: React.PropTypes.object.isRequired,
         onClickContentItem: React.PropTypes.func.isRequired
     },
-    render: function() {
+    render: function(): any {
         var control = <ContentListViewer collection={this.props.collection}
                                          onClickContentItem={this.props.onClickContentItem} />;
         return <div className="topic-list-container">
