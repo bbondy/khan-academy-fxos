@@ -1,99 +1,98 @@
-var gulp = require('gulp');
-var jshint = require('gulp-jshint');
-var less = require('gulp-less');
-var concat = require('gulp-concat');
-var uglify = require('gulp-uglify');
-var path = require('path');
-var rename = require('gulp-rename');
-var react = require('gulp-react');
-var flowtype = require('gulp-flowtype');
-var source = require('vinyl-source-stream');
-var jsxcs = require('gulp-jsxcs');
-var gutil = require('gulp-util');
-var jest = require('gulp-jest');
-var browserify = require('browserify');
-var reactify = require('reactify');
-var es6defaultParams = require('es6-default-params');
+var gulp = require("gulp"),
+    jshint = require("gulp-jshint"),
+    less = require("gulp-less"),
+    concat = require("gulp-concat"),
+    uglify = require("gulp-uglify"),
+    path = require("path"),
+    rename = require("gulp-rename"),
+    react = require("gulp-react"),
+    flowtype = require("gulp-flowtype"),
+    source = require("vinyl-source-stream"),
+    jsxcs = require("gulp-jsxcs"),
+    gutil = require("gulp-util"),
+    jest = require("gulp-jest"),
+    browserify = require("browserify"),
+    reactify = require("reactify"),
+    es6defaultParams = require("es6-default-params"),
+    transform = require("vinyl-transform"),
+    exorcist = require("exorcist"),
+    fs         = require('fs'),
+    mapfile = path.join(__dirname, './build/bundle.js.map');
 
 // Lint Task
-gulp.task('prelint', function() {
-    return gulp.src('js/**/*.js')
-        .pipe(jsxcs().on('error', function(err) {
+gulp.task("prelint", function() {
+    return gulp.src("js/**/*.js")
+        .pipe(jsxcs().on("error", function(err) {
             console.log(err.toString());
         }))
-        .pipe(jshint.reporter('default'));
+        .pipe(jshint.reporter("default"));
 });
 
 // Lint Task
-gulp.task('postlint', function() {
-    return gulp.src('build/**/*.js')
+gulp.task("postlint", function() {
+    return gulp.src("build/**/*.js")
         .pipe(jshint({
             esnext: true
         }))
-        .pipe(jshint.reporter('default'));
+        .pipe(jshint.reporter("default"));
 });
 
 
 
-gulp.task('typecheck', function() {
-    return gulp.src('js/**/*.js')
+gulp.task("typecheck", function() {
+    return gulp.src("js/**/*.js")
         .pipe(flowtype({
-            declarations: './flowtypes',
+            declarations: "./flowtypes",
             background: false,    // Watch/Server mode
             all: false,           // Check all files regardless
-            lib: '',              // Library directory
-            module: '',           // Module mode
+            lib: "",              // Library directory
+            module: "",           // Module mode
             stripRoot: false,     // Relative vs Absolute paths
             weak: false,          // Force weak check
             showAllErrors: false, // Show more than 50 errors
             killFlow: false,
         }))
-        .pipe(jshint.reporter('default'));
+        .pipe(jshint.reporter("default"));
 });
 
 // Compile Our LESS
-gulp.task('less', function() {
-    return gulp.src('./style/**/*.less')
+gulp.task("less", function() {
+    return gulp.src("./style/**/*.less")
         .pipe(less({
-            paths: [ path.join(__dirname, 'style') ]
+            paths: [ path.join(__dirname, "style") ]
         }))
-        .pipe(gulp.dest('./build/css'));
+        .pipe(gulp.dest("./build/css"));
 });
 
-gulp.task('react', function() {
-    return browserify('./js/main.js', {
+gulp.task("react", function() {
+    return browserify("./js/main.js", {
             debug: true
         })
+        // Convert to react and strip out Flow types
         .transform({
-            'strip-types': true,
+            "strip-types": true,
             es6: true}, reactify)
+        // Convert out ES6 default params
         .transform(es6defaultParams)
         .bundle()
-        .pipe(source('bundle.js'))
-        .pipe(gulp.dest('./build'));
-        /*
-        .pipe(react({
-            harmony: true,
-            // Skip Flow type annotations!
-            stripTypes: true
-        }))
-        */
-
+        // Exttract the source map fro the source bundle
+        .pipe(exorcist(mapfile))
+        .pipe(fs.createWriteStream(path.join(__dirname, './build/bundle.js'), 'utf8'));
 });
 
 // Concatenate & Minify JS
-gulp.task('releasify', function() {
-    return gulp.src('build/**/*.js')
-        .pipe(concat('all.js'))
-        .pipe(gulp.dest('dist'))
-        .pipe(rename('all.min.js'))
+gulp.task("releasify", function() {
+    return gulp.src("build/**/*.js")
+        .pipe(concat("all.js"))
+        .pipe(gulp.dest("dist"))
+        .pipe(rename("all.min.js"))
         .pipe(uglify())
-        .pipe(gulp.dest('dist'));
+        .pipe(gulp.dest("dist"));
 });
 
 // Test
-gulp.task('test', function() {
-    return gulp.src('__tests__').pipe(jest({
+gulp.task("test", function() {
+    return gulp.src("__tests__").pipe(jest({
         //testDirectoryName: "__test__",
         testPathIgnorePatterns: [
             "perseus",
@@ -110,13 +109,13 @@ gulp.task('test', function() {
 });
 
 // Watch Files For Changes
-gulp.task('watch', function() {
-    gulp.watch('js/**/*.js', ['prelint', 'typecheck', 'react']);
-    gulp.watch('build/**/*.js', ['postlint']);
-    gulp.watch('style/**/*.less', ['less']);
+gulp.task("watch", function() {
+    gulp.watch("js/**/*.js", ["prelint", "typecheck", "react"]);
+    gulp.watch("build/**/*.js", ["postlint"]);
+    gulp.watch("style/**/*.less", ["less"]);
 });
 
 // Default Task
 // Not including Flow typechecking by default because it takes so painfully long.
 // Maybe because of my code layout or otheriwse, needto figure it out before enabling by default.
-gulp.task('default', ['prelint', 'typecheck', 'react', 'less', 'postlint', 'watch']);
+gulp.task("default", ["prelint", "typecheck", "react", "less", "postlint", "watch"]);
