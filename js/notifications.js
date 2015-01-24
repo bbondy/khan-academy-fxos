@@ -9,7 +9,7 @@ var Notifications = {
      * @param message The message of the notification
      * @param clickCallback A callback to call if the notification is clicked.
      */
-    info: function(title, message, clickCallback) {
+    info: function(title: string, message: string, clickCallback: any) {
         // TODO: If we ever want this to work outside of FFOS we may need
         // to request permissions here.
         if (!window.Notification) {

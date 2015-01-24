@@ -1,6 +1,5 @@
 [ignore]
 .*/KAS/*
-.*/bower_components/*
 .*/build/*
 .*/data/*
 .*/fonts/*
@@ -8,16 +7,19 @@
 .*/img/*
 .*/khan-exercises/*
 .*/locales/*
-.*/node_modules/*
 .*/output/*
 .*/perseus/*
 .*/style/*
 .*/test/*
 .*/tools/*
 .*/webapp/*
+.*/node_modules/request/*
+.*/bower_components/*
+.*/node_modules/*
 
 [include]
 
 [libs]
+./flowtypes/all.js
 
 [options]

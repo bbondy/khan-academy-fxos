@@ -43,7 +43,7 @@ var BackButton = React.createClass({
         model: React.PropTypes.object.isRequired,
         onClickBack: React.PropTypes.func.isRequired
     },
-    render: function() {
+    render: function(): any {
         return <div>
             <a className="icon-back-link " href="javascript:void(0)" onClick={Util.partial(this.props.onClickBack, this.props.model)}>
                 <span className="icon icon-back">Back</span>
@@ -58,7 +58,7 @@ var BackButton = React.createClass({
  * When clicked it will expand a drawer with context sensitive options.
  */
 var MenuButton = React.createClass({
-    render: function() {
+    render: function(): any {
         return <div>
             <menu type="toolbar" className="icon-menu-link ">
                 <a href="#main-content">
@@ -78,7 +78,7 @@ var AppHeader = React.createClass({
         model: React.PropTypes.object,
         isPaneShowing: React.PropTypes.bool.isRequired
     },
-    render: function() {
+    render: function(): any {
         var backButton;
         var model = this.props.model;
         if (model && (this.props.isPaneShowing ||
@@ -128,7 +128,7 @@ var AppHeader = React.createClass({
 });
 
 var StatusBarViewer = React.createClass({
-    render: function() {
+    render: function(): any {
         if (!models.TempAppState.get("status")) {
             return <div/>;
         }
@@ -167,7 +167,7 @@ var Sidebar = React.createClass({
         onClickSupport: React.PropTypes.func.isRequired,
         onClickSignout: React.PropTypes.func.isRequired
     },
-    render: function() {
+    render: function(): any {
         var items = [];
 
         ////////////////////
@@ -271,7 +271,7 @@ var MainView = React.createClass({
         model: React.PropTypes.object
     },
     mixins: [Util.BackboneMixin, Util.LocalizationMixin],
-    getBackboneModels: function() {
+    getBackboneModels: function(): Array<any> {
         return [new models.ContentList(models.TopicTree.allContentItems),
             models.AppOptions, models.TempAppState, models.CurrentUser];
     },
@@ -279,16 +279,15 @@ var MainView = React.createClass({
     },
     getInitialState: function() {
         return {
-            currentModel: this.props.model || null,
+            currentModel: this.props.model,
             isPaneShowing: false,
             showProfile: false,
             showDownloads: false,
             showSettings: false,
             wasLastDownloads: false,
-            lastModel: null,
         };
     },
-    onClickContentItemFromDownloads: function(model) {
+    onClickContentItemFromDownloads: function(model: any) {
         // We need to keep track of the currentModel here because
         // we're changing the currentModel, so going back from the
         // downloads pane would be impossible otherwise.
@@ -301,7 +300,7 @@ var MainView = React.createClass({
             lastModel: this.state.currentModel
         });
     },
-    onClickContentItem: function(model) {
+    onClickContentItem: function(model: any) {
         this.setState({
             currentModel: model,
             showProfile: false,
@@ -309,7 +308,7 @@ var MainView = React.createClass({
             showSettings: false
         });
     },
-    onClickTopic: function(model) {
+    onClickTopic: function(model: any) {
         this.setState({
             currentModel: model,
             showProfile: false,
@@ -323,7 +322,7 @@ var MainView = React.createClass({
      * TODO: This works fine as is, but the logic can be simplified and
      * be less ugly by simply using a stack of current pane views.
      */
-    onClickBack: function(model) {
+    onClickBack: function(model: any) {
         // If we were on a content item from downloads,
         // then go back to downloads.
         if (this.state.wasLastDownloads) {
@@ -399,7 +398,7 @@ var MainView = React.createClass({
             wasLastDownloads: false
         });
     },
-    onClickSettings: function(model) {
+    onClickSettings: function(model: any) {
         this.setState({
             showDownloads: false,
             showProfile: false,
@@ -407,7 +406,7 @@ var MainView = React.createClass({
             wasLastDownloads: false
         });
     },
-    _openUrl: function(url) {
+    _openUrl: function(url: string) {
         if (window.MozActivity) {
             new window.MozActivity({
                 name: "view",
@@ -421,14 +420,14 @@ var MainView = React.createClass({
         }
 
     },
-    onClickSupport: function(model) {
+    onClickSupport: function(model: any) {
         var url = "https://khanacademy.zendesk.com/hc/communities/public/topics/200155074-Mobile-Discussions";
         this._openUrl(url);
     },
-    onClickViewOnKA: function(model) {
+    onClickViewOnKA: function(model: any) {
         this._openUrl(model.getKAUrl());
     },
-    onClickShare: function(model) {
+    onClickShare: function(model: any) {
         new window.MozActivity({
             name: "share",
             data: {
@@ -437,7 +436,7 @@ var MainView = React.createClass({
             }
         });
     },
-    onClickDownloadContent: function(model) {
+    onClickDownloadContent: function(model: any) {
         var totalCount = 1;
         if (model.isTopic()) {
             totalCount = model.getChildNotDownloadedCount();
@@ -513,7 +512,7 @@ var MainView = React.createClass({
                 });
             }
             Status.stop();
-            Notifications.info(title, message);
+            Notifications.info(title, message, () => {});
         }).fail((isCancel) => {
             if (isCancel) {
                 title = l10n.get("download-canceled");
@@ -523,24 +522,24 @@ var MainView = React.createClass({
                 message = l10n.get("content-items-downloaded-failure");
             }
             Status.stop();
-            Notifications.info(title, message);
+            Notifications.info(title, message, () => {});
         });
     },
-    onClickCancelDownloadContent: function(model) {
+    onClickCancelDownloadContent: function(model: any) {
         if (!confirm(l10n.get("cancel-download-warning"))) {
             return;
         }
         Downloads.cancelDownloading();
     },
-    onClickDeleteDownloadedContent: function(video) {
+    onClickDeleteDownloadedContent: function(video: any) {
         Downloads.deleteContent(video);
     },
-    isPaneShowing: function() {
+    isPaneShowing: function(): boolean {
         return this.state.showDownloads ||
             this.state.showProfile ||
             this.state.showSettings;
     },
-    onTopicSearch: function(topicSearch) {
+    onTopicSearch: function(topicSearch: string) {
         if (!topicSearch) {
             this.setState({currentModel: this.state.searchingModel, searchingModel: null});
             return;
@@ -553,10 +552,10 @@ var MainView = React.createClass({
         var contentList = new models.ContentList(results);
         this.setState({currentModel: contentList, searchingModel: searchingModel});
     },
-    getCurrentModel: function() {
+    getCurrentModel: function(): any {
         return this.state.currentModel;
     },
-    render: function() {
+    render: function(): any {
         var currentModel = this.getCurrentModel();
 
         // Make sure scrollTop is at the top of the page

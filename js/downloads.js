@@ -98,7 +98,7 @@ var Downloads = {
      * Used to download either a single content item for all content
      * items underneath the specified topic.
      */
-    download: function(model, onProgress) {
+    download: function(model: any, onProgress: any) {
         if (model.isContent()) {
             return this.downloadContent(model, onProgress, 0);
         } else if (model.isTopic()) {
@@ -144,7 +144,7 @@ var Downloads = {
      * Downloads the file at the specified URL and stores it to the
      * specified filename.
      */
-    downloadContent: function(contentItem, onProgress, downloadNumber) {
+    downloadContent: function(contentItem: any, onProgress: any, downloadNumber: any) {
         var d = $.Deferred();
         if (onProgress) {
             onProgress(downloadNumber, 0);

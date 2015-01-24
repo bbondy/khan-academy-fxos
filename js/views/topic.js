@@ -4,7 +4,8 @@
 
 var React = require("react/addons"),
     _ = require("underscore"),
-    models = require("../models");
+    models = require("../models"),
+    Util = require("../util");
 
 var cx = React.addons.classSet;
 
@@ -23,7 +24,7 @@ var TopicListItem = React.createClass({
     getInitialState: function() {
         return {};
     },
-    render: function() {
+    render: function(): any {
         var topicClassObj = {
             "topic-item": true,
             faded: models.AppOptions.get("showDownloadsOnly") &&
@@ -57,7 +58,7 @@ var VideoListItem = React.createClass({
         video: React.PropTypes.object.isRequired,
         onClickVideo: React.PropTypes.func.isRequired
     },
-    render: function() {
+    render: function(): any {
         var videoNodeClass = cx({
           "video-node": true,
           completed: this.props.video.isCompleted(),
@@ -113,7 +114,7 @@ var ArticleListItem = React.createClass({
         article: React.PropTypes.object.isRequired,
         onClickArticle: React.PropTypes.func.isRequired
     },
-    render: function() {
+    render: function(): any {
         var articleNodeClass = cx({
           "article-node": true,
           completed: this.props.article.isCompleted(),
@@ -163,7 +164,7 @@ var ExerciseListItem = React.createClass({
         exercise: React.PropTypes.object.isRequired,
         onClickExercise: React.PropTypes.func.isRequired
     },
-    render: function() {
+    render: function(): any {
         var exerciseNodeClass = cx({
           "exercise-node": true,
           completed: this.props.exercise.isCompleted(),
@@ -216,7 +217,7 @@ var TopicViewer = React.createClass({
         onClickTopic: React.PropTypes.func.isRequired,
         onClickContentItem: React.PropTypes.func.isRequired
     },
-    render: function() {
+    render: function(): any {
         var topics;
         if (this.props.topic.get("topics")) {
             topics = _(this.props.topic.get("topics").models).map((topic) => {
@@ -264,10 +265,9 @@ var TopicViewer = React.createClass({
 var ContentListViewer = React.createClass({
     propTypes: {
         collection: React.PropTypes.object.isRequired,
-        onClickContentItem: React.PropTypes.func.isRequired,
-        onClickTranscript: React.PropTypes.func.isRequired
+        onClickContentItem: React.PropTypes.func.isRequired
     },
-    render: function() {
+    render: function(): any {
         var contentItems;
         if (this.props.collection.models) {
             contentItems = _(this.props.collection.models).map((contentItem) => {

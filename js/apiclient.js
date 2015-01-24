@@ -156,7 +156,7 @@ var APIClient = {
      *
      * @return a promise with the results of the API call
      */
-    _basicAPICall: function(url, extraParams, method, dataType) {
+    _basicAPICall: function(url, extraParams, method, dataType): any {
         extraParams = extraParams || {};
         dataType = dataType || "json";
         if (_.isUndefined(method)) {
@@ -196,7 +196,7 @@ var APIClient = {
      *
      * @return a promise with the results
      */
-    getUserProgress: function() {
+    getUserProgress: function(): any {
         var extraParams = {
             kind: "Video,Article,Exercise"
         };
@@ -205,7 +205,7 @@ var APIClient = {
     /**
      * Obtains basic user profile information.
      */
-    getUserInfo: function() {
+    getUserInfo: function(): any {
         return this._basicAPICall(this.API_V1_BASE + "/user");
     },
     /**
@@ -214,7 +214,7 @@ var APIClient = {
      * @param jsOnly true if the installed file to load is pure JavaScript.
      * @return a promise with the topic tree
      */
-    getInstalledTopicTree: function(jsOnly: boolean) {
+    getInstalledTopicTree: function(jsOnly: boolean): any {
         var filename = `/data/topic-tree`;
         var lang = Util.getLang();
         if (lang) {
@@ -229,7 +229,7 @@ var APIClient = {
      *
      * @return a promise with the topic tree
      */
-    getTopicTree: function() {
+    getTopicTree: function(): any {
         return this._basicAPICall(this.API_V1_BASE + "/fxos/topictree");
     },
     /**
@@ -238,7 +238,7 @@ var APIClient = {
      * @param youTubeId The id of the youtube video to obtain the transcript for.
      * @return a promise with the transcript
      */
-    getVideoTranscript: function(youTubeId: string) {
+    getVideoTranscript: function(youTubeId: string): any {
         var url = this.API_V1_BASE + `/videos/${youTubeId}/transcript`;
         return this._basicAPICall(url);
     },
@@ -248,7 +248,7 @@ var APIClient = {
      * @param articleId The id of the article to obtain information on.
      * @return a promise with the status and other information
      */
-    getArticle: function(articleId: string) {
+    getArticle: function(articleId: string): any {
         return this._basicAPICall(this.API_V1_BASE + "/articles/" + articleId);
     },
     /**
@@ -257,12 +257,12 @@ var APIClient = {
      * @param exerciseName The name of the exercise to obtain information on.
      * @return a promise with the status and other information
      */
-    getExerciseByName: function(exerciseName: string) {
+    getExerciseByName: function(exerciseName: string): any {
         var url = `${this.API_INTERNAL_BASE}/exercises/${exerciseName}`;
         return this._basicAPICall(url);
     },
 
-    getTaskIfnoByExerciseName: function(exerciseName: string) {
+    getTaskIfnoByExerciseName: function(exerciseName: string): any {
         var url = `${this.API_INTERNAL_BASE}/user/tasks/exercises/${exerciseName}`;
         return this._basicAPICall(url);
     },
@@ -273,7 +273,7 @@ var APIClient = {
      * @param exerciseName The name of the exercise to obtain task information for
      * @return a promise with the task
      */
-    getMissions: function(exerciseName: string) {
+    getMissions: function(exerciseName: string): any {
         var url = `${this.API_INTERNAL_BASE}/user/missions`;
         return this._basicAPICall(url);
     },
@@ -283,7 +283,7 @@ var APIClient = {
      * @param exerciseId The id of the exercise to obtain information on.
      * @return a promise with the status and other information
      */
-    getAssessmentItem: function(assessmentId: string) {
+    getAssessmentItem: function(assessmentId: string): any {
         return this._basicAPICall(this.API_V1_BASE + "/assessment_items/" + assessmentId);
     },
     /**
@@ -292,7 +292,7 @@ var APIClient = {
      * @param articleId The id of the article to mark as completed.
      * @return a promise with the status and other information
      */
-    reportArticleRead: function(articleId: string) {
+    reportArticleRead: function(articleId: string): any {
         return this._basicAPICall(this.API_V1_BASE + `/user/article/${articleId}/log`, undefined, "POST");
     },
     /**
@@ -316,7 +316,7 @@ var APIClient = {
     getUserExercises: function() {
         return this._basicAPICall(this.API_INTERNAL_BASE + "/user/exercises");
     },
-    getUserExercise: function(exerciseName) {
+    getUserExercise: function(exerciseName: string) {
         var url = `${this.API_INTERNAL_BASE}/user/exercises/${exerciseName}`;
         return this._basicAPICall(url);
     },
