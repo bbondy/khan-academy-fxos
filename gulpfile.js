@@ -13,6 +13,7 @@ var gutil = require('gulp-util');
 var jest = require('gulp-jest');
 var browserify = require('browserify');
 var reactify = require('reactify');
+var es6defaultParams = require('es6-default-params');
 
 // Lint Task
 gulp.task('prelint', function() {
@@ -64,6 +65,7 @@ gulp.task('react', function() {
         .transform({
             'strip-types': true,
             es6: true}, reactify)
+        .transform(es6defaultParams)
         .bundle()
         .pipe(source('bundle.js'))
         .pipe(gulp.dest('./build'));
