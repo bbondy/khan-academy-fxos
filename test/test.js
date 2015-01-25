@@ -96,43 +96,6 @@ require(["l10n", "jquery", "underscore", "react", "util", "models", "apiclient",
         });
     });
 
-    // Languages in which topic trees should be tested for
-    var languages = ["en", "fr", "es", "pt", "tr", "bn"];
-    QUnit.asyncTest("testUtil", function(assert) {
-        assert.strictEqual(Util.numberWithCommas("1234567890"),"1,234,567,890");
-        var oneAdder = Util.partial(function(x, y) { return x + y; }, 1);
-        assert.strictEqual(oneAdder(5), 6);
-        assert.strictEqual(window.x, undefined);
-        assert.strictEqual(Util.appendQueryParam("http://test.com?a=b", "x", "y"), "http://test.com?a=b&x=y");
-        assert.strictEqual(Util.appendQueryParam("http://test.com", "x", "y"), "http://test.com?x=y");
-        assert.strictEqual(Util.getParameterByName("a", "?a=b"), "b");
-        assert.strictEqual(Util.getParameterByName("a", "?a=b&c=d"), "b");
-        assert.strictEqual(Util.getParameterByName("c", "?a=b&c=d"), "d");
-        var old = navigator.connection;
-        if (!navigator.connection) {
-            navigator.connection = { metered: false, bandwidth: Infinity };
-            assert.strictEqual(Util.isMeteredConnection(), false);
-            assert.strictEqual(Util.isBandwidthCapped(), false);
-            navigator.connection = { metered: true, bandwidth: 33};
-            assert.strictEqual(Util.isMeteredConnection(), true);
-            assert.strictEqual(Util.isBandwidthCapped(), true);
-            navigator.connection = { metered: false, bandwidth: 33};
-            assert.strictEqual(Util.isMeteredConnection(), false);
-            assert.strictEqual(Util.isBandwidthCapped(), true);
-            navigator.connection = { type: "wifi" };
-            assert.strictEqual(Util.isBandwidthCapped(), false);
-            navigator.connection = { type: "none" };
-            assert.strictEqual(Util.isBandwidthCapped(), false);
-            navigator.connection = { type: "cellular" };
-            assert.strictEqual(Util.isBandwidthCapped(), true);
-        }
-        navigator.connection = old;
-        Util.loadScript("/test/_test1.js").done(function() {
-            assert.strictEqual(window.x, 3);
-            QUnit.start();
-        });
-    });
-
     QUnit.asyncTest("APIClient.init", function(assert) {
         expect(5);
         APIClient.init().done(function() {
@@ -243,22 +206,6 @@ require(["l10n", "jquery", "underscore", "react", "util", "models", "apiclient",
         expect(1);
         models.CurrentUser.init().done(function() {
             assert.ok(models.CurrentUser.initialized);
-            QUnit.start();
-        });
-    });
-    QUnit.asyncTest("Storage.init", function(assert) {
-        expect(1);
-        Storage.init().then(function() {
-            if (!Util.isFirefoxOS()) {
-                assert.ok(true);
-                QUnit.start();
-                return;
-            }
-            return Storage.writeText("test-file", "test");
-        }).then(function() {
-            return Storage.readText("test-file");
-        }).done(function(result) {
-            assert.strictEqual(result, "test");
             QUnit.start();
         });
     });
