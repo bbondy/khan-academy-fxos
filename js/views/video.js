@@ -12,8 +12,9 @@ var $ = require("jquery"),
     Storage = require("../storage"),
     Downloads = require("../downloads"),
     Notifications = require("../notifications"),
+    loadPackage = require("../load-package"),
     Status = require("../status"),
-    videojs =require("../../bower_components/videojs/dist/video-js/video");
+    videojs;
 
 var cx = React.addons.classSet;
 
@@ -69,6 +70,11 @@ var VideoViewer = React.createClass({
         video: React.PropTypes.object.isRequired
     },
     componentWillMount: function() {
+
+        // TODO: Make this load async
+        loadPackage("video-package.js", false);
+        videojs = require("video.js");
+
         Util.log("VideoViewer will mount");
         this.videoCreatedPromise = $.Deferred();
         if (models.AppOptions.get("showTranscripts")) {

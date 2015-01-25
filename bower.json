@@ -15,7 +15,6 @@
   ],
   "dependencies": {
     "MathJax": "~2.4.0",
-    "katex": "~0.1.1",
-    "videojs": "~4.11.3"
+    "katex": "~0.1.1"
   }
 }

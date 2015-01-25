@@ -24,8 +24,10 @@
     </head>
     <body role="application">
         <div id="app"></div>
-        <script type="text/javascript"
-                src="/build/bundle.js"></script>
-        <script src="/node_modules/requirejs/require.js"></script>
+        <script type="text/javascript" src="/build/corelib-package.js"></script>
+        <script type="text/javascript" src="/build/common-package.js"></script>
+        <script type="text/javascript">
+            require("./js/main.js");
+        </script>
     </body>
 </html>

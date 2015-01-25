@@ -7,17 +7,17 @@ var gulp = require("gulp"),
     rename = require("gulp-rename"),
     react = require("gulp-react"),
     flowtype = require("gulp-flowtype"),
-    source = require("vinyl-source-stream"),
     jsxcs = require("gulp-jsxcs"),
-    gutil = require("gulp-util"),
     jest = require("gulp-jest"),
     browserify = require("browserify"),
     reactify = require("reactify"),
     es6defaultParams = require("es6-default-params"),
     transform = require("vinyl-transform"),
     exorcist = require("exorcist"),
-    fs         = require('fs'),
-    mapfile = path.join(__dirname, './build/bundle.js.map');
+    fs = require("fs"),
+    es = require("event-stream"),
+    JSONStream = require("JSONStream"),
+    _ = require("underscore");
 
 // Lint Task
 gulp.task("prelint", function() {
@@ -36,8 +36,6 @@ gulp.task("postlint", function() {
         }))
         .pipe(jshint.reporter("default"));
 });
-
-
 
 gulp.task("typecheck", function() {
     return gulp.src("js/**/*.js")
@@ -64,20 +62,58 @@ gulp.task("less", function() {
         .pipe(gulp.dest("./build/css"));
 });
 
+// The react task should not normally be needed.
+// This is only present if the errors from
+// browserify/reactify are not good enough.
 gulp.task("react", function() {
-    return browserify("./js/main.js", {
-            debug: true
-        })
-        // Convert to react and strip out Flow types
-        .transform({
-            "strip-types": true,
-            es6: true}, reactify)
-        // Convert out ES6 default params
-        .transform(es6defaultParams)
-        .bundle()
-        // Exttract the source map fro the source bundle
-        .pipe(exorcist(mapfile))
-        .pipe(fs.createWriteStream(path.join(__dirname, './build/bundle.js'), 'utf8'));
+    return gulp.src("./js/**/*.js")
+        .pipe(react({
+            harmony: true,
+            // Skip Flow type annotations!
+            stripTypes: true
+        }))
+        .pipe(gulp.dest("./build"));
+});
+
+gulp.task("browserify", function() {
+
+    return fs.createReadStream("javascript-packages.json")
+        .pipe(JSONStream.parse())
+        .pipe(es.mapSync(function (packages) {
+            // Collect all files
+            var allFiles = [];
+            for (p in packages) {
+                allFiles = allFiles.concat(packages[p]);
+            }
+
+            // For each package, do the gulp chain externing
+            // everything else.  I tried both refactor-bundle and
+            // partition-bundle but they didn't seem to have the flexibility
+            // I needed.
+            var mapfile = path.join(__dirname, "./build/" + p + ".map");
+            for (p in packages) {
+                otherFiles = _(allFiles).filter(function(f) {
+                    return packages[p].indexOf(f) === -1;
+                });
+
+                var b = browserify({
+                    debug: true
+                });
+                b.external(otherFiles);
+                b.require(packages[p]);
+
+                // Convert to react and strip out Flow types
+                b.transform({
+                    "strip-types": true,
+                    es6: true}, reactify)
+                // Convert out ES6 default params
+                .transform(es6defaultParams)
+                .bundle()
+                // Exttract the source map fro the source bundle
+                .pipe(exorcist(mapfile))
+                .pipe(fs.createWriteStream(path.join(__dirname, './build/' + p), 'utf8'));
+            }
+         }));
 });
 
 // Concatenate & Minify JS
@@ -110,7 +146,7 @@ gulp.task("test", function() {
 
 // Watch Files For Changes
 gulp.task("watch", function() {
-    gulp.watch("js/**/*.js", ["prelint", "typecheck", "react"]);
+    gulp.watch("js/**/*.js", ["prelint", "typecheck", "browserify"]);
     gulp.watch("build/**/*.js", ["postlint"]);
     gulp.watch("style/**/*.less", ["less"]);
 });
@@ -118,4 +154,4 @@ gulp.task("watch", function() {
 // Default Task
 // Not including Flow typechecking by default because it takes so painfully long.
 // Maybe because of my code layout or otheriwse, needto figure it out before enabling by default.
-gulp.task("default", ["prelint", "typecheck", "react", "less", "postlint", "watch"]);
+gulp.task("default", ["prelint", "typecheck", "less", "browserify", "postlint", "watch"]);
