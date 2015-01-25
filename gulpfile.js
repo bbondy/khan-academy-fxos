@@ -128,13 +128,15 @@ gulp.task("releasify", function() {
 
 // Test
 gulp.task("test", function() {
-    return gulp.src("__tests__").pipe(jest({
-        //testDirectoryName: "__test__",
+     return gulp.src('__tests__').pipe(jest({
+        scriptPreprocessor: "./js/preprocessor.js",
+        unmockedModulePathPatterns: [
+            "node_modules/react"
+        ],
+        testDirectoryName: "js",
         testPathIgnorePatterns: [
-            "perseus",
-            "bower_compoennts",
             "node_modules",
-            "spec/support"
+            "js/preprocessor.js"
         ],
         moduleFileExtensions: [
             "js",
