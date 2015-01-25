@@ -34,7 +34,6 @@
     "beforeOpeningRoundBrace": true
   },
   "disallowSpacesInCallExpression": true,
-  "disallowMultipleVarDecl": true,
   "disallowSpacesInsideObjectBrackets": "all",
   "disallowSpacesInsideArrayBrackets": "all",
   "disallowSpacesInsideParentheses": true,
