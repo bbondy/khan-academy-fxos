@@ -16,7 +16,8 @@ var $ = require("jquery"),
     models = require("./models"),
     APIClient = require("./apiclient");
 
-var Downloads = {
+var Downloads: { contentList: any; init: any; canCancelDownload: any; cancelDownloading: any; download: any; downloadContent: any; downloadTopic: any; deleteContent: any } = {
+    contentList: null,
     /**
      * Initializes download manager
      */

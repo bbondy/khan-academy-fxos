@@ -14,7 +14,7 @@ var $ = require("jquery"),
     Notifications = require("../notifications"),
     loadPackage = require("../load-package"),
     Status = require("../status"),
-    videojs;
+    videojs: any;
 
 var cx = React.addons.classSet;
 
@@ -60,6 +60,7 @@ var TranscriptViewer = React.createClass({
         return <ul className="transcript">{transcriptItems}</ul>;
     }
 });
+
 
 /**
  * Represents a single video, it will load the video dynamically and
