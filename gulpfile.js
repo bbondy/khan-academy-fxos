@@ -29,6 +29,7 @@ gulp.task("prelint", function() {
 });
 
 // Lint Task
+// TODO: Re-enable this after it is fixed
 gulp.task("postlint", function() {
     return gulp.src("build/**/*.js")
         .pipe(jshint({
@@ -149,11 +150,11 @@ gulp.task("test", function() {
 // Watch Files For Changes
 gulp.task("watch", function() {
     gulp.watch("js/**/*.js", ["prelint", "typecheck", "browserify"]);
-    gulp.watch("build/**/*.js", ["postlint"]);
+    //gulp.watch("build/**/*.js", ["postlint"]);
     gulp.watch("style/**/*.less", ["less"]);
 });
 
 // Default Task
 // Not including Flow typechecking by default because it takes so painfully long.
 // Maybe because of my code layout or otheriwse, needto figure it out before enabling by default.
-gulp.task("default", ["prelint", "typecheck", "less", "browserify", "postlint", "watch"]);
+gulp.task("default", ["prelint", "typecheck", "less", "browserify", "watch"]);
