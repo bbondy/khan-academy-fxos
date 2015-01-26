@@ -1,5 +1,5 @@
-/* @flow weak */
-// Using weak only because flow doesn't support generators and yield syntax
+// TODO: Use of generators stopping use of flow for this file.
+// Need to figure out how to transform using regenerator or something first before passing it to Flow.
 
 "strict";
 
@@ -149,7 +149,16 @@ var TopicTreeCollection = Backbone.Collection.extend(TopicTreeBase);
  * equal to 'all' items.
  * This isn't an actual backbone model (yet)
  */
-var TopicTree = {
+var TopicTree: {
+    init: any;
+    refreshTopicTreeInfo: any;
+    getTopicTreeFilename: any;
+    allContentItems: Array<any>;
+    getContentItemById: any;
+    getContentItemsByIds: any;
+    root: any;
+} = {
+    root: null,
     init: function() {
         var d = $.Deferred();
 
