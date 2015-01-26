@@ -61,12 +61,28 @@ var TranscriptViewer = React.createClass({
     }
 });
 
-
 /**
  * Represents a single video, it will load the video dynamically and
  * display it to the user.
  */
-var VideoViewer = React.createClass({
+var VideoViewerRawObj: {
+        videoClass: ?string;
+        videoSrc: ?string;
+        videoNode: any;
+        videoId: ?string;
+        initSecondWatched: number;
+        lastSecondWatched: number;
+        secondsWatched: number;
+        lastReportedTime: Date;
+        lastWatchedTimeSinceLastUpdate: Date;
+        pointsPerReport: number;
+        pointsObj: any;
+        isPlaying: boolean;
+        videoCreatedPromise: any;
+        transcriptPromise: any;
+        cleanedUp: boolean;
+        videojs: any;
+    } = {
     propTypes: {
         video: React.PropTypes.object.isRequired
     },
@@ -455,7 +471,8 @@ var VideoViewer = React.createClass({
         </div>;
     },
     MIN_SECONDS_BETWEEN_REPORTS: 10
-});
+};
+var VideoViewer = React.createClass(VideoViewerRawObj);
 
 module.exports = {
     VideoViewer: VideoViewer,
