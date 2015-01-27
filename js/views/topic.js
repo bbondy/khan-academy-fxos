@@ -2,8 +2,8 @@
 
 "use strict";
 
-var React = require("react/addons"),
-    _ = require("underscore"),
+var _ = require("underscore"),
+    React = require("react/addons"),
     models = require("../models"),
     Util = require("../util");
 

@@ -10,10 +10,7 @@ var $ = require("jquery"),
     models = require("../models"),
     APIClient = require("../apiclient"),
     Storage = require("../storage"),
-    Downloads = require("../downloads"),
-    Notifications = require("../notifications"),
     loadPackage = require("../load-package"),
-    Status = require("../status"),
     videojs: any;
 
 var cx = React.addons.classSet;

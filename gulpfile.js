@@ -20,18 +20,16 @@ var gulp = require("gulp"),
     _ = require("underscore");
 
 // Lint Task
-gulp.task("prelint", function() {
+gulp.task("lint", function() {
     return gulp.src("js/**/*.js")
         .pipe(jsxcs().on("error", function(err) {
             console.log(err.toString());
         }))
-        .pipe(jshint.reporter("default"));
-});
-
-// Lint Task
-// TODO: Re-enable this after it is fixed
-gulp.task("postlint", function() {
-    return gulp.src("build/**/*.js")
+        .pipe(react({
+            harmony: true,
+            // Skip Flow type annotations!
+            stripTypes: true
+        }))
         .pipe(jshint({
             esnext: true
         }))
@@ -102,6 +100,7 @@ gulp.task("browserify", function() {
                 });
                 b.external(otherFiles);
                 b.require(packages[p]);
+                b.pipeline
 
                 // Convert to react and strip out Flow types
                 b.transform({
@@ -149,12 +148,11 @@ gulp.task("test", function() {
 
 // Watch Files For Changes
 gulp.task("watch", function() {
-    gulp.watch("js/**/*.js", ["prelint", "typecheck", "browserify"]);
-    //gulp.watch("build/**/*.js", ["postlint"]);
+    gulp.watch("js/**/*.js", ["lint", "typecheck", "browserify"]);
     gulp.watch("style/**/*.less", ["less"]);
 });
 
 // Default Task
 // Not including Flow typechecking by default because it takes so painfully long.
 // Maybe because of my code layout or otheriwse, needto figure it out before enabling by default.
-gulp.task("default", ["prelint", "typecheck", "less", "browserify", "watch"]);
+gulp.task("default", ["lint", "typecheck", "less", "browserify", "watch"]);

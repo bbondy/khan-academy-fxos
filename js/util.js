@@ -109,7 +109,7 @@ var Util = {
      *
      * @return true if the bandwidth is metered.
      */
-    isFirefoxOS: function() : boolean {
+    isFirefoxOS: function(): boolean {
         return window.location.protocol === "app:";
     },
     /**
@@ -186,7 +186,7 @@ var Util = {
      * Formats a number with thousand separators
      * http://stackoverflow.com/a/2901298/3153
      */
-    numberWithCommas: function(x: number) : string {
+    numberWithCommas: function(x: number): string {
         if (_.isUndefined(x)) {
             return "0";
         }
@@ -216,7 +216,7 @@ var Util = {
      *
      * @param filename The URL to load
      */
-    loadScript: function(filename: string) {
+    loadScript: function(filename: string): any {
         var d = $.Deferred();
         var s: any = document.createElement("script");
         s.type = "text/javascript";
