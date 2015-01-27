@@ -34,6 +34,7 @@
     "serve-static": "^1.7.1",
     "uglify": "^0.1.1",
     "underscore": "^1.7.0",
+    "video.js": "^4.11.4",
     "vinyl-source-stream": "^1.0.0",
     "vinyl-transform": "^1.0.0"
   },
