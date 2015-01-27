@@ -13,7 +13,7 @@ define(["react", "topic"], function(React, topicViews) {
         },
         getInitialState: function() {
             return {
-                searchValue: ''
+                searchValue: ""
             };
         },
         onChange: function(event) {
@@ -39,8 +39,9 @@ define(["react", "topic"], function(React, topicViews) {
         render: function() {
             var text = document.webL10n.get("search");
             if (this.props.model.getTitle()) {
-                text = document.webL10n.get("search-topic",
-                        {"topic": this.props.model.getTitle()});
+                text = document.webL10n.get("search-topic", {
+                            topic: this.props.model.getTitle()
+                        });
             }
             return <div>
                 <input ref="search"

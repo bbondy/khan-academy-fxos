@@ -65,50 +65,50 @@ define(["jquery", "react", "util", "models", "apiclient", "cache", "storage",
             isPaneShowing: React.PropTypes.bool.isRequired
         },
         render: function() {
-                var backButton;
-                if (this.props.model && (this.props.isPaneShowing ||
-                        this.props.model.isContent() ||
-                        this.props.model.isTopic() && !this.props.model.isRoot() ||
-                        this.props.model.isContentList())) {
-                    backButton = <BackButton model={this.props.model}
-                                             onClickBack={this.props.onClickBack}/>;
-                }
+            var backButton;
+            if (this.props.model && (this.props.isPaneShowing ||
+                    this.props.model.isContent() ||
+                    this.props.model.isTopic() && !this.props.model.isRoot() ||
+                    this.props.model.isContentList())) {
+                backButton = <BackButton model={this.props.model}
+                                         onClickBack={this.props.onClickBack}/>;
+            }
 
-                var styleObj = {
-                    fixed: true,
-                    "topic-header": this.props.model && !this.props.model.isRoot() &&
-                        !this.props.isPaneShowing &&
-                        (this.props.model.isTopic() || this.props.model.isContent())
-                };
-                var parentDomain = this.props.model && this.props.model.getParentDomain();
-                if (parentDomain && !this.props.isPaneShowing) {
-                    styleObj[parentDomain.getId()] = true;
-                }
-                var styleClass = cx(styleObj);
+            var styleObj = {
+                fixed: true,
+                "topic-header": this.props.model && !this.props.model.isRoot() &&
+                    !this.props.isPaneShowing &&
+                    (this.props.model.isTopic() || this.props.model.isContent())
+            };
+            var parentDomain = this.props.model && this.props.model.getParentDomain();
+            if (parentDomain && !this.props.isPaneShowing) {
+                styleObj[parentDomain.getId()] = true;
+            }
+            var styleClass = cx(styleObj);
 
-                var title = "Khan Academy";
-                if (this.props.isDownloadsShowing) {
-                    title = document.webL10n.get("view-downloads");
-                } else if (this.props.isProfileShowing) {
-                    title = document.webL10n.get("view-profile");
-                } else if (this.props.isSettingsShowing) {
-                    title = document.webL10n.get("view-settings");
-                } else if (this.props.model && this.props.model.getTitle()) {
-                    title = this.props.model.getTitle();
-                } else if (this.props.model && this.props.model.isContentList()) {
-                    title = document.webL10n.get("search");
-                }
+            var title = "Khan Academy";
+            if (this.props.isDownloadsShowing) {
+                title = document.webL10n.get("view-downloads");
+            } else if (this.props.isProfileShowing) {
+                title = document.webL10n.get("view-profile");
+            } else if (this.props.isSettingsShowing) {
+                title = document.webL10n.get("view-settings");
+            } else if (this.props.model && this.props.model.getTitle()) {
+                title = this.props.model.getTitle();
+            } else if (this.props.model && this.props.model.isContentList()) {
+                title = document.webL10n.get("search");
+            }
 
-                var menuButton;
-                if (this.props.model) {
-                    menuButton = <MenuButton/>;
-                }
+            var menuButton;
+            if (this.props.model) {
+                menuButton = <MenuButton/>;
+            }
 
-                return <header className={styleClass}>
-                        {backButton}
-                        {menuButton}
-                        <h1 className="header-title">{title}</h1>
-                    </header>;
+            return <header className={styleClass}>
+                    {backButton}
+                    {menuButton}
+                    <h1 className="header-title">{title}</h1>
+                </header>;
         }
     });
 
@@ -192,7 +192,7 @@ define(["jquery", "react", "util", "models", "apiclient", "cache", "storage",
                     items.push(<li key="cancel-downloading" className="hot-item">
                             <a href="#" data-l10n-id="cancel-downloading" onClick={Util.partial(this.props.onClickCancelDownloadContent, this.props.model)}>Cancel Downloading</a>
                         </li>);
-                } else if(!this.props.isPaneShowing &&
+                } else if (!this.props.isPaneShowing &&
                             this.props.model && this.props.model.isTopic()) {
                     items.push(<li key="download-topic" className="hot-item">
                             <a href="#" data-l10n-id="download-topic" onClick={Util.partial(this.props.onClickDownloadContent, this.props.model)}>Download Topic</a>
@@ -402,7 +402,7 @@ define(["jquery", "react", "util", "models", "apiclient", "cache", "storage",
                     }
                 });
             } else {
-                window.open(url, '_blank');
+                window.open(url, "_blank");
             }
 
         },
@@ -450,8 +450,10 @@ define(["jquery", "react", "util", "models", "apiclient", "cache", "storage",
 
             // Prompt to download remaining
             if (model.isTopic()) {
-                if (!confirm(document.webL10n.get("download-remaining",
-                            {"totalCount": totalCount, "totalCountStr": totalCountStr}))) {
+                if (!confirm(document.webL10n.get("download-remaining", {
+                    totalCount: totalCount,
+                    totalCountStr: totalCountStr
+                }))) {
                     return;
                 }
             }
@@ -462,8 +464,12 @@ define(["jquery", "react", "util", "models", "apiclient", "cache", "storage",
                     return;
                 }
                 count = Util.numberWithCommas(count);
-                var progressMessage = document.webL10n.get("downloading-progress",
-                            {"count" : count, "totalCount": totalCount, "totalCountStr": totalCountStr, "currentProgress": currentProgress});
+                var progressMessage = document.webL10n.get("downloading-progress", {
+                    count: count,
+                    totalCount: totalCount,
+                    totalCountStr: totalCountStr,
+                    currentProgress: currentProgress
+                });
                 Status.update(progressMessage);
             };
             Status.start();
@@ -473,18 +479,22 @@ define(["jquery", "react", "util", "models", "apiclient", "cache", "storage",
                 var message;
                 if (model.isContent()) {
                     if (model.isVideo()) {
-                        message = document.webL10n.get("video-complete-body",
-                            {"title" : contentTitle});
+                        message = document.webL10n.get("video-complete-body", {
+                            title: contentTitle
+                        });
                     } else {
-                        message = document.webL10n.get("article-complete-body",
-                            {"title" : contentTitle});
+                        message = document.webL10n.get("article-complete-body", {
+                            title: contentTitle
+                        });
                     }
                 } else {
                     // TODO: We don't want commas here so we should change the source
                     // strings for all locales for count and countStr
                     // count = Util.numberWithCommas(count);
-                    message = document.webL10n.get("content-items-downloaded-succesfully",
-                        {"count" : count, "title": contentTitle});
+                    message = document.webL10n.get("content-items-downloaded-succesfully", {
+                        count: count,
+                        title: contentTitle
+                    });
                 }
                 Status.stop();
                 Notifications.info(title, message);
@@ -544,17 +554,13 @@ define(["jquery", "react", "util", "models", "apiclient", "cache", "storage",
             if (!currentModel) {
                 // Still loading topic tree
                 control = <div className="app-loading"/>;
-            }
-            else if (this.state.showProfile) {
+            } else if (this.state.showProfile) {
                 control = <ProfileViewer/>;
-            }
-            else if (this.state.showDownloads) {
+            } else if (this.state.showDownloads) {
                 control = <DownloadsViewer onClickContentItem={this.onClickContentItemFromDownloads} />;
-            }
-            else if (this.state.showSettings) {
+            } else if (this.state.showSettings) {
                 control = <SettingsViewer options={models.AppOptions }/>;
-            }
-            else if (currentModel.isTopic()) {
+            } else if (currentModel.isTopic()) {
                 control = <TopicViewer topic={currentModel}
                                        onClickTopic={this.onClickTopic}
                                        onClickContentItem={this.onClickContentItem}/>;

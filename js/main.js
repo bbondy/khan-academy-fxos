@@ -15,7 +15,7 @@ define(["jquery", "react", "util", "models", "apiclient", "cache", "storage", "d
     window.models = models;
 
     $("body").bind("contextmenu", function(e) {
-        Util.log('contextmenu!');
+        Util.log("contextmenu!");
         e.preventDefault();
     });
 
@@ -38,8 +38,8 @@ define(["jquery", "react", "util", "models", "apiclient", "cache", "storage", "d
     var mainView = React.render(<MainView/>, mountNode);
 
     // Init everything
-    Storage.init().then(function(){
-      return APIClient.init();
+    Storage.init().then(function() {
+        return APIClient.init();
     }).then(function() {
         return models.TopicTree.init();
     }).then(function() {

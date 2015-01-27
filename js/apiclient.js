@@ -52,7 +52,7 @@ define(["jquery", "underscore", "oauth", "util"], function($, _, _oauth, Util) {
          */
         _getAccessToken: function() {
             var d = $.Deferred();
-            $.oauth($.extend( {}, this.oauth, {
+            $.oauth($.extend({}, this.oauth, {
                 type: "GET",
                 url: this.API_BASE + "/auth/access_token",
                 oauthCallback: this._oauthCallback,
@@ -92,7 +92,7 @@ define(["jquery", "underscore", "oauth", "util"], function($, _, _oauth, Util) {
                 this._loadAuth();
             }
             var d = $.Deferred();
-            this._oauthCallback = window.location.href.split("#")[0].split('?')[0];
+            this._oauthCallback = window.location.href.split("#")[0].split("?")[0];
             if (Util.isFirefoxOS()) {
                 this._oauthCallback = "http://firefoxos.non-existent-domain-asdfg.com/authenticated.html";
             }
@@ -131,7 +131,7 @@ define(["jquery", "underscore", "oauth", "util"], function($, _, _oauth, Util) {
          */
         signIn: function() {
             // Start the oauth process by redirecting them to the request_token url
-            var url = $.getURL($.extend( {}, this.oauth, {
+            var url = $.getURL($.extend({}, this.oauth, {
                 url: this.API_BASE + "/auth/request_token",
                 oauthCallback: this._oauthCallback
             }));
@@ -169,7 +169,7 @@ define(["jquery", "underscore", "oauth", "util"], function($, _, _oauth, Util) {
                 }
             }
             var d = $.Deferred();
-            $.oauth($.extend( {}, this.oauth, {
+            $.oauth($.extend({}, this.oauth, {
                 type: method,
                 url: url,
                 timeout: 120000,
@@ -233,7 +233,8 @@ define(["jquery", "underscore", "oauth", "util"], function($, _, _oauth, Util) {
          * @return a promise with the transcript
          */
         getVideoTranscript: function(youTubeId) {
-            return this._basicAPICall(this.API_V1_BASE + `/videos/${youTubeId}/transcript`);
+            var url = `${this.API_V1_BASE}/videos/${youTubeId}/transcript`;
+            return this._basicAPICall(url);
         },
         /**
          * Obtains an article
@@ -251,11 +252,13 @@ define(["jquery", "underscore", "oauth", "util"], function($, _, _oauth, Util) {
          * @return a promise with the status and other information
          */
         getExerciseByName: function(exerciseName) {
-            return this._basicAPICall(`${this.API_INTERNAL_BASE}/exercises/${exerciseName}`);
+            var url = `${this.API_INTERNAL_BASE}/exercises/${exerciseName}`;
+            return this._basicAPICall(url);
         },
 
         getTaskIfnoByExerciseName: function(exerciseName) {
-            return this._basicAPICall(`${this.API_INTERNAL_BASE}/user/tasks/exercises/${exerciseName}`);
+            var url = `${this.API_INTERNAL_BASE}/user/tasks/exercises/${exerciseName}`;
+            return this._basicAPICall(url);
         },
 
         /**
@@ -265,7 +268,8 @@ define(["jquery", "underscore", "oauth", "util"], function($, _, _oauth, Util) {
          * @return a promise with the task
          */
         getMissions: function(exerciseName) {
-            return this._basicAPICall(`${this.API_INTERNAL_BASE}/user/missions`);
+            var url = `${this.API_INTERNAL_BASE}/user/missions`;
+            return this._basicAPICall(url);
         },
         /**
          * Obtains an exercise
@@ -307,7 +311,8 @@ define(["jquery", "underscore", "oauth", "util"], function($, _, _oauth, Util) {
             return this._basicAPICall(this.API_INTERNAL_BASE + "/user/exercises");
         },
         getUserExercise: function(exerciseName) {
-            return this._basicAPICall(`${this.API_INTERNAL_BASE}/user/exercises/${exerciseName}`);
+            var url = `${this.API_INTERNAL_BASE}/user/exercises/${exerciseName}`;
+            return this._basicAPICall(url);
         },
         /**
          * Reports progress and completion on a video.

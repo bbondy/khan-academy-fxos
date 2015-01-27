@@ -1,3 +1,4 @@
+//jscs:disable
 /* jshint ignore:start */
 
 /**

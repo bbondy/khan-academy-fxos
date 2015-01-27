@@ -1,18 +1,28 @@
-var gulp = require('gulp');
-var jshint = require('gulp-jshint');
-var less = require('gulp-less');
-var concat = require('gulp-concat');
-var uglify = require('gulp-uglify');
-var rename = require('gulp-rename');
-var react = require('gulp-react');
+var gulp = require('gulp'),
+    jshint = require('gulp-jshint'),
+    less = require('gulp-less'),
+    concat = require('gulp-concat'),
+    uglify = require('gulp-uglify'),
+    rename = require('gulp-rename'),
+    react = require('gulp-react'),
+    jsxcs = require("gulp-jsxcs");
+
 
 // Lint Task
 gulp.task('lint', function() {
-    return gulp.src('build/**/*.js')
+    return gulp.src("js/**/*.js")
+        .pipe(jsxcs().on("error", function(err) {
+            console.log(err.toString());
+        }))
+        .pipe(react({
+            harmony: true,
+            // Skip Flow type annotations!
+            stripTypes: true
+        }))
         .pipe(jshint({
             esnext: true
         }))
-        .pipe(jshint.reporter('default'));
+        .pipe(jshint.reporter("default"));
 });
 
 // Compile Our LESS

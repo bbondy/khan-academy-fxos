@@ -1,71 +1,71 @@
 require.config({
-    baseUrl: '/build',
+    baseUrl: "/build",
     paths: {
         // Modules
-        "util": "util",
-        "downloads": "downloads",
-        "apiclient": "apiclient",
-        "main": "main",
-        "oauth": "oauth",
-        "models": "models",
-        "notifications": "notifications",
-        "cache": "cache",
+        util: "util",
+        downloads: "downloads",
+        apiclient: "apiclient",
+        main: "main",
+        oauth: "oauth",
+        models: "models",
+        notifications: "notifications",
+        cache: "cache",
 
         // Modules to test the app
-        "test": "../test/test",
+        test: "../test/test",
         "test-react": "../test/test-react",
-        "sinon": "../test/sinon-1.1.0.3",
+        sinon: "../test/sinon-1.1.0.3",
 
         // Third party libs
-        "react": "../bower_components/react/react-with-addons",
+        react: "../bower_components/react/react-with-addons",
         //"react": "../bower_components/react/react-with-addons.min",
-        "underscore": "../bower_components/underscore/underscore-min",
-        "jquery": "../bower_components/jquery/dist/jquery.min",
-        "backbone": "../bower_components/backbone/backbone",
-        "perseus": "../webapp/javascript/perseus-package/perseus-2",
-        "katex": "../bower_components/katex/build/katex.min",
-        "videojs": "../bower_components/videojs/dist/video-js/video",
-        "kas": "../bower_components/KAS/kas",
-        "mathjax": "../bower_components/MathJax/MathJax",
+        underscore: "../bower_components/underscore/underscore-min",
+        jquery: "../bower_components/jquery/dist/jquery.min",
+        backbone: "../bower_components/backbone/backbone",
+        perseus: "../webapp/javascript/perseus-package/perseus-2",
+        katex: "../bower_components/katex/build/katex.min",
+        videojs: "../bower_components/videojs/dist/video-js/video",
+        kas: "../bower_components/KAS/kas",
+        mathjax: "../bower_components/MathJax/MathJax",
 
         // Views
-        "article": "./views/article",
-        "exercise": "./views/exercise",
-        "chrome": "./views/chrome",
-        "search": "./views/search",
-        "topic": "./views/topic",
-        "video": "./views/video",
-        "pane": "./views/pane",
+        article: "./views/article",
+        exercise: "./views/exercise",
+        chrome: "./views/chrome",
+        search: "./views/search",
+        topic: "./views/topic",
+        video: "./views/video",
+        pane: "./views/pane",
     },
     shim: {
         jquery: {
-          exports: '$'
+          exports: "$"
         },
         underscore: {
           deps: ["jquery"],
-          exports: '_'
+          exports: "_"
         },
         oauth:{
           deps: ["jquery"],
         },
         kas: {
-            exports: 'KAS'
+            exports: "KAS"
         },
         katex: {
-          exports: 'katex'
+          exports: "katex"
         },
         perseus: {
             deps: ["react", "katex", "jquery"],
         },
         backbone: {
           deps:["underscore", "jquery"],
-          exports: 'Backbone'
+          exports: "Backbone"
         },
         videojs: {
-          exports: 'videojs'
+          exports: "videojs"
         },
         mathjax: {
-          exports: 'MathJax'
+          exports: "MathJax"
         },
         waitSeconds: 15
    }
@@ -79,11 +79,11 @@ require.config({
 
 var initModules = [];
 if (window.isTest) {
-    initModules.push('test-react');
-    initModules.push('test');
-    initModules.push('sinon');
+    initModules.push("test-react");
+    initModules.push("test");
+    initModules.push("sinon");
 } else {
-    initModules.push('main');
+    initModules.push("main");
 }
 
 window.Exercises = {

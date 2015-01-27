@@ -43,7 +43,7 @@ define(["jquery", "react", "underscore", "util", "models", "apiclient", "storage
                                        key={transcriptItem.start_time}
                                        onClickTranscript={this.props.onClickTranscript} />;
             });
-            return <ul className='transcript'>{transcriptItems}</ul>;
+            return <ul className="transcript">{transcriptItems}</ul>;
         }
     });
 
@@ -79,7 +79,7 @@ define(["jquery", "react", "underscore", "util", "models", "apiclient", "storage
                 });
             }
 
-            Util.log('video: %o', this.props.video);
+            Util.log("video: %o", this.props.video);
             this.videoId = this.props.video.getId();
             this.initSecondWatched = 0;
             this.lastSecondWatched = 0;
@@ -130,12 +130,14 @@ define(["jquery", "react", "underscore", "util", "models", "apiclient", "storage
             video.play();
         },
         getInitialState: function() {
-            return { showOfflineImage: false };
+            return {
+                showOfflineImage: false
+            };
         },
         _canPlayYoutube: function() {
             if (this.initSecondWatched) {
                 this.player.seekTo(this.initSecondWatched);
-                Util.log('set current time to: ' + this.initSecondWatched);
+                Util.log("set current time to: " + this.initSecondWatched);
                 delete this.initSecondWatched;
             }
             if (this.state.showOfflineImage) {
@@ -148,7 +150,7 @@ define(["jquery", "react", "underscore", "util", "models", "apiclient", "storage
             var video = this._getVideoDOMNode();
             if (this.initSecondWatched) {
                 video.currentTime = this.initSecondWatched;
-                Util.log('set current time to: ' + video.currentTime);
+                Util.log("set current time to: " + video.currentTime);
                 delete this.initSecondWatched;
             }
             if (this.state.showOfflineImage) {
@@ -219,11 +221,11 @@ define(["jquery", "react", "underscore", "util", "models", "apiclient", "storage
                 break;
                 case e.target.error.MEDIA_ERR_SRC_NOT_SUPPORTED:
                     Util.warn("The video could not be loaded, either because the server or network failed or because the format is not supported.");
-                    break;
+                break;
                 default:
                     Util.warn("An unknown error occurred.");
-                    break;
-           }
+                break;
+            }
         },
         _getVideoDOMNode: function() {
             if (!this.videoNode) {
@@ -258,27 +260,29 @@ define(["jquery", "react", "underscore", "util", "models", "apiclient", "storage
         },
         componentDidMount: function() {
             var videoMountNode = this.refs.videoPlaceholder.getDOMNode();
-            this.videoNode = $('<video width="640" height="264" type="' + this.props.video.getContentMimeType() + '"' +
-                ' id="video-player" class="' + this.videoClass + '" preload="auto" src="' + this.videoSrc + '" controls>' +
-                '</video>');
+            this.videoNode = $("<video width='640' height='264' type='" + this.props.video.getContentMimeType() + "'" +
+                " id='video-player' class='" + this.videoClass + "' preload='auto' src='" + this.videoSrc + "' controls>" +
+                "</video>");
             $(videoMountNode).append(this.videoNode);
 
-            this.videojs = videojs(this.videoNode.get(0)/*"video-player"*/, { width: '100%', height: '100%'}, () => {
-                Util.log("Videojs player is initialized and ready.");
-                // Add an event listener to track watched time
-                var video = this._getVideoDOMNode();
-                video.addEventListener("canplay", this._canPlayHTML5.bind(this));
-                video.addEventListener("progress", this._onNetworkProgress.bind(this));
-                video.addEventListener("timeupdate", this._onTimeupdateHTML5);
-                video.addEventListener("play", this._onPlay.bind(this), true);
-                video.addEventListener("pause", this._onPause.bind(this), true);
-                video.addEventListener("stop", this._onStop.bind(this), true);
-                video.addEventListener("ended", this._onEnded.bind(this), true);
-                video.addEventListener("error", this._onError.bind(this), true);
-                video.defaultPlaybackRate = models.AppOptions.get("playbackRate") / 100;
-                video.playbackRate = models.AppOptions.get("playbackRate") / 100;
-                this.videoCreatedPromise.resolve();
-            });
+            this.videojs = videojs(this.videoNode.get(0)/*"video-player"*/, {
+                width: "100%",
+                height: "100%"}, () => {
+                    Util.log("Videojs player is initialized and ready.");
+                    // Add an event listener to track watched time
+                    var video = this._getVideoDOMNode();
+                    video.addEventListener("canplay", this._canPlayHTML5.bind(this));
+                    video.addEventListener("progress", this._onNetworkProgress.bind(this));
+                    video.addEventListener("timeupdate", this._onTimeupdateHTML5);
+                    video.addEventListener("play", this._onPlay.bind(this), true);
+                    video.addEventListener("pause", this._onPause.bind(this), true);
+                    video.addEventListener("stop", this._onStop.bind(this), true);
+                    video.addEventListener("ended", this._onEnded.bind(this), true);
+                    video.addEventListener("error", this._onError.bind(this), true);
+                    video.defaultPlaybackRate = models.AppOptions.get("playbackRate") / 100;
+                    video.playbackRate = models.AppOptions.get("playbackRate") / 100;
+                    this.videoCreatedPromise.resolve();
+                });
         },
 
         // Updates the secondsWatched variable with the difference between the current
@@ -307,8 +311,10 @@ define(["jquery", "react", "underscore", "util", "models", "apiclient", "storage
                 duration: this.MIN_SECONDS_BETWEEN_REPORTS * 1000,
                 step: (num) => {
                     this.pointsObj.num = Math.ceil(num);
-                    var pointsString = document.webL10n.get("points-so-far",
-                        {"earned" : this.pointsObj.num, "available": this.availablePoints});
+                    var pointsString = document.webL10n.get("points-so-far", {
+                        earned: this.pointsObj.num,
+                        available: this.availablePoints
+                    });
                     $(".energy-points.energy-points-video").text(pointsString);
                 }
             });
@@ -352,7 +358,7 @@ define(["jquery", "react", "underscore", "util", "models", "apiclient", "storage
             Util.log("Calling video load!");
             var video = this._getVideoDOMNode();
             if (video) {
-               video.load();
+                video.load();
             }
         },
 
@@ -370,19 +376,21 @@ define(["jquery", "react", "underscore", "util", "models", "apiclient", "storage
             if (this.state.downloadedUrl) {
                 this.videoSrc = this.state.downloadedUrl;
             }
-            Util.log('video rendered with url: ' + this.videoSrc);
-            var pointsString = document.webL10n.get("points-so-far",
-                        {"earned" : this.props.video.getPoints(), "available": this.availablePoints});
+            Util.log("video rendered with url: " + this.videoSrc);
+            var pointsString = document.webL10n.get("points-so-far", {
+                earned: this.props.video.getPoints(),
+                available: this.availablePoints
+            });
             var pointsDiv;
             if (models.CurrentUser.isSignedIn()) {
                 pointsDiv = <div className="energy-points energy-points-video">{pointsString}</div>;
             }
 
             var videoClassObj = {
-              'video-has-transcript': !!this.state.transcript,
-              'video-js': true,
-              'vjs-default-skin': true,
-              'signed-in': models.CurrentUser.isSignedIn()
+              "video-has-transcript": !!this.state.transcript,
+              "video-js": true,
+              "vjs-default-skin": true,
+              "signed-in": models.CurrentUser.isSignedIn()
             };
             var parentDomain = this.props.video && this.props.video.getParentDomain();
             if (parentDomain) {
