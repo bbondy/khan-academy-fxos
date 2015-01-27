@@ -1,5 +1,5 @@
-require(["l10n", "jquery", "underscore", "react", "util", "models", "apiclient", "storage", "downloads", "cache", "minify", "notifications", "status"],
-        function(l10n, $, _, React, Util, models, APIClient, Storage, Downloads, Cache, Minify, Notifications, Status) {
+require(["jquery", "underscore", "react", "util", "models", "apiclient", "storage", "downloads", "cache", "minify", "notifications", "status"],
+        function($, _, React, Util, models, APIClient, Storage, Downloads, Cache, Minify, Notifications, Status) {
 
     QUnit.asyncTest("models.AppOptions.fetch defaults and reset", function(assert) {
         expect(9);
@@ -93,6 +93,43 @@ require(["l10n", "jquery", "underscore", "react", "util", "models", "apiclient",
                 APIClient._basicAPICall.restore();
                 QUnit.start();
             });
+        });
+    });
+
+    // Languages in which topic trees should be tested for
+    var languages = ["en", "fr", "es", "pt", "tr", "bn"];
+    QUnit.asyncTest("testUtil", function(assert) {
+        assert.strictEqual(Util.numberWithCommas("1234567890"),"1,234,567,890");
+        var oneAdder = Util.partial(function(x, y) { return x + y; }, 1);
+        assert.strictEqual(oneAdder(5), 6);
+        assert.strictEqual(window.x, undefined);
+        assert.strictEqual(Util.appendQueryParam("http://test.com?a=b", "x", "y"), "http://test.com?a=b&x=y");
+        assert.strictEqual(Util.appendQueryParam("http://test.com", "x", "y"), "http://test.com?x=y");
+        assert.strictEqual(Util.getParameterByName("a", "?a=b"), "b");
+        assert.strictEqual(Util.getParameterByName("a", "?a=b&c=d"), "b");
+        assert.strictEqual(Util.getParameterByName("c", "?a=b&c=d"), "d");
+        var old = navigator.connection;
+        if (!navigator.connection) {
+            navigator.connection = { metered: false, bandwidth: Infinity };
+            assert.strictEqual(Util.isMeteredConnection(), false);
+            assert.strictEqual(Util.isBandwidthCapped(), false);
+            navigator.connection = { metered: true, bandwidth: 33};
+            assert.strictEqual(Util.isMeteredConnection(), true);
+            assert.strictEqual(Util.isBandwidthCapped(), true);
+            navigator.connection = { metered: false, bandwidth: 33};
+            assert.strictEqual(Util.isMeteredConnection(), false);
+            assert.strictEqual(Util.isBandwidthCapped(), true);
+            navigator.connection = { type: "wifi" };
+            assert.strictEqual(Util.isBandwidthCapped(), false);
+            navigator.connection = { type: "none" };
+            assert.strictEqual(Util.isBandwidthCapped(), false);
+            navigator.connection = { type: "cellular" };
+            assert.strictEqual(Util.isBandwidthCapped(), true);
+        }
+        navigator.connection = old;
+        Util.loadScript("/test/_test1.js").done(function() {
+            assert.strictEqual(window.x, 3);
+            QUnit.start();
         });
     });
 
@@ -209,6 +246,22 @@ require(["l10n", "jquery", "underscore", "react", "util", "models", "apiclient",
             QUnit.start();
         });
     });
+    QUnit.asyncTest("Storage.init", function(assert) {
+        expect(1);
+        Storage.init().then(function() {
+            if (!Util.isFirefoxOS()) {
+                assert.ok(true);
+                QUnit.start();
+                return;
+            }
+            return Storage.writeText("test-file", "test");
+        }).then(function() {
+            return Storage.readText("test-file");
+        }).done(function(result) {
+            assert.strictEqual(result, "test");
+            QUnit.start();
+        });
+    });
     QUnit.asyncTest("Downloads.init", function(assert) {
         expect(1);
         Downloads.init().done(function() {
@@ -269,18 +322,18 @@ require(["l10n", "jquery", "underscore", "react", "util", "models", "apiclient",
     });
 
     QUnit.test("testLocalization", function(assert) {
-        l10n.setAsyncLoading(false);
-        l10n.setExactLangOnly(true);
-        var enDict = l10n.getData();
+        document.webL10n.setAsyncLoading(false);
+        document.webL10n.setExactLangOnly(true);
+        var enDict = document.webL10n.getData();
         var otherLanguages = languages.slice(1);
 
         // Make sure each localization file has an associated string
         otherLanguages.forEach(function(lang) {
-            l10n.setLanguage(lang);
+            document.webL10n.setLanguage(lang);
             for (var s in enDict) {
                 if (enDict.hasOwnProperty(s)) {
 
-                    var translated = l10n.get(s);
+                    var translated = document.webL10n.get(s);
                     if (!translated) {
                         console.error("Not localized! lang: %s, prop: %s, en-associated: %o",
                             lang, s, enDict[s], lang);

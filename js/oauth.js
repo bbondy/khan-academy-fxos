@@ -1,6 +1,4 @@
-//jscs:disable
 /* jshint ignore:start */
-
 /*
  * A JavaScript implementation of the Secure Hash Algorithm, SHA-1, as defined
  * in FIPS PUB 180-1
@@ -9,8 +7,6 @@
  * Distributed under the BSD License
  * See http://pajhome.org.uk/crypt/md5 for details.
  */
-
-var $ = require("jquery");
 
 /*
  * Configurable variables. You may need to tweak these to be compatible with
