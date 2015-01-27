@@ -1,6 +1,6 @@
 {
     "corelib-package.js": ["react/addons", "jquery", "underscore", "backbone"],
-    "exercise-package.js": ["./bower_components/katex/build/katex.min.js", "./bower_components/KAS/kas.js", "./bower_components/MathJax/MathJax.js"],
+    "exercise-package.js": ["./bower_components/katex/build/katex.min.js", "./bower_components/MathJax/MathJax.js"],
     "video-package.js": ["video.js"],
     "common-package.js": ["./js/downloads.js",
                           "./js/minify.js",
