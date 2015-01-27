@@ -7,16 +7,17 @@
     "test": "test"
   },
   "dependencies": {
+    "JSONStream": "^0.10.0",
     "backbone": "^1.1.2",
     "browserify": "^8.1.1",
     "connect": "^3.3.2",
     "es6-default-params": "^0.4.3",
+    "event-stream": "^3.2.1",
     "exorcist": "^0.1.6",
     "gulp": "^3.8.10",
     "gulp-concat": "^2.4.3",
     "gulp-flowtype": "^0.4.1",
     "gulp-jshint": "^1.9.0",
-    "gulp-less": "^2.0.1",
     "gulp-notify": "^2.1.0",
     "gulp-react": "^2.0.0",
     "gulp-rename": "^1.2.0",
