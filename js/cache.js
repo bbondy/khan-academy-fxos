@@ -12,10 +12,9 @@
  * init will not wait for the result.
  */
 
-var $ = require("jquery");
-var Util = require("./util");
-var models = require("./models");
-
+var $ = require("jquery"),
+    Util = require("./util"),
+    models = require("./models");
 
 var TEN_MINUTES = 1000 * 60 * 10;
 var Cache = {
@@ -24,7 +23,7 @@ var Cache = {
     /**
      * Initializes the cache manager
      */
-    init: function() {
+    init: function(): any {
         var d = $.Deferred();
 
         this.lastUserInfoRefresh = localStorage.getItem(this.heartbeatUserInfoName);
@@ -46,7 +45,7 @@ var Cache = {
      *   - refreshing logged in info (at most every 12 hours)
      *   - refreshing the topic tree (at most once a week)
      */
-    heartbeat: function() {
+    heartbeat: function(): any {
         if (Util.isMeteredConnection()) {
             Util.log("skipping heartbeat due to metered connection!");
             return;

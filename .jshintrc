@@ -76,8 +76,6 @@
     "-W040"         : true,     // Possible strict warning
 
     "globals": {
-        "$": false,
-        "_": false,
         "MozActivity": false,
         "Notification": false,
         "ArchiveReader": false,

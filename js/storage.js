@@ -10,7 +10,7 @@ var Storage = {
      * Initializes the device storage for the sd card.
      * Must be called before any other API.
      */
-    init: function() {
+    init: function(): any {
         if (!navigator.getDeviceStorage || !Util.isFirefoxOS()) {
             return $.Deferred().resolve().promise();
         }
@@ -26,7 +26,7 @@ var Storage = {
     /**
      * Returns a promise which when resolved contains an array of binary data
      */
-    readAsBlob: function(filename: string) {
+    readAsBlob: function(filename: string): any {
         var d = $.Deferred();
         if (!this.sdcard) {
             return d.reject().promise();
@@ -46,7 +46,7 @@ var Storage = {
     /**
      * Returns a promise which when resolved contains a string of data
      */
-    readText: function(filename: string) {
+    readText: function(filename: string): any {
         var d = $.Deferred();
         if (!this.sdcard) {
             return d.reject().promise();
@@ -71,7 +71,7 @@ var Storage = {
      * Deletes the specified file from sdstorage.
      * Resolves if the file no longer exists, wehther or not it was deleted.
      */
-    delete: function(filename: string) {
+    delete: function(filename: string): any {
         var d = $.Deferred();
         if (!this.sdcard) {
             return d.reject().promise();

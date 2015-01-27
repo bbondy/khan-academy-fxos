@@ -2,6 +2,7 @@
 
 "use strict";
 
+/*
 // Perseus module uses React directly and uses $._ directly for
 // localization, so we do this as a hack to get it to work
 function perseusPrep(katex, KAS, MathJax) {
@@ -11,14 +12,11 @@ function perseusPrep(katex, KAS, MathJax) {
     window.KAS = KAS;
     window.MathJax = MathJax;
 }
+*/
 
-var $ = require("jquery"),
-    _ = require("underscore"),
-    React = require("react/addons"),
+var React = require("react/addons"),
     Util = require("../util"),
-    models = require("../models"),
-    APIClient = require("../apiclient"),
-    Storage = require("../storage");
+    APIClient = require("../apiclient");
 
 /**
  * Represents a single exercise, it will load the exercise dynamically and

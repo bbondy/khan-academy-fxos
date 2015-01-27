@@ -2,9 +2,9 @@
 
 "use strict";
 
+require("./oauth");
 var $ = require("jquery"),
     _ = require("underscore"),
-    _oauth = require("./oauth"),
     Util = require("./util");
 
 /**
@@ -31,14 +31,14 @@ var APIClient = {
     /**
      * Save oauth info to local storage
      */
-    _saveAuth: function() {
+    _saveAuth: function(): any {
         localStorage.setItem(this._localStorageAuthName, JSON.stringify(this.oauth));
     },
     /**
      * Obtains the locally stored secrets file.
      * TODO: We could just make the secrets file javascript and include the script!
      */
-    _getSecrets: function() {
+    _getSecrets: function(): any {
         // First check if we have the info from the local storage values
         // If so just resolve from that.
         if (this.oauth.consumerKey && this.oauth.consumerSecret) {
@@ -56,7 +56,7 @@ var APIClient = {
     /**
      * Obtains the access token using the request token and oauth verifier.
      */
-    _getAccessToken: function() {
+    _getAccessToken: function(): any {
         var d = $.Deferred();
         $.oauth($.extend({}, this.oauth, {
             type: "GET",
@@ -91,7 +91,7 @@ var APIClient = {
      *
      * @return a promise which resolves when the object is initialized.
      */
-    init: function() {
+    init: function(): any {
         // If a login is not in progress, then load the auth info
         var oauthVerifier = Util.getParameterByName("oauth_token");
         if (!oauthVerifier) {
