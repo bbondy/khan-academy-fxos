@@ -76,6 +76,9 @@ gulp.task("react", function() {
 
 gulp.task("browserify", function() {
 
+    gulp.src('./js/init.js')
+        .pipe(gulp.dest('./build'));
+
     return fs.createReadStream("javascript-packages.json")
         .pipe(JSONStream.parse())
         .pipe(es.mapSync(function (packages) {
@@ -100,7 +103,6 @@ gulp.task("browserify", function() {
                 });
                 b.external(otherFiles);
                 b.require(packages[p]);
-                b.pipeline
 
                 // Convert to react and strip out Flow types
                 b.transform({

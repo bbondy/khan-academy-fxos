@@ -1,0 +1,3 @@
+mkdir dist
+mkdir dist/package
+cp -Rf build data fonts index.html locales manifest.webapp secrets.json style tools img dist/package/
