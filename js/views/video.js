@@ -86,7 +86,7 @@ var VideoViewerRawObj: {
     componentWillMount: function() {
 
         // TODO: Make this load async
-        loadPackage("video-package.js", false);
+        loadPackage("video-package.js");
         videojs = require("video.js");
 
         Util.log("VideoViewer will mount");
