@@ -17,6 +17,7 @@ var gulp = require("gulp"),
     fs = require("fs"),
     es = require("event-stream"),
     JSONStream = require("JSONStream"),
+    runSequence = require("run-sequence"),
     _ = require("underscore");
 
 // Lint Task
@@ -74,14 +75,19 @@ gulp.task("react", function() {
         .pipe(gulp.dest("./build"));
 });
 
-gulp.task("browserify", function() {
+gulp.task("copy-init", function() {
+    return gulp.src("./js/init.js")
+        .pipe(gulp.dest("./build"));
+});
 
-    gulp.src('./js/init.js')
-        .pipe(gulp.dest('./build'));
-
+var packages = {};
+var allFiles = [];
+gulp.task("read-packages", function() {
     return fs.createReadStream("javascript-packages.json")
         .pipe(JSONStream.parse())
-        .pipe(es.mapSync(function (packages) {
+        .pipe(es.mapSync(function (p) {
+            packages = p;
+
             // Collect all files
             var allFiles = [];
             for (p in packages) {
@@ -104,19 +110,39 @@ gulp.task("browserify", function() {
                 b.external(otherFiles);
                 b.require(packages[p]);
 
-                // Convert to react and strip out Flow types
-                b.transform({
-                    "strip-types": true,
-                    es6: true}, reactify)
-                // Convert out ES6 default params
-                .transform(es6defaultParams)
-                .bundle()
-                // Exttract the source map fro the source bundle
-                .pipe(exorcist(mapfile))
-                .pipe(fs.createWriteStream(path.join(__dirname, './build/' + p), 'utf8'));
+                (function(p, b) {
+                    // Create a new gulp task with the name of the package
+                    gulp.task(p, function() {
+                        // Convert to react and strip out Flow types
+                        return b.transform({
+                            "strip-types": true,
+                            es6: true}, reactify)
+                        // Convert out ES6 default params
+                        .transform(es6defaultParams)
+                        .bundle()
+                        // Exttract the source map fro the source bundle
+                        .pipe(exorcist(mapfile))
+                        .pipe(fs.createWriteStream(path.join(__dirname, "./build/" + p), "utf8"));
+                    });
+                })(p, b);
             }
-         }));
+
+
+        }));
 });
+
+gulp.task("build-packages", function(cb) {
+    // Note the packages are not run sequentially, they are run together
+    // and then the callback cb is run sequentially after they are all
+    // complete.
+    runSequence(_.keys(packages), cb);
+});
+
+gulp.task("browserify", function(cb) {
+    runSequence(["copy-init", "read-packages"], "build-packages", cb);
+});
+
+
 
 // Concatenate & Minify JS
 gulp.task("releasify", function() {
@@ -130,7 +156,7 @@ gulp.task("releasify", function() {
 
 // Test
 gulp.task("test", function() {
-     return gulp.src('__tests__').pipe(jest({
+     return gulp.src("__tests__").pipe(jest({
         scriptPreprocessor: "./js/preprocessor.js",
         unmockedModulePathPatterns: [
             "node_modules/react"
