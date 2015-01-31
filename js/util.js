@@ -186,11 +186,11 @@ var Util = {
      * Formats a number with thousand separators
      * http://stackoverflow.com/a/2901298/3153
      */
-    numberWithCommas: function(x: number): string {
+    numberWithCommas: function(x: any): string {
         if (_.isUndefined(x)) {
             return "0";
         }
-        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        return String(x).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     },
     /**
      * Binds a set of arguments to a function without modifying the bound `this`
