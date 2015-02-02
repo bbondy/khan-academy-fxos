@@ -11,7 +11,6 @@ var gulp = require("gulp"),
     jest = require("gulp-jest"),
     browserify = require("browserify"),
     reactify = require("reactify"),
-    es6defaultParams = require("es6-default-params"),
     transform = require("vinyl-transform"),
     exorcist = require("exorcist"),
     fs = require("fs"),
@@ -107,8 +106,31 @@ gulp.task("read-packages", function() {
                 var b = browserify({
                     debug: true
                 });
-                b.external(otherFiles);
-                b.require(packages[p]);
+
+                otherFiles.forEach(function(f) {
+                    var data = f.split(":")
+                    if (data.length === 1) {
+                        b.external(data[0]);
+                    } else if (data.length > 1) {
+                        b.external(data[0]);
+                    } else {
+                        console.error("no file specified for gulp package")
+                    }
+                });
+
+
+                packages[p].forEach(function(f) {
+                    var data = f.split(":")
+                    if (data.length === 1) {
+                        b.require(data[0]);
+                    } else if (data.length > 1) {
+                        b.require(data[1], {
+                            expose: data[0]
+                        });
+                    } else {
+                        console.error("no file specified for gulp package")
+                    }
+                });
 
                 (function(p, b) {
                     // Create a new gulp task with the name of the package
@@ -117,10 +139,8 @@ gulp.task("read-packages", function() {
                         return b.transform({
                             "strip-types": true,
                             es6: true}, reactify)
-                        // Convert out ES6 default params
-                        .transform(es6defaultParams)
                         .bundle()
-                        // Exttract the source map fro the source bundle
+                        // Extract the source map fro the source bundle
                         .pipe(exorcist(mapfile))
                         .pipe(fs.createWriteStream(path.join(__dirname, "./build/" + p), "utf8"));
                     });
