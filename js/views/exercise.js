@@ -2,7 +2,6 @@
 
 "use strict";
 
-/*
 // Perseus module uses React directly and uses $._ directly for
 // localization, so we do this as a hack to get it to work
 function perseusPrep(katex, KAS, MathJax) {
@@ -12,11 +11,13 @@ function perseusPrep(katex, KAS, MathJax) {
     window.KAS = KAS;
     window.MathJax = MathJax;
 }
-*/
 
 var React = require("react/addons"),
     Util = require("../util"),
-    APIClient = require("../apiclient");
+    loadPackage = require("../load-package"),
+    APIClient = require("../apiclient"),
+    _ = require("underscore"),
+    $ = require("jquery");
 
 /**
  * Represents a single exercise, it will load the exercise dynamically and
@@ -97,28 +98,26 @@ var ExerciseViewer = React.createClass({
             });
         }
 
-        /*
-         * TODO
-        requirejs(["../../khan-exercises/khan-exercise"], function(Khan) {
-            window.Khan = Khan;
-            window.$ = $;
-            window._ = _;
-            window.React = React;
-            window.KhanUtil = Khan.Util;
+        loadPackage("exercise-package.js");
 
-            katex = require("../../bower_components/katex/build/katex.min"),
-            KAS = require("../../bower_components/KAS/kas"),
-            MathJax = require("../../bower_components/MathJax/MathJax");
+        // TODO: Make this load async
+        window._ = _;
+        window.React = React;
+        window.$ = $;
+        var Khan = require("Khan");
+        window.Khan = Khan;
+        window.KhanUtil = Khan.Util;
 
-            perseusPrep(katex, KAS, MathJax, Khan.Util);
-            var Perseus = require("../../webapp/javascript/perseus-package/perseus-2");
-            Perseus.init({}).then(() => {
-                Util.log("Perseus init done %o, %o", Perseus);
-                this.ItemRenderer = Perseus.ItemRenderer;
-                this.forceUpdate();
-            });
+        var katex = require("katex"),
+            KAS = require("KAS"),
+            MathJax = require("MathJax"),
+            Perseus = require("Perseus");
+        perseusPrep(katex, KAS, MathJax, Khan.Util);
+        Perseus.init({}).then(() => {
+            Util.log("Perseus init done %o, %o", Perseus);
+            this.ItemRenderer = Perseus.ItemRenderer;
+            this.forceUpdate();
         });
-        */
     },
     componentDidMount: function() {
     },
