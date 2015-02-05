@@ -104,6 +104,9 @@ var ExerciseViewer = React.createClass({
         window._ = _;
         window.React = React;
         window.$ = $;
+        window.Exercises = {
+            cluesEnabled: false
+        };
         var Khan = require("Khan");
         window.Khan = Khan;
         window.KhanUtil = Khan.Util;
