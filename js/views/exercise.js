@@ -104,22 +104,24 @@ var ExerciseViewer = React.createClass({
         window._ = _;
         window.React = React;
         window.$ = $;
+        $._ = (x) => x;
+        window.jQuery = $;
         window.Exercises = {
             cluesEnabled: false
         };
-        var Khan = require("Khan");
-        window.Khan = Khan;
-        window.KhanUtil = Khan.Util;
+        requirejs(["./khan-exercises/khan-exercise", "./bower_components/MathJax/MathJax.js"], (Khan_, MathJax_) => {
+            window.Khan = Khan;
+            window.KhanUtil = Khan.Util;
 
-        var katex = require("katex"),
-            KAS = require("KAS"),
-            MathJax = require("MathJax"),
-            Perseus = require("Perseus");
-        perseusPrep(katex, KAS, MathJax, Khan.Util);
-        Perseus.init({}).then(() => {
-            Util.log("Perseus init done %o, %o", Perseus);
-            this.ItemRenderer = Perseus.ItemRenderer;
-            this.forceUpdate();
+            var katex = require("katex"),
+                KAS = require("KAS"),
+                Perseus = require("Perseus");
+            perseusPrep(katex, KAS, MathJax, Khan.Util);
+            Perseus.init({}).then(() => {
+                Util.log("Perseus init done %o, %o", Perseus);
+                this.ItemRenderer = Perseus.ItemRenderer;
+                this.forceUpdate();
+            });
         });
     },
     componentDidMount: function() {

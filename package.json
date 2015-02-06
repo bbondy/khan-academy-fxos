@@ -31,7 +31,6 @@
     "react-tools": "^0.12.2",
     "reactify": "^0.17.1",
     "regenerator": "^0.8.9",
-    "requirejs": "^2.1.15",
     "serve-static": "^1.7.1",
     "uglify": "^0.1.1",
     "underscore": "^1.7.0",

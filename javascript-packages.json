@@ -1,7 +1,10 @@
 {
     "corelib-package.js": ["react/addons", "jquery", "underscore", "backbone"],
-    "exercise-package.js": ["./bower_components/katex/build/katex.min.js", "./bower_components/MathJax/MathJax.js"],
     "video-package.js": ["video.js"],
+    "exercise-package.js": ["katex:./bower_components/katex/build/katex.min.js",
+                            "Perseus:./bower_components/perseus/perseus-2",
+                            "KAS:./bower_components/KAS/kas"
+                            ],
     "common-package.js": ["./js/downloads.js",
                           "./js/minify.js",
                           "./js/oauth.js",
