@@ -9,7 +9,6 @@ function perseusPrep(katex, KAS, MathJax) {
     window.$_ = function(x) { return x; };
     window.katex = katex;
     window.KAS = KAS;
-    window.MathJax = MathJax;
 }
 
 var React = require("react/addons"),
@@ -109,8 +108,13 @@ var ExerciseViewer = React.createClass({
         window.Exercises = {
             cluesEnabled: false
         };
-        requirejs(["./khan-exercises/khan-exercise", "./bower_components/MathJax/MathJax.js"], (Khan_, MathJax_) => {
-            window.Khan = Khan;
+
+        var requirejs = require("../requirejs");
+        console.log(requirejs);
+        // Make Flow happy
+        requirejs(["./khan-exercises/khan-exercise", "./bower_components/MathJax/MathJax"], (Khan, MathJax) => {
+            Khan = Khan || window.Khan;
+            MathJax = MathJax || window.MathJax;
             window.KhanUtil = Khan.Util;
 
             var katex = require("katex"),

@@ -78,6 +78,10 @@ gulp.task("copy-init", function() {
     return gulp.src("./js/init.js")
         .pipe(gulp.dest("./build"));
 });
+gulp.task("copy-require-init", function() {
+    return gulp.src("./js/require-init.js")
+        .pipe(gulp.dest("./build"));
+});
 
 var packages = {};
 var allFiles = [];
@@ -159,7 +163,7 @@ gulp.task("build-packages", function(cb) {
 });
 
 gulp.task("browserify", function(cb) {
-    runSequence(["copy-init", "read-packages"], "build-packages", cb);
+    runSequence(["copy-init", "copy-require-init", "read-packages"], "build-packages", cb);
 });
 
 
