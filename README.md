@@ -73,6 +73,10 @@ The size is listed in pages (4 KB/page).
 
 `adb shell dmesg | tail -20`
 
+## Branches
+
+There are 2 main branches. One with AMD module loading (requirejs) and one for CommonJS (using browserify) . I'm unsure which will survive yet.
+
 ## Contribute
 
 Please feel free to contribute directly by adding pull requests and issues through github.
