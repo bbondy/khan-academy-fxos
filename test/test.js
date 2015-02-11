@@ -251,22 +251,6 @@ require(["l10n", "jquery", "underscore", "react", "util", "models", "apiclient",
             assert.ok(Cache.timer);
         });
     });
-    QUnit.test("Notifications.info", function(assert) {
-        var notificationPropExists = !!window.Notification;
-        window.Notification = window.Notification || function() {};
-        var title = "title";
-        var message = "message";
-        sinon.stub(window, "Notification", function(t, m) {
-            assert.strictEqual(t, title);
-            assert.strictEqual(m.body, message);
-        });
-        Notifications.info(title, message);
-        if (notificationPropExists) {
-            window.Notification.restore();
-        } else {
-            delete window.Notification;
-        }
-    });
 
     QUnit.test("testLocalization", function(assert) {
         l10n.setAsyncLoading(false);
