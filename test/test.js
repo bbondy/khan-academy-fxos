@@ -96,25 +96,6 @@ require(["l10n", "jquery", "underscore", "react", "util", "models", "apiclient",
         });
     });
 
-    QUnit.asyncTest("APIClient.init", function(assert) {
-        expect(5);
-        APIClient.init().done(function() {
-            // Consumer key and secret should be available after init
-            assert.ok(APIClient.oauth.consumerKey);
-            assert.ok(APIClient.oauth.consumerSecret);
-            APIClient.getTopicTree().done(function() {
-                assert.ok(true);
-                return APIClient.getVideoTranscript();
-            }).then(function() {
-                assert.ok(true);
-                return APIClient.getVideoTranscript();
-            }).done(function() {
-                assert.ok(true);
-                QUnit.start();
-            });
-        });
-    });
-
     QUnit.asyncTest("models.TopicTree.init", function(assert) {
 
         // Helper method for validating a valid topic
