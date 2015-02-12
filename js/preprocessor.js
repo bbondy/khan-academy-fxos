@@ -6,9 +6,12 @@ var ReactTools = require("react-tools"),
 module.exports = {
     process: function(src) {
         src = es6defaultParams.compile(src).code;
-        src = regenerator.compile(src, {
-            includeRuntime: true
-        }).code;
+        // Regenerator has a bug when using backbone
+        if (src.indexOf("root.Backbone = factory(") === -1) {
+            src = regenerator.compile(src, {
+                includeRuntime: true
+            }).code;
+        }
         return ReactTools.transform(src, {
             stripTypes: true,
             harmony: true
