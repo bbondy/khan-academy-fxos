@@ -50,7 +50,6 @@ describe("Util module", function() {
         navigator.connection = old;
         Util.loadScript("/test/_test1.js").done(function() {
             expect(window.x).toBe(3);
-            QUnit.start();
         });
     });
 });
