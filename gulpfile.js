@@ -37,7 +37,7 @@ gulp.task("lint", function() {
 });
 
 gulp.task("typecheck", function() {
-    return gulp.src("js/**/*.js")
+    return gulp.src(["js/**/*.js", "!./js/**/__tests__/*.js"])
         .pipe(flowtype({
             declarations: "./flowtypes",
             background: false,    // Watch/Server mode
@@ -65,7 +65,7 @@ gulp.task("less", function() {
 // This is only present if the errors from
 // browserify/reactify are not good enough.
 gulp.task("react", function() {
-    return gulp.src("./js/**/*.js")
+    return gulp.src(["./js/**/*.js"])
         .pipe(react({
             harmony: true,
             // Skip Flow type annotations!
@@ -200,11 +200,11 @@ gulp.task("test", function() {
 
 // Watch Files For Changes
 gulp.task("watch", function() {
-    gulp.watch("js/**/*.js", ["lint", "typecheck", "browserify"]);
+    gulp.watch("js/**/*.js", ["lint", "browserify"]);
     gulp.watch("style/**/*.less", ["less"]);
 });
 
 // Default Task
 // Not including Flow typechecking by default because it takes so painfully long.
 // Maybe because of my code layout or otheriwse, needto figure it out before enabling by default.
-gulp.task("default", ["lint", "typecheck", "less", "browserify", "watch"]);
+gulp.task("default", ["lint", "less", "browserify", "watch"]);
