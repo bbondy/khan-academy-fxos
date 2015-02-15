@@ -919,7 +919,8 @@ var UserModel = Backbone.Model.extend({
 var TempAppStateModel = Backbone.Model.extend({
     defaults: {
         currentDownloadRequest: null,
-        isTopicDownloading: false
+        isTopicDownloading: false,
+        showingStatus: false,
     }
 });
 

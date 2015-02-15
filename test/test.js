@@ -158,24 +158,6 @@ require(["l10n", "jquery", "underscore", "react", "util", "models", "apiclient",
             QUnit.start();
         });
     });
-    QUnit.asyncTest("Status.start, stop, update", function(assert) {
-        expect(6);
-        assert.ok(!models.TempAppState.get("showingStatus"));
-        Status.start();
-        assert.strictEqual(models.TempAppState.get("showingStatus"), true);
-        var message = "hello world!";
-        Status.update(message);
-        assert.strictEqual(models.TempAppState.get("status"), message);
-        message = "changed message!";
-        Status.update(message);
-        assert.strictEqual(models.TempAppState.get("status"), message);
-        Status.stop();
-        setTimeout(function() {
-            assert.strictEqual(models.TempAppState.get("status"), "");
-            assert.strictEqual(models.TempAppState.get("showingStatus"), false);
-            QUnit.start();
-        });
-    });
     QUnit.asyncTest("Cache.init", function(assert) {
         expect(2);
         Cache.heartbeatInterval = 100;
