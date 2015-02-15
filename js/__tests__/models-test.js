@@ -1,4 +1,5 @@
 jest.dontMock("../models");
+var models = require("../models");
 
 describe("models module", function() {
     beforeEach(function () {
@@ -15,8 +16,6 @@ describe("models module", function() {
     });
 
     it("models.AppOptions.fetch defaults and reset", function(assert) {
-
-        var models = require("../models");
         models.AppOptions.fetch().done(function() {
             models.AppOptions.reset();
             expect(models.AppOptions.get("showDownloadsOnly")).toBe(false);
@@ -39,4 +38,17 @@ describe("models module", function() {
             expect(models.AppOptions.get("playbackRate")).toBe(100);
         });
     });
+
+    it("models.CurrentUser.init works", function(assert) {
+        var initRan = false;
+        waitsFor(() => {
+            return initRan;
+        });
+
+         models.CurrentUser.init().done(function() {
+              expect(models.CurrentUser.initialized).toBe(true);
+              initRan = true;
+          });
+    });
+
 });

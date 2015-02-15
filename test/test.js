@@ -158,13 +158,6 @@ require(["l10n", "jquery", "underscore", "react", "util", "models", "apiclient",
             QUnit.start();
         });
     });
-    QUnit.asyncTest("models.CurrentUser.init", function(assert) {
-        expect(1);
-        models.CurrentUser.init().done(function() {
-            assert.ok(models.CurrentUser.initialized);
-            QUnit.start();
-        });
-    });
     QUnit.asyncTest("Status.start, stop, update", function(assert) {
         expect(6);
         assert.ok(!models.TempAppState.get("showingStatus"));
