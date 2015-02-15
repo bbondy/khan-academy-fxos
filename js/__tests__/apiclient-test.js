@@ -7,13 +7,13 @@ describe("APIClient", function() {
     beforeEach(function () {
         window.localStorage = {};
         localStorage.setItem = function (key, val) {
-             this[key] = val + '';
+             window.localStorage[key] = val + '';
         }
         localStorage.getItem = function (key) {
-            return this[key] || null;
+            return window.localStorage[key] || null;
         }
         Object.defineProperty(localStorage, 'length', {
-            get: function () { return Object.keys(this).length - 2; }
+            get: function () { return Object.keys(window.localStorage).length - 2; }
         });
     });
 

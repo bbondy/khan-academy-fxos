@@ -158,24 +158,6 @@ require(["l10n", "jquery", "underscore", "react", "util", "models", "apiclient",
             QUnit.start();
         });
     });
-    QUnit.asyncTest("Cache.init", function(assert) {
-        expect(2);
-        Cache.heartbeatInterval = 100;
-        var count = 0;
-        sinon.stub(Cache, "heartbeat", function() {
-            ++count;
-            if (count >= 3) {
-                assert.ok(true);
-                window.clearInterval(Cache.timer);
-                Cache.heartbeat.restore();
-                QUnit.start();
-            }
-        });
-        Cache.init().done(function() {
-            assert.ok(Cache.timer);
-        });
-    });
-
     QUnit.test("testLocalization", function(assert) {
         l10n.setAsyncLoading(false);
         l10n.setExactLangOnly(true);
