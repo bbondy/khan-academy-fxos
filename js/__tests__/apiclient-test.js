@@ -10,7 +10,7 @@ describe("APIClient", function() {
              this[key] = val + '';
         }
         localStorage.getItem = function (key) {
-            return this[key];
+            return this[key] || null;
         }
         Object.defineProperty(localStorage, 'length', {
             get: function () { return Object.keys(this).length - 2; }

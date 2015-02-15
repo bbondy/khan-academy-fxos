@@ -942,9 +942,9 @@ var AppOptionsModel = Backbone.Model.extend({
             localStorage.setItem(this._name, JSON.stringify(this.toJSON()));
         } else if (method === "read") {
             var result = localStorage.getItem(this._name);
-            var attributes = this.parse(JSON.parse(result));
-            if (attributes) {
-                this.attributes = attributes;
+            var attr = this.parse(JSON.parse(result));
+            if (attr) {
+                this.attributes = attr;
             }
         } else if (method === "delete") {
             // You can't delete options!

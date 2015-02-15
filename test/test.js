@@ -1,31 +1,6 @@
 require(["l10n", "jquery", "underscore", "react", "util", "models", "apiclient", "storage", "downloads", "cache", "minify", "notifications", "status"],
         function(l10n, $, _, React, Util, models, APIClient, Storage, Downloads, Cache, Minify, Notifications, Status) {
 
-    QUnit.asyncTest("models.AppOptions.fetch defaults and reset", function(assert) {
-        expect(9);
-        models.AppOptions.fetch().done(function() {
-            models.AppOptions.reset();
-            assert.strictEqual(models.AppOptions.get("showDownloadsOnly"), false);
-            assert.strictEqual(models.AppOptions.get("showTranscripts"), true);
-            assert.strictEqual(models.AppOptions.get("playbackRate"), 100);
-
-            // Change settings
-            models.AppOptions.set("showDownloadsOnly", true);
-            models.AppOptions.set("showTranscripts", false);
-            models.AppOptions.set("playbackRate", 200);
-            assert.strictEqual(models.AppOptions.get("showDownloadsOnly"), true);
-            assert.strictEqual(models.AppOptions.get("showTranscripts"), false);
-            assert.strictEqual(models.AppOptions.get("playbackRate"), 200);
-
-            // Now reset back to default
-            models.AppOptions.reset();
-            assert.strictEqual(models.AppOptions.get("showDownloadsOnly"), false);
-            assert.strictEqual(models.AppOptions.get("showTranscripts"), true);
-            assert.strictEqual(models.AppOptions.get("playbackRate"), 100);
-            QUnit.start();
-        });
-    });
-
     QUnit.asyncTest("test APIClient calls the right things", function(assert) {
 
         APIClient.init().done(function() {
