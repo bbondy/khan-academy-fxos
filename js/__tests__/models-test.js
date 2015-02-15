@@ -2,16 +2,18 @@ jest.dontMock("../models");
 var models = require("../models");
 
 describe("models module", function() {
-    beforeEach(function () {
+    beforeEach(function() {
         window.localStorage = {};
-        localStorage.setItem = function (key, val) {
-             this[key] = val + '';
-        }
-        localStorage.getItem = function (key) {
+        localStorage.setItem = function(key, val) {
+            this[key] = val + "";
+        };
+        localStorage.getItem = function(key) {
             return this[key] || null;
-        }
-        Object.defineProperty(localStorage, 'length', {
-            get: function () { return Object.keys(this).length - 2; }
+        };
+        Object.defineProperty(localStorage, "length", {
+            get: function() {
+                return Object.keys(this).length - 2;
+            }
         });
     });
 
@@ -45,10 +47,10 @@ describe("models module", function() {
             return initRan;
         });
 
-         models.CurrentUser.init().done(function() {
-              expect(models.CurrentUser.initialized).toBe(true);
-              initRan = true;
-          });
+        models.CurrentUser.init().done(function() {
+            expect(models.CurrentUser.initialized).toBe(true);
+            initRan = true;
+        });
     });
 
 });

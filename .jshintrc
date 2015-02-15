@@ -79,7 +79,13 @@
         "MozActivity": false,
         "Notification": false,
         "ArchiveReader": false,
-        "define": false
+        "define": false,
+        "describe"   : false,
+        "it"         : false,
+        "before"     : false,
+        "beforeEach" : false,
+        "after"      : false,
+        "afterEach"  : false
     }
 }
 
