@@ -77,7 +77,7 @@ The size is listed in pages (4 KB/page).
 
 ## Branches
 
-There are 2 main branches. One with AMD module loading (requirejs) and one for CommonJS (using browserify) . I'm unsure which will survive yet.
+There are 2 main branches. One with AMD module loading (requirejs) and one for CommonJS (using browserify) . Master is based on the browserify version but is not currently stable yet.
 
 ## Contribute
 
