@@ -6,7 +6,6 @@ var gulp = require("gulp"),
     path = require("path"),
     rename = require("gulp-rename"),
     react = require("gulp-react"),
-    flowtype = require("gulp-flowtype"),
     jsxcs = require("gulp-jsxcs"),
     jest = require("gulp-jest"),
     browserify = require("browserify"),
@@ -32,22 +31,6 @@ gulp.task("lint", function() {
         }))
         .pipe(jshint({
             esnext: true
-        }))
-        .pipe(jshint.reporter("default"));
-});
-
-gulp.task("typecheck", function() {
-    return gulp.src(["js/**/*.js", "!./js/**/__tests__/*.js"])
-        .pipe(flowtype({
-            declarations: "./flowtypes",
-            background: false,    // Watch/Server mode
-            all: false,           // Check all files regardless
-            lib: "",              // Library directory
-            module: "",           // Module mode
-            stripRoot: false,     // Relative vs Absolute paths
-            weak: false,          // Force weak check
-            showAllErrors: false, // Show more than 50 errors
-            killFlow: false,
         }))
         .pipe(jshint.reporter("default"));
 });
