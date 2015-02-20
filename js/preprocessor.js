@@ -7,14 +7,15 @@ module.exports = {
     process: function(src) {
         src = es6defaultParams.compile(src).code;
         // Regenerator has a bug when using backbone
-        if (src.indexOf("root.Backbone = factory(") === -1) {
+        if (src.indexOf("\"enable_regenerator\"") !== -1) {
             src = regenerator.compile(src, {
                 includeRuntime: true
             }).code;
         }
-        return ReactTools.transform(src, {
+        src = ReactTools.transform(src, {
             stripTypes: true,
             harmony: true
         });
+        return src;
     }
 };

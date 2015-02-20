@@ -1,8 +1,5 @@
-jest.dontMock("../cache.js")
-    .dontMock("sinon");
-
-var Cache = require("../cache"),
-    sinon = require("sinon");
+jest.dontMock("../cache.js");
+var Cache = require("../cache");
 
 describe("Cache module", function() {
     beforeEach(function() {
@@ -21,26 +18,24 @@ describe("Cache module", function() {
     });
 
     it("initializes correctly and has a heartbeat", function() {
-        expect(2);
         Cache.heartbeatInterval = 100;
-
         var initRan = false;
-        var count = 0;
-        sinon.stub(Cache, "heartbeat", function() {
-            ++count;
-            if (count >= 3) {
-                window.clearInterval(Cache.timer);
-                Cache.heartbeat.restore();
-            }
-        });
+        Cache.heartbeat = jest.genMockFn();
+        expect(Cache.heartbeat).not.toBeCalled();
         Cache.init().done(function() {
             expect(Cache.timer).toBeTruthy();
             initRan = true;
+            jest.runOnlyPendingTimers();
+            expect(Cache.heartbeat).toBeCalled();
+            jest.runOnlyPendingTimers();
+            jest.runOnlyPendingTimers();
+            expect(Cache.heartbeat.mock.calls.length).toBe(3);
+            expect(setInterval.mock.calls.length).toBe(1);
+            expect(setInterval.mock.calls[0][1]).toBe(Cache.heartbeatInterval);
         });
         waitsFor(() => {
-            return initRan && count >=3;
+            return initRan;
         });
-        jest.runAllTimers();
     });
 });
 

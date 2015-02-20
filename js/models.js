@@ -1,7 +1,9 @@
 // TODO: Use of generators stopping use of flow for this file.
 // Need to figure out how to transform using regenerator or something first before passing it to Flow.
 
+
 "strict";
+"enable_regenerator";
 
 var $ = require("jquery"),
     _ = require("underscore"),

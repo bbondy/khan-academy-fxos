@@ -8,7 +8,6 @@ describe("Util module", function() {
             return x + y;
         }, 1);
         expect(oneAdder(5)).toBe(6);
-        expect(window.x).toBe(undefined);
         expect(Util.appendQueryParam("http://test.com?a=b", "x", "y")).toBe("http://test.com?a=b&x=y");
         expect(Util.appendQueryParam("http://test.com", "x", "y")).toBe("http://test.com?x=y");
         expect(Util.getParameterByName("a", "?a=b")).toBe("b");
@@ -48,8 +47,5 @@ describe("Util module", function() {
             expect(Util.isBandwidthCapped()).toBe(true);
         }
         navigator.connection = old;
-        Util.loadScript("/test/_test1.js").done(function() {
-            expect(window.x).toBe(3);
-        });
     });
 });

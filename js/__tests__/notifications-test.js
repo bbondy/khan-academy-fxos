@@ -1,25 +1,17 @@
-jest.dontMock("../notifications.js")
-    .dontMock("sinon");
+jest.dontMock("../notifications.js");
 
-var Notifications = require("../notifications"),
-    sinon = require("sinon");
+var Notifications = require("../notifications");
 
 describe("Util module", function() {
     it("has basic exports work", function() {
-        var notificationPropExists = !!window.Notification;
         window.Notification = window.Notification || function() {};
         var title = "title";
         var message = "message";
-        sinon.stub(window, "Notification", function(t, m) {
-            expect(t).toBe(title);
-            expect(m.body).toBe(message);
-        });
+        window.Notification = jest.genMockFunction();
         Notifications.info(title, message);
-        if (notificationPropExists) {
-            window.Notification.restore();
-        } else {
-            delete window.Notification;
-        }
+        expect(window.Notification.mock.calls.length).toBe(1);
+        expect(window.Notification.mock.calls[0][0]).toBe(title);
+        expect(window.Notification.mock.calls[0][1].body).toBe(message);
     });
 });
 
