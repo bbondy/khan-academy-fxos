@@ -360,9 +360,10 @@ var TopicModel = TopicTreeModel.extend({
                     item[Minify.getShortName("id")] !== "x29232c6b";
             });
             var contentItems = _(topic[Minify.getShortName("children")]).filter(function(item) {
-                return item[Minify.getShortName("kind")] === Minify.getShortValue("kind", "Video") ||
-                    item[Minify.getShortName("kind")] === Minify.getShortValue("kind", "Article") ||
-                    item[Minify.getShortName("kind")] === Minify.getShortValue("kind", "Exercise");
+                var kind = item[Minify.getShortName("kind")];
+                return kind === Minify.getShortValue("kind", "Video") ||
+                    kind === Minify.getShortValue("kind", "Article") ||
+                    kind === Minify.getShortValue("kind", "Exercise");
             });
             response.downloadCount = 0;
             response.topics = new TopicList(topics, {parse: true});
