@@ -1,17 +1,15 @@
 // TODO: Provide an async variant
-module.exports = function(packageFilename) {
+module.exports = function(packageFilename, async, callback) {
     // Check if the scripti s already loaded
     if (document.getElementById(packageFilename)) {
         return;
     }
 
-    var src = "/build/" + packageFilename;
-    var xhrObj = new XMLHttpRequest();
-    xhrObj.open("GET", src, false);
-    xhrObj.send(null);
     var s = document.createElement("script");
-    s.type = "text/javascript";
-    s.text = xhrObj.responseText;
     s.id =  packageFilename;
-    document.getElementsByTagName("head")[0].appendChild(s);
+    s.type = "text/javascript";
+    s.src = "/build/" + packageFilename;
+    s.async = !!async;
+    s.onload = callback;
+    document.body.appendChild(s);
 };

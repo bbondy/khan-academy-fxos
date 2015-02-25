@@ -10,8 +10,7 @@ var $ = require("jquery"),
     models = require("../models"),
     APIClient = require("../apiclient"),
     Storage = require("../storage"),
-    loadPackage = require("../load-package"),
-    videojs: any;
+    loadPackage = require("../load-package");
 
 var cx = React.addons.classSet;
 
@@ -84,11 +83,7 @@ var VideoViewerRawObj: {
         video: React.PropTypes.object.isRequired
     },
     componentWillMount: function() {
-
-        // TODO: Make this load async
-        loadPackage("video-package.js");
-        videojs = require("video.js");
-
+        var requirejs = require("../requirejs");
         Util.log("VideoViewer will mount");
         this.videoCreatedPromise = $.Deferred();
         if (models.AppOptions.get("showTranscripts")) {
@@ -313,6 +308,9 @@ var VideoViewerRawObj: {
             " id='video-player' class='" + this.videoClass + "' preload='auto' src='" + this.videoSrc + "' controls>" +
             "</video>");
         $(videoMountNode).append(this.videoNode);
+
+        requirejs(["./bower_components/videojs/dist/video-js/video.js"], (x) => {
+        var requirejs = require("../requirejs");
         this.videojs = videojs(this._getVideoDOMNode(), {
                 width: "100%",
                 height: "100%"
@@ -335,6 +333,7 @@ var VideoViewerRawObj: {
             if (this.videoCreatedPromise) {
                 this.videoCreatedPromise.resolve();
             }
+        });
         });
     },
 
