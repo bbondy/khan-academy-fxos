@@ -262,7 +262,7 @@ var APIClient = {
         return this._basicAPICall(url);
     },
 
-    getTaskIfnoByExerciseName: function(exerciseName: string): any {
+    getTaskInfoByExerciseName: function(exerciseName: string): any {
         var url = `${this.API_INTERNAL_BASE}/user/tasks/exercises/${exerciseName}`;
         return this._basicAPICall(url);
     },

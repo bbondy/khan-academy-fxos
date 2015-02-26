@@ -71,7 +71,7 @@ var ExerciseViewer = React.createClass({
         var isCorrect = score.correct;
         var secondsTaken = 10; //TODO
         var data = {};
-        APIClient.getTaskIfnoByExerciseName(this.props.exercise.getName()).then((info) => {
+        APIClient.getTaskInfoByExerciseName(this.props.exercise.getName()).then((info) => {
             data.taskId = info.id;
             return APIClient.getUserExercise(this.props.exercise.getName());
         }).then((info) => {
