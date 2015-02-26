@@ -27,7 +27,6 @@ describe("APIClient", function() {
     });
 
     it("initializes correctly", function(assert) {
-        var $ = require("jquery");
         var APIClient = require("../apiclient");
         var initRan = false;
         waitsFor(() => {
@@ -62,7 +61,7 @@ describe("APIClient", function() {
         APIClient.init().done(function() {
             APIClient._basicAPICall = jest.genMockFn();
             APIClient._basicAPICall.mockImpl((url, extraParams, method, dataType) => {
-                return  $.Deferred().resolve({
+                return $.Deferred().resolve({
                     url: url,
                     extraParams: extraParams ? JSON.stringify(extraParams) : "",
                     method: method || "GET",
@@ -91,7 +90,7 @@ describe("APIClient", function() {
                 expect(result.url).toBe("https://www.khanacademy.org/api/v1/fxos/topictree");
                 expect(result.method).toBe("GET");
                 expect(result.extraParams).toBe("");
-                return APIClient.getVideoTranscript('abcd');
+                return APIClient.getVideoTranscript("abcd");
             }).then(function(result) {
                 expect(result.url).toBe("https://www.khanacademy.org/api/v1/videos/abcd/transcript");
                 expect(result.method).toBe("GET");
@@ -116,7 +115,7 @@ describe("APIClient", function() {
                 expect(result.url).toBe("https://www.khanacademy.org/api/v1/user/videos");
                 expect(result.method).toBe("GET");
                 expect(result.extraParams).toBe("");
-                return APIClient.reportVideoProgress(1,2,3,4,5);
+                return APIClient.reportVideoProgress(1, 2, 3, 4, 5);
             }).done(function(result) {
                 expect(result.url).toBe("https://www.khanacademy.org/api/v1/user/videos/2/log");
                 expect(result.method).toBe("POST");

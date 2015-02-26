@@ -9,8 +9,7 @@ var $ = require("jquery"),
     Util = require("../util"),
     models = require("../models"),
     APIClient = require("../apiclient"),
-    Storage = require("../storage"),
-    loadPackage = require("../load-package");
+    Storage = require("../storage");
 
 var cx = React.addons.classSet;
 
@@ -83,7 +82,6 @@ var VideoViewerRawObj: {
         video: React.PropTypes.object.isRequired
     },
     componentWillMount: function() {
-        var requirejs = require("../requirejs");
         Util.log("VideoViewer will mount");
         this.videoCreatedPromise = $.Deferred();
         if (models.AppOptions.get("showTranscripts")) {
@@ -309,31 +307,31 @@ var VideoViewerRawObj: {
             "</video>");
         $(videoMountNode).append(this.videoNode);
 
-        requirejs(["./bower_components/videojs/dist/video-js/video.js"], (x) => {
         var requirejs = require("../requirejs");
-        this.videojs = videojs(this._getVideoDOMNode(), {
-                width: "100%",
-                height: "100%"
-        }, () => {
-            Util.log("Videojs player is initialized and ready.");
-            // Add an event listener to track watched time
-            var video = this._getVideoDOMNode();
-            if (video) {
-                video.addEventListener("canplay", this._canPlayHTML5.bind(this));
-                video.addEventListener("progress", this._onNetworkProgress.bind(this));
-                video.addEventListener("timeupdate", this._onTimeupdateHTML5);
-                video.addEventListener("play", this._onPlay.bind(this), true);
-                video.addEventListener("pause", this._onPause.bind(this), true);
-                video.addEventListener("stop", this._onStop.bind(this), true);
-                video.addEventListener("ended", this._onEnded.bind(this), true);
-                video.addEventListener("error", this._onError.bind(this), true);
-                video.defaultPlaybackRate = models.AppOptions.get("playbackRate") / 100;
-                video.playbackRate = models.AppOptions.get("playbackRate") / 100;
-            }
-            if (this.videoCreatedPromise) {
-                this.videoCreatedPromise.resolve();
-            }
-        });
+        requirejs(["./bower_components/videojs/dist/video-js/video.js"], (videojs) => {
+            this.videojs = videojs(this._getVideoDOMNode(), {
+                    width: "100%",
+                    height: "100%"
+            }, () => {
+                Util.log("Videojs player is initialized and ready.");
+                // Add an event listener to track watched time
+                var video = this._getVideoDOMNode();
+                if (video) {
+                    video.addEventListener("canplay", this._canPlayHTML5.bind(this));
+                    video.addEventListener("progress", this._onNetworkProgress.bind(this));
+                    video.addEventListener("timeupdate", this._onTimeupdateHTML5);
+                    video.addEventListener("play", this._onPlay.bind(this), true);
+                    video.addEventListener("pause", this._onPause.bind(this), true);
+                    video.addEventListener("stop", this._onStop.bind(this), true);
+                    video.addEventListener("ended", this._onEnded.bind(this), true);
+                    video.addEventListener("error", this._onError.bind(this), true);
+                    video.defaultPlaybackRate = models.AppOptions.get("playbackRate") / 100;
+                    video.playbackRate = models.AppOptions.get("playbackRate") / 100;
+                }
+                if (this.videoCreatedPromise) {
+                    this.videoCreatedPromise.resolve();
+                }
+            });
         });
     },
 
