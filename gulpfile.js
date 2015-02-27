@@ -58,7 +58,12 @@ gulp.task("react", function() {
 });
 
 gulp.task("copy-to-build", function() {
-    return gulp.src(["./js/init.js", "./js/copy-require-init.js", "./bower_components/videojs/dist/video-js/video.js"])
+    return gulp.src([
+        "./js/init.js",
+        "./js/copy-require-init.js",
+        "./bower_components/requirejs/require.js",
+        "./bower_components/videojs/dist/video-js/video.js"
+        ])
         .pipe(gulp.dest("./build"));
 });
 
