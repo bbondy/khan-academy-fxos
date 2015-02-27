@@ -57,12 +57,8 @@ gulp.task("react", function() {
         .pipe(gulp.dest("./build"));
 });
 
-gulp.task("copy-init", function() {
-    return gulp.src("./js/init.js")
-        .pipe(gulp.dest("./build"));
-});
-gulp.task("copy-require-init", function() {
-    return gulp.src("./js/require-init.js")
+gulp.task("copy-to-build", function() {
+    return gulp.src(["./js/init.js", "./js/copy-require-init.js", "./bower_components/videojs/dist/video-js/video.js"])
         .pipe(gulp.dest("./build"));
 });
 
@@ -146,7 +142,7 @@ gulp.task("build-packages", function(cb) {
 });
 
 gulp.task("browserify", function(cb) {
-    runSequence(["copy-init", "copy-require-init", "read-packages"], "build-packages", cb);
+    runSequence(["copy-to-build", "read-packages"], "build-packages", cb);
 });
 
 
