@@ -58,52 +58,56 @@ gulp.task("react", function() {
         .pipe(gulp.dest("./build"));
 });
 
-gulp.task('webpack', function(callback) {
+gulp.task("webpack", function(callback) {
     webpack({
-        entry: './js/main.js',
-
+        entry: "./js/main.js",
+        devtool: "#source-map",
         plugins: [
         ],
         output: {
-            path: './build/',
-            filename: 'bundle.js',
-            publicPath: 'http://localhost:8094/assets'
+            path: "./build/",
+            filename: "bundle.js",
+            sourceMapFilename: "[file].map",
+            publicPath: "http://localhost:8094/assets"
         },
         module: {
             loaders: [
                 {
                     //tell webpack to use jsx-loader for all *.jsx files
                     test: /\.js$/,
-                    loader: 'regenerator-loader'
+                    loader: "regenerator-loader"
                 },
                 {
                     //tell webpack to use jsx-loader for all *.jsx files
                     test: /\.js$/,
-                    loader: 'jsx-loader?insertPragma=React.DOM&harmony&stripTypes'
+                    loader: "jsx-loader?insertPragma=React.DOM&harmony&stripTypes"
                 }
             ],
         },
         externals: {
             //don't bundle the 'react' npm package with our bundle.js
             //but get it from a global 'React' variable
-            'react': 'React'
+            "react": "React"
         },
         resolve: {
-            extensions: ['', '.js', '.jsx']
+            extensions: ["", ".js", ".jsx"]
         }
     }, function(err, stats) {
-        if(err) throw new gutil.PluginError("webpack", err);
-        gutil.log("[webpack]", stats.toString({
+        if(err) {
+            throw new gutil.PluginError("webpack", err);
+        }
+        // Log filenames packed:
+        //gutil.log("[webpack]", stats.toString({
             // output options
-        }));
+        //}));
         callback();
     });
 });
 
-gulp.task('package', function () {
-  return gulp.src('', {read: false})
+gulp.task("package", function () {
+  return gulp.src("", {read: false})
     .pipe(shell([
-      './tools/package'
+      "./tools/package"
     ]))
 });
 
