@@ -17,6 +17,10 @@ var React = require("react/addons"),
     _ = require("underscore"),
     $ = require("jquery");
 
+window.Exercises = {
+    cluesEnabled: false
+};
+
 /**
  * Represents a single exercise, it will load the exercise dynamically and
  * display it to the user.
@@ -102,27 +106,28 @@ var ExerciseViewer = React.createClass({
         window.$ = $;
         $._ = (x) => x;
         window.jQuery = $;
-        window.Exercises = {
-            cluesEnabled: false
-        };
 
-        console.log("before requirejs");
-        var {requirejs} = require("../requirejs");
-        requirejs(["./build/exercise-util-shim.js"], (ExerciseShim) => {
-            console.log("before katext etc");
-            var katex = require("katex"),
-                KAS = require("KAS"),
-                Perseus = require("Perseus");
-            console.log("katex %o:", katex);
-            console.log("KAS %o:", KAS);
-            console.log("Perseus %o:", Perseus);
 
-            perseusPrep(katex, KAS, MathJax, ExerciseShim.KhanUtil);
-            Perseus.init({}).then(() => {
-                Util.log("Perseus init done %o, %o", Perseus);
-                this.ItemRenderer = Perseus.ItemRenderer;
-                this.forceUpdate();
-            });
+        var Khan = require("../../khan-exercises/khan-exercise");
+        var MathJax = require("../../bower_components/MathJax/MathJax.js");
+        Khan = window.Khan;
+        MathJax = window.MathJax;
+        window.KhanUtil = Khan.Util;
+
+        console.log("Khan: %o", Khan);
+
+        var katex = require("../../bower_components/katex/katex"),
+            KAS = require("../../bower_components/KAS/kas"),
+            Perseus = require("../../bower_components/perseus/perseus-2");
+        console.log("katex %o:", katex);
+        console.log("KAS %o:", KAS);
+        console.log("Perseus %o:", Perseus);
+
+        perseusPrep(katex, KAS, MathJax, KhanUtil);
+        Perseus.init({}).then(() => {
+            Util.log("Perseus init done %o, %o", Perseus);
+            this.ItemRenderer = Perseus.ItemRenderer;
+            this.forceUpdate();
         });
     },
     componentDidMount: function() {

@@ -156,7 +156,7 @@ var APIClient = {
      *
      * @return a promise with the results of the API call
      */
-    _basicAPICall: function(url: string, extraParams: any= undefined, method:?string = undefined, dataType:?string = undefined): any {
+    _basicAPICall: function(url: string, extraParams: any, method:?string, dataType: ?string): any {
         extraParams = extraParams || {};
         dataType = dataType || "json";
         if (_.isUndefined(method)) {

@@ -1,4 +1,5 @@
 var gulp = require("gulp"),
+    gutil = require("gulp-util"),
     jshint = require("gulp-jshint"),
     less = require("gulp-less"),
     concat = require("gulp-concat"),
@@ -9,15 +10,14 @@ var gulp = require("gulp"),
     react = require("gulp-react"),
     jsxcs = require("gulp-jsxcs"),
     jest = require("gulp-jest"),
-    browserify = require("browserify"),
-    reactify = require("reactify"),
     transform = require("vinyl-transform"),
-    exorcist = require("exorcist"),
     fs = require("fs"),
     es = require("event-stream"),
     JSONStream = require("JSONStream"),
     runSequence = require("run-sequence"),
-    _ = require("underscore");
+    _ = require("underscore"),
+    webpack = require("webpack");
+
 
 // Lint Task
 gulp.task("lint", function() {
@@ -46,8 +46,8 @@ gulp.task("less", function() {
 });
 
 // The react task should not normally be needed.
-// This is only present if the errors from
-// browserify/reactify are not good enough.
+// This is only present if the errors from webpack and you
+// want to only try running react.
 gulp.task("react", function() {
     return gulp.src(["./js/**/*.js"])
         .pipe(react({
@@ -58,17 +58,42 @@ gulp.task("react", function() {
         .pipe(gulp.dest("./build"));
 });
 
-// Things here we don't want to use browserify for and are probably
-// managed by requirejs
-gulp.task("copy-to-build", function() {
-    return gulp.src([
-        "./js/init.js",
-        "./js/copy-require-init.js",
-        "./js/exercise-util-shim.js",
-        "./bower_components/requirejs/require.js",
-        "./bower_components/videojs/dist/video-js/video.js",
-        ])
-        .pipe(gulp.dest("./build"));
+gulp.task('webpack', function(callback) {
+    webpack({
+        entry: './js/main.js',
+        output: {
+            filename: 'build/bundle.js',
+            publicPath: 'http://localhost:8094/assets'
+        },
+        module: {
+            loaders: [
+                {
+                    //tell webpack to use jsx-loader for all *.jsx files
+                    test: /\.js$/,
+                    loader: 'regenerator-loader'
+                },
+                {
+                    //tell webpack to use jsx-loader for all *.jsx files
+                    test: /\.js$/,
+                    loader: 'jsx-loader?insertPragma=React.DOM&harmony&stripTypes'
+                }
+            ],
+        },
+        externals: {
+            //don't bundle the 'react' npm package with our bundle.js
+            //but get it from a global 'React' variable
+            'react': 'React'
+        },
+        resolve: {
+            extensions: ['', '.js', '.jsx']
+        }
+    }, function(err, stats) {
+        if(err) throw new gutil.PluginError("webpack", err);
+        gutil.log("[webpack]", stats.toString({
+            // output options
+        }));
+        callback();
+    });
 });
 
 gulp.task('package', function () {
@@ -77,91 +102,6 @@ gulp.task('package', function () {
       './tools/package'
     ]))
 });
-
-var packages = {};
-var allFiles = [];
-gulp.task("read-packages", function() {
-    return fs.createReadStream("javascript-packages.json")
-        .pipe(JSONStream.parse())
-        .pipe(es.mapSync(function (p) {
-            packages = p;
-
-            // Collect all files
-            var allFiles = [];
-            for (p in packages) {
-                allFiles = allFiles.concat(packages[p]);
-            }
-
-            // For each package, do the gulp chain externing
-            // everything else.  I tried both refactor-bundle and
-            // partition-bundle but they didn't seem to have the flexibility
-            // I needed.
-            var mapfile = path.join(__dirname, "./build/" + p + ".map");
-            for (p in packages) {
-                otherFiles = _(allFiles).filter(function(f) {
-                    return packages[p].indexOf(f) === -1;
-                });
-
-                var b = browserify({
-                    debug: true
-                });
-
-                otherFiles.forEach(function(f) {
-                    var data = f.split(":")
-                    if (data.length === 1) {
-                        b.external(data[0]);
-                    } else if (data.length > 1) {
-                        b.external(data[0]);
-                    } else {
-                        console.error("no file specified for gulp package")
-                    }
-                });
-
-
-                packages[p].forEach(function(f) {
-                    var data = f.split(":")
-                    if (data.length === 1) {
-                        b.require(data[0]);
-                    } else if (data.length > 1) {
-                        b.require(data[1], {
-                            expose: data[0]
-                        });
-                    } else {
-                        console.error("no file specified for gulp package")
-                    }
-                });
-
-                (function(p, b) {
-                    // Create a new gulp task with the name of the package
-                    gulp.task(p, function() {
-                        // Convert to react and strip out Flow types
-                        return b.transform({
-                            "strip-types": true,
-                            es6: true}, reactify)
-                        .bundle()
-                        // Extract the source map fro the source bundle
-                        .pipe(exorcist(mapfile))
-                        .pipe(fs.createWriteStream(path.join(__dirname, "./build/" + p), "utf8"));
-                    });
-                })(p, b);
-            }
-
-
-        }));
-});
-
-gulp.task("build-packages", function(cb) {
-    // Note the packages are not run sequentially, they are run together
-    // and then the callback cb is run sequentially after they are all
-    // complete.
-    runSequence(_.keys(packages), cb);
-});
-
-gulp.task("browserify", function(cb) {
-    runSequence(["copy-to-build", "read-packages"], "build-packages", cb);
-});
-
-
 
 // Concatenate & Minify JS
 gulp.task("releasify", function() {
@@ -195,11 +135,13 @@ gulp.task("test", function() {
 
 // Watch Files For Changes
 gulp.task("watch", function() {
-    gulp.watch("js/**/*.js", ["lint", "browserify"]);
+    gulp.watch("js/**/*.js", ["lint", "webpack"]);
     gulp.watch("style/**/*.less", ["less"]);
 });
 
 // Default Task
 // Not including Flow typechecking by default because it takes so painfully long.
 // Maybe because of my code layout or otheriwse, needto figure it out before enabling by default.
-gulp.task("default", ["lint", "less", "browserify", "package"]);
+gulp.task("default", function(cb) {
+    runSequence(["lint", "less", "webpack"], "package", cb);
+});

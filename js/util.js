@@ -154,7 +154,7 @@ var Util = {
      *   not specified, uses window.location.search.
      * @return The obtained parameter value or null if not found
      */
-    getParameterByName: function(name: string, params: any = undefined): ?string {
+    getParameterByName: function(name: string, params: any): ?string {
         if (_.isUndefined(params)) {
             params = window.location.search;
         }

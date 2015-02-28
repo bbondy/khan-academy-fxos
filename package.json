@@ -9,7 +9,6 @@
   "dependencies": {
     "JSONStream": "^0.10.0",
     "backbone": "^1.1.2",
-    "browserify": "^8.1.3",
     "connect": "^3.3.2",
     "es6-default-params": "^0.4.3",
     "event-stream": "^3.2.2",
@@ -39,16 +38,21 @@
     "vinyl-transform": "^1.0.0"
   },
   "devDependencies": {
-    "gulp-browserify": "^0.5.1",
     "gulp-jest": "^0.3.0",
     "gulp-jscs": "^1.4.0",
     "gulp-jsxcs": "^0.1.6",
     "gulp-less": "^2.0.1",
     "gulp-reactify": "^1.1.0",
     "gulp-shell": "^0.3.0",
+    "gulp-util": "^3.0.4",
+    "gulp-webpack": "^1.2.0",
     "jest-cli": "^0.2.1",
+    "jsx-loader": "^0.12.2",
+    "regenerator-loader": "^2.0.0",
     "run-sequence": "^1.0.2",
-    "sinon": "^1.12.2"
+    "sinon": "^1.12.2",
+    "webpack": "^1.6.0",
+    "webpack-dev-server": "^1.7.0"
   },
   "jest": {
     "scriptPreprocessor": "<rootDir>/js/preprocessor.js",
