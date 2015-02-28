@@ -123,7 +123,7 @@ var ExerciseViewer = React.createClass({
         console.log("KAS %o:", KAS);
         console.log("Perseus %o:", Perseus);
 
-        perseusPrep(katex, KAS, MathJax, KhanUtil);
+        perseusPrep(katex, KAS, MathJax, Khan.Util);
         Perseus.init({}).then(() => {
             Util.log("Perseus init done %o, %o", Perseus);
             this.ItemRenderer = Perseus.ItemRenderer;

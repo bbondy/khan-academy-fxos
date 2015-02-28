@@ -61,8 +61,12 @@ gulp.task("react", function() {
 gulp.task('webpack', function(callback) {
     webpack({
         entry: './js/main.js',
+
+        plugins: [
+        ],
         output: {
-            filename: 'build/bundle.js',
+            path: './build/',
+            filename: 'bundle.js',
             publicPath: 'http://localhost:8094/assets'
         },
         module: {
