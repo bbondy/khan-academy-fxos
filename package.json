@@ -45,6 +45,7 @@
     "gulp-jsxcs": "^0.1.6",
     "gulp-less": "^2.0.1",
     "gulp-reactify": "^1.1.0",
+    "gulp-shell": "^0.3.0",
     "jest-cli": "^0.2.1",
     "run-sequence": "^1.0.2",
     "sinon": "^1.12.2"

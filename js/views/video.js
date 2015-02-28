@@ -307,7 +307,7 @@ var VideoViewerRawObj: {
             "</video>");
         $(videoMountNode).append(this.videoNode);
 
-        var requirejs = require("../requirejs");
+        var {requirejs} = require("../requirejs");
         requirejs(["./build/video.js"], (videojs) => {
             this.videojs = videojs(this._getVideoDOMNode(), {
                     width: "100%",

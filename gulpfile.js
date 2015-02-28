@@ -4,6 +4,7 @@ var gulp = require("gulp"),
     concat = require("gulp-concat"),
     uglify = require("gulp-uglify"),
     path = require("path"),
+    shell = require("gulp-shell"),
     rename = require("gulp-rename"),
     react = require("gulp-react"),
     jsxcs = require("gulp-jsxcs"),
@@ -57,14 +58,24 @@ gulp.task("react", function() {
         .pipe(gulp.dest("./build"));
 });
 
+// Things here we don't want to use browserify for and are probably
+// managed by requirejs
 gulp.task("copy-to-build", function() {
     return gulp.src([
         "./js/init.js",
         "./js/copy-require-init.js",
+        "./js/exercise-util-shim.js",
         "./bower_components/requirejs/require.js",
-        "./bower_components/videojs/dist/video-js/video.js"
+        "./bower_components/videojs/dist/video-js/video.js",
         ])
         .pipe(gulp.dest("./build"));
+});
+
+gulp.task('package', function () {
+  return gulp.src('', {read: false})
+    .pipe(shell([
+      './tools/package'
+    ]))
 });
 
 var packages = {};
@@ -191,4 +202,4 @@ gulp.task("watch", function() {
 // Default Task
 // Not including Flow typechecking by default because it takes so painfully long.
 // Maybe because of my code layout or otheriwse, needto figure it out before enabling by default.
-gulp.task("default", ["lint", "less", "browserify", "watch"]);
+gulp.task("default", ["lint", "less", "browserify", "package"]);

@@ -1,3 +1,10 @@
-mkdir dist
-mkdir dist/package
-cp -Rf build data fonts index.html locales manifest.webapp secrets.json style tools img dist/package/
+mkdir -p dist/package/bower_components/MathJax/extensions
+mkdir -p dist/package/bower_components/KAS
+mkdir -p dist/package/bower_components/katex/build
+mkdir -p dist/package/bower_components/perseus
+cp -Rf build data fonts index.html locales khan-exercises manifest.webapp secrets.json style tools img dist/package/
+cp bower_components/MathJax/MathJax.js dist/package/bower_components/MathJax
+cp bower_components/MathJax/extensions/*.js dist/package/bower_components/MathJax/extensions
+cp bower_components/KAS/*.js dist/package/bower_components/KAS
+cp bower_components/katex/build/katex.min.css dist/package/bower_components/katex/build
+cp bower_components/perseus/perseus-2.css dist/package/bower_components/perseus

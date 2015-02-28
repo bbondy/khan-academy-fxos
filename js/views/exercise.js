@@ -13,7 +13,6 @@ function perseusPrep(katex, KAS, MathJax) {
 
 var React = require("react/addons"),
     Util = require("../util"),
-    loadPackage = require("../load-package"),
     APIClient = require("../apiclient"),
     _ = require("underscore"),
     $ = require("jquery");
@@ -97,8 +96,6 @@ var ExerciseViewer = React.createClass({
             });
         }
 
-        loadPackage("exercise-package.js");
-
         // TODO: Make this load async
         window._ = _;
         window.React = React;
@@ -109,18 +106,18 @@ var ExerciseViewer = React.createClass({
             cluesEnabled: false
         };
 
-        var requirejs = require("../requirejs");
-        console.log(requirejs);
-        // Make Flow happy
-        requirejs(["./khan-exercises/khan-exercise", "./bower_components/MathJax/MathJax"], (Khan, MathJax) => {
-            Khan = Khan || window.Khan;
-            MathJax = MathJax || window.MathJax;
-            window.KhanUtil = Khan.Util;
-
+        console.log("before requirejs");
+        var {requirejs} = require("../requirejs");
+        requirejs(["./build/exercise-util-shim.js"], (ExerciseShim) => {
+            console.log("before katext etc");
             var katex = require("katex"),
                 KAS = require("KAS"),
                 Perseus = require("Perseus");
-            perseusPrep(katex, KAS, MathJax, Khan.Util);
+            console.log("katex %o:", katex);
+            console.log("KAS %o:", KAS);
+            console.log("Perseus %o:", Perseus);
+
+            perseusPrep(katex, KAS, MathJax, ExerciseShim.KhanUtil);
             Perseus.init({}).then(() => {
                 Util.log("Perseus init done %o, %o", Perseus);
                 this.ItemRenderer = Perseus.ItemRenderer;
