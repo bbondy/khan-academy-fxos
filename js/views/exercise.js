@@ -108,7 +108,7 @@ var ExerciseViewer = React.createClass({
         window.jQuery = $;
 
 
-        var Khan = require("../../khan-exercises/khan-exercise");
+        var Khan = require("../../khan-exercises/main");
         var MathJax = require("../../bower_components/MathJax/MathJax.js");
         Khan = window.Khan;
         MathJax = window.MathJax;
