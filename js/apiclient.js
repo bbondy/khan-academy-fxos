@@ -314,10 +314,10 @@ var APIClient = {
      *   - total_correct: <num>
      */
     getUserExercises: function(): any {
-        return this._basicAPICall(this.API_INTERNAL_BASE + "/user/exercises");
+        return this._basicAPICall(this.API_V1_BASE + "/user/exercises");
     },
     getUserExercise: function(exerciseName: string): any {
-        var url = `${this.API_INTERNAL_BASE}/user/exercises/${exerciseName}`;
+        var url = `${this.API_V1_BASE}/user/exercises/${exerciseName}`;
         return this._basicAPICall(url);
     },
     /**
