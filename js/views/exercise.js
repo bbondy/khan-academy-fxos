@@ -76,8 +76,24 @@ var ExerciseViewer = React.createClass({
         var data = {};
         APIClient.getTaskInfoByExerciseName(this.props.exercise.getName()).then((info) => {
             data.taskId = info.id;
+            this.taskAttemptHistory = info.task_attempt_history;
             return APIClient.getUserExercise(this.props.exercise.getName());
         }).then((info) => {
+
+            // TODO: Call this instead when the exercise loads and after submitting
+            // Stash out info for the UI
+            this.level = info.exercise_progress.level;
+            this.mastered = info.exercise_progress.mastered;
+            this.practiced = info.exercise_progress.practiced;
+            this.streak = info.streak;
+
+
+            console.log("taskAttemptHistory: %o", this.taskAttemptHistory);
+            console.log("level: %o", this.level);
+            console.log("mastered: %o", this.mastered);
+            console.log("practiced: %o", this.practiced);
+            console.log("streak: %o", this.streak);
+
             var problemNumber = info.total_done + 1;
             Util.log("submitting exercise progress for problemNumber: %i", problemNumber);
             console.log("taskId: " + data.taskId);
