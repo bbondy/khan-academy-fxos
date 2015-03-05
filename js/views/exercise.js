@@ -164,6 +164,14 @@ var ExerciseViewer = React.createClass({
                     this.state.currentHint < this.state.perseusItemData.hints.length) {
             }
             content = <div className="framework-perseus">
+                          <div className="problem-history">
+                              <i className="attempt-icon attempt-pending fa fa-circle-o"></i>
+                              <i className="attempt-icon attempt-pending fa fa-circle-o"></i>
+                              <i className="attempt-icon attempt-correct fa fa-check-circle-o"></i>
+                              <i className="attempt-icon attempt-hint  fa fa-lightbulb-o"></i>
+                              <i className="attempt-icon attempt-wrong fa fa-times-circle-o"></i>
+                          </div>
+
                           <this.ItemRenderer ref="itemRenderer"
                                              item={this.state.perseusItemData}
                                              problemNum={Math.floor(Math.random() * 50) + 1}
