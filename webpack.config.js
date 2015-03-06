@@ -2,10 +2,11 @@ module.exports = {
     entry: "./js/main.js",
     devtool: "#source-map",
     output: {
-        path: "./build/",
+        path: require("path").resolve("./build"),
         filename: "bundle.js",
         sourceMapFilename: "[file].map",
-        publicPath: "http://localhost:8094/assets"
+        publicPath: "/build/",
+        stats: { colors: true },
     },
     module: {
         loaders: [

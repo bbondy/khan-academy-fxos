@@ -16,7 +16,9 @@ var gulp = require("gulp"),
     JSONStream = require("JSONStream"),
     runSequence = require("run-sequence"),
     _ = require("underscore"),
-    webpack = require("webpack");
+    webpack = require("webpack"),
+    webpackConfig = require("./webpack.config.js"),
+    WebpackDevServer = require("webpack-dev-server");
 
 
 // Lint Task
@@ -59,40 +61,10 @@ gulp.task("react", function() {
 });
 
 gulp.task("webpack", function(callback) {
-    webpack({
-        entry: "./js/main.js",
-        devtool: "#source-map",
-        plugins: [
-        ],
-        output: {
-            path: "./build/",
-            filename: "bundle.js",
-            sourceMapFilename: "[file].map",
-            publicPath: "http://localhost:8094/assets"
-        },
-        module: {
-            loaders: [
-                {
-                    //tell webpack to use jsx-loader for all *.jsx files
-                    test: /\.js$/,
-                    loader: "regenerator-loader"
-                },
-                {
-                    //tell webpack to use jsx-loader for all *.jsx files
-                    test: /\.js$/,
-                    loader: "jsx-loader?insertPragma=React.DOM&harmony&stripTypes"
-                }
-            ],
-        },
-        externals: {
-            //don't bundle the 'react' npm package with our bundle.js
-            //but get it from a global 'React' variable
-            "react": "React"
-        },
-        resolve: {
-            extensions: ["", ".js", ".jsx"]
-        }
-    }, function(err, stats) {
+    var myConfig = Object.create(webpackConfig);
+    myConfig.debug = true;
+
+    webpack(myConfig, function(err, stats) {
         if(err) {
             throw new gutil.PluginError("webpack", err);
         }
@@ -101,6 +73,21 @@ gulp.task("webpack", function(callback) {
             // output options
         //}));
         callback();
+    });
+});
+
+gulp.task("webpack-dev-server", function(callback) {
+    var myConfig = Object.create(webpackConfig);
+    myConfig.debug = true;
+
+    new WebpackDevServer(webpack(myConfig)).listen(8008, "localhost", function(err) {
+        if (err) {
+            throw new gutil.PluginError("webpack-dev-server", err);
+        }
+        // Server listening
+        gutil.log("[webpack-dev-server]", "http://localhost:8008/webpack-dev-server/index.html");
+        // keep the server alive or continue?
+        // callback();
     });
 });
 
