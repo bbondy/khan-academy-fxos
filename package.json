@@ -1,4 +1,4 @@
-/{
+{
   "name": "khan-academy-fxos",
   "version": "1.0.0",
   "description": "Khan Academy Firefox OS app =============================",
@@ -35,7 +35,7 @@
     "uglify": "^0.1.1",
     "underscore": "^1.7.0",
     "vinyl-source-stream": "^1.0.0",
-    "vinyl-transform": "^1.0.0",
+    "vinyl-transform": "^1.0.0"
   },
   "devDependencies": {
     "gulp-jest": "^0.3.0",
