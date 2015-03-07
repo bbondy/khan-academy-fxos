@@ -165,13 +165,25 @@ var ExerciseViewer = React.createClass({
             if (this.state.currentHint !== -1 &&
                     this.state.currentHint < this.state.perseusItemData.hints.length) {
             }
+
+            // Always show 5 attempt icons with either pending, correct, hint or wrong
+            var attemptIcons = [];
+            this.taskAttemptHistory = this.taskAttemptHistory.slice(-5);
+            for (var i = 0; i < 5; i++) {
+                if (i >= this.taskAttemptHistory.length) {
+                    attemptIcons.push(<i className="attempt-icon attempt-pending fa fa-circle-o"></i>);
+                } else if(this.taskAttemptHistory[i].seen_hint) {
+                    attemptIcons.push(<i className="attempt-icon attempt-hint  fa fa-lightbulb-o"></i>);
+                } else if(!this.taskAttemptHistory[i].correct) {
+                    attemptIcons.push(<i className="attempt-icon attempt-wrong fa fa-times-circle-o"></i>);
+                } else {
+                    attemptIcons.push(<i className="attempt-icon attempt-correct fa fa-check-circle-o"></i>);
+                }
+            }
+
             content = <div className="framework-perseus">
                           <div className="problem-history">
-                              <i className="attempt-icon attempt-pending fa fa-circle-o"></i>
-                              <i className="attempt-icon attempt-pending fa fa-circle-o"></i>
-                              <i className="attempt-icon attempt-correct fa fa-check-circle-o"></i>
-                              <i className="attempt-icon attempt-hint  fa fa-lightbulb-o"></i>
-                              <i className="attempt-icon attempt-wrong fa fa-times-circle-o"></i>
+                              {attemptIcons}
                           </div>
 
                           <this.ItemRenderer ref="itemRenderer"
