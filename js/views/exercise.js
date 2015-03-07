@@ -39,6 +39,33 @@ var ExerciseViewer = React.createClass({
             currentHint: -1
         };
     },
+    refreshUserExerciseInfo: function() {
+        return APIClient.getTaskInfoByExerciseName(this.props.exercise.getName()).then((info) => {
+            this.taskId = info.id;
+            this.taskAttemptHistory = info.task_attempt_history;
+            return APIClient.getUserExercise(this.props.exercise.getName());
+        }).then((info) => {
+            // TODO: Call this instead when the exercise loads and after submitting
+            // Stash out info for the UI
+            this.level = info.exercise_progress.level;
+            this.mastered = info.exercise_progress.mastered;
+            this.practiced = info.exercise_progress.practiced;
+            this.streak = info.streak;
+
+            console.log("taskAttemptHistory: %o", this.taskAttemptHistory);
+            console.log("level: %o", this.level);
+            console.log("mastered: %o", this.mastered);
+            console.log("practiced: %o", this.practiced);
+            console.log("streak: %o", this.streak);
+
+            this.problemNumber = info.total_done + 1;
+            Util.log("submitting exercise progress for problemNumber: %i", this.problemNumber);
+            console.log("taskId: " + this.taskId);
+            console.log("problemNumber: " + this.problemNumber);
+            console.log("problem type name: " + this.problemTypeName);
+        });
+
+    },
     refreshRandomAssessment: function() {
 
         // Pick a random problem type:
@@ -52,11 +79,13 @@ var ExerciseViewer = React.createClass({
         this.randomAssessmentSHA1 = randomProblemTypeGroup.items[randomProblemTypeIndex].sha1;
         this.randomAssessmentId = randomProblemTypeGroup.items[randomProblemTypeIndex].id;
 
-        APIClient.getAssessmentItem(this.randomAssessmentId).done((result) => {
-            var assessment = JSON.parse(result.item_data);
-            Util.log("Got assessment item: %o: item data: %o", result, assessment);
-            this.setState({
-                perseusItemData: assessment
+        this.refreshUserExerciseInfo().then(() => {
+            APIClient.getAssessmentItem(this.randomAssessmentId).done((result) => {
+                var assessment = JSON.parse(result.item_data);
+                Util.log("Got assessment item: %o: item data: %o", result, assessment);
+                this.setState({
+                    perseusItemData: assessment
+                });
             });
         });
     },
@@ -73,37 +102,10 @@ var ExerciseViewer = React.createClass({
         var attemptNumber = 1; // TODO
         var isCorrect = score.correct;
         var secondsTaken = 10; //TODO
-        var data = {};
-        APIClient.getTaskInfoByExerciseName(this.props.exercise.getName()).then((info) => {
-            data.taskId = info.id;
-            this.taskAttemptHistory = info.task_attempt_history;
-            return APIClient.getUserExercise(this.props.exercise.getName());
-        }).then((info) => {
-
-            // TODO: Call this instead when the exercise loads and after submitting
-            // Stash out info for the UI
-            this.level = info.exercise_progress.level;
-            this.mastered = info.exercise_progress.mastered;
-            this.practiced = info.exercise_progress.practiced;
-            this.streak = info.streak;
-
-
-            console.log("taskAttemptHistory: %o", this.taskAttemptHistory);
-            console.log("level: %o", this.level);
-            console.log("mastered: %o", this.mastered);
-            console.log("practiced: %o", this.practiced);
-            console.log("streak: %o", this.streak);
-
-            var problemNumber = info.total_done + 1;
-            Util.log("submitting exercise progress for problemNumber: %i", problemNumber);
-            console.log("taskId: " + data.taskId);
-            console.log("problemNumber: " + problemNumber);
-            console.log("problem type name: " + this.problemTypeName);
-            return APIClient.reportExerciseProgress(this.props.exercise.getName(), problemNumber,
-                                                    this.randomAssessmentSHA1, this.randomAssessmentId,
-                                                    secondsTaken, this.state.hintsUsed, isCorrect,
-                                                    attemptNumber, this.problemTypeName, data.taskId);
-        }).done(() => {
+        APIClient.reportExerciseProgress(this.props.exercise.getName(), this.problemNumber,
+                                         this.randomAssessmentSHA1, this.randomAssessmentId,
+                                         secondsTaken, this.state.hintsUsed, isCorrect,
+                                         attemptNumber, this.problemTypeName, this.taskId).done(() => {
             this.refreshRandomAssessment();
         });
     },
