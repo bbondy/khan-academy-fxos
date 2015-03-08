@@ -79,8 +79,12 @@ gulp.task("webpack", function(callback) {
 gulp.task("webpack-dev-server", function(callback) {
     var myConfig = Object.create(webpackConfig);
     myConfig.debug = true;
-
-    new WebpackDevServer(webpack(myConfig)).listen(8008, "localhost", function(err) {
+    new WebpackDevServer(webpack(myConfig), {
+        publicPath: myConfig.output.publicPath,
+        stats: {
+            colors: true
+        }
+    }).listen(8008, "localhost", function(err) {
         if (err) {
             throw new gutil.PluginError("webpack-dev-server", err);
         }
