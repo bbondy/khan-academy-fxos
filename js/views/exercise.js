@@ -14,6 +14,7 @@ function perseusPrep(katex, KAS, MathJax) {
 var React = require("react/addons"),
     Util = require("../util"),
     APIClient = require("../apiclient"),
+    l10n = require("../l10n"),
     _ = require("underscore"),
     $ = require("jquery");
 
@@ -181,9 +182,19 @@ var ExerciseViewer = React.createClass({
                 }
             }
 
+            var streakText;
+            if (this.streak > 5) {
+                streakText = l10n.get("correct-streak", {
+                    count: this.streak
+                });
+            }
+
             content = <div className="framework-perseus">
                           <div className="problem-history">
                               {attemptIcons}
+                              <div>
+                                  {streakText}
+                              </div>
                           </div>
 
                           <this.ItemRenderer ref="itemRenderer"
