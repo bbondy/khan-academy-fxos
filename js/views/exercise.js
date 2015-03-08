@@ -42,28 +42,21 @@ var ExerciseViewer = React.createClass({
     },
     refreshUserExerciseInfo: function() {
         return APIClient.getTaskInfoByExerciseName(this.props.exercise.getName()).then((info) => {
-            this.taskId = info.id;
-            this.taskAttemptHistory = info.task_attempt_history;
+            this.setState({
+                taskId: info.id,
+                taskAttemptHistory: info.task_attempt_history
+            });
             return APIClient.getUserExercise(this.props.exercise.getName());
         }).then((info) => {
             // TODO: Call this instead when the exercise loads and after submitting
             // Stash out info for the UI
-            this.level = info.exercise_progress.level;
-            this.mastered = info.exercise_progress.mastered;
-            this.practiced = info.exercise_progress.practiced;
-            this.streak = info.streak;
-
-            console.log("taskAttemptHistory: %o", this.taskAttemptHistory);
-            console.log("level: %o", this.level);
-            console.log("mastered: %o", this.mastered);
-            console.log("practiced: %o", this.practiced);
-            console.log("streak: %o", this.streak);
-
-            this.problemNumber = info.total_done + 1;
-            Util.log("submitting exercise progress for problemNumber: %i", this.problemNumber);
-            console.log("taskId: " + this.taskId);
-            console.log("problemNumber: " + this.problemNumber);
-            console.log("problem type name: " + this.problemTypeName);
+            this.setState({
+                level: info.exercise_progress.level,
+                mastered: info.exercise_progress.mastered,
+                practiced: info.exercise_progress.practiced,
+                problemNumber: info.total_done + 1,
+                streak: info.streak
+            });
         });
 
     },
@@ -103,12 +96,17 @@ var ExerciseViewer = React.createClass({
         var attemptNumber = 1; // TODO
         var isCorrect = score.correct;
         var secondsTaken = 10; //TODO
-        APIClient.reportExerciseProgress(this.props.exercise.getName(), this.problemNumber,
-                                         this.randomAssessmentSHA1, this.randomAssessmentId,
-                                         secondsTaken, this.state.hintsUsed, isCorrect,
-                                         attemptNumber, this.problemTypeName, this.taskId).done(() => {
-            this.refreshRandomAssessment();
-        });
+        APIClient.reportExerciseProgress(this.props.exercise.getName(), this.state.problemNumber,
+            this.randomAssessmentSHA1, this.randomAssessmentId,
+            secondsTaken, this.state.hintsUsed, isCorrect,
+            attemptNumber, this.problemTypeName, this.state.taskId).done(() => {
+                if (isCorrect) {
+                    this.refreshRandomAssessment();
+                } else {
+                    // Refresh attempt info so it shows up as wrong
+                    this.refreshUserExerciseInfo();
+                }
+            });
     },
     componentWillMount: function() {
         if (this.props.exercise.isPerseusExercise()) {
@@ -169,13 +167,13 @@ var ExerciseViewer = React.createClass({
 
             // Always show 5 attempt icons with either pending, correct, hint or wrong
             var attemptIcons = [];
-            this.taskAttemptHistory = this.taskAttemptHistory.slice(-5);
+            this.state.taskAttemptHistory = this.state.taskAttemptHistory.slice(-5);
             for (var i = 0; i < 5; i++) {
-                if (i >= this.taskAttemptHistory.length) {
+                if (i >= this.state.taskAttemptHistory.length) {
                     attemptIcons.push(<i className="attempt-icon attempt-pending fa fa-circle-o"></i>);
-                } else if(this.taskAttemptHistory[i].seen_hint) {
+                } else if (this.state.taskAttemptHistory[i].seen_hint) {
                     attemptIcons.push(<i className="attempt-icon attempt-hint  fa fa-lightbulb-o"></i>);
-                } else if(!this.taskAttemptHistory[i].correct) {
+                } else if (!this.state.taskAttemptHistory[i].correct) {
                     attemptIcons.push(<i className="attempt-icon attempt-wrong fa fa-times-circle-o"></i>);
                 } else {
                     attemptIcons.push(<i className="attempt-icon attempt-correct fa fa-check-circle-o"></i>);
@@ -183,9 +181,9 @@ var ExerciseViewer = React.createClass({
             }
 
             var streakText;
-            if (this.streak > 5) {
+            if (this.state.streak > 5) {
                 streakText = l10n.get("correct-streak", {
-                    count: this.streak
+                    count: this.state.streak
                 });
             }
 
