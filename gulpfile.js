@@ -79,6 +79,7 @@ gulp.task("webpack", function(callback) {
 gulp.task("webpack-dev-server", function(callback) {
     var myConfig = Object.create(webpackConfig);
     myConfig.debug = true;
+    myConfig.cache = true;
     new WebpackDevServer(webpack(myConfig), {
         publicPath: myConfig.output.publicPath,
         stats: {
