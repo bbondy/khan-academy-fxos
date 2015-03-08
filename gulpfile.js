@@ -60,6 +60,27 @@ gulp.task("react", function() {
         .pipe(gulp.dest("./build"));
 });
 
+// Copy minify.js to the build folder and strip out Flow typechecks
+gulp.task("copyMinifyScript", function() {
+    return gulp.src(["./js/minify.js"])
+        .pipe(react({
+            harmony: true,
+            // Skip Flow type annotations!
+            stripTypes: true
+        }))
+        .pipe(gulp.dest("./build"));
+});
+gulp.task("runTopicTreeScript", function() {
+    return gulp.src("", {read: false})
+            .pipe(shell([
+        "./tools/updateTopicTreeData"
+    ]));
+});
+gulp.task("updateTopicTree", function(cb) {
+    runSequence("copyMinifyScript", "runTopicTreeScript", cb);
+});
+
+
 gulp.task("webpack", function(callback) {
     var myConfig = Object.create(webpackConfig);
     myConfig.debug = true;

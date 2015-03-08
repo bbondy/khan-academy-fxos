@@ -1,5 +1,5 @@
 fs = require("fs"),
-   Minify = require("../js/minify").Minify;
+   Minify = require("../build/minify");
 
 var files = ["data/topic-tree.json",
     "data/topic-tree-fr.json",
