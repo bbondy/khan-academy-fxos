@@ -9,8 +9,10 @@
 @coachAndClassDomainColor: #577996;
 
 @white: #fff;
-@gray: #cdcdcd;
+@lightGray: #cdcdcd;
 @black: #000;
+@green: #a6d153;
+@gray: #999999;
 
 html {
     font-size: 10px;
@@ -470,7 +472,7 @@ ul li:last-child:first-child div div.pipe {
 }
 
 ul li div div.pipe {
-    background-color: @gray;
+    background-color: @lightGray;
     bottom: -1px;
     left: 18px;
     height: 100%;
@@ -775,7 +777,14 @@ iframe {
 .problem-history {
     float: right;
     .attempt-icon {
+        color: @gray;
         margin-right: 0.2em;
         font-size: 1.6em;
     }
+
+    .attempt-icon.attempt-correct {
+        color: #a6d153;
+    }
 }
+
+
