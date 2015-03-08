@@ -73,6 +73,11 @@ var ExerciseViewer = React.createClass({
         this.randomAssessmentSHA1 = randomProblemTypeGroup.items[randomProblemTypeIndex].sha1;
         this.randomAssessmentId = randomProblemTypeGroup.items[randomProblemTypeIndex].id;
 
+        this.setState({
+            hintsUsed: 0,
+            currentHint: -1
+        });
+
         this.refreshUserExerciseInfo().then(() => {
             APIClient.getAssessmentItem(this.randomAssessmentId).done((result) => {
                 var assessment = JSON.parse(result.item_data);
