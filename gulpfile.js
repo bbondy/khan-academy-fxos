@@ -22,6 +22,8 @@ var gulp = require("gulp"),
 
 
 // Lint Task
+// Uses jsxcs, then strips Flow types and uses jshint.
+// Has no output.
 gulp.task("lint", function() {
     return gulp.src("js/**/*.js")
         .pipe(jsxcs().on("error", function(err) {
@@ -38,7 +40,7 @@ gulp.task("lint", function() {
         .pipe(jshint.reporter("default"));
 });
 
-// Compile Our LESS
+// Compile LESS into CSS puts output in ./build/css
 gulp.task("less", function() {
     return gulp.src("./style/**/*.less")
         .pipe(less({
@@ -50,6 +52,7 @@ gulp.task("less", function() {
 // The react task should not normally be needed.
 // This is only present if the errors from webpack and you
 // want to only try running react.
+// Puts output in the ./build folder
 gulp.task("react", function() {
     return gulp.src(["./js/**/*.js"])
         .pipe(react({
@@ -70,17 +73,20 @@ gulp.task("copyMinifyScript", function() {
         }))
         .pipe(gulp.dest("./build"));
 });
+// Runs ./tools/updateTopicTreeData
 gulp.task("runTopicTreeScript", function() {
     return gulp.src("", {read: false})
             .pipe(shell([
         "./tools/updateTopicTreeData"
     ]));
 });
+// sequences the above 2 tasks to generate new topic tree files
 gulp.task("updateTopicTree", function(cb) {
     runSequence("copyMinifyScript", "runTopicTreeScript", cb);
 });
 
-
+// Initiates a webpack operation and puts the bundle in ./build based
+// on the config in webpack.config.js.
 gulp.task("webpack", function(callback) {
     var myConfig = Object.create(webpackConfig);
     myConfig.debug = true;
@@ -97,6 +103,9 @@ gulp.task("webpack", function(callback) {
     });
 });
 
+// Starts a webpack dev-server on port 8008
+// localhost:8008 can be used instead for development.
+// The bundle.js file will not be written out and will be served from memory.
 gulp.task("webpack-dev-server", function(callback) {
     var myConfig = Object.create(webpackConfig);
     myConfig.debug = true;
@@ -117,24 +126,16 @@ gulp.task("webpack-dev-server", function(callback) {
     });
 });
 
+// Runs the ./tools/package script which bundles the app for Firefox OS devices.
+// Puts the output in ./dist/package
 gulp.task("package", function () {
   return gulp.src("", {read: false})
     .pipe(shell([
       "./tools/package"
-    ]))
+    ]));
 });
 
-// Concatenate & Minify JS
-gulp.task("releasify", function() {
-    return gulp.src("build/**/*.js")
-        .pipe(concat("all.js"))
-        .pipe(gulp.dest("dist"))
-        .pipe(rename("all.min.js"))
-        .pipe(uglify())
-        .pipe(gulp.dest("dist"));
-});
-
-// Test
+// Runs Jest tests
 gulp.task("test", function() {
      return gulp.src("__tests__").pipe(jest({
         scriptPreprocessor: "./js/preprocessor.js",
@@ -154,7 +155,8 @@ gulp.task("test", function() {
     }));
 });
 
-// Watch Files For Changes
+// Watch Files For Changes, when there are some will run lint and webpack
+// Will also watch for .less changes and generate new .css.
 gulp.task("watch", function() {
     gulp.watch("js/**/*.js", ["lint", "webpack"]);
     gulp.watch("style/**/*.less", ["less"]);
