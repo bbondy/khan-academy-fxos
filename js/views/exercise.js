@@ -22,6 +22,11 @@ window.Exercises = {
     cluesEnabled: false
 };
 
+var TaskCompleteView = React.createClass({
+    render: function() {
+        return <div>TODO: Task complete UI</div>;
+    }
+});
 /**
  * Represents a single exercise, it will load the exercise dynamically and
  * display it to the user.
@@ -106,6 +111,13 @@ var ExerciseViewer = React.createClass({
             secondsTaken, this.state.hintsUsed, isCorrect,
             attemptNumber, this.problemTypeName, this.state.taskId).done(() => {
                 if (isCorrect) {
+                    // If we have another correct and we already have 4 correct,
+                    // then show task complete view.
+                    if (this.state.streak >= 4) {
+                        this.setState({
+                            taskComplete: true
+                        });
+                    }
                     this.refreshRandomAssessment();
                 } else {
                     // Refresh attempt info so it shows up as wrong
@@ -163,6 +175,8 @@ var ExerciseViewer = React.createClass({
         } else if (this.props.exercise.isKhanExercisesExercise()) {
             var path = `/khan-exercises/exercises/${this.props.exercise.getFilename()}`;
             content = <iframe src={path}/>;
+        } else if (this.state.taskComplete) {
+            return <TaskCompleteView/>;
         } else if (this.ItemRenderer && this.state.perseusItemData) {
             var showHintsButton = this.state.perseusItemData.hints.length > this.state.hintsUsed;
             var hint;
@@ -172,13 +186,13 @@ var ExerciseViewer = React.createClass({
 
             // Always show 5 attempt icons with either pending, correct, hint or wrong
             var attemptIcons = [];
-            this.state.taskAttemptHistory = this.state.taskAttemptHistory.slice(-5);
+            var taskAttemptHistory = this.state.taskAttemptHistory.slice(-5);
             for (var i = 0; i < 5; i++) {
-                if (i >= this.state.taskAttemptHistory.length) {
+                if (i >= taskAttemptHistory.length) {
                     attemptIcons.push(<i className="attempt-icon attempt-pending fa fa-circle-o"></i>);
-                } else if (this.state.taskAttemptHistory[i].seen_hint) {
+                } else if (taskAttemptHistory[i].seen_hint) {
                     attemptIcons.push(<i className="attempt-icon attempt-hint  fa fa-lightbulb-o"></i>);
-                } else if (!this.state.taskAttemptHistory[i].correct) {
+                } else if (!taskAttemptHistory[i].correct) {
                     attemptIcons.push(<i className="attempt-icon attempt-wrong fa fa-times-circle-o"></i>);
                 } else {
                     attemptIcons.push(<i className="attempt-icon attempt-correct fa fa-check-circle-o"></i>);
