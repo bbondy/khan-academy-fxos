@@ -60,7 +60,8 @@ var ExerciseViewer = React.createClass({
                 mastered: info.exercise_progress.mastered,
                 practiced: info.exercise_progress.practiced,
                 problemNumber: info.total_done + 1,
-                streak: info.streak
+                streak: info.streak,
+                longestStreak: info.longest_streak
             });
         });
 
@@ -205,12 +206,21 @@ var ExerciseViewer = React.createClass({
                     count: this.state.streak
                 });
             }
+            var longestStreakText;
+            if (this.state.longestStreak > 5) {
+                longestStreakText = l10n.get("longest-correct-streak", {
+                    count: this.state.longestStreak
+                });
+            }
 
             content = <div className="framework-perseus">
                           <div className="problem-history">
                               {attemptIcons}
                               <div>
                                   {streakText}
+                              </div>
+                              <div>
+                                  {longestStreakText}
                               </div>
                           </div>
 
