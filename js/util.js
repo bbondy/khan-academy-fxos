@@ -192,18 +192,6 @@ var Util = {
         }
         return String(x).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     },
-    /**
-     * Binds a set of arguments to a function without modifying the bound `this`
-     *
-     * @return The same function with one of the specified parameters found.
-     */
-    partial: function(fn: any): any {
-        var aps = Array.prototype.slice;
-        var args = aps.call(arguments, 1);
-        return function() {
-            return fn.apply(this, args.concat(aps.call(arguments)));
-        };
-    },
 
     BackboneMixin,
     LocalizationMixin,

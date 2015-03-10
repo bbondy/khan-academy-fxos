@@ -27,7 +27,7 @@ var TranscriptItem = React.createClass({
         var startSecond = totalSeconds % 60 | 0;
         startSecond = ("0" + startSecond).slice(-2);
         return <li className="transcript-item" data-time={totalSeconds}>
-            <a href="javascript:void(0)" onClick={Util.partial(this.props.onClickTranscript, this.props.transcriptItem)}>
+            <a href="javascript:void(0)" onClick={_.partial(this.props.onClickTranscript, this.props.transcriptItem)}>
                 <div>{startMinute}:{startSecond}</div>
                 <div>{this.props.transcriptItem.text}</div>
             </a>

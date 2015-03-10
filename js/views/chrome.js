@@ -3,6 +3,7 @@
 "use strict";
 
 var $ = require("jquery"),
+    _ = require("underscore"),
     l10n = require("../l10n"),
     React = require("react/addons"),
     Util = require("../util"),
@@ -44,7 +45,7 @@ var BackButton = React.createClass({
     },
     render: function(): any {
         return <div>
-            <a className="icon-back-link " href="javascript:void(0)" onClick={Util.partial(this.props.onClickBack, this.props.model)}>
+            <a className="icon-back-link " href="javascript:void(0)" onClick={_.partial(this.props.onClickBack, this.props.model)}>
                 <span className="icon icon-back">Back</span>
             </a>
         </div>;
@@ -177,12 +178,12 @@ var Sidebar = React.createClass({
                 if (this.props.model.isDownloaded()) {
                     var text = l10n.get(this.props.model.isVideo() ? "delete-downloaded-video" : "delete-downloaded-article");
                     items.push(<li key="delete-downloaded-video" className="hot-item">
-                            <a href="#" onClick={Util.partial(this.props.onClickDeleteDownloadedContent, this.props.model)}>{{text}}</a>
+                            <a href="#" onClick={_.partial(this.props.onClickDeleteDownloadedContent, this.props.model)}>{{text}}</a>
                         </li>);
                 } else {
                     var text = l10n.get(this.props.model.isVideo() ? "download-video" : "download-article");
                     items.push(<li key="download-video" className="hot-item">
-                            <a href="#" className={this.props.model.isVideo() ? "download-video-link" : "download-article-link"} onClick={Util.partial(this.props.onClickDownloadContent, this.props.model)}>{{text}}</a>
+                            <a href="#" className={this.props.model.isVideo() ? "download-video-link" : "download-article-link"} onClick={_.partial(this.props.onClickDownloadContent, this.props.model)}>{{text}}</a>
                         </li>);
                 }
             }
@@ -193,23 +194,23 @@ var Sidebar = React.createClass({
                 this.props.model.isContent() &&
                 this.props.model.getKAUrl()) {
             var viewOnKAMessage = l10n.get("open-in-website");
-            items.push(<li key="open-in-website"><a href="#" className="open-in-website-link" onClick={Util.partial(this.props.onClickViewOnKA, this.props.model)}>{{viewOnKAMessage}}</a></li>);
+            items.push(<li key="open-in-website"><a href="#" className="open-in-website-link" onClick={_.partial(this.props.onClickViewOnKA, this.props.model)}>{{viewOnKAMessage}}</a></li>);
 
             if (window.MozActivity) {
                 var shareMessage = l10n.get("share");
-                items.push(<li key="share-link"><a href="#" className="share-link" onClick={Util.partial(this.props.onClickShare, this.props.model)}>{{shareMessage}}</a></li>);
+                items.push(<li key="share-link"><a href="#" className="share-link" onClick={_.partial(this.props.onClickShare, this.props.model)}>{{shareMessage}}</a></li>);
             }
         }
 
         if (Storage.isEnabled()) {
             if (Downloads.canCancelDownload()) {
                 items.push(<li key="cancel-downloading" className="hot-item">
-                        <a href="#" data-l10n-id="cancel-downloading" onClick={Util.partial(this.props.onClickCancelDownloadContent, this.props.model)}>Cancel Downloading</a>
+                        <a href="#" data-l10n-id="cancel-downloading" onClick={_.partial(this.props.onClickCancelDownloadContent, this.props.model)}>Cancel Downloading</a>
                     </li>);
             } else if (!this.props.isPaneShowing &&
                         this.props.model && this.props.model.isTopic()) {
                 items.push(<li key="download-topic" className="hot-item">
-                        <a href="#" data-l10n-id="download-topic" onClick={Util.partial(this.props.onClickDownloadContent, this.props.model)}>Download Topic</a>
+                        <a href="#" data-l10n-id="download-topic" onClick={_.partial(this.props.onClickDownloadContent, this.props.model)}>Download Topic</a>
                     </li>);
             }
         }

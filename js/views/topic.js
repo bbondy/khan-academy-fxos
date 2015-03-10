@@ -38,7 +38,7 @@ var TopicListItem = React.createClass({
             { this.props.topic.isRootChild() ?
                 <div className="color-block"/> : null }
             <a href="javascript:void(0)"
-               onClick={Util.partial(this.props.onClickTopic,
+               onClick={_.partial(this.props.onClickTopic,
                    this.props.topic)}>
                 <p className="topic-title">{this.props.topic.getTitle()}</p>
             </a>
@@ -89,14 +89,14 @@ var VideoListItem = React.createClass({
         return <li className={videoClass}>
             <div className={subwayIconClass}>
                 <a href="javascript:void(0)"
-                   onClick={Util.partial(this.props.onClickVideo,
+                   onClick={_.partial(this.props.onClickVideo,
                            this.props.video)}>
                     <div className={videoNodeClass}/>
                 </a>
                 <div className={pipeClass}/>
             </div>
             <a href="javascript:void(0)"
-               onClick={Util.partial(this.props.onClickVideo,
+               onClick={_.partial(this.props.onClickVideo,
                        this.props.video)}>
                 <p className="video-title">{this.props.video.getTitle()}</p>
             </a>
@@ -142,12 +142,12 @@ var ArticleListItem = React.createClass({
         var articleClass = cx(articleClassObj);
         return <li className={articleClass}>
             <div className={subwayIconClass}>
-                <a href="javascript:void(0)" onClick={Util.partial(this.props.onClickArticle, this.props.article)}>
+                <a href="javascript:void(0)" onClick={_.partial(this.props.onClickArticle, this.props.article)}>
                     <div className={articleNodeClass}/>
                 </a>
                 <div className={pipeClass}/>
             </div>
-            <a href="javascript:void(0)" onClick={Util.partial(this.props.onClickArticle, this.props.article)}>
+            <a href="javascript:void(0)" onClick={_.partial(this.props.onClickArticle, this.props.article)}>
                 <p className="article-title">{this.props.article.getTitle()}</p>
             </a>
         </li>;
@@ -193,12 +193,12 @@ var ExerciseListItem = React.createClass({
         Util.log("Exercise: %o", this.props.exercise);
         return <li className={exerciseClass}>
             <div className={subwayIconClass}>
-                <a href="javascript:void(0)" onClick={Util.partial(this.props.onClickExercise, this.props.exercise)}>
+                <a href="javascript:void(0)" onClick={_.partial(this.props.onClickExercise, this.props.exercise)}>
                     <div className={exerciseNodeClass}/>
                 </a>
                 <div className={pipeClass}/>
             </div>
-            <a href="javascript:void(0)" onClick={Util.partial(this.props.onClickExercise, this.props.exercise)}>
+            <a href="javascript:void(0)" onClick={_.partial(this.props.onClickExercise, this.props.exercise)}>
                 <p className="exercise-title">{this.props.exercise.getTitle()}</p>
             </a>
         </li>;
