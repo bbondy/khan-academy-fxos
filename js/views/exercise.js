@@ -46,22 +46,24 @@ var ExerciseViewer = React.createClass({
         };
     },
     refreshUserExerciseInfo: function() {
-        return APIClient.getTaskInfoByExerciseName(this.props.exercise.getName()).then((info) => {
-            this.setState({
-                taskId: info.id,
-                taskAttemptHistory: info.task_attempt_history
-            });
-            return APIClient.getUserExercise(this.props.exercise.getName());
-        }).then((info) => {
+
+        return $.when(APIClient.getTaskInfoByExerciseName(this.props.exercise.getName()),
+               APIClient.getUserExercise(this.props.exercise.getName())).then((taskInfo, exerciseInfo) => {
+
+            console.log("getTaskInfoByExerciseName: %o", taskInfo);
+            console.log("getUserExercise: %o", exerciseInfo);
+
             // TODO: Call this instead when the exercise loads and after submitting
             // Stash out info for the UI
             this.setState({
-                level: info.exercise_progress.level,
-                mastered: info.exercise_progress.mastered,
-                practiced: info.exercise_progress.practiced,
-                problemNumber: info.total_done + 1,
-                streak: info.streak,
-                longestStreak: info.longest_streak
+                level: exerciseInfo.exercise_progress.level,
+                mastered: exerciseInfo.exercise_progress.mastered,
+                practiced: exerciseInfo.exercise_progress.practiced,
+                problemNumber: exerciseInfo.total_done + 1,
+                streak: exerciseInfo.streak,
+                taskId: taskInfo.id,
+                taskAttemptHistory: taskInfo.task_attempt_history,
+                longestStreak: exerciseInfo.longest_streak
             });
         });
 
@@ -79,17 +81,14 @@ var ExerciseViewer = React.createClass({
         this.randomAssessmentSHA1 = randomProblemTypeGroup.items[randomProblemTypeIndex].sha1;
         this.randomAssessmentId = randomProblemTypeGroup.items[randomProblemTypeIndex].id;
 
-        this.setState({
-            hintsUsed: 0,
-            currentHint: -1
-        });
-
         this.refreshUserExerciseInfo().then(() => {
             APIClient.getAssessmentItem(this.randomAssessmentId).done((result) => {
                 var assessment = JSON.parse(result.item_data);
                 Util.log("Got assessment item: %o: item data: %o", result, assessment);
                 this.setState({
-                    perseusItemData: assessment
+                    hintsUsed: 0,
+                    currentHint: -1,
+                    perseusItemData: assessment,
                 });
             });
         });
@@ -118,6 +117,7 @@ var ExerciseViewer = React.createClass({
                         this.setState({
                             taskComplete: true
                         });
+                        return;
                     }
                     this.refreshRandomAssessment();
                 } else {
