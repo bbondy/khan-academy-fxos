@@ -9,6 +9,7 @@
   "dependencies": {
     "JSONStream": "^0.10.0",
     "backbone": "^1.1.2",
+    "classnames": "^1.1.4",
     "connect": "^3.3.2",
     "es6-default-params": "^0.4.3",
     "event-stream": "^3.3.0",

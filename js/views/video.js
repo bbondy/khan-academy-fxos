@@ -6,12 +6,11 @@ var $ = require("jquery"),
     _ = require("underscore"),
     l10n = require("../l10n"),
     React = require("react/addons"),
+    classNames = require("classnames"),
     Util = require("../util"),
     models = require("../models"),
     APIClient = require("../apiclient"),
     Storage = require("../storage");
-
-var cx = React.addons.classSet;
 
 /**
  * Represents a single transcript item for the list of transcript items.
@@ -442,7 +441,7 @@ var VideoViewerRawObj: {
         if (parentDomain) {
             videoClassObj[parentDomain.getId()] = true;
         }
-        this.videoClass = cx(videoClassObj);
+        this.videoClass = classNames(videoClassObj);
 
         var control;
         if (this.state.showOfflineImage) {

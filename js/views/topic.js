@@ -4,10 +4,9 @@
 
 var _ = require("underscore"),
     React = require("react/addons"),
+    classNames = require("classNames"),
     models = require("../models"),
     Util = require("../util");
-
-var cx = React.addons.classSet;
 
 /**
  * Represents a single root, domain, subject, topic, or tutorial
@@ -32,7 +31,7 @@ var TopicListItem = React.createClass({
         };
         var parentDomain = this.props.topic.getParentDomain();
         topicClassObj[parentDomain.getId()] = true;
-        var topicClass = cx(topicClassObj);
+        var topicClass = classNames(topicClassObj);
 
         return <li className={topicClass}>
             { this.props.topic.isRootChild() ?
@@ -59,7 +58,7 @@ var VideoListItem = React.createClass({
         onClickVideo: React.PropTypes.func.isRequired
     },
     render: function(): any {
-        var videoNodeClass = cx({
+        var videoNodeClass = classNames({
           "video-node": true,
           completed: this.props.video.isCompleted(),
           "in-progress": this.props.video.isStarted()
@@ -83,9 +82,9 @@ var VideoListItem = React.createClass({
             videoClassObj[parentDomain.getId()] = true;
             pipeClassObj[parentDomain.getId()] = true;
         }
-        var subwayIconClass = cx(subwayIconClassObj);
-        var pipeClass = cx(pipeClassObj);
-        var videoClass = cx(videoClassObj);
+        var subwayIconClass = classNames(subwayIconClassObj);
+        var pipeClass = classNames(pipeClassObj);
+        var videoClass = classNames(videoClassObj);
         return <li className={videoClass}>
             <div className={subwayIconClass}>
                 <a href="javascript:void(0)"
@@ -115,7 +114,7 @@ var ArticleListItem = React.createClass({
         onClickArticle: React.PropTypes.func.isRequired
     },
     render: function(): any {
-        var articleNodeClass = cx({
+        var articleNodeClass = classNames({
           "article-node": true,
           completed: this.props.article.isCompleted(),
           "in-progress": this.props.article.isStarted()
@@ -137,9 +136,9 @@ var ArticleListItem = React.createClass({
         subwayIconClassObj[parentDomain.getId()] = true;
         articleClassObj[parentDomain.getId()] = true;
         pipeClassObj[parentDomain.getId()] = true;
-        var subwayIconClass = cx(subwayIconClassObj);
-        var pipeClass = cx(pipeClassObj);
-        var articleClass = cx(articleClassObj);
+        var subwayIconClass = classNames(subwayIconClassObj);
+        var pipeClass = classNames(pipeClassObj);
+        var articleClass = classNames(articleClassObj);
         return <li className={articleClass}>
             <div className={subwayIconClass}>
                 <a href="javascript:void(0)" onClick={_.partial(this.props.onClickArticle, this.props.article)}>
@@ -165,7 +164,7 @@ var ExerciseListItem = React.createClass({
         onClickExercise: React.PropTypes.func.isRequired
     },
     render: function(): any {
-        var exerciseNodeClass = cx({
+        var exerciseNodeClass = classNames({
           "exercise-node": true,
           completed: this.props.exercise.isCompleted(),
           "in-progress": this.props.exercise.isStarted()
@@ -187,9 +186,9 @@ var ExerciseListItem = React.createClass({
         subwayIconClassObj[parentDomain.getId()] = true;
         exerciseClassObj[parentDomain.getId()] = true;
         pipeClassObj[parentDomain.getId()] = true;
-        var subwayIconClass = cx(subwayIconClassObj);
-        var pipeClass = cx(pipeClassObj);
-        var exerciseClass = cx(exerciseClassObj);
+        var subwayIconClass = classNames(subwayIconClassObj);
+        var pipeClass = classNames(pipeClassObj);
+        var exerciseClass = classNames(exerciseClassObj);
         Util.log("Exercise: %o", this.props.exercise);
         return <li className={exerciseClass}>
             <div className={subwayIconClass}>

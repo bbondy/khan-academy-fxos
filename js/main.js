@@ -24,6 +24,7 @@ $.ajaxSetup({
 window.APIClient = APIClient;
 window.Util = Util;
 window.models = models;
+window.React = React;
 
 $("body").bind("contextmenu", function(e) {
     Util.log("contextmenu!");

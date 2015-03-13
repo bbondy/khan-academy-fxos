@@ -6,6 +6,7 @@ var $ = require("jquery"),
     _ = require("underscore"),
     l10n = require("../l10n"),
     React = require("react/addons"),
+    classNames = require("classnames"),
     Util = require("../util"),
     models = require("../models"),
     APIClient = require("../apiclient"),
@@ -20,7 +21,6 @@ var $ = require("jquery"),
     searchViews = require("./search"),
     paneViews = require("./pane");
 
-var cx = React.addons.classSet;
 var VideoViewer = videoViews.VideoViewer;
 var ArticleViewer = articleViews.ArticleViewer;
 var ExerciseViewer = exerciseViews.ExerciseViewer;
@@ -99,7 +99,7 @@ var AppHeader = React.createClass({
         if (parentDomain && !this.props.isPaneShowing) {
             styleObj[parentDomain.getId()] = true;
         }
-        var styleClass = cx(styleObj);
+        var styleClass = classNames(styleObj);
 
         var title = "Khan Academy";
         if (this.props.isDownloadsShowing) {
