@@ -315,14 +315,14 @@ var VideoViewerRawObj: {
             // Add an event listener to track watched time
             var video = this._getVideoDOMNode();
             if (video) {
-                video.addEventListener("canplay", this._canPlayHTML5.bind(this));
-                video.addEventListener("progress", this._onNetworkProgress.bind(this));
+                video.addEventListener("canplay", this._canPlayHTML5);
+                video.addEventListener("progress", this._onNetworkProgress);
                 video.addEventListener("timeupdate", this._onTimeupdateHTML5);
-                video.addEventListener("play", this._onPlay.bind(this), true);
-                video.addEventListener("pause", this._onPause.bind(this), true);
-                video.addEventListener("stop", this._onStop.bind(this), true);
-                video.addEventListener("ended", this._onEnded.bind(this), true);
-                video.addEventListener("error", this._onError.bind(this), true);
+                video.addEventListener("play", this._onPlay, true);
+                video.addEventListener("pause", this._onPause, true);
+                video.addEventListener("stop", this._onStop, true);
+                video.addEventListener("ended", this._onEnded, true);
+                video.addEventListener("error", this._onError, true);
                 video.defaultPlaybackRate = models.AppOptions.get("playbackRate") / 100;
                 video.playbackRate = models.AppOptions.get("playbackRate") / 100;
             }
