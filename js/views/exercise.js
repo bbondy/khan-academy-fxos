@@ -42,20 +42,16 @@ var ExerciseViewer = React.createClass({
     getInitialState: function() {
         return {
             hintsUsed: 0,
-            currentHint: -1
         };
     },
     refreshUserExerciseInfo: function() {
+        var d = $.Deferred();
+        $.when(APIClient.getTaskInfoByExerciseName(this.props.exercise.getName()),
+                APIClient.getUserExercise(this.props.exercise.getName())).then((taskInfo, exerciseInfo) => {
 
-        return $.when(APIClient.getTaskInfoByExerciseName(this.props.exercise.getName()),
-               APIClient.getUserExercise(this.props.exercise.getName())).then((taskInfo, exerciseInfo) => {
-
-            console.log("getTaskInfoByExerciseName: %o", taskInfo);
-            console.log("getUserExercise: %o", exerciseInfo);
-
-            // TODO: Call this instead when the exercise loads and after submitting
-            // Stash out info for the UI
-            this.setState({
+            Util.log("getTaskInfoByExerciseName: %o", taskInfo);
+            Util.log("getUserExercise: %o", exerciseInfo);
+            d.resolve({
                 level: exerciseInfo.exercise_progress.level,
                 mastered: exerciseInfo.exercise_progress.mastered,
                 practiced: exerciseInfo.exercise_progress.practiced,
@@ -65,8 +61,10 @@ var ExerciseViewer = React.createClass({
                 taskAttemptHistory: taskInfo.task_attempt_history,
                 longestStreak: exerciseInfo.longest_streak
             });
+        }).fail(() => {
+            d.reject();
         });
-
+        return d.promise();
     },
     refreshRandomAssessment: function() {
 
@@ -81,23 +79,28 @@ var ExerciseViewer = React.createClass({
         this.randomAssessmentSHA1 = randomProblemTypeGroup.items[randomProblemTypeIndex].sha1;
         this.randomAssessmentId = randomProblemTypeGroup.items[randomProblemTypeIndex].id;
 
-        this.refreshUserExerciseInfo().then(() => {
-            APIClient.getAssessmentItem(this.randomAssessmentId).done((result) => {
-                var assessment = JSON.parse(result.item_data);
-                Util.log("Got assessment item: %o: item data: %o", result, assessment);
+        return $.when(this.refreshUserExerciseInfo(),
+            APIClient.getAssessmentItem(this.randomAssessmentId)).then((userExerciseInfo, assessmentItem) => {
+                var assessment = JSON.parse(assessmentItem.item_data);
+                Util.log("Got assessment item: %o: item data: %o", assessmentItem, assessment);
                 this.setState({
                     hintsUsed: 0,
-                    currentHint: -1,
                     perseusItemData: assessment,
+                    level: userExerciseInfo.level,
+                    mastered: userExerciseInfo.mastered,
+                    practiced: userExerciseInfo.practiced,
+                    problemNumber: userExerciseInfo.problemNumber,
+                    streak: userExerciseInfo.streak,
+                    taskId: userExerciseInfo.taskId,
+                    taskAttemptHistory: userExerciseInfo.taskAttemptHistory,
+                    longestStreak: userExerciseInfo.longestStreak
                 });
             });
-        });
     },
     onClickRequestHint: function() {
         this.refs.itemRenderer.showHint();
         this.setState({
             hintsUsed: this.state.hintsUsed + 1,
-            currentHint: this.state.currentHint + 1
         });
     },
     onClickSubmitAnswer: function() {
@@ -113,7 +116,7 @@ var ExerciseViewer = React.createClass({
                 if (isCorrect) {
                     // If we have another correct and we already have 4 correct,
                     // then show task complete view.
-                    if (this.state.streak >= 4) {
+                    if (this.state.streak >= 4 && this.state.hintsUsed === 0) {
                         this.setState({
                             taskComplete: true
                         });
@@ -122,7 +125,7 @@ var ExerciseViewer = React.createClass({
                     this.refreshRandomAssessment();
                 } else {
                     // Refresh attempt info so it shows up as wrong
-                    this.refreshUserExerciseInfo();
+                    this.refreshUserExerciseInfo().then(this.setState.bind(this));
                 }
             });
     },
@@ -149,15 +152,9 @@ var ExerciseViewer = React.createClass({
         MathJax = window.MathJax;
         window.KhanUtil = Khan.Util;
 
-        console.log("Khan: %o", Khan);
-
         var katex = require("../../bower_components/katex/katex"),
             KAS = require("../../bower_components/KAS/kas"),
             Perseus = require("../../bower_components/perseus/perseus-2");
-        console.log("katex %o:", katex);
-        console.log("KAS %o:", KAS);
-        console.log("Perseus %o:", Perseus);
-
         perseusPrep(katex, KAS, MathJax, Khan.Util);
         Perseus.init({}).then(() => {
             Util.log("Perseus init done %o, %o", Perseus);
@@ -180,11 +177,6 @@ var ExerciseViewer = React.createClass({
             return <TaskCompleteView/>;
         } else if (this.ItemRenderer && this.state.perseusItemData) {
             var showHintsButton = this.state.perseusItemData.hints.length > this.state.hintsUsed;
-            var hint;
-            if (this.state.currentHint !== -1 &&
-                    this.state.currentHint < this.state.perseusItemData.hints.length) {
-            }
-
             // Always show 5 attempt icons with either pending, correct, hint or wrong
             var attemptIcons = [];
             var taskAttemptHistory = this.state.taskAttemptHistory.slice(-5);
@@ -226,7 +218,8 @@ var ExerciseViewer = React.createClass({
 
                           <this.ItemRenderer ref="itemRenderer"
                                              item={this.state.perseusItemData}
-                                             problemNum={Math.floor(Math.random() * 50) + 1}
+                                             key={this.state.problemNumber}
+                                             problemNum={this.state.problemNumber}
                                              initialHintsVisible={0}
                                              enabledFeatures={{
                                                  highlight: true,
@@ -243,7 +236,6 @@ var ExerciseViewer = React.createClass({
                                   data-l10n-id="hint"
                                   onClick={this.onClickRequestHint}>Hint</button>
                           }
-                          {hint}
                           <div id="hintsarea"/>
                       </div>;
         }
