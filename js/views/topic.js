@@ -16,9 +16,6 @@ var _ = require("underscore"),
  * which are the children of the clicked item.
  */
 class TopicListItem extends React.Component {
-    getInitialState() {
-        return {};
-    }
     render(): any {
         var topicClassObj = {
             "topic-item": true,

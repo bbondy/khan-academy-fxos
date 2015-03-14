@@ -275,8 +275,6 @@ var MainView = React.createClass({
         return [new models.ContentList(models.TopicTree.allContentItems),
             models.AppOptions, models.TempAppState, models.CurrentUser];
     },
-    componentWillMount: function() {
-    },
     getInitialState: function() {
         return {
             currentModel: this.props.model,

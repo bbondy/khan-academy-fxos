@@ -13,8 +13,9 @@ var ContentListViewer = topicViews.ContentListViewer;
  * Represents the topic search input item which is right below the header.
  */
 class TopicSearch extends React.Component {
-    getInitialState() {
-        return {
+    constructor(props) {
+        super(props);
+        this.state = {
             searchValue: ""
         };
     }
