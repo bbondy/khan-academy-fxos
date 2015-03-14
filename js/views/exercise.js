@@ -22,11 +22,11 @@ window.Exercises = {
     cluesEnabled: false
 };
 
-var TaskCompleteView = React.createClass({
-    render: function() {
+class TaskCompleteView extends React.Component {
+    render() {
         return <div>TODO: Task complete UI</div>;
     }
-});
+}
 /**
  * Represents a single exercise, it will load the exercise dynamically and
  * display it to the user.

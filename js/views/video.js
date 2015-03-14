@@ -16,11 +16,8 @@ var $ = require("jquery"),
  * Represents a single transcript item for the list of transcript items.
  * When clicekd, it willl fast forward the video to that transcript item.
  */
-var TranscriptItem = React.createClass({
-    propTypes: {
-        transcriptItem: React.PropTypes.object.isRequired
-    },
-    render: function(): any {
+class TranscriptItem extends React.Component {
+    render(): any {
         var totalSeconds = this.props.transcriptItem.start_time / 1000 | 0;
         var startMinute = totalSeconds / 60 | 0;
         var startSecond = totalSeconds % 60 | 0;
@@ -32,17 +29,16 @@ var TranscriptItem = React.createClass({
             </a>
         </li>;
     }
-});
+}
+TranscriptItem.propTypes = {
+    transcriptItem: React.PropTypes.object.isRequired
+};
 
 /**
  * Represents the entire transcript, which is a list of TranscriptItems.
  */
-var TranscriptViewer = React.createClass({
-    propTypes: {
-        collection: React.PropTypes.array.isRequired,
-        onClickTranscript: React.PropTypes.func.isRequired
-    },
-    render: function(): any {
+class TranscriptViewer extends React.Component {
+    render(): any {
         if (!this.props.collection) {
             return null;
         }
@@ -53,7 +49,11 @@ var TranscriptViewer = React.createClass({
         });
         return <ul className="transcript">{transcriptItems}</ul>;
     }
-});
+}
+TranscriptViewer.propTypes = {
+    collection: React.PropTypes.array.isRequired,
+    onClickTranscript: React.PropTypes.func.isRequired
+};
 
 /**
  * Represents a single video, it will load the video dynamically and
@@ -409,7 +409,7 @@ var VideoViewerRawObj: {
         }
     },
 
-    render: function(): any {
+    render(): any {
         var transcriptViewer;
         if (!!this.state.transcript) {
             transcriptViewer = <TranscriptViewer collection={this.state.transcript}

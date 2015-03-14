@@ -38,27 +38,27 @@ var ProfileViewer = paneViews.ProfileViewer;
  * In general, when clicked it will take the user to the last view they were
  * at before.
  */
-var BackButton = React.createClass({
-    propTypes: {
-        model: React.PropTypes.object.isRequired,
-        onClickBack: React.PropTypes.func.isRequired
-    },
-    render: function(): any {
+class BackButton extends React.Component {
+    render() : any {
         return <div>
             <a className="icon-back-link " href="javascript:void(0)" onClick={_.partial(this.props.onClickBack, this.props.model)}>
                 <span className="icon icon-back">Back</span>
             </a>
         </div>;
     }
-});
+}
+BackButton.propTypes = {
+    model: React.PropTypes.object.isRequired,
+    onClickBack: React.PropTypes.func.isRequired
+};
 
 /**
  * Represents the menu button which is found on the top right of the header
  * on all screens.
  * When clicked it will expand a drawer with context sensitive options.
  */
-var MenuButton = React.createClass({
-    render: function(): any {
+class MenuButton extends React.Component {
+    render(): any {
         return <div>
             <menu type="toolbar" className="icon-menu-link ">
                 <a href="#main-content">
@@ -67,18 +67,14 @@ var MenuButton = React.createClass({
             </menu>
         </div>;
     }
-});
+}
 
 /**
  * Represents the app header, it contains the back button, the menu button,
  * and a title.
  */
-var AppHeader = React.createClass({
-    propTypes: {
-        model: React.PropTypes.object,
-        isPaneShowing: React.PropTypes.bool.isRequired
-    },
-    render: function(): any {
+class AppHeader extends React.Component {
+    render(): any {
         var backButton;
         var model = this.props.model;
         if (model && (this.props.isPaneShowing ||
@@ -125,10 +121,14 @@ var AppHeader = React.createClass({
                 <h1 className="header-title">{title}</h1>
             </header>;
     }
-});
+}
+AppHeader.propTypes = {
+    model: React.PropTypes.object,
+    isPaneShowing: React.PropTypes.bool.isRequired
+};
 
-var StatusBarViewer = React.createClass({
-    render: function(): any {
+class StatusBarViewer extends React.Component {
+    render(): any {
         if (!models.TempAppState.get("status")) {
             return <div/>;
         }
@@ -138,36 +138,18 @@ var StatusBarViewer = React.createClass({
         }
 
         return <div className="status-bar">
-                {models.TempAppState.get("status")}
-                {cancelButton}
-               </div>;
+            {models.TempAppState.get("status")}
+            {cancelButton}
+        </div>;
     }
-});
+}
 
 /**
  * Represents the sidebar drawer.
  * The sidebar drawer comes up when you click on the menu from the top header.
  */
-var Sidebar = React.createClass({
-    propTypes: {
-        model: React.PropTypes.object.isRequired,
-        isPaneShowing: React.PropTypes.bool.isRequired,
-        isSettingsShowing: React.PropTypes.bool.isRequired,
-        isProfileShowing: React.PropTypes.bool.isRequired,
-        isDownloadsShowing: React.PropTypes.bool.isRequired,
-        onClickDeleteDownloadedContent: React.PropTypes.func.isRequired,
-        onClickDownloadContent: React.PropTypes.func.isRequired,
-        onClickViewOnKA: React.PropTypes.func.isRequired,
-        onClickShare: React.PropTypes.func.isRequired,
-        onClickSignin: React.PropTypes.func.isRequired,
-        onClickCancelDownloadContent: React.PropTypes.func.isRequired,
-        onClickProfile: React.PropTypes.func.isRequired,
-        onClickSettings: React.PropTypes.func.isRequired,
-        onClickDownloads: React.PropTypes.func.isRequired,
-        onClickSupport: React.PropTypes.func.isRequired,
-        onClickSignout: React.PropTypes.func.isRequired
-    },
-    render: function(): any {
+class Sidebar extends React.Component {
+    render(): any {
         var items = [];
 
         ////////////////////
@@ -256,7 +238,25 @@ var Sidebar = React.createClass({
             </nav>
         </section>;
     }
-});
+}
+Sidebar.propTypes = {
+    model: React.PropTypes.object.isRequired,
+    isPaneShowing: React.PropTypes.bool.isRequired,
+    isSettingsShowing: React.PropTypes.bool.isRequired,
+    isProfileShowing: React.PropTypes.bool.isRequired,
+    isDownloadsShowing: React.PropTypes.bool.isRequired,
+    onClickDeleteDownloadedContent: React.PropTypes.func.isRequired,
+    onClickDownloadContent: React.PropTypes.func.isRequired,
+    onClickViewOnKA: React.PropTypes.func.isRequired,
+    onClickShare: React.PropTypes.func.isRequired,
+    onClickSignin: React.PropTypes.func.isRequired,
+    onClickCancelDownloadContent: React.PropTypes.func.isRequired,
+    onClickProfile: React.PropTypes.func.isRequired,
+    onClickSettings: React.PropTypes.func.isRequired,
+    onClickDownloads: React.PropTypes.func.isRequired,
+    onClickSupport: React.PropTypes.func.isRequired,
+    onClickSignout: React.PropTypes.func.isRequired
+};
 
 /**
  * This is the main app container itself.

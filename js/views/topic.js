@@ -15,15 +15,11 @@ var _ = require("underscore"),
  * list view will be replaced with a bunch of different TopicListItem
  * which are the children of the clicked item.
  */
-var TopicListItem = React.createClass({
-    propTypes: {
-        topic: React.PropTypes.object.isRequired,
-        onClickTopic: React.PropTypes.func.isRequired
-    },
-    getInitialState: function() {
+class TopicListItem extends React.Component {
+    getInitialState() {
         return {};
-    },
-    render: function(): any {
+    }
+    render(): any {
         var topicClassObj = {
             "topic-item": true,
             faded: models.AppOptions.get("showDownloadsOnly") &&
@@ -43,21 +39,19 @@ var TopicListItem = React.createClass({
             </a>
         </li>;
     }
-});
+}
+TopicListItem.propTypes = {
+    topic: React.PropTypes.object.isRequired,
+    onClickTopic: React.PropTypes.func.isRequired
+};
 
 /**
  * Represents a single video item in the topic list.
  * This renders the list item and not the actual video.
  * When clicked, it will render the video corresponding to this list item.
  */
-var VideoListItem = React.createClass({
-    componentDidMount: function() {
-    },
-    propTypes: {
-        video: React.PropTypes.object.isRequired,
-        onClickVideo: React.PropTypes.func.isRequired
-    },
-    render: function(): any {
+class VideoListItem extends React.Component {
+    render(): any {
         var videoNodeClass = classNames({
           "video-node": true,
           completed: this.props.video.isCompleted(),
@@ -101,19 +95,19 @@ var VideoListItem = React.createClass({
             </a>
         </li>;
     }
-});
+}
+VideoListItem.propTypes = {
+    video: React.PropTypes.object.isRequired,
+    onClickVideo: React.PropTypes.func.isRequired
+};
 
 /**
  * Represents a single article item in the topic list.
  * This renders the list item and not the actual article.
  * When clicked, it will render the article corresponding to this list item.
  */
-var ArticleListItem = React.createClass({
-    propTypes: {
-        article: React.PropTypes.object.isRequired,
-        onClickArticle: React.PropTypes.func.isRequired
-    },
-    render: function(): any {
+class ArticleListItem extends React.Component {
+    render(): any {
         var articleNodeClass = classNames({
           "article-node": true,
           completed: this.props.article.isCompleted(),
@@ -151,19 +145,19 @@ var ArticleListItem = React.createClass({
             </a>
         </li>;
     }
-});
+}
+ArticleListItem.propTypes = {
+    article: React.PropTypes.object.isRequired,
+    onClickArticle: React.PropTypes.func.isRequired
+};
 
 /**
  * Represents a single exercise item in the topic list.
  * This renders the list item and not the actual exercise.
  * When clicked, it will render the exercise corresponding to this list item.
  */
-var ExerciseListItem = React.createClass({
-    propTypes: {
-        exercise: React.PropTypes.object.isRequired,
-        onClickExercise: React.PropTypes.func.isRequired
-    },
-    render: function(): any {
+class ExerciseListItem extends React.Component {
+    render(): any {
         var exerciseNodeClass = classNames({
           "exercise-node": true,
           completed: this.props.exercise.isCompleted(),
@@ -202,21 +196,18 @@ var ExerciseListItem = React.createClass({
             </a>
         </li>;
     }
-});
+}
+ExerciseListItem.propTypes = {
+    exercise: React.PropTypes.object.isRequired,
+    onClickExercise: React.PropTypes.func.isRequired
+};
 
 /**
  * Represents a single topic and it displays a list of all of its children.
  * Each child of the list is a TopicListItem, VideoListItem, or ArticleListItem.
  */
-var TopicViewer = React.createClass({
-    componentDidMount: function() {
-    },
-    propTypes: {
-        topic: React.PropTypes.object.isRequired,
-        onClickTopic: React.PropTypes.func.isRequired,
-        onClickContentItem: React.PropTypes.func.isRequired
-    },
-    render: function(): any {
+class TopicViewer extends React.Component {
+    render(): any {
         var topics;
         if (this.props.topic.get("topics")) {
             topics = _(this.props.topic.get("topics").models).map((topic) => {
@@ -254,19 +245,20 @@ var TopicViewer = React.createClass({
                 {topicList}
         </div>;
     }
-});
+}
+TopicViewer.propTypes = {
+    topic: React.PropTypes.object.isRequired,
+    onClickTopic: React.PropTypes.func.isRequired,
+    onClickContentItem: React.PropTypes.func.isRequired
+};
 
 /**
  * Represents a list of content items.
  * This is used for displaying search results and download lists.
  * This always contains only a list of VideoListItems, or ARticleListItems.
  */
-var ContentListViewer = React.createClass({
-    propTypes: {
-        collection: React.PropTypes.object.isRequired,
-        onClickContentItem: React.PropTypes.func.isRequired
-    },
-    render: function(): any {
+class ContentListViewer extends React.Component {
+    render(): any {
         var contentItems;
         if (this.props.collection.models) {
             contentItems = _(this.props.collection.models).map((contentItem) => {
@@ -295,7 +287,11 @@ var ContentListViewer = React.createClass({
                 {topicList}
         </div>;
     }
-});
+}
+ContentListViewer.propTypes = {
+    collection: React.PropTypes.object.isRequired,
+    onClickContentItem: React.PropTypes.func.isRequired
+};
 
 module.exports = {
     TopicListItem,

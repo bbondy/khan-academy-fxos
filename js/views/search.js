@@ -12,37 +12,33 @@ var ContentListViewer = topicViews.ContentListViewer;
 /**
  * Represents the topic search input item which is right below the header.
  */
-var TopicSearch = React.createClass({
-    propTypes: {
-        model: React.PropTypes.object.isRequired,
-        onTopicSearch: React.PropTypes.func.isRequired
-    },
-    getInitialState: function() {
+class TopicSearch extends React.Component {
+    getInitialState() {
         return {
             searchValue: ""
         };
-    },
-    onChange: function(event: any) {
+    }
+    onChange(event: any) {
         var topicSearch = event.target.value;
         this.setState({
             searchValue: topicSearch
         });
         this.props.onTopicSearch(topicSearch);
-    },
-    handleFocus: function(event: any) {
+    }
+    handleFocus(event: any) {
         setTimeout(() => {
             $("html, body").stop(true, true).animate({
                 scrollTop: $(this.refs.search.getDOMNode()).offset().top
             }, 500);
         }, 500);
-    },
-    handleBlur: function(event: any) {
+    }
+    handleBlur(event: any) {
         $("html, body").stop(true, true).animate({
             scrollTop: 0
         }, 700);
-    },
+    }
 
-    render: function(): any {
+    render(): any {
         var text = l10n.get("search");
         if (this.props.model.getTitle()) {
             text = l10n.get("search-topic", {
@@ -63,25 +59,29 @@ var TopicSearch = React.createClass({
         </div>;
 
     }
-});
+}
+TopicSearch.propTypes = {
+    model: React.PropTypes.object.isRequired,
+    onTopicSearch: React.PropTypes.func.isRequired
+};
 
 /**
  * Represents a search result list which is basically just a wrapper around a
  * ContentListViewer for now.
  */
-var SearchResultsViewer = React.createClass({
-    propTypes: {
-        collection: React.PropTypes.object.isRequired,
-        onClickContentItem: React.PropTypes.func.isRequired
-    },
-    render: function(): any {
+class SearchResultsViewer extends React.Component {
+    render(): any {
         var control = <ContentListViewer collection={this.props.collection}
                                          onClickContentItem={this.props.onClickContentItem} />;
         return <div className="topic-list-container">
             {control}
         </div>;
     }
-});
+}
+SearchResultsViewer.propTypes = {
+    collection: React.PropTypes.object.isRequired,
+    onClickContentItem: React.PropTypes.func.isRequired
+};
 
 module.exports = {
     TopicSearch,

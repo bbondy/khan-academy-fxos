@@ -15,11 +15,8 @@ var ContentListViewer = topicViews.ContentListViewer;
  * Represents a downloads list which is basically just a wrapper around a
  * ContentListViewer for now.
  */
-var DownloadsViewer = React.createClass({
-    propTypes: {
-        onClickContentItem: React.PropTypes.func.isRequired
-    },
-    render: function(): any {
+class DownloadsViewer extends React.Component {
+    render(): any {
         if (!Downloads.contentList.length) {
             return <div className="downloads">
                 <div data-l10n-id="no-downloads">You have no downloads yet!</div>
@@ -32,42 +29,42 @@ var DownloadsViewer = React.createClass({
             {control}
         </div>;
     }
-});
+}
+DownloadsViewer.propTypes = {
+    onClickContentItem: React.PropTypes.func.isRequired
+};
 
 /**
  * Represents a list of settings which can be modified which affect
  * global state.
  */
-var SettingsViewer = React.createClass({
-    propTypes: {
-        options: React.PropTypes.object.isRequired
-    },
-    handleShowDownloadsChange: function(event: any) {
+class SettingsViewer extends React.Component {
+    handleShowDownloadsChange(event: any) {
         this.props.options.set("showDownloadsOnly", event.target.checked);
         this.props.options.save();
-    },
-    handleShowTranscriptsChange: function(event: any) {
+    }
+    handleShowTranscriptsChange(event: any) {
         this.props.options.set("showTranscripts", event.target.checked);
         this.props.options.save();
-    },
-    handleAutoUpdateTopicTreeChange: function(event: any) {
+    }
+    handleAutoUpdateTopicTreeChange(event: any) {
         this.props.options.set("autoUpdateTopicTree", event.target.checked);
         this.props.options.save();
-    },
-    handleSetPlaybackRateChange: function(event: any) {
+    }
+    handleSetPlaybackRateChange(event: any) {
         // Convert a value like: 0, 1, 2, 3 to 50, 100, 150, 200
         var percentage = 50 + event.target.value * 50;
         this.props.options.set("playbackRate", percentage);
         this.props.options.save();
-    },
-    handleReset: function(event: any) {
+    }
+    handleReset(event: any) {
         if (confirm(l10n.get("confirm-reset"))) {
             this.props.options.reset();
         }
-    },
+    }
     // YouTube player option is currently disabled due to a bug w/ the
     // API when on the actual device.  Callbacks aren't always called.
-    render: function(): any {
+    render(): any {
         return <div className="settings topic-list-container">
 
             <div data-l10n-id="show-downloads-only">Show downloads only</div>
@@ -122,16 +119,17 @@ var SettingsViewer = React.createClass({
                     onClick={this.handleReset}>Reset</button>
         </div>;
     }
-});
+}
+SettingsViewer.propTypes = {
+    options: React.PropTypes.object.isRequired
+};
 
 /**
  * Represents a user's profile. It gives the user information about their
  * username, badges, and points.
  */
-var ProfileViewer = React.createClass({
-    componentWillMount: function() {
-    },
-    render: function(): any {
+class ProfileViewer extends React.Component {
+    render(): any {
         var pointsString = l10n.get("points");
         // TODO(bbondy): The title attributes on the images need to change
         // because you can't hover with your finger on FxOS Maybe just
@@ -171,7 +169,7 @@ var ProfileViewer = React.createClass({
                 </div> : null }
         </div>;
     }
-});
+}
 
 module.exports = {
     DownloadsViewer,
