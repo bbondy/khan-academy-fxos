@@ -18,7 +18,7 @@ describe("Storage module", function() {
             return Storage.writeText("test-file", "test");
         }).then(() => {
             return Storage.readText("test-file");
-        }).done((result) => {
+        }).then((result) => {
             expect(result).toBe("test");
             initRan = true;
         });

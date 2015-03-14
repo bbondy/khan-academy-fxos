@@ -25,8 +25,6 @@
 
 'use strict';
 
-var $ = require("jquery");
-
 var gL10nData = {};
 var gTextData = '';
 var gTextProp = 'textContent';

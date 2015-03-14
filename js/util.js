@@ -2,8 +2,7 @@
 
 "use strict";
 
-var $ = require("jquery"),
-    _ = require("underscore"),
+var _ = require("underscore"),
     l10n = require("./l10n");
 
 // An example generic Mixin that you can add to any component that should react
@@ -205,19 +204,19 @@ var Util = {
      * @param filename The URL to load
      */
     loadScript: function(filename: string): any {
-        var d = $.Deferred();
-        var s: any = document.createElement("script");
-        s.type = "text/javascript";
-        s.src = filename;
-        s.onload = () => {
-            d.resolve();
-        };
-        s.onerror = (e) => {
-            Util.log("on error: %o", e);
-            d.reject();
-        };
-        document.getElementsByTagName("head")[0].appendChild(s);
-        return d.promise();
+        return new Promise((resolve, reject) => {
+            var s: any = document.createElement("script");
+            s.type = "text/javascript";
+            s.src = filename;
+            s.onload = () => {
+                resolve();
+            };
+            s.onerror = (e) => {
+                Util.log("on error: %o", e);
+                reject();
+            };
+            document.getElementsByTagName("head")[0].appendChild(s);
+        });
     }
 };
 

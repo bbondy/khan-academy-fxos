@@ -33,17 +33,17 @@ describe("APIClient", function() {
             return initRan;
         });
 
-        APIClient.init().done(function() {
+        APIClient.init().then(function() {
             // Consumer key and secret should be available after init
             expect(APIClient.oauth.consumerKey).toBeTruthy();
             expect(APIClient.oauth.consumerSecret).toBeTruthy();
             initRan = true;
             /*
-            APIClient.getTopicTree().done(function() {
+            APIClient.getTopicTree().then(function() {
                 return APIClient.getVideoTranscript();
             }).then(function() {
                 return APIClient.getVideoTranscript();
-            }).done(function() {
+            }).then(function() {
                 initRan = true;
             });
             */
@@ -56,16 +56,15 @@ describe("APIClient", function() {
         waitsFor(() => {
             return initRan;
         });
-        var $ = require("jquery");
         var APIClient = require("../apiclient");
-        APIClient.init().done(function() {
+        APIClient.init().then(function() {
             APIClient._basicAPICall = jest.genMockFn();
             APIClient._basicAPICall.mockImpl((url, extraParams, method, dataType) => {
-                return $.Deferred().resolve({
+                return Promise.resolve({
                     url: url,
                     extraParams: extraParams ? JSON.stringify(extraParams) : "",
                     method: method || "GET",
-                    dataType: dataType}).promise();
+                    dataType: dataType});
             });
             APIClient.getUserProgress().then(function(result) {
                 expect(result.url).toBe("https://www.khanacademy.org/api/v1/user/progress_summary");
@@ -116,7 +115,7 @@ describe("APIClient", function() {
                 expect(result.method).toBe("GET");
                 expect(result.extraParams).toBe("");
                 return APIClient.reportVideoProgress(1, 2, 3, 4, 5);
-            }).done(function(result) {
+            }).then(function(result) {
                 expect(result.url).toBe("https://www.khanacademy.org/api/v1/user/videos/2/log");
                 expect(result.method).toBe("POST");
                 expect(result.extraParams).toBe("{\"seconds_watched\":\"4\",\"last_second_watched\":\"5\"}");

@@ -1,6 +1,10 @@
+//var webpack = require('webpack'),
+//    ignore = new webpack.IgnorePlugin(new RegExp("^(underscore|jquery|react)$"));
+
 module.exports = {
     entry: "./js/main.js",
     devtool: "#source-map",
+    //plugins: [ignore],
     output: {
         path: require("path").resolve("./build"),
         filename: "bundle.js",

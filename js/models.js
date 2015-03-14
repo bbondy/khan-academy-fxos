@@ -5,8 +5,7 @@
 "strict";
 "enable_regenerator";
 
-var $ = require("jquery"),
-    _ = require("underscore"),
+var _ = require("underscore"),
     Backbone = require("backbone"),
     Util = require("./util"),
     APIClient = require("./apiclient"),
@@ -162,57 +161,57 @@ var TopicTree: {
 } = {
     root: null,
     init: function() {
-        var d = $.Deferred();
+        return new Promise((resolve, reject) => {
 
-        // Check if we have a local downloaded copy of the topic tree
-        Util.log("loading topic tree from storage: " + this.getTopicTreeFilename());
-        this.allContentItems.length = 0;
-        var topicTreePromise = Storage.readText(this.getTopicTreeFilename());
-        topicTreePromise.done((topicTree) => {
-            Util.log("Loaded topic tree from local copy, parsing...");
-            this.root = new TopicModel(JSON.parse(topicTree), {parse: true});
-            d.resolve();
-        });
+            // Check if we have a local downloaded copy of the topic tree
+            Util.log("loading topic tree from storage: " + this.getTopicTreeFilename());
+            this.allContentItems.length = 0;
+            var topicTreePromise = Storage.readText(this.getTopicTreeFilename());
+            topicTreePromise.then((topicTree) => {
+                Util.log("Loaded topic tree from local copy, parsing...");
+                this.root = new TopicModel(JSON.parse(topicTree), {parse: true});
+                resolve();
+            });
 
-        // If we don't have a local downloaded copy, load in the
-        // one we shipped with for the instaled app.
-        topicTreePromise.fail(() => {
-            var filename = `/data/topic-tree`;
-            var lang = Util.getLang();
-            if (lang) {
-                filename += "-" + lang;
-            }
-            filename += ".min.js";
-            Util.log("going for pre-installed default file: %s", filename);
-            Util.loadScript(filename).done(() => {
-                Util.log("Topic tree script loaded, parsing...");
-                this.root = new TopicModel(window.topictree, {parse: true});
-                d.resolve();
-            }).fail(() => {
-                d.reject();
+            // If we don't have a local downloaded copy, load in the
+            // one we shipped with for the instaled app.
+            topicTreePromise.catch(() => {
+                var filename = `/data/topic-tree`;
+                var lang = Util.getLang();
+                if (lang) {
+                    filename += "-" + lang;
+                }
+                filename += ".min.js";
+                Util.log("going for pre-installed default file: %s", filename);
+                Util.loadScript(filename).then(() => {
+                    Util.log("Topic tree script loaded, parsing...");
+                    this.root = new TopicModel(window.topictree, {parse: true});
+                    resolve();
+                }).catch(() => {
+                    reject();
+                });
             });
         });
-        return d.promise();
     },
     /**
      * Refreshes topic tree info by doing an API call and minifying the
      * output. On the next program load it will be used.
      */
     refreshTopicTreeInfo: function() {
-        var d = $.Deferred();
-        var getTopicTreePromise = APIClient.getTopicTree();
-        getTopicTreePromise.done((data) => {
-            // Mutates passed in object tree
-            Minify.minify(data);
-            Storage.writeText(this.getTopicTreeFilename(),
-                JSON.stringify(data));
-            d.resolve(data);
-        });
+        return new Promise((resolve, reject) => {
+            var getTopicTreePromise = APIClient.getTopicTree();
+            getTopicTreePromise.then((data) => {
+                // Mutates passed in object tree
+                Minify.minify(data);
+                Storage.writeText(this.getTopicTreeFilename(),
+                    JSON.stringify(data));
+                resolve(data);
+            });
 
-        getTopicTreePromise.fail(() => {
-            d.reject();
+            getTopicTreePromise.catch(() => {
+                reject();
+            });
         });
-        return d.promise();
     },
     // Obtains the path of a locally cached topic tree file
     // if one is specified.
@@ -503,7 +502,7 @@ var UserModel = Backbone.Model.extend({
         if (!this.isSignedIn()) {
             Util.log("Not signed in, won't get user info!");
             this.initialized = true;
-            return $.Deferred().resolve().promise();
+            return Promise.reject();
         }
 
         // If we have cached info, use that, otherwise fall back
@@ -521,26 +520,25 @@ var UserModel = Backbone.Model.extend({
         }
 
         this.initialized = true;
-        return $.Deferred().resolve().promise();
+        return Promise.resolve();
     },
     signIn: function() {
-        var d = $.Deferred();
-        APIClient.signIn().done(() => {
-            //this.refreshLoggedInInfo(); <-- Since we currently change the
-            // window.locaiton, we dont' get a callback from this promise.
-            // So there's no point to refreshLoggedInInfo.  Commenting for
-            // extra emphasis.
+        return new Promise((resolve, reject) => {
+            APIClient.signIn().then(() => {
+                //this.refreshLoggedInInfo(); <-- Since we currently change the
+                // window.locaiton, we dont' get a callback from this promise.
+                // So there's no point to refreshLoggedInInfo.  Commenting for
+                // extra emphasis.
 
-            // We don't need to wait for the result of the
-            // refreshLoggedInInfo promise, just resolve right away.
-            d.resolve();
-        }).fail(() => {
-            d.reject();
+                // We don't need to wait for the result of the
+                // refreshLoggedInInfo promise, just resolve right away.
+                resolve();
+            }).catch(() => {
+                reject();
+            });
         });
-        return d.promise();
     },
     signOut: function() {
-
         // Unbind user specific data from the topic tree
         this._syncStartedToTopicTree(false);
         this._syncCompletedToTopicTree(false);
@@ -730,186 +728,186 @@ var UserModel = Backbone.Model.extend({
         localStorage.setItem(this._userExercisesLocalStorageName(), JSON.stringify(userExercises));
     },
     refreshLoggedInInfo: function(forceRefreshAllInfo) {
-        var d = $.Deferred();
-        if (!this.isSignedIn()) {
-            return d.resolve().promise();
-        }
-
-        // Get the user profile info
-        APIClient.getUserInfo().then((result) => {
-            Util.log("getUserInfo: %o", result);
-            this.set("userInfo", {
-                avatarUrl: result.avatar_url,
-                joined: result.joined,
-                nickname: result.nickname,
-                username: result.username,
-                points: result.points,
-                badgeCounts: result.badge_counts
-            });
-            this._saveUserInfo();
-
-            if (!forceRefreshAllInfo && this._loadLocalStorageData()) {
-                Util.log("User info only obtained. Not obtaining user data because we have it cached already!");
-                return;
+        return new Promise((resolve, reject) => {
+            if (!this.isSignedIn()) {
+                return resolve();
             }
 
-            // The call is needed for completed/in progress status of content items
-            // Unlike getUserVideos, this includes both articles and videos.
-            return APIClient.getUserProgress();
+            // Get the user profile info
+            APIClient.getUserInfo().then((result) => {
+                Util.log("getUserInfo: %o", result);
+                this.set("userInfo", {
+                    avatarUrl: result.avatar_url,
+                    joined: result.joined,
+                    nickname: result.nickname,
+                    username: result.username,
+                    points: result.points,
+                    badgeCounts: result.badge_counts
+                });
+                this._saveUserInfo();
 
-        }).then((data) => {
-            Util.log("getUserProgress: %o", data);
-            var startedEntityIds = data.started;
-            var completedEntityIds = data.complete;
+                if (!forceRefreshAllInfo && this._loadLocalStorageData()) {
+                    Util.log("User info only obtained. Not obtaining user data because we have it cached already!");
+                    return;
+                }
 
-            // Get rid of the 'a' and 'v' prefixes, and set the completed / started
-            // attributes accordingly.
-            this.set("startedEntityIds", _.map(startedEntityIds, function(e) {
-                return e.substring(1);
-            }));
-            this.set("completedEntityIds", _.map(completedEntityIds, function(e) {
-                return e.substring(1);
-            }));
+                // The call is needed for completed/in progress status of content items
+                // Unlike getUserVideos, this includes both articles and videos.
+                return APIClient.getUserProgress();
 
-            // Update topic tree models
-            this._syncStartedToTopicTree(true);
-            this._syncCompletedToTopicTree(true);
+            }).then((data) => {
+                Util.log("getUserProgress: %o", data);
+                var startedEntityIds = data.started;
+                var completedEntityIds = data.complete;
 
-            // Save to local storage
-            this._saveStarted();
-            this._saveCompleted();
+                // Get rid of the 'a' and 'v' prefixes, and set the completed / started
+                // attributes accordingly.
+                this.set("startedEntityIds", _.map(startedEntityIds, function(e) {
+                    return e.substring(1);
+                }));
+                this.set("completedEntityIds", _.map(completedEntityIds, function(e) {
+                    return e.substring(1);
+                }));
 
-            return APIClient.getUserVideos();
-        }).then((userVideosResults) => {
-            // The call is needed for the last second watched and points of each watched item.
-            this.set("userVideos", userVideosResults);
-            this._syncUserVideoProgressToTopicTree(true);
-            this._saveUserVideos();
+                // Update topic tree models
+                this._syncStartedToTopicTree(true);
+                this._syncCompletedToTopicTree(true);
 
-            return APIClient.getUserExercises();
-        }).then((userExercisesResults) => {
-            this.set("userExercises", userExercisesResults);
-            this._syncUserExerciseProgressToTopicTree(true);
-            this._saveUserExercises();
-            d.resolve();
-        }).fail(() => {
-            d.reject();
+                // Save to local storage
+                this._saveStarted();
+                this._saveCompleted();
+
+                return APIClient.getUserVideos();
+            }).then((userVideosResults) => {
+                // The call is needed for the last second watched and points of each watched item.
+                this.set("userVideos", userVideosResults);
+                this._syncUserVideoProgressToTopicTree(true);
+                this._saveUserVideos();
+
+                return APIClient.getUserExercises();
+            }).then((userExercisesResults) => {
+                this.set("userExercises", userExercisesResults);
+                this._syncUserExerciseProgressToTopicTree(true);
+                this._saveUserExercises();
+                resolve();
+            }).catch(() => {
+                reject();
+            });
         });
-        return d.promise();
     },
     reportArticleRead: function(article) {
-        var d = $.Deferred();
-        APIClient.reportArticleRead(article.getId()).done((result) => {
-            Util.log("reported article complete: %o", result);
-            article.set({
-                completed: true
-            });
+        return new Promise((resolve, reject) => {
+            APIClient.reportArticleRead(article.getId()).then((result) => {
+                Util.log("reported article complete: %o", result);
+                article.set({
+                    completed: true
+                });
 
-            var index = this.get("completedEntityIds").indexOf(article.getId());
-            if (index === -1) {
-                this.get("completedEntityIds").push(article.getId());
-            }
-            this._saveCompleted();
-            d.resolve(result);
-        }).fail(() => {
-            d.reject();
+                var index = this.get("completedEntityIds").indexOf(article.getId());
+                if (index === -1) {
+                    this.get("completedEntityIds").push(article.getId());
+                }
+                this._saveCompleted();
+                resolve(result);
+            }).catch(() => {
+                reject();
+            });
         });
-        return d.promise();
     },
     reportVideoProgress: function(video, youTubeId, secondsWatched, lastSecondWatched) {
-        var d = $.Deferred();
-        var videoId = video.getId();
-        var duration = video.getDuration();
-        APIClient.reportVideoProgress(videoId, youTubeId, duration, secondsWatched, lastSecondWatched).done((result) => {
-            if (!result) {
-                Util.warn("Video progress report returned null results!");
-                return;
-            }
-            Util.log("reportVideoProgress result: %o", result);
-
-            var lastPoints = video.getPoints() || 0;
-            var newPoints = lastPoints + result.points_earned;
-            if (newPoints > 750) {
-                newPoints = 750;
-            }
-
-            // If they've watched some part of the video, and it's not almost the end
-            // Otherwise check if we already have video progress for this item and we
-            // therefore no longer need it.
-            var lastSecondWatched;
-            if (result.last_second_watched > 10 &&
-                    duration - result.last_second_watched > 10) {
-                lastSecondWatched = result.last_second_watched;
-            }
-
-            // If we're just getting a completion of a video update
-            // the user's overall points locally.
-            if (result.points_earned > 0) {
-                // TODO: It would be better to store userInfo properties directly
-                // That way notificaitons will go out automatically.
-                var userInfo = CurrentUser.get("userInfo");
-                userInfo.points += result.points_earned;
-                CurrentUser._saveUserInfo();
-            }
-
-            video.set({
-                points: newPoints,
-                completed: result.is_video_completed,
-                started: !result.is_video_completed,
-                lastSecondWatched: lastSecondWatched
-            });
-
-            // Update locally stored cached info
-            var index;
-            if (result.is_video_completed) {
-                index = this.get("startedEntityIds").indexOf(video.getId());
-                if (index !== -1) {
-                    this.get("startedEntityIds").splice(index, 1);
+        return new Promise((resolve, reject) => {
+            var videoId = video.getId();
+            var duration = video.getDuration();
+            APIClient.reportVideoProgress(videoId, youTubeId, duration, secondsWatched, lastSecondWatched).then((result) => {
+                if (!result) {
+                    Util.warn("Video progress report returned null results!");
+                    return;
                 }
-                index = this.get("completedEntityIds").indexOf(video.getId());
-                if (index === -1) {
-                    this.get("completedEntityIds").push(video.getId());
-                }
-            } else {
-                index = this.get("startedEntityIds").indexOf(video.getId());
-                if (index === -1) {
-                    this.get("startedEntityIds").push(video.getId());
-                }
-            }
+                Util.log("reportVideoProgress result: %o", result);
 
-            var foundUserVideo = _(this.get("userVideos")).find((info) => {
-                info.video.id === video.getId();
-            });
-            var isNew = !foundUserVideo;
-            foundUserVideo = foundUserVideo || {
-                video: {
+                var lastPoints = video.getPoints() || 0;
+                var newPoints = lastPoints + result.points_earned;
+                if (newPoints > 750) {
+                    newPoints = 750;
+                }
+
+                // If they've watched some part of the video, and it's not almost the end
+                // Otherwise check if we already have video progress for this item and we
+                // therefore no longer need it.
+                var lastSecondWatched;
+                if (result.last_second_watched > 10 &&
+                        duration - result.last_second_watched > 10) {
+                    lastSecondWatched = result.last_second_watched;
+                }
+
+                // If we're just getting a completion of a video update
+                // the user's overall points locally.
+                if (result.points_earned > 0) {
+                    // TODO: It would be better to store userInfo properties directly
+                    // That way notificaitons will go out automatically.
+                    var userInfo = CurrentUser.get("userInfo");
+                    userInfo.points += result.points_earned;
+                    CurrentUser._saveUserInfo();
+                }
+
+                video.set({
+                    points: newPoints,
+                    completed: result.is_video_completed,
+                    started: !result.is_video_completed,
+                    lastSecondWatched: lastSecondWatched
+                });
+
+                // Update locally stored cached info
+                var index;
+                if (result.is_video_completed) {
+                    index = this.get("startedEntityIds").indexOf(video.getId());
+                    if (index !== -1) {
+                        this.get("startedEntityIds").splice(index, 1);
+                    }
+                    index = this.get("completedEntityIds").indexOf(video.getId());
+                    if (index === -1) {
+                        this.get("completedEntityIds").push(video.getId());
+                    }
+                } else {
+                    index = this.get("startedEntityIds").indexOf(video.getId());
+                    if (index === -1) {
+                        this.get("startedEntityIds").push(video.getId());
+                    }
+                }
+
+                var foundUserVideo = _(this.get("userVideos")).find((info) => {
+                    info.video.id === video.getId();
+                });
+                var isNew = !foundUserVideo;
+                foundUserVideo = foundUserVideo || {
+                    video: {
+                        id: video.getId()
+                    },
+                    duration: video.getDuration()
+                };
+                foundUserVideo["points"] = newPoints;
+                foundUserVideo["last_second_watched"] = lastSecondWatched;
+                if (isNew) {
+                    this.get("userVideos").push(foundUserVideo);
+                }
+
+                this._saveStarted();
+                this._saveCompleted();
+                this._saveUserVideos();
+                this._saveUserExercises();
+
+                resolve({
+                    completed: result.is_video_completed,
+                    lastSecondWatched: result.last_second_watched,
+                    pointsEarned: result.points_earned,
+                    youtubeId: result.youtube_id,
+                    videoId: videoId,
                     id: video.getId()
-                },
-                duration: video.getDuration()
-            };
-            foundUserVideo["points"] = newPoints;
-            foundUserVideo["last_second_watched"] = lastSecondWatched;
-            if (isNew) {
-                this.get("userVideos").push(foundUserVideo);
-            }
-
-            this._saveStarted();
-            this._saveCompleted();
-            this._saveUserVideos();
-            this._saveUserExercises();
-
-            d.resolve({
-                completed: result.is_video_completed,
-                lastSecondWatched: result.last_second_watched,
-                pointsEarned: result.points_earned,
-                youtubeId: result.youtube_id,
-                videoId: videoId,
-                id: video.getId()
+                });
+            }).catch(() => {
+                reject();
             });
-        }).fail(() => {
-            d.reject();
         });
-        return d.promise();
     }
 });
 
@@ -953,7 +951,7 @@ var AppOptionsModel = Backbone.Model.extend({
         } else if (method === "delete") {
             // You can't delete options!
         }
-        return $.Deferred().resolve().promise();
+        return Promise.resolve();
     },
     _name: "appOptions.json"
 });

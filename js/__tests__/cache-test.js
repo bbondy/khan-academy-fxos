@@ -1,3 +1,4 @@
+require('es6-promise').polyfill();
 jest.dontMock("../cache.js");
 var Cache = require("../cache");
 
@@ -22,7 +23,7 @@ describe("Cache module", function() {
         var initRan = false;
         Cache.heartbeat = jest.genMockFn();
         expect(Cache.heartbeat).not.toBeCalled();
-        Cache.init().done(function() {
+        Cache.init().then(function() {
             expect(Cache.timer).toBeTruthy();
             initRan = true;
             jest.runOnlyPendingTimers();

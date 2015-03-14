@@ -12,8 +12,7 @@
  * init will not wait for the result.
  */
 
-var $ = require("jquery"),
-    Util = require("./util"),
+var Util = require("./util"),
     models = require("./models");
 
 var TEN_MINUTES = 1000 * 60 * 10;
@@ -24,8 +23,6 @@ var Cache = {
      * Initializes the cache manager
      */
     init: function(): any {
-        var d = $.Deferred();
-
         this.lastUserInfoRefresh = localStorage.getItem(this.heartbeatUserInfoName);
         if (this.lastUserInfoRefresh) {
             this.lastUserInfoRefresh = Date.parse(this.lastUserInfoRefresh);
@@ -36,7 +33,7 @@ var Cache = {
         }
 
         this.timer = setInterval(this.heartbeat.bind(this), this.heartbeatInterval);
-        return d.resolve().promise();
+        return Promise.resolve();
     },
     /**
      * Heartbeat called every heartbeatInterval
@@ -61,7 +58,7 @@ var Cache = {
             Util.log("heartbeat: no need to refresh user info yet!");
         } else {
             Util.log("heartbeat: Refreshing logged in info!");
-            models.CurrentUser.refreshLoggedInInfo(true).done(() => {
+            models.CurrentUser.refreshLoggedInInfo(true).then(() => {
                 this.lastUserInfoRefresh = new Date();
                 localStorage.setItem(this.heartbeatUserInfoName, this.lastUserInfoRefresh);
             });
@@ -74,7 +71,7 @@ var Cache = {
             Util.log("heartbeat: not refreshing the topic tree because of user preference!");
         } else {
             Util.log("heartbeat: Refreshing topic tree!");
-            models.TopicTree.refreshTopicTreeInfo().done(() => {
+            models.TopicTree.refreshTopicTreeInfo().then(() => {
                 this.lastTopicTreeRefresh = new Date();
                 localStorage.setItem(this.heartbeatTopicTreeName, this.lastTopicTreeRefresh);
             });

@@ -2,8 +2,7 @@
 
 "use strict";
 
-var $ = require("jquery"),
-    Util = require("./util");
+var Util = require("./util");
 
 var Storage = {
     /**
@@ -12,10 +11,10 @@ var Storage = {
      */
     init: function(): any {
         if (!navigator.getDeviceStorage || !Util.isFirefoxOS()) {
-            return $.Deferred().resolve().promise();
+            return Promise.resolve();
         }
         this.sdcard = navigator.getDeviceStorage("sdcard");
-        return $.Deferred().resolve().promise();
+        return Promise.resolve();
     },
     /**
      * Returns true if storage is available on the device
@@ -27,69 +26,65 @@ var Storage = {
      * Returns a promise which when resolved contains an array of binary data
      */
     readAsBlob: function(filename: string): any {
-        var d = $.Deferred();
-        if (!this.sdcard) {
-            return d.reject().promise();
-        }
-        var request = this.sdcard.get(filename);
-        request.onsuccess = function() {
-            var file = this.result;
-            d.resolve(file);
-        };
-        request.onerror = function() {
-            Util.warn("Unable to get the file %s: %o", filename, this.error);
-            d.reject();
-        };
-
-        return d.promise();
+        return new Promise((resolve, reject) => {
+            if (!this.sdcard) {
+                return reject();
+            }
+            var request = this.sdcard.get(filename);
+            request.onsuccess = function() {
+                resolve(this.result);
+            };
+            request.onerror = function() {
+                Util.warn("Unable to get the file %s: %o", filename, this.error);
+                reject();
+            };
+        });
     },
     /**
      * Returns a promise which when resolved contains a string of data
      */
     readText: function(filename: string): any {
-        var d = $.Deferred();
-        if (!this.sdcard) {
-            return d.reject().promise();
-        }
-        var request = this.sdcard.get(filename);
-        request.onsuccess = function() {
-            var file = this.result;
-            var fileReader = new FileReader();
-            fileReader.readAsText(file.slice());
-            fileReader.onloadend = function() {
-                d.resolve(fileReader.result);
+        return new Promise((resolve, reject) => {
+            if (!this.sdcard) {
+                return reject();
+            }
+            var request = this.sdcard.get(filename);
+            request.onsuccess = function() {
+                var file = this.result;
+                var fileReader = new FileReader();
+                fileReader.readAsText(file.slice());
+                fileReader.onloadend = function() {
+                    resolve(fileReader.result);
+                };
             };
-        };
-        request.onerror = function() {
-            Util.warn("Unable to get the file %s: %o", filename, this.error);
-            d.reject();
-        };
-
-        return d.promise();
+            request.onerror = function() {
+                Util.warn("Unable to get the file %s: %o", filename, this.error);
+                reject();
+            };
+        });
     },
     /**
      * Deletes the specified file from sdstorage.
      * Resolves if the file no longer exists, wehther or not it was deleted.
      */
     delete: function(filename: string): any {
-        var d = $.Deferred();
-        if (!this.sdcard) {
-            return d.reject().promise();
-        }
-        var request = this.sdcard.delete(filename);
-        request.onsuccess = function() {
-            d.resolve();
-        };
-        request.onerror = function() {
-            if (this.error.name === "NotFoundError") {
-                d.resolve();
-            } else {
-                Util.warn("Unable to delete the file: %o", this.error);
-                d.reject();
+        return new Promise((resolve, reject) => {
+            if (!this.sdcard) {
+                return reject();
             }
-        };
-
-        return d.promise();
+            var request = this.sdcard.delete(filename);
+            request.onsuccess = function() {
+                resolve();
+            };
+            request.onerror = function() {
+                if (this.error.name === "NotFoundError") {
+                    resolve();
+                } else {
+                    Util.warn("Unable to delete the file: %o", this.error);
+                    reject();
+                }
+            };
+        });
     },
     /**
      * Writes out the specified data as text in the specified file.
@@ -102,25 +97,27 @@ var Storage = {
      * Writes out the specified blob in the specified file.
      */
     writeBlob: function(filename: string, blob: any): any {
-        var d = $.Deferred();
-        this.delete(filename).always(() => {
-            if (!this.sdcard) {
-                Util.log("rejected!");
-                return d.reject().promise();
-            }
+        return new Promise((resolve, reject) => {
+            this.delete(filename)
+            // .always
+            .catch(() => {}).then(() => {
+                if (!this.sdcard) {
+                    Util.log("rejected!");
+                    return reject();
+                }
 
-            var request = this.sdcard.addNamed(blob, filename);
-            request.onsuccess = function() {
-                Util.log(filename + " was written successfully!");
-                d.resolve();
-            };
-            // An error typically occur if a file with the same name already exist
-            request.onerror = function() {
-                Util.warn("Unable to write the file: %o", this.error);
-                d.reject();
-            };
+                var request = this.sdcard.addNamed(blob, filename);
+                request.onsuccess = function() {
+                    Util.log(filename + " was written successfully!");
+                    resolve();
+                };
+                // An error typically occur if a file with the same name already exist
+                request.onerror = function() {
+                    Util.warn("Unable to write the file: %o", this.error);
+                    reject();
+                };
+            });
         });
-        return d.promise();
     }
 };
 

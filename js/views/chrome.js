@@ -487,7 +487,7 @@ var MainView = React.createClass({
         Status.start();
         var message;
         var title;
-        Downloads.download(model, onProgress).done((model, count) => {
+        Downloads.download(model, onProgress).then((model, count) => {
             var title = l10n.get("download-complete");
             var contentTitle = model.getTitle();
             if (model.isContent()) {
@@ -511,7 +511,7 @@ var MainView = React.createClass({
             }
             Status.stop();
             Notifications.info(title, message, () => {});
-        }).fail((isCancel) => {
+        }).catch((isCancel) => {
             if (isCancel) {
                 title = l10n.get("download-canceled");
                 message = l10n.get("content-items-downloaded-cancel");

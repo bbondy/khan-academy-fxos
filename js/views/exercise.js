@@ -45,26 +45,26 @@ var ExerciseViewer = React.createClass({
         };
     },
     refreshUserExerciseInfo: function() {
-        var d = $.Deferred();
-        $.when(APIClient.getTaskInfoByExerciseName(this.props.exercise.getName()),
-                APIClient.getUserExercise(this.props.exercise.getName())).then((taskInfo, exerciseInfo) => {
+        return new Promise((resolve, reject) => {
+            $.when(APIClient.getTaskInfoByExerciseName(this.props.exercise.getName()),
+                    APIClient.getUserExercise(this.props.exercise.getName())).then((taskInfo, exerciseInfo) => {
 
-            Util.log("getTaskInfoByExerciseName: %o", taskInfo);
-            Util.log("getUserExercise: %o", exerciseInfo);
-            d.resolve({
-                level: exerciseInfo.exercise_progress.level,
-                mastered: exerciseInfo.exercise_progress.mastered,
-                practiced: exerciseInfo.exercise_progress.practiced,
-                problemNumber: exerciseInfo.total_done + 1,
-                streak: exerciseInfo.streak,
-                taskId: taskInfo.id,
-                taskAttemptHistory: taskInfo.task_attempt_history,
-                longestStreak: exerciseInfo.longest_streak
+                Util.log("getTaskInfoByExerciseName: %o", taskInfo);
+                Util.log("getUserExercise: %o", exerciseInfo);
+                resolve({
+                    level: exerciseInfo.exercise_progress.level,
+                    mastered: exerciseInfo.exercise_progress.mastered,
+                    practiced: exerciseInfo.exercise_progress.practiced,
+                    problemNumber: exerciseInfo.total_done + 1,
+                    streak: exerciseInfo.streak,
+                    taskId: taskInfo.id,
+                    taskAttemptHistory: taskInfo.task_attempt_history,
+                    longestStreak: exerciseInfo.longest_streak
+                });
+            }).catch(() => {
+                reject();
             });
-        }).fail(() => {
-            d.reject();
         });
-        return d.promise();
     },
     refreshRandomAssessment: function() {
 
@@ -79,8 +79,8 @@ var ExerciseViewer = React.createClass({
         this.randomAssessmentSHA1 = randomProblemTypeGroup.items[randomProblemTypeIndex].sha1;
         this.randomAssessmentId = randomProblemTypeGroup.items[randomProblemTypeIndex].id;
 
-        return $.when(this.refreshUserExerciseInfo(),
-            APIClient.getAssessmentItem(this.randomAssessmentId)).then((userExerciseInfo, assessmentItem) => {
+        return Promise.all([this.refreshUserExerciseInfo(),
+            APIClient.getAssessmentItem(this.randomAssessmentId)]).then((userExerciseInfo, assessmentItem) => {
                 var assessment = JSON.parse(assessmentItem.item_data);
                 Util.log("Got assessment item: %o: item data: %o", assessmentItem, assessment);
                 this.setState({
@@ -112,7 +112,7 @@ var ExerciseViewer = React.createClass({
         APIClient.reportExerciseProgress(this.props.exercise.getName(), this.state.problemNumber,
             this.randomAssessmentSHA1, this.randomAssessmentId,
             secondsTaken, this.state.hintsUsed, isCorrect,
-            attemptNumber, this.problemTypeName, this.state.taskId).done(() => {
+            attemptNumber, this.problemTypeName, this.state.taskId).then(() => {
                 if (isCorrect) {
                     // If we have another correct and we already have 4 correct,
                     // then show task complete view.
@@ -131,7 +131,7 @@ var ExerciseViewer = React.createClass({
     },
     componentWillMount: function() {
         if (this.props.exercise.isPerseusExercise()) {
-            APIClient.getExerciseByName(this.props.exercise.getName()).done((result) => {
+            APIClient.getExerciseByName(this.props.exercise.getName()).then((result) => {
                 this.exercise = result;
                 Util.log("got exercise: %o", result);
                 this.refreshRandomAssessment();
@@ -161,10 +161,6 @@ var ExerciseViewer = React.createClass({
             this.ItemRenderer = Perseus.ItemRenderer;
             this.forceUpdate();
         });
-    },
-    componentDidMount: function() {
-    },
-    componentWillUnmount: function() {
     },
     render: function(): any {
         var content;

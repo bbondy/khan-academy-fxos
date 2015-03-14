@@ -39,42 +39,48 @@ var APIClient = {
      * TODO: We could just make the secrets file javascript and include the script!
      */
     _getSecrets: function(): any {
-        // First check if we have the info from the local storage values
-        // If so just resolve from that.
-        if (this.oauth.consumerKey && this.oauth.consumerSecret) {
-            Util.log("resolving with local secrets info");
-            return $.Deferred().resolve(this.oauth).promise();
-        }
+        return new Promise((resolve, reject) => {
+            // First check if we have the info from the local storage values
+            // If so just resolve from that.
+            if (this.oauth.consumerKey && this.oauth.consumerSecret) {
+                Util.log("resolving with local secrets info");
+                return resolve(this.oauth);
+            }
 
-        // Otherwise request the info from the secrets.json file
-        return $.ajax({
-            url: "/secrets.json",
-            timeout: 15000,
-            dataType: "json",
+            // Otherwise request the info from the secrets.json file
+            return $.ajax({
+                url: "/secrets.json",
+                timeout: 15000,
+                dataType: "json",
+            }).done((x) => {
+                resolve(x);
+            }).fail((x) => {
+                reject(x);
+            });
         });
     },
     /**
      * Obtains the access token using the request token and oauth verifier.
      */
     _getAccessToken: function(): any {
-        var d = $.Deferred();
-        $.oauth($.extend({}, this.oauth, {
-            type: "GET",
-            url: this.API_BASE + "/auth/access_token",
-            oauthCallback: this._oauthCallback,
-            timeout: 15000,
-            success: (data) => {
-                this.oauth.token = Util.getParameterByName("oauth_token", data);
-                this.oauth.tokenSecret = Util.getParameterByName("oauth_token_secret", data);
-                delete this.oauth.oauthVerifier;
-                d.resolve();
-            },
-            error: (xhr, status) => {
-                Util.error(`error: ${status}: %o`, xhr);
-                d.reject();
-            }
-        }));
-        return d.promise();
+        return new Promise((resolve, reject) => {
+            $.oauth($.extend({}, this.oauth, {
+                type: "GET",
+                url: this.API_BASE + "/auth/access_token",
+                oauthCallback: this._oauthCallback,
+                timeout: 15000,
+                success: (data) => {
+                    this.oauth.token = Util.getParameterByName("oauth_token", data);
+                    this.oauth.tokenSecret = Util.getParameterByName("oauth_token_secret", data);
+                    delete this.oauth.oauthVerifier;
+                    resolve();
+                },
+                error: (xhr, status) => {
+                    Util.error(`error: ${status}: %o`, xhr);
+                    reject();
+                }
+            }));
+        });
     },
     /**
      * Determines based on the known oauth info, if the user is signed in.
@@ -92,41 +98,41 @@ var APIClient = {
      * @return a promise which resolves when the object is initialized.
      */
     init: function(): any {
-        // If a login is not in progress, then load the auth info
-        var oauthVerifier = Util.getParameterByName("oauth_token");
-        if (!oauthVerifier) {
-            this._loadAuth();
-        }
-        var d = $.Deferred();
-        this._oauthCallback = window.location.href.split("#")[0].split("?")[0];
-        if (Util.isFirefoxOS()) {
-            this._oauthCallback = "http://firefoxos.non-existent-domain-asdfg.com/authenticated.html";
-        }
-
-        this._getSecrets().done((keyData) => {
-            this.oauth.consumerKey = keyData.consumerKey;
-            this.oauth.consumerSecret = keyData.consumerSecret;
-
-            // TODO: Only do access token stuff if we don't have local storage values
-            if (this.oauth.oauthVerifier) {
-                this._getAccessToken().done(() => {
-                    this._saveAuth();
-                    d.resolve();
-                }).fail(() => {
-                    // Even if we failed, we should resolve because this
-                    // indicates we are initialized successfully, justnot
-                    // signed in.
-                    d.resolve();
-                });
-            } else {
-                d.resolve();
+        return new Promise((resolve, reject) => {
+            // If a login is not in progress, then load the auth info
+            var oauthVerifier = Util.getParameterByName("oauth_token");
+            if (!oauthVerifier) {
+                this._loadAuth();
             }
-        }).fail(() => {
-            // We should always be able to obtain secrets.json info!
-            Util.warn("Could not obtain secrets");
-            d.reject();
+            this._oauthCallback = window.location.href.split("#")[0].split("?")[0];
+            if (Util.isFirefoxOS()) {
+                this._oauthCallback = "http://firefoxos.non-existent-domain-asdfg.com/authenticated.html";
+            }
+
+            this._getSecrets().then((keyData) => {
+                this.oauth.consumerKey = keyData.consumerKey;
+                this.oauth.consumerSecret = keyData.consumerSecret;
+
+                // TODO: Only do access token stuff if we don't have local storage values
+                if (this.oauth.oauthVerifier) {
+                    this._getAccessToken().then(() => {
+                        this._saveAuth();
+                        resolve();
+                    }).catch(() => {
+                        // Even if we failed, we should resolve because this
+                        // indicates we are initialized successfully, justnot
+                        // signed in.
+                        resolve();
+                    });
+                } else {
+                    resolve();
+                }
+            }).catch(() => {
+                // We should always be able to obtain secrets.json info!
+                Util.warn("Could not obtain secrets");
+                reject();
+            });
         });
-        return d.promise();
     },
     /**
      * Signs the user in by redirecting them.
@@ -157,38 +163,38 @@ var APIClient = {
      * @return a promise with the results of the API call
      */
     _basicAPICall: function(url: string, extraParams: any, method:?string, dataType: ?string): any {
-        extraParams = extraParams || {};
-        dataType = dataType || "json";
-        if (_.isUndefined(method)) {
-            method = "GET";
-        }
-
-        // Add a lang parameter to tell the KA API which langauge we want
-        var lang = Util.getLang();
-        if (lang) {
-            extraParams["lang"] = lang;
-        }
-
-        for (var p in extraParams) {
-            if (extraParams.hasOwnProperty(p)) {
-                url = Util.appendQueryParam(url, p, extraParams[p]);
+        return new Promise((resolve, reject) => {
+            extraParams = extraParams || {};
+            dataType = dataType || "json";
+            if (_.isUndefined(method)) {
+                method = "GET";
             }
-        }
-        var d = $.Deferred();
-        $.oauth($.extend({}, this.oauth, {
-            type: method,
-            url: url,
-            timeout: 120000,
-            dataType,
-            success: (data) => {
-                d.resolve(data);
-            },
-            error: function(xhr, status) {
-                Util.error(`error: ${status}: %o`, xhr);
-                d.reject();
+
+            // Add a lang parameter to tell the KA API which langauge we want
+            var lang = Util.getLang();
+            if (lang) {
+                extraParams["lang"] = lang;
             }
-        }));
-        return d.promise();
+
+            for (var p in extraParams) {
+                if (extraParams.hasOwnProperty(p)) {
+                    url = Util.appendQueryParam(url, p, extraParams[p]);
+                }
+            }
+            $.oauth($.extend({}, this.oauth, {
+                type: method,
+                url: url,
+                timeout: 120000,
+                dataType,
+                success: (data) => {
+                    resolve(data);
+                },
+                error: function(xhr, status) {
+                    Util.error(`error: ${status}: %o`, xhr);
+                    reject();
+                }
+            }));
+        });
     },
     /**
      * Obtains the user progress summary. That is to say started and

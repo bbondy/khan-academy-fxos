@@ -2,8 +2,7 @@
 
 "strict";
 
-var $ = require("jquery"),
-    React = require("react/addons"),
+var React = require("react/addons"),
     Util = require("./util"),
     models = require("./models"),
     APIClient = require("./apiclient"),
@@ -12,27 +11,19 @@ var $ = require("jquery"),
     Storage = require("./storage"),
     chromeViews = require("./views/chrome");
 
-/*
-// I thought this was supposed to be needed, but it seems to not be needed
-// I think the manifest permissions implies this for us.
-$.ajaxSetup({
-    xhr: function() {return new window.XMLHttpRequest({mozSystem: true});}
-});
-*/
-
 // TODO: remove, just for easy inpsection
 window.APIClient = APIClient;
 window.Util = Util;
 window.models = models;
 window.React = React;
 
-$("body").bind("contextmenu", function(e) {
+document.querySelector("body").addEventListener("contextmenu", function(e) {
     Util.log("contextmenu!");
     e.preventDefault();
 });
 
 // App is moving to background
-$(document).bind("visibilitychange", function(e) {
+document.addEventListener("visibilitychange", function(e) {
     if (document.hidden) {
         Util.log("visibility changing (hide)");
         // TODO(bbondy): Try to free up resources here for a smaller chance
@@ -51,19 +42,23 @@ var mainView = React.render(<MainView/>, mountNode);
 
 // Init everything
 Storage.init().then(function() {
+    console.log('storage init');
     return APIClient.init();
 }).then(function() {
+    console.log('api client init');
     return models.TopicTree.init();
 }).then(function() {
-    return $.when(Downloads.init(), Cache.init(), models.AppOptions.fetch());
+    console.log('topic tree init');
+    return Promise.all([Downloads.init(), Cache.init(), models.AppOptions.fetch()]);
 }).then(function() {
+    console.log('all init');
     // We don't want to have to wait for results, so just start this and don't wait
     models.CurrentUser.init();
 
     // Start showing the topic tree
     mainView.setProps({model: models.TopicTree.root});
     mainView.setState({currentModel: models.TopicTree.root});
-}).fail((error) => {
+}).catch((error) => {
     alert(error);
     Util.quit();
 });

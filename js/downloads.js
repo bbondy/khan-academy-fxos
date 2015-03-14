@@ -9,8 +9,7 @@
  *   - Provides the ability to delete those downloads
  */
 
-var $ = require("jquery"),
-    _ = require("underscore"),
+var _ = require("underscore"),
     Util = require("./util"),
     Storage = require("./storage"),
     models = require("./models"),
@@ -22,12 +21,15 @@ var Downloads: { contentList: any; init: any; canCancelDownload: any; cancelDown
      * Initializes download manager
      */
     init: function() {
-        var d = $.Deferred();
-        this.contentList = new models.ContentList();
-        this._readManifest().always(() => {
-            d.resolve();
+        // Force always resolve instead of just returning readManifest
+        return new Promise((resolve) => {
+            this.contentList = new models.ContentList();
+            this._readManifest().then(() => {
+                resolve();
+            }).catch(() => {
+                resolve();
+            });
         });
-        return d.promise();
     },
     /**
      * Writes out the manifest file, which keeps track of downloaded data
@@ -43,22 +45,22 @@ var Downloads: { contentList: any; init: any; canCancelDownload: any; cancelDown
      * Reads in a manifest file, which keeps track of downloaded data
      */
     _readManifest: function() {
-        var d = $.Deferred();
-        Storage.readText(this.manifestFilename).done((data) => {
-            var contentListIds;
-            if (data) {
-                contentListIds = JSON.parse(data);
-            }
-            var contentListModels = models.TopicTree.getContentItemsByIds(contentListIds);
-            _(contentListModels).each((model) => {
-                this._setDownloaded(model, true);
+        return new Promise((resolve, reject) => {
+            Storage.readText(this.manifestFilename).then((data) => {
+                var contentListIds;
+                if (data) {
+                    contentListIds = JSON.parse(data);
+                }
+                var contentListModels = models.TopicTree.getContentItemsByIds(contentListIds);
+                _(contentListModels).each((model) => {
+                    this._setDownloaded(model, true);
+                });
+                this.contentList = new models.ContentList(contentListModels);
+                resolve();
+            }).catch(() => {
+                reject();
             });
-            this.contentList = new models.ContentList(contentListModels);
-            d.resolve();
-        }).fail(() => {
-            d.reject();
         });
-        return d.promise();
     },
     _setDownloaded: function(model: any, downloaded: boolean) {
         model.setDownloaded(downloaded);
@@ -105,121 +107,121 @@ var Downloads: { contentList: any; init: any; canCancelDownload: any; cancelDown
         } else if (model.isTopic()) {
             return this.downloadTopic(model, onProgress);
         }
-        return $.Deferred().resolve().promise();
+        return Promise.resolve();
     },
     /**
      * Downloads all content items recursively one at a time for
      * the current topic
      */
     downloadTopic: function(topic: any, onProgress: any) {
-        this.currentProgress = onProgress;
-        var d = $.Deferred();
-        var downloadedCount = 0;
-        models.TempAppState.set("isDownloadingTopic", true);
-        var predicate = (model) => !model.isDownloaded();
-        var seq = topic.enumChildrenGenerator(predicate);
-        var downloadOneAtATime = () => {
-            try {
-                var contentItem = seq.next().value;
-                // Allow at most one download at a time.
-                this.downloadContent(contentItem, onProgress, downloadedCount).done(() => {
-                    downloadedCount++;
-                    setTimeout(downloadOneAtATime, 1000);
-                }).fail((isCancel) => {
-                    if (isCancel) {
-                        delete this.currentProgress;
-                    }
-                    d.reject(isCancel);
-                });
-            } catch (e) {
-                // done, no more items in the generator
-                models.TempAppState.set("isDownloadingTopic", false);
-                d.resolve(topic, downloadedCount);
-                delete this.currentProgress;
-            }
-        };
-        downloadOneAtATime();
-        return d.promise();
+        return new Promise((resolve, reject) => {
+            this.currentProgress = onProgress;
+            var downloadedCount = 0;
+            models.TempAppState.set("isDownloadingTopic", true);
+            var predicate = (model) => !model.isDownloaded();
+            var seq = topic.enumChildrenGenerator(predicate);
+            var downloadOneAtATime = () => {
+                try {
+                    var contentItem = seq.next().value;
+                    // Allow at most one download at a time.
+                    this.downloadContent(contentItem, onProgress, downloadedCount).then(() => {
+                        downloadedCount++;
+                        setTimeout(downloadOneAtATime, 1000);
+                    }).catch((isCancel) => {
+                        if (isCancel) {
+                            delete this.currentProgress;
+                        }
+                        reject(isCancel);
+                    });
+                } catch (e) {
+                    // done, no more items in the generator
+                    models.TempAppState.set("isDownloadingTopic", false);
+                    resolve(topic, downloadedCount);
+                    delete this.currentProgress;
+                }
+            };
+            downloadOneAtATime();
+        });
     },
     /**
      * Downloads the file at the specified URL and stores it to the
      * specified filename.
      */
     downloadContent: function(contentItem: any, onProgress: any, downloadNumber: any) {
-        var d = $.Deferred();
-        if (onProgress) {
-            onProgress(downloadNumber, 0);
-        }
-
-        var filename = contentItem.getId();
-        var handleContentLoaded = (contentData) => {
-            var blob = new window.Blob([contentData], {
-                type: contentItem.getContentMimeType()
-            });
-            Storage.writeBlob(filename, blob).done(() => {
-                this._addDownloadToManifest(contentItem);
-                if (onProgress) {
-                    onProgress(downloadNumber + 1, 0);
-                }
-                d.resolve(contentItem, 1);
-            }).fail(() => {
-                d.reject();
-            });
-        };
-        if (contentItem.isVideo()) {
-            var url = contentItem.getDownloadUrl();
-            var req = new XMLHttpRequest({mozSystem: true});
-            req.open("GET", url, true);
-            req.responseType = "arraybuffer";
-            req.onload = () => {
-                models.TempAppState.set("currentDownloadRequest", null);
-                handleContentLoaded(req.response);
-            };
-            req.onabort = (e) => {
-                d.reject(true);
-            };
-            req.onerror = (e) => {
-                d.reject(false);
-            };
-            req.onprogress = (e) => {
-                var percent = Math.floor(e.loaded * 100 / e.total);
-                onProgress(downloadNumber, percent);
-            };
-            req.send();
-            models.TempAppState.set("currentDownloadRequest", req);
-        } else if (contentItem.isArticle()) {
-            if (contentItem.get("content")) {
-                // Articles have a content property with the html we want to
-                // download already. It's not loaded in by the topic tree but
-                // when the article is actually loaded.
-                handleContentLoaded(contentItem.get("content"));
-            } else {
-                // Sometimes articles are downloaded before they are viewed,
-                // so try to download it here.
-                APIClient.getArticle(contentItem.getId()).done((result) => {
-                    contentItem.set("content", result.translated_html_content);
-                    handleContentLoaded(contentItem.get("content"));
-                }).fail(() => {
-                    return d.reject().promise();
-                });
+        return new Promise((resolve, reject) => {
+            if (onProgress) {
+                onProgress(downloadNumber, 0);
             }
-        }
-        return d.promise();
+
+            var filename = contentItem.getId();
+            var handleContentLoaded = (contentData) => {
+                var blob = new window.Blob([contentData], {
+                    type: contentItem.getContentMimeType()
+                });
+                Storage.writeBlob(filename, blob).then(() => {
+                    this._addDownloadToManifest(contentItem);
+                    if (onProgress) {
+                        onProgress(downloadNumber + 1, 0);
+                    }
+                    resolve(contentItem, 1);
+                }).catch(() => {
+                    reject();
+                });
+            };
+            if (contentItem.isVideo()) {
+                var url = contentItem.getDownloadUrl();
+                var req = new XMLHttpRequest({mozSystem: true});
+                req.open("GET", url, true);
+                req.responseType = "arraybuffer";
+                req.onload = () => {
+                    models.TempAppState.set("currentDownloadRequest", null);
+                    handleContentLoaded(req.response);
+                };
+                req.onabort = (e) => {
+                    reject(true);
+                };
+                req.onerror = (e) => {
+                    reject(false);
+                };
+                req.onprogress = (e) => {
+                    var percent = Math.floor(e.loaded * 100 / e.total);
+                    onProgress(downloadNumber, percent);
+                };
+                req.send();
+                models.TempAppState.set("currentDownloadRequest", req);
+            } else if (contentItem.isArticle()) {
+                if (contentItem.get("content")) {
+                    // Articles have a content property with the html we want to
+                    // download already. It's not loaded in by the topic tree but
+                    // when the article is actually loaded.
+                    handleContentLoaded(contentItem.get("content"));
+                } else {
+                    // Sometimes articles are downloaded before they are viewed,
+                    // so try to download it here.
+                    APIClient.getArticle(contentItem.getId()).then((result) => {
+                        contentItem.set("content", result.translated_html_content);
+                        handleContentLoaded(contentItem.get("content"));
+                    }).catch(() => {
+                        return reject().promise();
+                    });
+                }
+            }
+        });
     },
     /**
      * Removes a download from the list of downloaded files and
      * removes the file on disk.
      */
     deleteContent: function(contentItem: any): any {
-        var d = $.Deferred();
-        var filename = contentItem.getId();
-        Storage.delete(filename).done(() => {
-            this._removeDownloadFromManifest(contentItem);
-            d.resolve();
-        }).fail(() => {
-            d.reject();
+        return new Promise((resolve, reject) => {
+            var filename = contentItem.getId();
+            Storage.delete(filename).then(() => {
+                this._removeDownloadFromManifest(contentItem);
+                resolve();
+            }).catch(() => {
+                reject();
+            });
         });
-        return d.promise();
     },
     /**
      * Adds the specified model to the list of downloaded files

@@ -10,7 +10,7 @@ describe("Downloads module", function() {
         });
 
         var Downloads = require("../downloads");
-        Downloads.init().done(function() {
+        Downloads.init().then(function() {
             initRan = true;
         });
     });

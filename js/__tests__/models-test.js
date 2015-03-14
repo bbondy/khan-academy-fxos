@@ -8,7 +8,6 @@ jest.dontMock("../models")
 jasmine.getEnv().defaultTimeoutInterval = 60000;
 
 var models = require("../models"),
-    $ = require("jquery"),
     Util = require("../util"),
     Storage = require("../storage");
 
@@ -83,7 +82,7 @@ describe("models module", function() {
     });
 
     it("models.AppOptions.fetch defaults and reset", function(assert) {
-        models.AppOptions.fetch().done(function() {
+        models.AppOptions.fetch().then(function() {
             models.AppOptions.reset();
             expect(models.AppOptions.get("showDownloadsOnly")).toBe(false);
             expect(models.AppOptions.get("showTranscripts")).toBe(true);
@@ -112,7 +111,7 @@ describe("models module", function() {
             return initRan;
         });
 
-        models.CurrentUser.init().done(function() {
+        models.CurrentUser.init().then(function() {
             expect(models.CurrentUser.initialized).toBe(true);
             initRan = true;
         });
@@ -156,8 +155,8 @@ describe("models module", function() {
             }
         };
 
-        Storage.readText.mockReturnValue($.Deferred().resolve(JSON.stringify(mockTopicTreeData)).promise());
-        var promise = $.Deferred().resolve().promise();
+        Storage.readText.mockReturnValue(Promise.resolve(JSON.stringify(mockTopicTreeData)).promise());
+        var promise = Promise.resolve();
         var languages = ["en", "fr", "es", "pt", "tr", "bn"];
         languages.forEach((lang) => {
             promise = promise.then(function() {
@@ -201,7 +200,7 @@ describe("models module", function() {
             return initRan;
         });
 
-        promise.done(() => {
+        promise.then(() => {
             initRan = true;
         });
     });

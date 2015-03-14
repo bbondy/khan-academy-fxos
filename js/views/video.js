@@ -72,8 +72,6 @@ var VideoViewerRawObj: {
         pointsPerReport: number;
         pointsObj: any;
         isPlaying: boolean;
-        videoCreatedPromise: any;
-        transcriptPromise: any;
         cleanedUp: boolean;
         videojs: any;
     } = {
@@ -82,27 +80,19 @@ var VideoViewerRawObj: {
     },
     componentWillMount: function() {
         Util.log("VideoViewer will mount");
-        this.videoCreatedPromise = $.Deferred();
         if (models.AppOptions.get("showTranscripts")) {
-            this.transcriptPromise = $.Deferred();
-            APIClient.getVideoTranscript(this.props.video.getYoutubeId()).done((transcript) => {
+            APIClient.getVideoTranscript(this.props.video.getYoutubeId()).then((transcript) => {
                 if (transcript && transcript.length === 0) {
                     return;
                 }
                 // This will cause a second re-render but that's OK
                 this.setState({transcript: transcript});
-                if (this.transcriptPromise) {
-                    this.transcriptPromise.resolve();
-                }
-            }).fail((e) => {
-                if (this.transcriptPromise) {
-                    this.transcriptPromise.reject(e);
-                }
+            }).catch((e) => {
             });
         }
 
         if (this.props.video.isDownloaded()) {
-            Storage.readAsBlob(this.props.video.getId()).done((result) => {
+            Storage.readAsBlob(this.props.video.getId()).then((result) => {
                 var download_url = window.URL.createObjectURL(result);
                 this.setState({downloadedUrl: download_url, showOfflineImage: false});
             });
@@ -294,7 +284,6 @@ var VideoViewerRawObj: {
     pointsPerReport: 0,
     pointsObj: {},
     isPlaying: false,
-    videoCreatedPromise: null,
     transcriptPromise: null,
     cleanedUp: false,
     videojs: null,
@@ -325,9 +314,6 @@ var VideoViewerRawObj: {
                 video.addEventListener("error", this._onError, true);
                 video.defaultPlaybackRate = models.AppOptions.get("playbackRate") / 100;
                 video.playbackRate = models.AppOptions.get("playbackRate") / 100;
-            }
-            if (this.videoCreatedPromise) {
-                this.videoCreatedPromise.resolve();
             }
         });
     },
@@ -389,7 +375,7 @@ var VideoViewerRawObj: {
             models.CurrentUser.reportVideoProgress(this.props.video,
                     this.props.video.getYoutubeId(),
                     this.secondsWatched,
-                    this.lastSecondWatched).done(() => {
+                    this.lastSecondWatched).then(() => {
                         // We could just add a backbone model to watch for video model
                         // changes and it would work automatically, but to get animated points
                         // growing, we need to do it manually.
