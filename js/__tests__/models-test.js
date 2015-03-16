@@ -2,6 +2,7 @@ jest.dontMock("../models")
     .dontMock("../minify");
 
 var models = require("../models");
+
 jest.dontMock("../models")
     .dontMock("../util");
 
@@ -155,7 +156,7 @@ describe("models module", function() {
             }
         };
 
-        Storage.readText.mockReturnValue(Promise.resolve(JSON.stringify(mockTopicTreeData)).promise());
+        Storage.readText.mockReturnValue(Promise.resolve(JSON.stringify(mockTopicTreeData)));
         var promise = Promise.resolve();
         var languages = ["en", "fr", "es", "pt", "tr", "bn"];
         languages.forEach((lang) => {

@@ -2,6 +2,8 @@
 
 "use strict";
 
+require("native-promise-only"); // For Jest!
+
 var _ = require("underscore"),
     l10n = require("./l10n");
 

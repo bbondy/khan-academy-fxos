@@ -502,7 +502,7 @@ var UserModel = Backbone.Model.extend({
         if (!this.isSignedIn()) {
             Util.log("Not signed in, won't get user info!");
             this.initialized = true;
-            return Promise.reject();
+            return Promise.resolve();
         }
 
         // If we have cached info, use that, otherwise fall back

@@ -1,4 +1,3 @@
-require('es6-promise').polyfill();
 jest.dontMock("../cache.js");
 var Cache = require("../cache");
 
