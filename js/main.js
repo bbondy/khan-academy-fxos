@@ -42,16 +42,12 @@ var mainView = React.render(<MainView/>, mountNode);
 
 // Init everything
 Storage.init().then(function() {
-    console.log('storage init');
     return APIClient.init();
 }).then(function() {
-    console.log('api client init');
     return models.TopicTree.init();
 }).then(function() {
-    console.log('topic tree init');
     return Promise.all([Downloads.init(), Cache.init(), models.AppOptions.fetch()]);
 }).then(function() {
-    console.log('all init');
     // We don't want to have to wait for results, so just start this and don't wait
     models.CurrentUser.init();
 
