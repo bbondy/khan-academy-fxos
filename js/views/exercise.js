@@ -52,9 +52,9 @@ var ExerciseViewer = React.createClass({
                 Util.log("getTaskInfoByExerciseName: %o", taskInfo);
                 Util.log("getUserExercise: %o", exerciseInfo);
                 resolve({
-                    level: exerciseInfo.exercise_progress.level,
-                    mastered: exerciseInfo.exercise_progress.mastered,
-                    practiced: exerciseInfo.exercise_progress.practiced,
+                    level: exerciseInfo.exercise_progress && exerciseInfo.exercise_progress.level,
+                    mastered: exerciseInfo.exercise_progress && exerciseInfo.exercise_progress.mastered,
+                    practiced: exerciseInfo.exercise_progress && exerciseInfo.exercise_progress.practiced,
                     problemNumber: exerciseInfo.total_done + 1,
                     streak: exerciseInfo.streak,
                     taskId: taskInfo.id,
@@ -80,7 +80,9 @@ var ExerciseViewer = React.createClass({
         this.randomAssessmentId = randomProblemTypeGroup.items[randomProblemTypeIndex].id;
 
         return Promise.all([this.refreshUserExerciseInfo(),
-            APIClient.getAssessmentItem(this.randomAssessmentId)]).then((userExerciseInfo, assessmentItem) => {
+            APIClient.getAssessmentItem(this.randomAssessmentId)]).then((results) => {
+                var userExerciseInfo = results[0],
+                    assessmentItem = results[1];
                 var assessment = JSON.parse(assessmentItem.item_data);
                 Util.log("Got assessment item: %o: item data: %o", assessmentItem, assessment);
                 this.setState({
@@ -92,7 +94,7 @@ var ExerciseViewer = React.createClass({
                     problemNumber: userExerciseInfo.problemNumber,
                     streak: userExerciseInfo.streak,
                     taskId: userExerciseInfo.taskId,
-                    taskAttemptHistory: userExerciseInfo.taskAttemptHistory,
+                    taskAttemptHistory: userExerciseInfo.taskAttemptHistory || [],
                     longestStreak: userExerciseInfo.longestStreak
                 });
             });
