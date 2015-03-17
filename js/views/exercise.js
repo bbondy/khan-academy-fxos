@@ -47,8 +47,8 @@ var ExerciseViewer = React.createClass({
     refreshUserExerciseInfo: function() {
         return new Promise((resolve, reject) => {
             $.when(APIClient.getTaskInfoByExerciseName(this.props.exercise.getName()),
-                    APIClient.getUserExercise(this.props.exercise.getName())).then((taskInfo, exerciseInfo) => {
-
+                    APIClient.getUserExercise(this.props.exercise.getName()))
+            .then((taskInfo, exerciseInfo) => {
                 Util.log("getTaskInfoByExerciseName: %o", taskInfo);
                 Util.log("getUserExercise: %o", exerciseInfo);
                 resolve({
