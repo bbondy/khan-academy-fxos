@@ -92,7 +92,9 @@
     ]
   },
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "start": "gulp webpack-dev-server",
+    "build": "gulp"
   },
   "repository": {
     "type": "git",
