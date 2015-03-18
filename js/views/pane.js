@@ -3,7 +3,7 @@
 "use strict";
 
 var l10n = require("../l10n"),
-    React = require("react/addons"),
+    React = require("react"),
     Util = require("../util"),
     models = require("../models"),
     Downloads = require("../downloads"),

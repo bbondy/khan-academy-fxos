@@ -5,7 +5,7 @@
 var $ = require("jquery"),
     _ = require("underscore"),
     l10n = require("../l10n"),
-    React = require("react/addons"),
+    React = require("react"),
     classNames = require("classnames"),
     Util = require("../util"),
     models = require("../models"),

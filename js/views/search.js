@@ -3,7 +3,7 @@
 "use strict";
 
 var $ = require("jquery"),
-    React = require("react/addons"),
+    React = require("react"),
     l10n = require("../l10n"),
     topicViews = require("./topic");
 

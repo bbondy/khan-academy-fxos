@@ -11,7 +11,7 @@ function perseusPrep(katex, KAS, MathJax) {
     window.KAS = KAS;
 }
 
-var React = require("react/addons"),
+var React = require("react"),
     Util = require("../util"),
     APIClient = require("../apiclient"),
     l10n = require("../l10n"),

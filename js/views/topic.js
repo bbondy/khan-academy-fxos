@@ -3,7 +3,7 @@
 "use strict";
 
 var _ = require("underscore"),
-    React = require("react/addons"),
+    React = require("react"),
     classNames = require("classNames"),
     models = require("../models"),
     Util = require("../util");

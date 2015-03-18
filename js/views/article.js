@@ -2,7 +2,7 @@
 
 "use strict";
 
-var React = require("react/addons"),
+var React = require("react"),
     Util = require("../util"),
     models = require("../models"),
     APIClient = require("../apiclient"),
