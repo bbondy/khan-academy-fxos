@@ -26,14 +26,14 @@ class TopicSearch extends React.Component {
         });
         this.props.onTopicSearch(topicSearch);
     }
-    handleFocus(event: any) {
+    onFocus(event: any) {
         setTimeout(() => {
             $("html, body").stop(true, true).animate({
                 scrollTop: $(this.refs.search.getDOMNode()).offset().top
             }, 500);
         }, 500);
     }
-    handleBlur(event: any) {
+    onBlur(event: any) {
         $("html, body").stop(true, true).animate({
             scrollTop: 0
         }, 700);
@@ -53,9 +53,9 @@ class TopicSearch extends React.Component {
                    placeholder={text}
                    value={this.state.searchValue}
                    required=""
-                   onChange={this.onChange}
-                   onFocus={this.handleFocus}
-                   onBlur={this.handleBlur}
+                   onChange={this.onChange.bind(this)}
+                   onFocus={this.onFocus.bind(this)}
+                   onBlur={this.onBlur.bind(this)}
                    />
         </div>;
 

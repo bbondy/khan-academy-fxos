@@ -399,7 +399,7 @@ var VideoViewerRawObj: {
         var transcriptViewer;
         if (!!this.state.transcript) {
             transcriptViewer = <TranscriptViewer collection={this.state.transcript}
-                                                 onClickTranscript={this.onClickTranscript} />;
+                                                 onClickTranscript={this.onClickTranscript.bind(this)} />;
         }
 
         this.videoSrc = this.props.video.getDownloadUrl();
@@ -431,7 +431,7 @@ var VideoViewerRawObj: {
 
         var control;
         if (this.state.showOfflineImage) {
-            control = <div className="video-placeholder" onClick={this.onReloadVideo}/>;
+            control = <div className="video-placeholder" onClick={this.onReloadVideo.bind(this)}/>;
         } else {
             control = <div className={this.videoClass} ref="videoPlaceholder" id="video-placeholder"/>;
         }

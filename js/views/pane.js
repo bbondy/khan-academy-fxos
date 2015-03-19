@@ -39,25 +39,25 @@ DownloadsViewer.propTypes = {
  * global state.
  */
 class SettingsViewer extends React.Component {
-    handleShowDownloadsChange(event: any) {
+    onShowDownloadsChange(event: any) {
         this.props.options.set("showDownloadsOnly", event.target.checked);
         this.props.options.save();
     }
-    handleShowTranscriptsChange(event: any) {
+    onShowTranscriptsChange(event: any) {
         this.props.options.set("showTranscripts", event.target.checked);
         this.props.options.save();
     }
-    handleAutoUpdateTopicTreeChange(event: any) {
+    onAutoUpdateTopicTreeChange(event: any) {
         this.props.options.set("autoUpdateTopicTree", event.target.checked);
         this.props.options.save();
     }
-    handleSetPlaybackRateChange(event: any) {
+    onSetPlaybackRateChange(event: any) {
         // Convert a value like: 0, 1, 2, 3 to 50, 100, 150, 200
         var percentage = 50 + event.target.value * 50;
         this.props.options.set("playbackRate", percentage);
         this.props.options.save();
     }
-    handleReset(event: any) {
+    onReset(event: any) {
         if (confirm(l10n.get("confirm-reset"))) {
             this.props.options.reset();
         }
@@ -73,7 +73,7 @@ class SettingsViewer extends React.Component {
                    className="show-downloads-setting app-chrome"
                    type="checkbox"
                    checked={this.props.options.get("showDownloadsOnly")}
-                   onChange={this.handleShowDownloadsChange}></input>
+                   onChange={this.onShowDownloadsChange.bind(this)}></input>
             <span></span>
             </label>
 
@@ -83,7 +83,7 @@ class SettingsViewer extends React.Component {
                    className="show-transcripts-setting app-chrome"
                    type="checkbox"
                    checked={this.props.options.get("showTranscripts")}
-                   onChange={this.handleShowTranscriptsChange}></input>
+                   onChange={this.onShowTranscriptsChange.bind(this)}></input>
             <span></span>
             </label>
 
@@ -93,7 +93,7 @@ class SettingsViewer extends React.Component {
                    className="auto-update-topic-tree-setting app-chrome"
                    type="checkbox"
                    checked={this.props.options.get("autoUpdateTopicTree")}
-                   onChange={this.handleAutoUpdateTopicTreeChange}></input>
+                   onChange={this.onAutoUpdateTopicTreeChange.bind(this)}></input>
             <span></span>
             </label>
 
@@ -107,7 +107,7 @@ class SettingsViewer extends React.Component {
                        type="range"
                        min="0" max="3"
                        value={(this.props.options.get("playbackRate") - 50) / 50}
-                       onChange={this.handleSetPlaybackRateChange}></input>
+                       onChange={this.onSetPlaybackRateChange.bind(this)}></input>
                 <label class="icon">{this.props.options.get("playbackRate")}%</label>
                 <span></span>
             </section>
@@ -116,7 +116,7 @@ class SettingsViewer extends React.Component {
             <button id="reset-button"
                     className="reset-button"
                     data-l10n-id="reset-setting"
-                    onClick={this.handleReset}>Reset</button>
+                    onClick={this.onReset.bind(this)}>Reset</button>
         </div>;
     }
 }
