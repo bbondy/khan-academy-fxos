@@ -6,140 +6,186 @@
 "enable_regenerator";
 
 var _ = require("underscore"),
-    Backbone = require("backbone"),
     Util = require("./util"),
     APIClient = require("./apiclient"),
     Storage = require("./storage"),
     Minify = require("./minify");
 
-var TopicTreeBase = {
+
+// temporary helper to help
+class BaseModel {
+    constructor(data, extra) {
+        if (extra && extra.parse) {
+            this.attributes = data;
+        } else {
+            this.defaults = data && data.defaults;
+            this.attributes = this.defaults || {};
+        }
+        this.callbacks = [];
+    }
+    get(prop) {
+        return this.attributes[prop];
+    }
+    set(prop, value) {
+        this.attributes[prop] = value;
+        _.each(this.callbacks, (callback) => callback());
+    }
+    on(type, callback) {
+        this.callbacks.push(callback);
+    }
+}
+
+class BaseCollection {
+    constructor(models, options) {
+        this.models = models;
+        if (options && options.parse) {
+            if (_.isString(this.models)) {
+                this.models = JSON.parse(this.models);
+            } else {
+                this.models = models;
+            }
+        }
+        if (this.modelClass) {
+            this.models = _.map(this.models, (x) => new this.modelClass(x, {parse: true}));
+        }
+    }
+}
+
+class TopicTreeBase extends BaseModel {
+    constructor(data, extra) {
+        super(data, extra);
+    }
     /**
      * Gets the ID of the topic tree item
      */
-    getId: function() {
+    getId() {
         if (this.isExercise()) {
             return this.getProgressKey().substring(1);
         }
         return this.get(Minify.getShortName("id"));
-    },
+    }
     /**
      * Gets the slug of the topic tree item
      */
-    getProgressKey: function() {
+    getProgressKey() {
         return this.get(Minify.getShortName("progress_key"));
-    },
+    }
     /**
      * Gets the slug of the topic tree item
      */
-    getSlug: function() {
+    getSlug() {
         return this.get(Minify.getShortName("slug"));
-    },
+    }
     /**
      * Gets a best possible guess at a unique ID, usually based on the ID
      */
-    getKey: function() {
+    getKey() {
         return this.getId() || this.getSlug() || this.getTitle();
-    },
+    }
     /**
      * Gets the kind of the topic tree item
      * Example values: Article, Topic, Video
      */
-    getKind: function() {
+    getKind() {
         return Minify.getLongValue("kind", this.get(Minify.getShortName("kind")));
-    },
+    }
     /**
      * Obtains the translated title of the topic tree item
      */
-    getTitle: function() {
+    getTitle() {
         return this.get(Minify.getShortName("translated_title")) ||
             this.get(Minify.getShortName("translated_display_name"));
-    },
+    }
     /**
      * Checks if the topic tree item is a topic
      */
-    isTopic: function() {
+    isTopic() {
         return false;
-    },
+    }
     /**
      * Checks if the topic tree item is a video list
      */
-    isVideoList: function() {
+    isVideoList() {
         return false;
-    },
+    }
     /**
      * Checks if the topic tree item is a video
      */
-    isVideo: function() {
+    isVideo() {
         return this.getKind() === "Video";
-    },
+    }
     /**
      * Checks if the topic tree item is an article list
      */
-    isArticleList: function() {
+    isArticleList() {
         return false;
-    },
+    }
     /**
      * Checks if the topic tree item is an article
      */
-    isArticle: function() {
+    isArticle() {
         return this.getKind() === "Article";
-    },
+    }
     /**
      * Checks if the topic tree item is an article list
      */
-    isExerciseList: function() {
+    isExerciseList() {
         return false;
-    },
+    }
     /**
      * Checks if the topic tree item is an article
      */
-    isExercise: function() {
+    isExercise() {
         return this.getKind() === "Exercise";
-    },
+    }
     /**
      * Checks if the topic tree item is a content item
      */
-    isContent: function() {
+    isContent() {
         return this.isVideo() || this.isArticle() || this.isExercise();
-    },
+    }
     /**
      * Checks if the topic tree item is a content list
      */
-    isContentList: function() {
+    isContentList() {
         return false;
-    },
+    }
     /**
      * Obtains the parent domain topic tree item
      */
-    getParentDomain: function() {
+    getParentDomain() {
         var current = this;
         while (current && !current.isRootChild()) {
             current = current.getParent();
         }
         return current;
-    },
+    }
     /**
      * Checks if the topic tree item is a child of the root topic tree item
      * I.e. a top level subject.
      */
-    isRootChild: function() {
+    isRootChild() {
         return this.getParent() && this.getParent().isRoot();
-    },
+    }
     /**
      * Cehecks if the topic tree item is the root item
      */
-    isRoot: function() {
+    isRoot() {
         return !this.getParent();
-    },
+    }
     /**
      * Obtains the parent of this topic tree item.
      */
-    getParent: function() {
+    getParent() {
         return this.get("parent");
     }
-};
-var TopicTreeModel = Backbone.Model.extend(TopicTreeBase);
-var TopicTreeCollection = Backbone.Collection.extend(TopicTreeBase);
+}
+
+class TopicTreeCollection extends BaseCollection {
+    constructor(models, options) {
+        super(models, options);
+    }
+}
 
 
 /**
@@ -148,7 +194,6 @@ var TopicTreeCollection = Backbone.Collection.extend(TopicTreeBase);
  * models representing a single entity.
  * It's not used for search just because the root of search isn't always
  * equal to 'all' items.
- * This isn't an actual backbone model (yet)
  */
 var TopicTree: {
     init: any;
@@ -254,81 +299,109 @@ var TopicTree: {
     }
 };
 
-var TopicModel = TopicTreeModel.extend({
-    url: "/knowledge-map.json",
-    initialize: function() {
-    },
+class TopicModel extends TopicTreeBase {
+
+    constructor(data, extra) {
+        super(data, extra);
+    }
+
+    getTopics() {
+        var topics = new TopicList(this.get(Minify.getShortName("children")).filter((child) =>
+            child[Minify.getShortName("kind")] === Minify.getShortValue("kind", "Topic")
+        ), { parse: true });
+
+        this.parentListToThis(topics);
+        return topics;
+    }
+
+    getContentItems() {
+        var contentItems = new ContentList(this.get(Minify.getShortName("children")).filter((child) => {
+            var kind = child[Minify.getShortName("kind")];
+            return kind === Minify.getShortValue("kind", "Video") ||
+                kind === Minify.getShortValue("kind", "Article") ||
+                kind === Minify.getShortValue("kind", "Exercise");
+        }), { parse: true });
+
+        this.parentListToThis(contentItems);
+        return contentItems;
+    }
+
+    parentListToThis(list) {
+        _.each(list.models, (child) => {
+            child.set("parent", this);
+        });
+    }
 
     /**
      * Recursively traverses the topic tree and calls a
      * callback for each found content item.
      */
-    enumChildren: function(callback, predicate) {
-        _(this.get("contentItems").models).each(function(model) {
+    enumChildren(callback, predicate) {
+        _(this.getContentItems().models).each(function(model) {
             if (!predicate || predicate(model)) {
                 callback(model);
             }
         });
-        _(this.get("topics").models).each(function(topic) {
+        _(this.getTopics().models).each(function(topic) {
             topic.enumChildren(callback, predicate);
         });
-    },
+    }
     /**
      * Provides a generator which can be used to iterate through
      * the content items incrementally.
      */
-    enumChildrenGenerator: function*(predicate) {
-        for (var i = 0; i < this.get("contentItems").models.length; i++) {
-            var model = this.get("contentItems").models[i];
+    *enumChildrenGenerator(predicate) {
+        for (var i = 0; i < this.getContentItems().models.length; i++) {
+            var model = this.getContentItems().models[i];
             if (!predicate || predicate(model)) {
                 yield model;
             }
         }
 
-        for (var i = 0; i < this.get("topics").models.length; i++) {
-            yield* this.get("topics").models[i].enumChildrenGenerator(predicate);
+        for (var i = 0; i < this.getTopics().models.length; i++) {
+            yield* this.getTopics().models[i].enumChildrenGenerator(predicate);
         }
-    },
+    }
     /**
      * Returns the total count of content items underneath the specified topic
      */
-    getChildCount: function() {
+    getChildCount() {
         var count = 0;
         this.enumChildren((model) => {
             count++;
         });
         return count;
-    },
+    }
     /**
      * Returns the total count of content items underneath the specified topic
      * that is not downloaded
      */
-    getChildNotDownloadedCount: function() {
+    getChildNotDownloadedCount() {
         var count = 0;
         this.enumChildren((model) => count++, (model) => !model.isDownloaded());
         return count;
-    },
+    }
     /**
      * Initiates a recursive search for the term `search`
      */
-    findContentItems: function(search, maxResults) {
+    findContentItems(search, maxResults) {
         if (_.isUndefined(maxResults)) {
             maxResults = 40;
         }
         var results = [];
         this._findContentItems(search, results, maxResults);
         return results.slice(0, maxResults);
-    },
+    }
     /**
      * Recursively calls _findContentItems on all children and adds videos and articles with
      * a matching title to the results array.
      */
-    _findContentItems: function(search, results, maxResults) {
+    _findContentItems(search, results, maxResults) {
         if (results.length > maxResults) {
             return;
         }
 
-        _(this.get("contentItems").models).each((item) => {
+        _(this.getContentItems().models).each((item) => {
             // TODO: Possibly search descriptions too?
             // TODO: We could potentially index the transcripts for a really good search
             // TODO: Tokenize the `search` string and do an indexOf for each token
@@ -339,16 +412,16 @@ var TopicModel = TopicTreeModel.extend({
             }
         });
 
-        _(this.get("topics").models).each((item) => {
+        _(this.getTopics().models).each((item) => {
             item._findContentItems(search, results, maxResults);
         });
-    },
+    }
     /**
      * Recursively parses a topic with 2 extra properties:
-     *  contentItems: A backbone collection: ContentList which contains ContentModel instances
-     *  topics: A backbone collection: TopicList which contains TopicModel instances
+     *  contentItems: A collection: ContentList which contains ContentModel instances
+     *  topics: A collection: TopicList which contains TopicModel instances
      */
-    parse: function(response) {
+    parse(response) {
         var parseTopicChildren = (topic) => {
             _(topic[Minify.getShortName("children")]).each((item) => {
                 item.parent = this;//response;
@@ -372,41 +445,44 @@ var TopicModel = TopicTreeModel.extend({
 
         parseTopicChildren(response);
         return response;
-    },
-    isTopic: function() {
+    }
+    isTopic() {
         return true;
-    },
-});
+    }
+}
 
-var ContentModel = TopicTreeModel.extend({
-    isContent: function() {
+class ContentModel extends TopicTreeBase {
+    constructor(data, extra) {
+        super(data, extra);
+    }
+    isContent() {
         return true;
-    },
-    isDownloaded: function() {
+    }
+    isDownloaded() {
         return !!this.get("downloaded");
-    },
-    setDownloaded: function(downloaded) {
+    }
+    setDownloaded(downloaded) {
         this.set("downloaded", downloaded);
-    },
-    getContentMimeType: function() {
+    }
+    getContentMimeType() {
         return this.isVideo ? "video/mp4" : "text/html";
-    },
-    isCompleted: function() {
+    }
+    isCompleted() {
         return this.get("completed");
-    },
-    isStarted: function() {
+    }
+    isStarted() {
         return this.get("started");
-    },
-    getYoutubeId: function() {
+    }
+    getYoutubeId() {
         return this.get(Minify.getShortName("youtube_id"));
-    },
-    getPoints: function() {
+    }
+    getPoints() {
         return this.get("points") || 0;
-    },
-    getName: function() {
+    }
+    getName() {
         return this.get(Minify.getShortName("name"));
-    },
-    getKAUrl: function() {
+    }
+    getKAUrl() {
         var value = this.get(Minify.getShortName("ka_url"));
         if (!value) {
             return null;
@@ -415,8 +491,8 @@ var ContentModel = TopicTreeModel.extend({
             value = "http://www.khanacademy.org/video/" + value;
         }
         return value;
-    },
-    getDownloadUrl: function() {
+    }
+    getDownloadUrl() {
         var value = this.get(Minify.getShortName("download_urls"));
         if (!value) {
             return null;
@@ -425,80 +501,60 @@ var ContentModel = TopicTreeModel.extend({
             value = "http://fastly.kastatic.org/KA-youtube-converted/" + value + ".mp4";
         }
         return value;
-    },
-    getDuration: function() {
+    }
+    getDuration() {
         return this.get(Minify.getShortName("duration"));
-    },
-    getFilename: function() {
+    }
+    getFilename() {
         return this.get(Minify.getShortName("file_name"));
-    },
+    }
     // A newer perseus style exercise
-    isPerseusExercise:function() {
+    isPerseusExercise() {
         return !this.get(Minify.getShortName("file_name"));
-    },
+    }
     // An older style exercise pointed to by the khan-exercises submodule
-    isKhanExercisesExercise: function() {
+    isKhanExercisesExercise() {
         return !!this.get(Minify.getShortName("file_name"));
     }
-});
+}
 
-var VideoModel = ContentModel.extend({});
-
-var ArticleModel = ContentModel.extend({});
-
-var ExerciseModel = ContentModel.extend({});
-
-var TopicList = TopicTreeCollection.extend({
-    model: TopicModel,
-});
-
-var ContentList = TopicTreeCollection.extend({
-    model: ContentModel,
-    isContentList: function() {
+class VideoModel extends ContentModel {}
+class ArticleModel extends ContentModel {}
+class ExerciseModel extends ContentModel {}
+class TopicList extends TopicTreeCollection {
+    constructor(models, options) {
+        this.modelClass = TopicModel;
+        super(models, options);
+    }
+}
+class ContentList extends TopicTreeCollection {
+    constructor(models, options) {
+        this.modelClass = ContentModel;
+        super(models, options);
+    }
+    isContentList() {
         return true;
     }
-});
+}
 
-var VideoList = ContentList.extend({
-    model: VideoModel,
-    isVideoList: function() {
-        return true;
-    }
-});
-
-var ArticleList = ContentList.extend({
-    model: ArticleModel,
-    isArticleList: function() {
-        return true;
-    }
-});
-
-var ExerciseList = ContentList.extend({
-    model: ExerciseModel,
-    isExerciseList: function() {
-        return true;
-    }
-});
-
-var UserModel = Backbone.Model.extend({
-    _getLocalStorageName: function(base) {
+class UserModel extends BaseModel {
+    _getLocalStorageName(base) {
         return base + "-uid-" + (this.get("userInfo").nickname ||
             this.get("userInfo").username);
-    },
-    _completedEntitiesLocalStorageName: function() {
+    }
+    _completedEntitiesLocalStorageName() {
         return this._getLocalStorageName("completed");
-    },
-    _startedEntitiesLocalStorageName: function() {
+    }
+    _startedEntitiesLocalStorageName() {
         return this._getLocalStorageName("started");
-    },
-    _userVideosLocalStorageName: function() {
+    }
+    _userVideosLocalStorageName() {
         return this._getLocalStorageName("userVideos");
-    },
-    _userExercisesLocalStorageName: function() {
+    }
+    _userExercisesLocalStorageName() {
         return this._getLocalStorageName("userExercises");
-    },
-    _userInfoLocalStorageName: "userInfo-3",
-    init: function() {
+    }
+    init() {
         if (!this.isSignedIn()) {
             Util.log("Not signed in, won't get user info!");
             this.initialized = true;
@@ -521,8 +577,8 @@ var UserModel = Backbone.Model.extend({
 
         this.initialized = true;
         return Promise.resolve();
-    },
-    signIn: function() {
+    }
+    signIn() {
         return new Promise((resolve, reject) => {
             APIClient.signIn().then(() => {
                 //this.refreshLoggedInInfo(); <-- Since we currently change the
@@ -537,8 +593,8 @@ var UserModel = Backbone.Model.extend({
                 reject();
             });
         });
-    },
-    signOut: function() {
+    }
+    signOut() {
         // Unbind user specific data from the topic tree
         this._syncStartedToTopicTree(false);
         this._syncCompletedToTopicTree(false);
@@ -550,11 +606,11 @@ var UserModel = Backbone.Model.extend({
         localStorage.removeItem(this._userInfoLocalStorageName);
 
         return APIClient.signOut();
-    },
-    isSignedIn: function() {
+    }
+    isSignedIn() {
         return APIClient.isSignedIn();
-    },
-    _loadLocalStorageData: function() {
+    }
+    _loadLocalStorageData() {
         // We can't obtain the other local storage values if this is not present!
         if (!this.get("userInfo")) {
             return false;
@@ -586,8 +642,8 @@ var UserModel = Backbone.Model.extend({
             this.get("startedEntityIds") &&
             this.get("userVideos") &&
             this.get("userExercises");
-    },
-    _syncCompletedToTopicTree: function(set) {
+    }
+    _syncCompletedToTopicTree(set) {
         var completedEntities = TopicTree.getContentItemsByIds(this.get("completedEntityIds"));
         _.each(completedEntities, function(contentItem) {
             if (set) {
@@ -601,8 +657,8 @@ var UserModel = Backbone.Model.extend({
         });
         Util.log("completed entity Ids: %o", this.get("completedEntityIds"));
         Util.log("completed entities: %o", completedEntities);
-    },
-    _syncStartedToTopicTree: function(set) {
+    }
+    _syncStartedToTopicTree(set) {
         var startedEntities = TopicTree.getContentItemsByIds(this.get("startedEntityIds"));
         _.each(startedEntities, function(contentItem) {
             if (set) {
@@ -613,8 +669,8 @@ var UserModel = Backbone.Model.extend({
         });
         Util.log("started entity Ids: %o", this.get("startedEntityIds"));
         Util.log("started entities: %o", startedEntities);
-    },
-    _syncUserVideoProgressToTopicTree: function(set) {
+    }
+    _syncUserVideoProgressToTopicTree(set) {
         // Get a list of the Ids we'll be searching for in TopicTree models
         // This is only being done for a fast lookup so we don't need to later
         // search through all o the models
@@ -642,8 +698,8 @@ var UserModel = Backbone.Model.extend({
             }
         });
         Util.log("getUserVideos entities: %o", this.get("userVideos"));
-    },
-    _syncUserExerciseProgressToTopicTree: function(set) {
+    }
+    _syncUserExerciseProgressToTopicTree(set) {
         // Get a list of the Ids we'll be searching for in TopicTree models
         // This is only being done for a fast lookup so we don't need to later
         // search through all o the models
@@ -670,26 +726,26 @@ var UserModel = Backbone.Model.extend({
             }
         });
         Util.log("getUserExercises entities: %o", this.get("userExercises"));
-    },
-    _saveUserInfo: function() {
+    }
+    _saveUserInfo() {
         if (this.get("userInfo")) {
-            localStorage.removeItem(this._userInfoLocalStorageName);
-            localStorage.setItem(this._userInfoLocalStorageName, JSON.stringify(this.get("userInfo")));
+            localStorage.removeItem(UserModel._userInfoLocalStorageName);
+            localStorage.setItem(UserModel._userInfoLocalStorageName, JSON.stringify(this.get("userInfo")));
         }
-    },
-    _saveStarted: function() {
+    }
+    _saveStarted() {
         if (this.get("startedEntityIds")) {
             localStorage.removeItem(this._startedEntitiesLocalStorageName());
             localStorage.setItem(this._startedEntitiesLocalStorageName(), JSON.stringify(this.get("startedEntityIds")));
         }
-    },
-    _saveCompleted: function() {
+    }
+    _saveCompleted() {
         if (this.get("completedEntityIds")) {
             localStorage.removeItem(this._completedEntitiesLocalStorageName());
             localStorage.setItem(this._completedEntitiesLocalStorageName(), JSON.stringify(this.get("completedEntityIds")));
         }
-    },
-    _saveUserVideos: function() {
+    }
+    _saveUserVideos() {
         var userVideos = this.get("userVideos");
         if (!userVideos) {
             return;
@@ -706,8 +762,8 @@ var UserModel = Backbone.Model.extend({
         });
         localStorage.removeItem(this._userVideosLocalStorageName());
         localStorage.setItem(this._userVideosLocalStorageName(), JSON.stringify(userVideos));
-    },
-    _saveUserExercises: function() {
+    }
+    _saveUserExercises() {
         var userExercises = this.get("userExercises");
         if (!userExercises) {
             return;
@@ -726,8 +782,8 @@ var UserModel = Backbone.Model.extend({
         // The extra removeItem calls before the setItem calls help in case local storage is almost full
         localStorage.removeItem(this._userExercisesLocalStorageName());
         localStorage.setItem(this._userExercisesLocalStorageName(), JSON.stringify(userExercises));
-    },
-    refreshLoggedInInfo: function(forceRefreshAllInfo) {
+    }
+    refreshLoggedInInfo(forceRefreshAllInfo) {
         return new Promise((resolve, reject) => {
             if (!this.isSignedIn()) {
                 return resolve();
@@ -794,8 +850,8 @@ var UserModel = Backbone.Model.extend({
                 reject();
             });
         });
-    },
-    reportArticleRead: function(article) {
+    }
+    reportArticleRead(article) {
         return new Promise((resolve, reject) => {
             APIClient.reportArticleRead(article.getId()).then((result) => {
                 Util.log("reported article complete: %o", result);
@@ -813,8 +869,8 @@ var UserModel = Backbone.Model.extend({
                 reject();
             });
         });
-    },
-    reportVideoProgress: function(video, youTubeId, secondsWatched, lastSecondWatched) {
+    }
+    reportVideoProgress(video, youTubeId, secondsWatched, lastSecondWatched) {
         return new Promise((resolve, reject) => {
             var videoId = video.getId();
             var duration = video.getDuration();
@@ -909,7 +965,9 @@ var UserModel = Backbone.Model.extend({
             });
         });
     }
-});
+}
+UserModel._userInfoLocalStorageName = "userInfo-3";
+
 
 // Just really a model to hold temporary app state
 // that should not persist after it is changed on app
@@ -917,7 +975,7 @@ var UserModel = Backbone.Model.extend({
 // For example we use this for isDownloadingTopic from
 // Downloads so we can easily adjust views based on that state
 // changing.
-var TempAppStateModel = Backbone.Model.extend({
+var TempAppState = new BaseModel({
     defaults: {
         currentDownloadRequest: null,
         isTopicDownloading: false,
@@ -928,33 +986,32 @@ var TempAppStateModel = Backbone.Model.extend({
 /**
  * Stores app level options in local storage
  */
-var AppOptionsModel = Backbone.Model.extend({
-    defaults: {
-        autoUpdateTopicTree: true,
-        showDownloadsOnly: false,
-        showTranscripts: true,
-        playbackRate: 100
-    },
-    reset: function() {
-        this.clear().set(this.defaults);
-        this.save();
-    },
-    sync: function(method, model, options) {
-        if (method === "create" || method === "update") {
-            localStorage.setItem(this._name, JSON.stringify(this.toJSON()));
-        } else if (method === "read") {
-            var result = localStorage.getItem(this._name);
-            var attr = this.parse(JSON.parse(result));
-            if (attr) {
-                this.attributes = attr;
+class AppOptionsModel extends BaseModel {
+    constructor() {
+        this._name = "appOptions.json";
+        super({
+            defaults: {
+                autoUpdateTopicTree: true,
+                showDownloadsOnly: false,
+                showTranscripts: true,
+                playbackRate: 100
             }
-        } else if (method === "delete") {
-            // You can't delete options!
-        }
-        return Promise.resolve();
-    },
-    _name: "appOptions.json"
-});
+        });
+        this.fetch();
+    }
+    fetch() {
+        var result = localStorage.getItem(this._name);
+        var attr = JSON.parse(result);
+        Object.assign(this.attributes, attr);
+    }
+    save() {
+        localStorage.setItem(this._name, JSON.stringify(this.attributes));
+    }
+    reset() {
+        this.attributes = this.defaults;
+        this.save();
+    }
+}
 
 var CurrentUser = new UserModel();
 module.exports = {
@@ -965,11 +1022,8 @@ module.exports = {
     ExerciseModel,
     TopicList,
     ContentList,
-    VideoList,
-    ArticleList,
-    ExerciseList,
     TopicTree,
     AppOptions: new AppOptionsModel(),
-    TempAppState: new TempAppStateModel(),
+    TempAppState,
     CurrentUser,
 };

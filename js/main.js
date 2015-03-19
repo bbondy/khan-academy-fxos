@@ -52,10 +52,15 @@ Storage.init().then(function() {
     models.CurrentUser.init();
 
     // Start showing the topic tree
-    mainView.setProps({model: models.TopicTree.root});
-    mainView.setState({currentModel: models.TopicTree.root});
+    var topicModel = models.TopicTree.root;
+    mainView.setProps({model: topicModel});
+    mainView.setState({currentModel: topicModel});
 }).catch((error) => {
     alert(error);
-    Util.quit();
+    if (Util.isFirefoxOS()) {
+        Util.quit();
+    } else {
+        throw error;
+    }
 });
 

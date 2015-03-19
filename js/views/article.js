@@ -16,10 +16,10 @@ var ArticleViewer = React.createClass({
     propTypes: {
         article: React.PropTypes.object.isRequired
     },
-    mixins: [Util.BackboneMixin],
-    getBackboneModels: function(): Array<any> {
-        return [this.props.article];
-    },
+    //mixins: [Util.BackboneMixin],
+    //getBackboneModels: function(): Array<any> {
+    //    return [this.props.article];
+    //},
     getInitialState: function() {
         return {};
     },

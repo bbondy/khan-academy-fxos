@@ -35,10 +35,10 @@ var ExerciseViewer = React.createClass({
     propTypes: {
         exercise: React.PropTypes.object.isRequired
     },
-    mixins: [Util.BackboneMixin],
-    getBackboneModels: function(): Array<any> {
-        return [this.props.exercise];
-    },
+    //mixins: [Util.BackboneMixin],
+    //getBackboneModels: function(): Array<any> {
+    //    return [this.props.exercise];
+    //},
     getInitialState: function() {
         return {
             hintsUsed: 0,

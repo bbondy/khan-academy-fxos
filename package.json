@@ -8,7 +8,6 @@
   },
   "dependencies": {
     "JSONStream": "^0.10.0",
-    "backbone": "^1.1.2",
     "classnames": "^1.1.4",
     "es6-default-params": "^0.4.3",
     "event-stream": "^3.3.0",
@@ -53,8 +52,7 @@
     "unmockedModulePathPatterns": [
       "node_modules/react",
       "node_modules/jquery",
-      "node_modules/underscore",
-      "node_modules/backbone"
+      "node_modules/underscore"
     ],
     "testPathDirs": [
       "./js"

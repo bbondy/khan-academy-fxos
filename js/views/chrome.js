@@ -270,11 +270,12 @@ var MainView = React.createClass({
         // Optional because it's not specified until the topic tree is loaded
         model: React.PropTypes.object
     },
-    mixins: [Util.BackboneMixin, Util.LocalizationMixin],
-    getBackboneModels: function(): Array<any> {
-        return [new models.ContentList(models.TopicTree.allContentItems),
-            models.AppOptions, models.TempAppState, models.CurrentUser];
-    },
+    mixins: [Util.LocalizationMixin],
+    //mixins: [Util.BackboneMixin, Util.LocalizationMixin],
+    //getBackboneModels: function(): Array<any> {
+    //    return [new models.ContentList(models.TopicTree.allContentItems),
+    //        models.AppOptions, models.TempAppState, models.CurrentUser];
+    //},
     getInitialState: function() {
         return {
             currentModel: this.props.model,
@@ -569,16 +570,16 @@ var MainView = React.createClass({
         } else if (this.state.showProfile) {
             control = <ProfileViewer/>;
         } else if (this.state.showDownloads) {
-            control = <DownloadsViewer onClickContentItem={this.onClickContentItemFromDownloads} />;
+            control = <DownloadsViewer onClickContentItem={this.onClickContentItemFromDownloads.bind(this)} />;
         } else if (this.state.showSettings) {
             control = <SettingsViewer options={models.AppOptions }/>;
         } else if (currentModel.isTopic()) {
             control = <TopicViewer topic={currentModel}
-                                   onClickTopic={this.onClickTopic}
-                                   onClickContentItem={this.onClickContentItem}/>;
+                                   onClickTopic={this.onClickTopic.bind(this)}
+                                   onClickContentItem={this.onClickContentItem.bind(this)}/>;
         } else if (currentModel.isContentList()) {
             control = <SearchResultsViewer collection={currentModel}
-                                           onClickContentItem={this.onClickContentItem} />;
+                                           onClickContentItem={this.onClickContentItem.bind(this)} />;
         } else if (currentModel.isVideo()) {
             control = <VideoViewer  video={this.getCurrentModel()}/>;
         } else if (currentModel.isArticle()) {
@@ -592,23 +593,23 @@ var MainView = React.createClass({
         var topicSearch;
         if (!this.isPaneShowing() && currentModel && !currentModel.isContent()) {
             topicSearch = <TopicSearch model={currentModel}
-                                       onTopicSearch={this.onTopicSearch}/>;
+                                       onTopicSearch={this.onTopicSearch.bind(this)}/>;
         }
 
         var sidebar;
         if (currentModel) {
             sidebar = <Sidebar model={currentModel}
-                           onClickSignin={this.onClickSignin}
-                           onClickSignout={this.onClickSignout}
-                           onClickProfile={this.onClickProfile}
-                           onClickDownloads={this.onClickDownloads}
-                           onClickSettings={this.onClickSettings}
-                           onClickSupport={this.onClickSupport}
-                           onClickDownloadContent={this.onClickDownloadContent}
-                           onClickViewOnKA={this.onClickViewOnKA}
-                           onClickShare={this.onClickShare}
-                           onClickCancelDownloadContent={this.onClickCancelDownloadContent}
-                           onClickDeleteDownloadedContent={this.onClickDeleteDownloadedContent}
+                           onClickSignin={this.onClickSignin.bind(this)}
+                           onClickSignout={this.onClickSignout.bind(this)}
+                           onClickProfile={this.onClickProfile.bind(this)}
+                           onClickDownloads={this.onClickDownloads.bind(this)}
+                           onClickSettings={this.onClickSettings.bind(this)}
+                           onClickSupport={this.onClickSupport.bind(this)}
+                           onClickDownloadContent={this.onClickDownloadContent.bind(this)}
+                           onClickViewOnKA={this.onClickViewOnKA.bind(this)}
+                           onClickShare={this.onClickShare.bind(this)}
+                           onClickCancelDownloadContent={this.onClickCancelDownloadContent.bind(this)}
+                           onClickDeleteDownloadedContent={this.onClickDeleteDownloadedContent.bind(this)}
                            isPaneShowing={this.isPaneShowing()}
                            isDownloadsShowing={this.state.showDownloads}
                            isProfileShowing={this.state.showProfile}
@@ -619,8 +620,8 @@ var MainView = React.createClass({
             {sidebar}
             <section id="main-content" role="region" className="skin-dark">
                 <AppHeader model={currentModel}
-                           onClickBack={this.onClickBack}
-                           onTopicSearch={this.onTopicSearch}
+                           onClickBack={this.onClickBack.bind(this)}
+                           onTopicSearch={this.onTopicSearch.bind(this)}
                            isPaneShowing={this.isPaneShowing()}
                            isDownloadsShowing={this.state.showDownloads}
                            isProfileShowing={this.state.showProfile}
@@ -628,7 +629,7 @@ var MainView = React.createClass({
                            />
                     {topicSearch}
                     {control}
-                    <StatusBarViewer onClickCancelDownloadContent={this.onClickCancelDownloadContent} />
+                    <StatusBarViewer onClickCancelDownloadContent={this.onClickCancelDownloadContent.bind(this)} />
             </section>
         </section>;
     }

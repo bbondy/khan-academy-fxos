@@ -18,9 +18,3 @@ declare module "addons.js" {
  */
 declare module "video.js" {
 }
-
-/**
- * backbone.js
- */
-declare module "backbone.js" {
-}

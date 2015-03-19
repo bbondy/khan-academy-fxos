@@ -206,17 +206,17 @@ ExerciseListItem.propTypes = {
 class TopicViewer extends React.Component {
     render(): any {
         var topics;
-        if (this.props.topic.get("topics")) {
-            topics = _(this.props.topic.get("topics").models).map((topic) => {
+        if (this.props.topic.getTopics()) {
+            topics = _(this.props.topic.getTopics().models).map((topic) => {
                 return <TopicListItem topic={topic}
                                       onClickTopic={this.props.onClickTopic}
                                       key={topic.getKey()}/>;
             });
         }
 
-        var contentItems;
-        if (this.props.topic.get("contentItems")) {
-            contentItems = _(this.props.topic.get("contentItems").models).map((contentItem) => {
+        var contentItems = this.props.topic.getContentItems();
+        if (contentItems) {
+            contentItems = _(contentItems.models).map((contentItem) => {
                 if (contentItem.isVideo()) {
                     return <VideoListItem video={contentItem}
                                           onClickVideo={this.props.onClickContentItem}

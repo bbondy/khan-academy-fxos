@@ -123,11 +123,8 @@ describe("models module", function() {
         // Helper method for validating a valid topic
         var assertValidTopic = (t) => {
             expect(t.isTopic()).toBeTruthy();
-            expect(t.isVideoList()).toBeFalsy();
             expect(t.isVideo()).toBeFalsy();
-            expect(t.isArticleList()).toBeFalsy();
             expect(t.isArticle()).toBeFalsy();
-            expect(t.isExerciseList()).toBeFalsy();
             expect(t.isExercise()).toBeFalsy();
             expect(t.isContent()).toBeFalsy();
             expect(t.isContentList()).toBeFalsy();
@@ -137,10 +134,7 @@ describe("models module", function() {
         // Helper method for validating a validcontent item
         var assertValidContent = (c) => {
             expect(c.isTopic()).toBeFalsy();
-            expect(c.isVideoList()).toBeFalsy();
             expect(c.isVideo() ^ c.isArticle() ^ c.isExercise()).toBeTruthy();
-            expect(c.isArticleList()).toBeFalsy();
-            expect(c.isExerciseList()).toBeFalsy();
             expect(c.isContent()).toBeTruthy();
             expect(c.isContentList()).toBeFalsy();
             expect(c.getParentDomain()).toBeTruthy();
@@ -173,8 +167,8 @@ describe("models module", function() {
                 expect(root.getParent()).toBeFalsy();
                 assertValidTopic(root);
                 // Topics are at root
-                expect(models.TopicTree.root.get("topics").models.length).toBeGreaterThan(0);
-                models.TopicTree.root.get("topics").models.forEach((m) => {
+                expect(models.TopicTree.root.getTopics().models.length).toBeGreaterThan(0);
+                models.TopicTree.root.getTopics().models.forEach((m) => {
                     expect(m.getParentDomain()).toBeTruthy();
                     expect(m.isRoot()).toBeFalsy();
                     expect(m.getParent()).toBeTruthy();
@@ -187,7 +181,7 @@ describe("models module", function() {
                 });
 
                 // But there are no content items at root
-                expect(models.TopicTree.root.get("contentItems").models.length).toBe(0);
+                expect(models.TopicTree.root.getContentItems().models.length).toBe(0);
                 expect(models.TopicTree.root.findContentItems("mission", 1).length).toBe(1);
                 var results = models.TopicTree.root.findContentItems("count", 2);
                 expect(results.length).toBe(2);
