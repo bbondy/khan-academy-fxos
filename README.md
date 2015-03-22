@@ -35,8 +35,11 @@ You need [Nodejs](http://nodejs.org) installed to run the following commands (pl
     cd bower_components/katex
     make
     cd ../../
-    gulp
+    gulp webpack-dev-server&
 
+Navigate to http://localhost:8008.  As you make changes webpack will rebundle the sources.
+
+## Alternate route of getting setup (not recommended)
 To run a web server instead of using the Firefox emulator, run: `./tools/runserver`.  
 This will start a local python HTTP server on port 8092.  
 
