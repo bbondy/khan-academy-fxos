@@ -213,7 +213,9 @@ var TopicTree: {
             var topicTreePromise = Storage.readText(this.getTopicTreeFilename());
             topicTreePromise.then((topicTree) => {
                 Util.log("Loaded topic tree from local copy, parsing...");
+
                 this.root = new TopicModel(JSON.parse(topicTree), {parse: true});
+
                 resolve();
             });
 

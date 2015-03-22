@@ -10,7 +10,8 @@ var React = require("react"),
     Downloads = require("./downloads"),
     Storage = require("./storage"),
     chromeViews = require("./views/chrome"),
-    {readOptions, resetOptions, writeOptions} = require("./app-options"),
+    {readOptions, resetOptions, writeOptions} = require("./data/app-options"),
+    {readTopicTree} = require("./data/topic-tree"),
     Cursor = require('immutable/contrib/cursor');
 
 // TODO: remove, just for easy inpsection
@@ -52,6 +53,11 @@ Storage.init().then(function() {
 }).then(function() {
     // We don't want to have to wait for results, so just start this and don't wait
     models.CurrentUser.init();
+
+    readTopicTree().then((immutableTopicTree) => {
+        // TODO: Start using it instead of models.TopicTree
+        console.log("Immutable topic tree: %o", immutableTopicTree);
+    });
 
     // Start showing the topic tree
     var topicModel = models.TopicTree.root;

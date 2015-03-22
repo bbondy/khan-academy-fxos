@@ -8,7 +8,7 @@ var l10n = require("../l10n"),
     models = require("../models"),
     Downloads = require("../downloads"),
     topicViews = require("./topic"),
-    { resetOptions } = require("../app-options");
+    { resetOptions } = require("../data/app-options");
 
 var ContentListViewer = topicViews.ContentListViewer;
 
