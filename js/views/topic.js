@@ -19,7 +19,7 @@ class TopicListItem extends React.Component {
     render(): any {
         var topicClassObj = {
             "topic-item": true,
-            faded: models.AppOptions.get("showDownloadsOnly") &&
+            faded: this.props.optionsCursor.get("showDownloadsOnly") &&
                 this.props.topic.get("downloadCount") === 0
         };
         var parentDomain = this.props.topic.getParentDomain();
@@ -39,7 +39,8 @@ class TopicListItem extends React.Component {
 }
 TopicListItem.propTypes = {
     topic: React.PropTypes.object.isRequired,
-    onClickTopic: React.PropTypes.func.isRequired
+    onClickTopic: React.PropTypes.func.isRequired,
+    optionsCursor: React.PropTypes.func.isRequired,
 };
 
 /**
@@ -64,7 +65,7 @@ class VideoListItem extends React.Component {
         };
         var videoClassObj = {
             "video-item": true,
-            faded: models.AppOptions.get("showDownloadsOnly") &&
+            faded: this.props.optionsCursor.get("showDownloadsOnly") &&
                 !this.props.video.isDownloaded()
         };
         var parentDomain = this.props.video.getParentDomain();
@@ -95,7 +96,8 @@ class VideoListItem extends React.Component {
 }
 VideoListItem.propTypes = {
     video: React.PropTypes.object.isRequired,
-    onClickVideo: React.PropTypes.func.isRequired
+    onClickVideo: React.PropTypes.func.isRequired,
+    optionsCursor: React.PropTypes.func.isRequired,
 };
 
 /**
@@ -120,7 +122,7 @@ class ArticleListItem extends React.Component {
         };
         var articleClassObj = {
             "article-item": true,
-            faded: models.AppOptions.get("showDownloadsOnly") &&
+            faded: this.props.optionsCursor.get("showDownloadsOnly") &&
                 !this.props.article.isDownloaded()
         };
         var parentDomain = this.props.article.getParentDomain();
@@ -145,7 +147,8 @@ class ArticleListItem extends React.Component {
 }
 ArticleListItem.propTypes = {
     article: React.PropTypes.object.isRequired,
-    onClickArticle: React.PropTypes.func.isRequired
+    onClickArticle: React.PropTypes.func.isRequired,
+    optionsCursor: React.PropTypes.func.isRequired,
 };
 
 /**
@@ -170,7 +173,7 @@ class ExerciseListItem extends React.Component {
         };
         var exerciseClassObj = {
             "exercise-item": true,
-            faded: models.AppOptions.get("showDownloadsOnly") &&
+            faded: this.props.optionsCursor.get("showDownloadsOnly") &&
                 !this.props.exercise.isDownloaded()
         };
         var parentDomain = this.props.exercise.getParentDomain();
@@ -196,7 +199,8 @@ class ExerciseListItem extends React.Component {
 }
 ExerciseListItem.propTypes = {
     exercise: React.PropTypes.object.isRequired,
-    onClickExercise: React.PropTypes.func.isRequired
+    onClickExercise: React.PropTypes.func.isRequired,
+    optionsCursor: React.PropTypes.func.isRequired,
 };
 
 /**
@@ -210,6 +214,7 @@ class TopicViewer extends React.Component {
             topics = _(this.props.topic.getTopics().models).map((topic) => {
                 return <TopicListItem topic={topic}
                                       onClickTopic={this.props.onClickTopic}
+                                      optionsCursor={this.props.optionsCursor}
                                       key={topic.getKey()}/>;
             });
         }
@@ -220,14 +225,17 @@ class TopicViewer extends React.Component {
                 if (contentItem.isVideo()) {
                     return <VideoListItem video={contentItem}
                                           onClickVideo={this.props.onClickContentItem}
+                                          optionsCursor={this.props.optionsCursor}
                                           key={contentItem.getKey()} />;
                 } else if (contentItem.isArticle()) {
                     return <ArticleListItem article={contentItem}
                                             onClickArticle={this.props.onClickContentItem}
+                                            optionsCursor={this.props.optionsCursor}
                                             key={contentItem.getKey()} />;
                 }
                 return <ExerciseListItem exercise={contentItem}
                                          onClickExercise={this.props.onClickContentItem}
+                                         optionsCursor={this.props.optionsCursor}
                                          key={contentItem.getKey()} />;
             });
         }
@@ -246,7 +254,7 @@ class TopicViewer extends React.Component {
 TopicViewer.propTypes = {
     topic: React.PropTypes.object.isRequired,
     onClickTopic: React.PropTypes.func.isRequired,
-    onClickContentItem: React.PropTypes.func.isRequired
+    onClickContentItem: React.PropTypes.func.isRequired,
 };
 
 /**
@@ -262,6 +270,7 @@ class ContentListViewer extends React.Component {
                 if (contentItem.isVideo()) {
                     return <VideoListItem video={contentItem}
                                           onClickVideo={this.props.onClickContentItem}
+                                          optionsCursor={this.props.optionsCursor}
                                           key={contentItem.getId()} />;
                 } else if (contentItem.isArticle()) {
                     return <ArticleListItem article={contentItem}
@@ -287,7 +296,8 @@ class ContentListViewer extends React.Component {
 }
 ContentListViewer.propTypes = {
     collection: React.PropTypes.object.isRequired,
-    onClickContentItem: React.PropTypes.func.isRequired
+    onClickContentItem: React.PropTypes.func.isRequired,
+    optionsCursor: React.PropTypes.func.isRequired,
 };
 
 module.exports = {

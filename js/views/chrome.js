@@ -268,7 +268,8 @@ Sidebar.propTypes = {
 var MainView = React.createClass({
     propTypes: {
         // Optional because it's not specified until the topic tree is loaded
-        model: React.PropTypes.object
+        model: React.PropTypes.object,
+        cursorOptions: React.PropTypes.object.isRequired,
     },
     mixins: [Util.LocalizationMixin],
     //mixins: [Util.BackboneMixin, Util.LocalizationMixin],
@@ -570,18 +571,22 @@ var MainView = React.createClass({
         } else if (this.state.showProfile) {
             control = <ProfileViewer/>;
         } else if (this.state.showDownloads) {
-            control = <DownloadsViewer onClickContentItem={this.onClickContentItemFromDownloads.bind(this)} />;
+            control = <DownloadsViewer onClickContentItem={this.onClickContentItemFromDownloads.bind(this)}
+                                       optionsCursor={this.props.optionsCursor}/>;
         } else if (this.state.showSettings) {
-            control = <SettingsViewer options={models.AppOptions }/>;
+            control = <SettingsViewer optionsCursor={this.props.optionsCursor}/>;
         } else if (currentModel.isTopic()) {
             control = <TopicViewer topic={currentModel}
                                    onClickTopic={this.onClickTopic.bind(this)}
+                                   optionsCursor={this.props.optionsCursor}
                                    onClickContentItem={this.onClickContentItem.bind(this)}/>;
         } else if (currentModel.isContentList()) {
             control = <SearchResultsViewer collection={currentModel}
-                                           onClickContentItem={this.onClickContentItem.bind(this)} />;
+                                           onClickContentItem={this.onClickContentItem.bind(this)}
+                                           optionsCursor={this.props.optionsCursor}/>;
         } else if (currentModel.isVideo()) {
-            control = <VideoViewer  video={this.getCurrentModel()}/>;
+            control = <VideoViewer video={this.getCurrentModel()}
+                                   optionsCursor={this.props.optionsCursor}/>;
         } else if (currentModel.isArticle()) {
             control = <ArticleViewer  article={currentModel}/>;
         } else if (currentModel.isExercise()) {
@@ -593,6 +598,7 @@ var MainView = React.createClass({
         var topicSearch;
         if (!this.isPaneShowing() && currentModel && !currentModel.isContent()) {
             topicSearch = <TopicSearch model={currentModel}
+                                       optionsCursor={this.props.optionsCursor}
                                        onTopicSearch={this.onTopicSearch.bind(this)}/>;
         }
 

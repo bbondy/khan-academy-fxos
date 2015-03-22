@@ -73,6 +73,7 @@ TopicSearch.propTypes = {
 class SearchResultsViewer extends React.Component {
     render(): any {
         var control = <ContentListViewer collection={this.props.collection}
+                                         optionsCursor={this.props.optionsCursor}
                                          onClickContentItem={this.props.onClickContentItem} />;
         return <div className="topic-list-container">
             {control}

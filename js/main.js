@@ -9,7 +9,9 @@ var React = require("react"),
     Cache = require("./cache"),
     Downloads = require("./downloads"),
     Storage = require("./storage"),
-    chromeViews = require("./views/chrome");
+    chromeViews = require("./views/chrome"),
+    {readOptions, resetOptions, writeOptions} = require("./app-options"),
+    Cursor = require('immutable/contrib/cursor');
 
 // TODO: remove, just for easy inpsection
 window.APIClient = APIClient;
@@ -46,14 +48,20 @@ Storage.init().then(function() {
 }).then(function() {
     return models.TopicTree.init();
 }).then(function() {
-    return Promise.all([Downloads.init(), Cache.init(), models.AppOptions.fetch()]);
+    return Promise.all([Downloads.init(), Cache.init()]);
 }).then(function() {
     // We don't want to have to wait for results, so just start this and don't wait
     models.CurrentUser.init();
 
     // Start showing the topic tree
     var topicModel = models.TopicTree.root;
-    mainView.setProps({model: topicModel});
+    var options = readOptions() || resetOptions();
+    var updateCursor = (newOptions) => {
+        writeOptions(newOptions);
+        mainView.setProps({ optionsCursor: Cursor.from(newOptions, updateCursor) });
+    };
+    var optionsCursor = Cursor.from(options, updateCursor);
+    mainView.setProps({model: topicModel, optionsCursor});
     mainView.setState({currentModel: topicModel});
 }).catch((error) => {
     alert(error);

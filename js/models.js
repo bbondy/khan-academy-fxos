@@ -11,7 +11,6 @@ var _ = require("underscore"),
     Storage = require("./storage"),
     Minify = require("./minify");
 
-
 // temporary helper to help
 class BaseModel {
     constructor(data, extra) {
@@ -983,35 +982,7 @@ var TempAppState = new BaseModel({
     }
 });
 
-/**
- * Stores app level options in local storage
- */
-class AppOptionsModel extends BaseModel {
-    constructor() {
-        this._name = "appOptions.json";
-        super({
-            defaults: {
-                autoUpdateTopicTree: true,
-                showDownloadsOnly: false,
-                showTranscripts: true,
-                playbackRate: 100
-            }
-        });
-        this.fetch();
-    }
-    fetch() {
-        var result = localStorage.getItem(this._name);
-        var attr = JSON.parse(result);
-        Object.assign(this.attributes, attr);
-    }
-    save() {
-        localStorage.setItem(this._name, JSON.stringify(this.attributes));
-    }
-    reset() {
-        this.attributes = this.defaults;
-        this.save();
-    }
-}
+
 
 var CurrentUser = new UserModel();
 module.exports = {
@@ -1023,7 +994,6 @@ module.exports = {
     TopicList,
     ContentList,
     TopicTree,
-    AppOptions: new AppOptionsModel(),
     TempAppState,
     CurrentUser,
 };

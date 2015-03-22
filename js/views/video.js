@@ -76,11 +76,12 @@ var VideoViewerRawObj: {
         videojs: any;
     } = {
     propTypes: {
-        video: React.PropTypes.object.isRequired
+        video: React.PropTypes.object.isRequired,
+        optionsCursor: React.PropTypes.object.isRequired
     },
     componentWillMount: function() {
         Util.log("VideoViewer will mount");
-        if (models.AppOptions.get("showTranscripts")) {
+        if (this.props.optionsCursor.get("showTranscripts")) {
             APIClient.getVideoTranscript(this.props.video.getYoutubeId()).then((transcript) => {
                 if (transcript && transcript.length === 0) {
                     return;
@@ -312,8 +313,8 @@ var VideoViewerRawObj: {
                 video.addEventListener("stop", this._onStop, true);
                 video.addEventListener("ended", this._onEnded, true);
                 video.addEventListener("error", this._onError, true);
-                video.defaultPlaybackRate = models.AppOptions.get("playbackRate") / 100;
-                video.playbackRate = models.AppOptions.get("playbackRate") / 100;
+                video.defaultPlaybackRate = this.props.optionsCursor.get("playbackRate") / 100;
+                video.playbackRate = this.props.optionsCursor.get("playbackRate") / 100;
             }
         });
     },
