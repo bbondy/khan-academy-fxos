@@ -19,7 +19,8 @@ var $ = require("jquery"),
     exerciseViews = require("./exercise"),
     topicViews = require("./topic"),
     searchViews = require("./search"),
-    paneViews = require("./pane");
+    paneViews = require("./pane"),
+    { TopicTreeNode } = require("../data/topic-tree");
 
 var VideoViewer = videoViews.VideoViewer;
 var ArticleViewer = articleViews.ArticleViewer;
@@ -279,7 +280,7 @@ var MainView = React.createClass({
     //},
     getInitialState: function() {
         return {
-            currentModel: this.props.model,
+            topicTreeCursor: this.props.topicTreeRootCursor,
             isPaneShowing: false,
             showProfile: false,
             showDownloads: false,
@@ -308,9 +309,9 @@ var MainView = React.createClass({
             showSettings: false
         });
     },
-    onClickTopic: function(model: any) {
+    onClickTopic: function(newTopicTreeCursor: any) {
         this.setState({
-            currentModel: model,
+            topicTreeCursor: newTopicTreeCursor,
             showProfile: false,
             showDownloads: false,
             showSettings: false,
@@ -553,10 +554,19 @@ var MainView = React.createClass({
         this.setState({currentModel: contentList, searchingModel: searchingModel});
     },
     getCurrentModel: function(): any {
-        return this.state.currentModel;
+        return this.state.topicTreeCursor;
     },
     render: function(): any {
-        var currentModel = this.getCurrentModel();
+
+        if (!this.state.topicTreeCursor) {
+            return <div/>;
+        }
+        return <TopicViewer topicCursor={this.state.topicTreeCursor}
+                            optionsCursor={this.props.optionsCursor}
+                            onClickTopic={this.onClickTopic.bind(this)}
+                            onClickContentItem={this.onClickContentItem.bind(this)}/>;
+
+        var currentModel = TopicTreeNode(this.getCurrentModel());
 
         // Make sure scrollTop is at the top of the page
         // This is in case the search box scrolling doesn't get an onblur

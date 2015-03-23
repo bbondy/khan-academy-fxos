@@ -55,20 +55,19 @@ Storage.init().then(function() {
     models.CurrentUser.init();
 
     readTopicTree().then((immutableTopicTree) => {
-        // TODO: Start using it instead of models.TopicTree
-        console.log("Immutable topic tree: %o", immutableTopicTree);
+        var topicTreeCursor = Cursor.from(immutableTopicTree);
+        mainView.setProps({topicTreeRootCursor: topicTreeCursor});
+        mainView.setState({topicTreeCursor: topicTreeCursor});
     });
 
     // Start showing the topic tree
-    var topicModel = models.TopicTree.root;
     var options = readOptions() || resetOptions();
-    var updateCursor = (newOptions) => {
+    var updateOptionsCursor = (newOptions) => {
         writeOptions(newOptions);
-        mainView.setProps({ optionsCursor: Cursor.from(newOptions, updateCursor) });
+        mainView.setProps({ optionsCursor: Cursor.from(newOptions, updateOptionsCursor) });
     };
-    var optionsCursor = Cursor.from(options, updateCursor);
-    mainView.setProps({model: topicModel, optionsCursor});
-    mainView.setState({currentModel: topicModel});
+    var optionsCursor = Cursor.from(options, updateOptionsCursor);
+    mainView.setProps({optionsCursor});
 }).catch((error) => {
     alert(error);
     if (Util.isFirefoxOS()) {

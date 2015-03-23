@@ -1,6 +1,8 @@
 var Immutable = require("immutable"),
     Storage = require("../storage"),
-    Util = require("../util");
+    Minify = require("../minify"),
+    Util = require("../util"),
+    Cursor = require('immutable/contrib/cursor');
 
 const getTopicTreeFilename = () => {
     var lang = Util.getLang();
@@ -41,7 +43,73 @@ const readTopicTree = () => {
     });
 };
 
+const getChildTopicCursors = (topicCursor) => {
+    var childTopicCursors = [];
+    window.c1 = topicCursor;
+    topicCursor.get(Minify.getShortName("children")).forEach((child) => {
+        if (child.get(Minify.getShortName("kind")) === Minify.getShortValue("kind", "Topic")) {
+            childTopicCursors.push(Cursor.from(child));
+        }
+    });
+    return childTopicCursors;
+};
+
+const getChildContentItems = (topicCursor) => {
+    var contentItems = new ContentList(topicCursor.get(Minify.getShortName("children")).filter((child) => {
+        var kind = child[Minify.getShortName("kind")];
+        return kind === Minify.getShortValue("kind", "Video") ||
+            kind === Minify.getShortValue("kind", "Article") ||
+            kind === Minify.getShortValue("kind", "Exercise");
+    }), { parse: true });
+    return Immutable.fromJS(contentItems);
+}
+
+
+const getTitle = (tpoicTreeCursor) => {
+    return tpoicTreeCursor.get(Minify.getShortName("translated_title")) ||
+            tpoicTreeCursor.get(Minify.getShortName("translated_display_name"));
+
+};
+
+const getProgressKey = (topicTreeCursor) => {
+    return topicTreeCursor.get(Minify.getShortName("progress_key"));
+};
+
+const getKind = (topicTreeCursor) => {
+    return Minify.getLongValue("kind", topicTreeCursor.get(Minify.getShortName("kind")));
+}
+
+const isExercise = (topicTreeCursor) => {
+    return getKind(topicTreeCursor) === "Exercise";
+}
+
+const getId = (topicTreeCursor) => {
+    if (isExercise(topicTreeCursor)) {
+        return getProgressKey(topicTreeCursor).substring(1);
+    }
+    return topicTreeCursor.get(Minify.getShortName("id"));
+};
+
+// todo: It's probably better to store this out of the topic tree
+const getDownloadCount = (topicTreeCursor) => {
+    return topicTreeCursor.get("downloadCount") === 0
+};
+
+const getSlug = (topicTreeCursor) => {
+    return topicTreeCursor.get(Minify.getShortName("slug"));
+};
+
+const getKey = (topicTreeCursor) => {
+    return getId(topicTreeCursor) || getSlug(topicTreeCursor) || getTitle(topicTreeCursor);
+}
+
+
 module.exports = {
     readTopicTree,
+    getId,
+    getTitle,
+    getKey,
+    getDownloadCount,
+    getChildTopicCursors,
 };
 

@@ -6,7 +6,9 @@ var _ = require("underscore"),
     React = require("react"),
     classNames = require("classNames"),
     models = require("../models"),
-    Util = require("../util");
+    Util = require("../util"),
+    {getId, getKey, getDownloadCount, getChildTopicCursors, getTitle} = require("../data/topic-tree"),
+    Cursor = require('immutable/contrib/cursor');
 
 /**
  * Represents a single root, domain, subject, topic, or tutorial
@@ -20,25 +22,23 @@ class TopicListItem extends React.Component {
         var topicClassObj = {
             "topic-item": true,
             faded: this.props.optionsCursor.get("showDownloadsOnly") &&
-                this.props.topic.get("downloadCount") === 0
+                getDownloadCount(this.props.topicCursor),
         };
-        var parentDomain = this.props.topic.getParentDomain();
-        topicClassObj[parentDomain.getId()] = true;
+        topicClassObj[getId(this.props.parentDomainCursor)] = true;
         var topicClass = classNames(topicClassObj);
-
         return <li className={topicClass}>
-            { this.props.topic.isRootChild() ?
+            { this.props.topicCursor === this.props.parentDomainCursor ?
                 <div className="color-block"/> : null }
             <a href="javascript:void(0)"
-               onClick={_.partial(this.props.onClickTopic,
-                   this.props.topic)}>
-                <p className="topic-title">{this.props.topic.getTitle()}</p>
+               onClick={_.partial(this.props.onClickTopic, this.props.topicCursor)}>
+                <p className="topic-title">{getTitle(this.props.topicCursor)}</p>
             </a>
         </li>;
     }
 }
 TopicListItem.propTypes = {
-    topic: React.PropTypes.object.isRequired,
+    topicCursor: React.PropTypes.object.isRequired,
+    parentDomainCursor: React.PropTypes.object.isRequired,
     onClickTopic: React.PropTypes.func.isRequired,
     optionsCursor: React.PropTypes.func.isRequired,
 };
@@ -209,19 +209,20 @@ ExerciseListItem.propTypes = {
  */
 class TopicViewer extends React.Component {
     render(): any {
-        var topics;
-        if (this.props.topic.getTopics()) {
-            topics = _(this.props.topic.getTopics().models).map((topic) => {
-                return <TopicListItem topic={topic}
-                                      onClickTopic={this.props.onClickTopic}
-                                      optionsCursor={this.props.optionsCursor}
-                                      key={topic.getKey()}/>;
-            });
-        }
+        var parentDomainCursor = this.props.parentDomainCursor;
+        var topics = getChildTopicCursors(this.props.topicCursor).map((childTopicCursor) => {
+            return <TopicListItem topicCursor={childTopicCursor}
+                                  onClickTopic={this.props.onClickTopic}
+                                  optionsCursor={this.props.optionsCursor}
+                                  parentDomainCursor={parentDomainCursor || childTopicCursor}
+                                  key={getKey(childTopicCursor)} />;
+        });
 
-        var contentItems = this.props.topic.getContentItems();
+        var contentItems;
+        /*
+        var contentItems = getChildContentItems(this.props.topicCursor);
         if (contentItems) {
-            contentItems = _(contentItems.models).map((contentItem) => {
+            contentItems = _(contentItems).map((contentItem) => {
                 if (contentItem.isVideo()) {
                     return <VideoListItem video={contentItem}
                                           onClickVideo={this.props.onClickContentItem}
@@ -239,6 +240,7 @@ class TopicViewer extends React.Component {
                                          key={contentItem.getKey()} />;
             });
         }
+        */
 
         var topicList = <section data-type="list">
                         <ul>
