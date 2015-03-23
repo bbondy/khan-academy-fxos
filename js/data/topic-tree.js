@@ -1,4 +1,5 @@
-var Immutable = require("immutable"),
+var _ = require("underscore"),
+    Immutable = require("immutable"),
     Storage = require("../storage"),
     Minify = require("../minify"),
     Util = require("../util"),
@@ -43,27 +44,19 @@ const readTopicTree = () => {
     });
 };
 
-const getChildTopicCursors = (topicCursor) => {
-    var childTopicCursors = [];
-    window.c1 = topicCursor;
-    topicCursor.get(Minify.getShortName("children")).forEach((child) => {
-        if (child.get(Minify.getShortName("kind")) === Minify.getShortValue("kind", "Topic")) {
-            childTopicCursors.push(Cursor.from(child));
-        }
-    });
-    return childTopicCursors;
+const genMapChildrenByKindFn = (kinds) => {
+    return (topicCursor, mapFn) => {
+        return topicCursor.get(Minify.getShortName("children")).filter((child) => {
+            return _.includes(kinds, child.get(Minify.getShortName("kind")));
+        }).map(mapFn);
+    };
 };
 
-const getChildContentItems = (topicCursor) => {
-    var contentItems = new ContentList(topicCursor.get(Minify.getShortName("children")).filter((child) => {
-        var kind = child[Minify.getShortName("kind")];
-        return kind === Minify.getShortValue("kind", "Video") ||
-            kind === Minify.getShortValue("kind", "Article") ||
-            kind === Minify.getShortValue("kind", "Exercise");
-    }), { parse: true });
-    return Immutable.fromJS(contentItems);
-}
-
+const mapChildTopicCursors = genMapChildrenByKindFn([Minify.getShortValue("kind", "Topic")]);
+const mapChildContentCursors = genMapChildrenByKindFn([
+    Minify.getShortValue("kind", "Video"),
+    Minify.getShortValue("kind", "Article"),
+    Minify.getShortValue("kind", "Exercise")]);
 
 const getTitle = (tpoicTreeCursor) => {
     return tpoicTreeCursor.get(Minify.getShortName("translated_title")) ||
@@ -110,6 +103,7 @@ module.exports = {
     getTitle,
     getKey,
     getDownloadCount,
-    getChildTopicCursors,
+    mapChildTopicCursors,
+    mapChildContentCursors,
 };
 

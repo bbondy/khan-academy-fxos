@@ -7,7 +7,7 @@ var _ = require("underscore"),
     classNames = require("classNames"),
     models = require("../models"),
     Util = require("../util"),
-    {getId, getKey, getDownloadCount, getChildTopicCursors, getTitle} = require("../data/topic-tree"),
+    {getId, getKey, getDownloadCount, mapChildTopicCursors, mapChildContentCursors, getTitle} = require("../data/topic-tree"),
     Cursor = require('immutable/contrib/cursor');
 
 /**
@@ -210,7 +210,7 @@ ExerciseListItem.propTypes = {
 class TopicViewer extends React.Component {
     render(): any {
         var parentDomainCursor = this.props.parentDomainCursor;
-        var topics = getChildTopicCursors(this.props.topicCursor).map((childTopicCursor) => {
+        var topics = mapChildTopicCursors(this.props.topicCursor, (childTopicCursor) => {
             return <TopicListItem topicCursor={childTopicCursor}
                                   onClickTopic={this.props.onClickTopic}
                                   optionsCursor={this.props.optionsCursor}
@@ -218,33 +218,27 @@ class TopicViewer extends React.Component {
                                   key={getKey(childTopicCursor)} />;
         });
 
-        var contentItems;
-        /*
-        var contentItems = getChildContentItems(this.props.topicCursor);
-        if (contentItems) {
-            contentItems = _(contentItems).map((contentItem) => {
-                if (contentItem.isVideo()) {
-                    return <VideoListItem video={contentItem}
-                                          onClickVideo={this.props.onClickContentItem}
-                                          optionsCursor={this.props.optionsCursor}
-                                          key={contentItem.getKey()} />;
-                } else if (contentItem.isArticle()) {
-                    return <ArticleListItem article={contentItem}
-                                            onClickArticle={this.props.onClickContentItem}
-                                            optionsCursor={this.props.optionsCursor}
-                                            key={contentItem.getKey()} />;
-                }
-                return <ExerciseListItem exercise={contentItem}
-                                         onClickExercise={this.props.onClickContentItem}
-                                         optionsCursor={this.props.optionsCursor}
-                                         key={contentItem.getKey()} />;
-            });
-        }
-        */
+        var contentItems = mapChildContentCursors(this.props.topicCursor, (contentItemCursors) => {
+            if (contentItem.isVideo()) {
+                return <VideoListItem videoCursor={contentItemCursor}
+                                      onClickVideo={this.props.onClickContentItem}
+                                      optionsCursor={this.props.optionsCursor}
+                                      key={getKey(contentItemCursor)} />;
+            } else if (contentItem.isArticle()) {
+                return <ArticleListItem articleCursor={contentItemCursor}
+                                        onClickArticle={this.props.onClickContentItem}
+                                        optionsCursor={this.props.optionsCursor}
+                                        key={getKey(contentItemCursor)} />;
+            }
+            return <ExerciseListItem exerciseCursor={contentItemCursor}
+                                     onClickExercise={this.props.onClickContentItem}
+                                     optionsCursor={this.props.optionsCursor}
+                                     key={key(contentItemCursor)} />;
+        });
 
         var topicList = <section data-type="list">
-                        <ul>
-                        {topics}
+                    <ul>
+                    {topics}
                         {contentItems}
                         </ul>
                 </section>;
@@ -254,7 +248,7 @@ class TopicViewer extends React.Component {
     }
 }
 TopicViewer.propTypes = {
-    topic: React.PropTypes.object.isRequired,
+    topicCursor: React.PropTypes.object.isRequired,
     onClickTopic: React.PropTypes.func.isRequired,
     onClickContentItem: React.PropTypes.func.isRequired,
 };
