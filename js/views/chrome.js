@@ -309,9 +309,10 @@ var MainView = React.createClass({
             showSettings: false
         });
     },
-    onClickTopic: function(newTopicTreeCursor: any) {
+    onClickTopic: function(newTopicTreeCursor: any, parentDomainCursor: any) {
         this.setState({
             topicTreeCursor: newTopicTreeCursor,
+            parentDomainCursor: parentDomainCursor,
             showProfile: false,
             showDownloads: false,
             showSettings: false,
@@ -562,6 +563,7 @@ var MainView = React.createClass({
             return <div/>;
         }
         return <TopicViewer topicCursor={this.state.topicTreeCursor}
+                            parentDomainCursor={this.state.parentDomainCursor}
                             optionsCursor={this.props.optionsCursor}
                             onClickTopic={this.onClickTopic.bind(this)}
                             onClickContentItem={this.onClickContentItem.bind(this)}/>;
