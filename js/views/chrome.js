@@ -20,6 +20,7 @@ var $ = require("jquery"),
     topicViews = require("./topic"),
     searchViews = require("./search"),
     paneViews = require("./pane"),
+    TopicTreeHelper = require("../data/topic-tree-helper"),
     { TopicTreeNode } = require("../data/topic-tree");
 
 var VideoViewer = videoViews.VideoViewer;
@@ -42,14 +43,14 @@ var ProfileViewer = paneViews.ProfileViewer;
 class BackButton extends React.Component {
     render() : any {
         return <div>
-            <a className="icon-back-link " href="javascript:void(0)" onClick={_.partial(this.props.onClickBack, this.props.model)}>
+            <a className="icon-back-link " href="javascript:void(0)" onClick={_.partial(this.props.onClickBack, this.props.topicTreeCursor)}>
                 <span className="icon icon-back">Back</span>
             </a>
         </div>;
     }
 }
 BackButton.propTypes = {
-    model: React.PropTypes.object.isRequired,
+    topicTreeCursor: React.PropTypes.object.isRequired,
     onClickBack: React.PropTypes.func.isRequired
 };
 
@@ -70,6 +71,14 @@ class MenuButton extends React.Component {
     }
 }
 
+// todo
+const isRoot = () => {
+    return false;
+};
+const getParnetDomain = () => {
+    return null;
+}
+
 /**
  * Represents the app header, it contains the back button, the menu button,
  * and a title.
@@ -77,22 +86,22 @@ class MenuButton extends React.Component {
 class AppHeader extends React.Component {
     render(): any {
         var backButton;
-        var model = this.props.model;
-        if (model && (this.props.isPaneShowing ||
-                model.isContent() ||
-                model.isTopic() && !model.isRoot() ||
-                model.isContentList())) {
-            backButton = <BackButton model={this.props.model}
+        var topicListCursor = this.props.topicListCursor;
+        if (topicListCursor && (this.props.isPaneShowing ||
+                isContent(topicListCursor) ||
+                isTopic(topicListCursor) && !isRoot(contentListCursor) ||
+                isContentList(topicListCursor))) {
+            backButton = <BackButton topicListCursor={topicListCursor}
                                      onClickBack={this.props.onClickBack}/>;
         }
 
         var styleObj = {
             fixed: true,
-            "topic-header": model && !model.isRoot() &&
+            "topic-header": topicListCursor && !isRoot(topicListCursor) &&
                 !this.props.isPaneShowing &&
-                (model.isTopic() || model.isContent())
+                (isTopic(topicListCursor) || isContent(topicListCursor))
         };
-        var parentDomain = model && model.getParentDomain();
+        var parentDomain = topicListCursor && getParentDomain(topicListCursor);
         if (parentDomain && !this.props.isPaneShowing) {
             styleObj[parentDomain.getId()] = true;
         }
@@ -105,14 +114,14 @@ class AppHeader extends React.Component {
             title = l10n.get("view-profile");
         } else if (this.props.isSettingsShowing) {
             title = l10n.get("view-settings");
-        } else if (model && model.getTitle()) {
-            title = model.getTitle();
-        } else if (model && model.isContentList()) {
+        } else if (topicListCursor && getTitle(topicListCursor)) {
+            title = getTitle(topicListCursor);
+        } else if (topicListCursor && isContentList(topicListCursor)) {
             title = l10n.get("search");
         }
 
         var menuButton;
-        if (model) {
+        if (topicListCursor) {
             menuButton = <MenuButton/>;
         }
 
@@ -124,7 +133,7 @@ class AppHeader extends React.Component {
     }
 }
 AppHeader.propTypes = {
-    model: React.PropTypes.object,
+    topicListCursor: React.PropTypes.object,
     isPaneShowing: React.PropTypes.bool.isRequired
 };
 
@@ -157,43 +166,43 @@ class Sidebar extends React.Component {
         // Context sensitive actions first
         if (Storage.isEnabled()) {
             if (!this.props.isPaneShowing &&
-                    this.props.model && this.props.model.isContent()) {
-                if (this.props.model.isDownloaded()) {
-                    var text = l10n.get(this.props.model.isVideo() ? "delete-downloaded-video" : "delete-downloaded-article");
+                    this.props.topicListCursor && isContent(this.props.topicListCursor)) {
+                if (isDownloaded(this.props.topicListCursor)) {
+                    var text = l10n.get(isVideo(this.props.topicListCursor) ? "delete-downloaded-video" : "delete-downloaded-article");
                     items.push(<li key="delete-downloaded-video" className="hot-item">
-                            <a href="#" onClick={_.partial(this.props.onClickDeleteDownloadedContent, this.props.model)}>{{text}}</a>
+                            <a href="#" onClick={_.partial(this.props.onClickDeleteDownloadedContent, this.props.topicListCursor)}>{{text}}</a>
                         </li>);
                 } else {
-                    var text = l10n.get(this.props.model.isVideo() ? "download-video" : "download-article");
+                    var text = l10n.get(isVideo(this.props.topicListCursor) ? "download-video" : "download-article");
                     items.push(<li key="download-video" className="hot-item">
-                            <a href="#" className={this.props.model.isVideo() ? "download-video-link" : "download-article-link"} onClick={_.partial(this.props.onClickDownloadContent, this.props.model)}>{{text}}</a>
+                            <a href="#" className={isVideo(this.props.topicListCursor) ? "download-video-link" : "download-article-link"} onClick={_.partial(this.props.onClickDownloadContent, this.props.topicListCursor)}>{{text}}</a>
                         </li>);
                 }
             }
         }
 
         if (!this.props.isPaneShowing &&
-                this.props.model &&
-                this.props.model.isContent() &&
-                this.props.model.getKAUrl()) {
+                this.props.topicListCursor &&
+                isContent(this.props.topicListCursor) &&
+                getKAUrl(this.props.topicListCursor)) {
             var viewOnKAMessage = l10n.get("open-in-website");
-            items.push(<li key="open-in-website"><a href="#" className="open-in-website-link" onClick={_.partial(this.props.onClickViewOnKA, this.props.model)}>{{viewOnKAMessage}}</a></li>);
+            items.push(<li key="open-in-website"><a href="#" className="open-in-website-link" onClick={_.partial(this.props.onClickViewOnKA, this.props.topicListCursor)}>{{viewOnKAMessage}}</a></li>);
 
             if (window.MozActivity) {
                 var shareMessage = l10n.get("share");
-                items.push(<li key="share-link"><a href="#" className="share-link" onClick={_.partial(this.props.onClickShare, this.props.model)}>{{shareMessage}}</a></li>);
+                items.push(<li key="share-link"><a href="#" className="share-link" onClick={_.partial(this.props.onClickShare, this.props.topicListCursor)}>{{shareMessage}}</a></li>);
             }
         }
 
         if (Storage.isEnabled()) {
             if (Downloads.canCancelDownload()) {
                 items.push(<li key="cancel-downloading" className="hot-item">
-                        <a href="#" data-l10n-id="cancel-downloading" onClick={_.partial(this.props.onClickCancelDownloadContent, this.props.model)}>Cancel Downloading</a>
+                        <a href="#" data-l10n-id="cancel-downloading" onClick={_.partial(this.props.onClickCancelDownloadContent, this.props.topicListCursor)}>Cancel Downloading</a>
                     </li>);
             } else if (!this.props.isPaneShowing &&
-                        this.props.model && this.props.model.isTopic()) {
+                        this.props.topicListCursor && isTopic(this.props.topicListCursor)) {
                 items.push(<li key="download-topic" className="hot-item">
-                        <a href="#" data-l10n-id="download-topic" onClick={_.partial(this.props.onClickDownloadContent, this.props.model)}>Download Topic</a>
+                        <a href="#" data-l10n-id="download-topic" onClick={_.partial(this.props.onClickDownloadContent, this.props.topicListCursor)}>Download Topic</a>
                     </li>);
             }
         }
@@ -241,7 +250,7 @@ class Sidebar extends React.Component {
     }
 }
 Sidebar.propTypes = {
-    model: React.PropTypes.object.isRequired,
+    topicListCursor: React.PropTypes.object.isRequired,
     isPaneShowing: React.PropTypes.bool.isRequired,
     isSettingsShowing: React.PropTypes.bool.isRequired,
     isProfileShowing: React.PropTypes.bool.isRequired,
@@ -259,6 +268,12 @@ Sidebar.propTypes = {
     onClickSignout: React.PropTypes.func.isRequired
 };
 
+
+// TODO
+const isContentList = () => {
+    return false;
+};
+
 /**
  * This is the main app container itself.
  * It implements most of the view based functionality for the rest of the views
@@ -269,7 +284,7 @@ Sidebar.propTypes = {
 var MainView = React.createClass({
     propTypes: {
         // Optional because it's not specified until the topic tree is loaded
-        model: React.PropTypes.object,
+        topicListCursor: React.PropTypes.object,
         cursorOptions: React.PropTypes.object.isRequired,
     },
     mixins: [Util.LocalizationMixin],
@@ -288,22 +303,22 @@ var MainView = React.createClass({
             wasLastDownloads: false,
         };
     },
-    onClickContentItemFromDownloads: function(model: any) {
-        // We need to keep track of the currentModel here because
-        // we're changing the currentModel, so going back from the
+    onClickContentItemFromDownloads: function(topicTreeCursor: any) {
+        // We need to keep track of the lastTopicTreeCursor here because
+        // we're changing the topicTreeCursor, so going back from the
         // downloads pane would be impossible otherwise.
         this.setState({
-            currentModel: model,
+            topicTreeCursor,
             showProfile: false,
             showDownloads: false,
             showSettings: false,
             wasLastDownloads: true,
-            lastModel: this.state.currentModel
+            lastTopicTreeCursor: this.state.topicTreeCursor
         });
     },
-    onClickContentItem: function(model: any) {
+    onClickContentItem: function(topicTreeCursor: any) {
         this.setState({
-            currentModel: model,
+            topicTreeCursor,
             showProfile: false,
             showDownloads: false,
             showSettings: false
@@ -324,7 +339,7 @@ var MainView = React.createClass({
      * TODO: This works fine as is, but the logic can be simplified and
      * be less ugly by simply using a stack of current pane views.
      */
-    onClickBack: function(model: any) {
+    onClickBack: function(topicListCursor: any) {
         // If we were on a content item from downloads,
         // then go back to downloads.
         if (this.state.wasLastDownloads) {
@@ -334,12 +349,12 @@ var MainView = React.createClass({
 
         // If we have a last model set, then we're effectively
         // presisng back from the downloads screen itself.
-        // The lastModel is needed because the downloads pane is the
-        // only pane where clicking on it can change the currentModel.
-        if (this.state.lastModel) {
+        // The lastTopicTreeCursor is needed because the downloads pane is the
+        // only pane where clicking on it can change the topicTreeCursor.
+        if (this.state.lastTopicTreeCursor) {
             this.setState({
-                currentModel: this.state.lastModel,
-                lastModel: undefined,
+                topicTreeCursor: this.state.lastTopicTreeCursor,
+                lastTopicTreeCursor: undefined,
                 showDownloads: false,
                 showProfile: false,
                 showSettings: false,
@@ -349,7 +364,7 @@ var MainView = React.createClass({
 
         /**
          * If settings or profile or ... is set, then don't show it anymore.
-         * This effectively makes the currentModel be in use again.
+         * This effectively makes the topicTreeCursor be in use again.
          */
         if (this.isPaneShowing()) {
             this.setState({
@@ -358,18 +373,18 @@ var MainView = React.createClass({
                 showSettings: false,
                 wasLastDownloads: false
             });
-            if (this.state.currentModel.isContentList()) {
+            if (isContentList(this.state.topicTreeCursor)) {
                 this.onTopicSearch("");
             }
             return;
         }
 
-        if (this.state.currentModel.isContentList()) {
+        if (isContentList(this.state.topicTreeCursor)) {
             return this.onTopicSearch("");
         }
 
         this.setState({
-            currentModel: model.getParent(),
+            topicTreeCursor: getParent(topicListCursor),
             showProfile: false,
             showDownloads: false,
             showSettings: false,
@@ -400,7 +415,7 @@ var MainView = React.createClass({
             wasLastDownloads: false
         });
     },
-    onClickSettings: function(model: any) {
+    onClickSettings: function() {
         this.setState({
             showDownloads: false,
             showProfile: false,
@@ -422,26 +437,26 @@ var MainView = React.createClass({
         }
 
     },
-    onClickSupport: function(model: any) {
+    onClickSupport: function() {
         var url = "https://khanacademy.zendesk.com/hc/communities/public/topics/200155074-Mobile-Discussions";
         this._openUrl(url);
     },
-    onClickViewOnKA: function(model: any) {
-        this._openUrl(model.getKAUrl());
+    onClickViewOnKA: function(topicListCursor: any) {
+        this._openUrl(getKAUrl(topicListCursor));
     },
-    onClickShare: function(model: any) {
+    onClickShare: function(topicListCursor: any) {
         new window.MozActivity({
             name: "share",
             data: {
                 type: "url",
-                url: model.getKAUrl()
+                url: getKAUrl(topicListCursor)
             }
         });
     },
-    onClickDownloadContent: function(model: any) {
+    onClickDownloadContent: function(topicListCursor: any) {
         var totalCount = 1;
-        if (model.isTopic()) {
-            totalCount = model.getChildNotDownloadedCount();
+        if (isTopic(topicListCursor)) {
+            totalCount = getChildNotDownloadedCount(topicListCursor);
         }
 
         // Check for errors
@@ -465,7 +480,7 @@ var MainView = React.createClass({
         var totalCountStr = Util.numberWithCommas(totalCount);
 
         // Prompt to download remaining
-        if (model.isTopic()) {
+        if (isTopic(topicListCursor)) {
             if (!confirm(l10n.get("download-remaining", {
                         totalCount: totalCount,
                         totalCountStr: totalCountStr
@@ -491,11 +506,11 @@ var MainView = React.createClass({
         Status.start();
         var message;
         var title;
-        Downloads.download(model, onProgress).then((model, count) => {
+        Downloads.download(topicTreeCursor, onProgress).then((topicTreeCursor, count) => {
             var title = l10n.get("download-complete");
-            var contentTitle = model.getTitle();
-            if (model.isContent()) {
-                if (model.isVideo()) {
+            var contentTitle = TopicTreeHelper.getTitle(topicTreeCursor);
+            if (TopicTreeHelper.isContent(topicTreeCursor)) {
+                if (TopicTreeHelper.isVideo(topicTreeCursor)) {
                     message = l10n.get("video-complete-body", {
                         title: contentTitle
                     });
@@ -527,7 +542,7 @@ var MainView = React.createClass({
             Notifications.info(title, message, () => {});
         });
     },
-    onClickCancelDownloadContent: function(model: any) {
+    onClickCancelDownloadContent: function() {
         if (!confirm(l10n.get("cancel-download-warning"))) {
             return;
         }
@@ -543,41 +558,26 @@ var MainView = React.createClass({
     },
     onTopicSearch: function(topicSearch: string) {
         if (!topicSearch) {
-            this.setState({currentModel: this.state.searchingModel, searchingModel: null});
+            this.setState({topicTreeCursor: this.state.searchingTopicTreeCursor, searchingTopicTreeCursor: null});
             return;
         }
-        var searchingModel = this.state.searchingModel;
-        if (!searchingModel) {
-            searchingModel = this.state.currentModel;
+        var searchingTopicTreeCursor = this.state.searchingTopicTreeCursor;
+        if (!searchingTopicTreeCursor) {
+            searchingTopicTreeCursor = this.state.topicTreeCursor;
         }
-        var results = searchingModel.findContentItems(topicSearch);
+        var results = searchingtopicTreeCursor.findContentItems(topicSearch);
         var contentList = new models.ContentList(results);
-        this.setState({currentModel: contentList, searchingModel: searchingModel});
-    },
-    getCurrentModel: function(): any {
-        return this.state.topicTreeCursor;
+        this.setState({topicTreeCursor: contentList, searchingTopicTreeCursor: searchingTopicTreeCursor});
     },
     render: function(): any {
-
-        if (!this.state.topicTreeCursor) {
-            return <div/>;
-        }
-        return <TopicViewer topicCursor={this.state.topicTreeCursor}
-                            parentDomainCursor={this.state.parentDomainCursor}
-                            optionsCursor={this.props.optionsCursor}
-                            onClickTopic={this.onClickTopic.bind(this)}
-                            onClickContentItem={this.onClickContentItem.bind(this)}/>;
-
-        var currentModel = TopicTreeNode(this.getCurrentModel());
-
         // Make sure scrollTop is at the top of the page
         // This is in case the search box scrolling doesn't get an onblur
-        if (currentModel && !currentModel.isContentList()) {
+        if (this.state.topicTreeCursor && !isContentList(this.state.topicTreeCursor)) {
             $("html, body").scrollTop(0);
         }
 
         var control;
-        if (!currentModel) {
+        if (!this.state.topicTreeCursor) {
             // Still loading topic tree
             control = <div className="app-loading"/>;
         } else if (this.state.showProfile) {
@@ -587,57 +587,58 @@ var MainView = React.createClass({
                                        optionsCursor={this.props.optionsCursor}/>;
         } else if (this.state.showSettings) {
             control = <SettingsViewer optionsCursor={this.props.optionsCursor}/>;
-        } else if (currentModel.isTopic()) {
-            control = <TopicViewer topic={currentModel}
+        } else if (TopicTreeHelper.isTopic(this.state.topicTreeCursor)) {
+            control = <TopicViewer topicCursor={this.state.topicTreeCursor}
                                    onClickTopic={this.onClickTopic.bind(this)}
                                    optionsCursor={this.props.optionsCursor}
                                    onClickContentItem={this.onClickContentItem.bind(this)}/>;
-        } else if (currentModel.isContentList()) {
-            control = <SearchResultsViewer collection={currentModel}
+        } else if (isContentList(this.state.topicTreeCursor)) {
+            control = <SearchResultsViewer collection={this.state.topicTreeCursor}
                                            onClickContentItem={this.onClickContentItem.bind(this)}
                                            optionsCursor={this.props.optionsCursor}/>;
-        } else if (currentModel.isVideo()) {
-            control = <VideoViewer video={this.getCurrentModel()}
+        } else if (TopicTreeHelper.isVideo(this.state.topicTreeCursor)) {
+            control = <VideoViewer video={this.state.topicTreeCursor}
                                    optionsCursor={this.props.optionsCursor}/>;
-        } else if (currentModel.isArticle()) {
-            control = <ArticleViewer  article={currentModel}/>;
-        } else if (currentModel.isExercise()) {
-            control = <ExerciseViewer  exercise={currentModel}/>;
+        } else if (TopicTreeHelper.isArticle(this.state.topicTreeCursor)) {
+            control = <ArticleViewer  article={this.state.topicTreeCursor}/>;
+        } else if (TopicTreeHelper.isExercise(this.state.topicTreeCursor)) {
+            control = <ExerciseViewer  exercise={this.state.topicTreeCursor}/>;
         } else {
             Util.error("Unrecognized content item!");
         }
 
         var topicSearch;
-        if (!this.isPaneShowing() && currentModel && !currentModel.isContent()) {
-            topicSearch = <TopicSearch model={currentModel}
+        if (!this.isPaneShowing() && this.state.topicTreeCursor &&
+                !TopicTreeHelper.isContent(this.state.topicTreeCursor)) {
+            topicSearch = <TopicSearch topicTreeCursor={this.state.topicTreeCursor}
                                        optionsCursor={this.props.optionsCursor}
                                        onTopicSearch={this.onTopicSearch.bind(this)}/>;
         }
 
         var sidebar;
-        if (currentModel) {
-            sidebar = <Sidebar model={currentModel}
-                           onClickSignin={this.onClickSignin.bind(this)}
-                           onClickSignout={this.onClickSignout.bind(this)}
-                           onClickProfile={this.onClickProfile.bind(this)}
-                           onClickDownloads={this.onClickDownloads.bind(this)}
-                           onClickSettings={this.onClickSettings.bind(this)}
-                           onClickSupport={this.onClickSupport.bind(this)}
-                           onClickDownloadContent={this.onClickDownloadContent.bind(this)}
-                           onClickViewOnKA={this.onClickViewOnKA.bind(this)}
-                           onClickShare={this.onClickShare.bind(this)}
-                           onClickCancelDownloadContent={this.onClickCancelDownloadContent.bind(this)}
-                           onClickDeleteDownloadedContent={this.onClickDeleteDownloadedContent.bind(this)}
-                           isPaneShowing={this.isPaneShowing()}
-                           isDownloadsShowing={this.state.showDownloads}
-                           isProfileShowing={this.state.showProfile}
-                           isSettingsShowing={this.state.showSettings} />;
+        if (this.state.topicTreeCursor) {
+            sidebar = <Sidebar topicTreeCursor={this.state.topicTreeCursor}
+                               onClickSignin={this.onClickSignin.bind(this)}
+                               onClickSignout={this.onClickSignout.bind(this)}
+                               onClickProfile={this.onClickProfile.bind(this)}
+                               onClickDownloads={this.onClickDownloads.bind(this)}
+                               onClickSettings={this.onClickSettings.bind(this)}
+                               onClickSupport={this.onClickSupport.bind(this)}
+                               onClickDownloadContent={this.onClickDownloadContent.bind(this)}
+                               onClickViewOnKA={this.onClickViewOnKA.bind(this)}
+                               onClickShare={this.onClickShare.bind(this)}
+                               onClickCancelDownloadContent={this.onClickCancelDownloadContent.bind(this)}
+                               onClickDeleteDownloadedContent={this.onClickDeleteDownloadedContent.bind(this)}
+                               isPaneShowing={this.isPaneShowing()}
+                               isDownloadsShowing={this.state.showDownloads}
+                               isProfileShowing={this.state.showProfile}
+                               isSettingsShowing={this.state.showSettings} />;
         }
 
         return <section className="current" id="index" data-position="current">
             {sidebar}
             <section id="main-content" role="region" className="skin-dark">
-                <AppHeader model={currentModel}
+                <AppHeader topicTreeCursor={this.state.topicTreeCursor}
                            onClickBack={this.onClickBack.bind(this)}
                            onTopicSearch={this.onTopicSearch.bind(this)}
                            isPaneShowing={this.isPaneShowing()}

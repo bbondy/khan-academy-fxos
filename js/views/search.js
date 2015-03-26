@@ -5,6 +5,7 @@
 var $ = require("jquery"),
     React = require("react"),
     l10n = require("../l10n"),
+    TopicTreeHelper = require("../data/topic-tree-helper"),
     topicViews = require("./topic");
 
 var ContentListViewer = topicViews.ContentListViewer;
@@ -41,9 +42,9 @@ class TopicSearch extends React.Component {
 
     render(): any {
         var text = l10n.get("search");
-        if (this.props.model.getTitle()) {
+        if (TopicTreeHelper.getTitle(this.props.topicTreeCursor)) {
             text = l10n.get("search-topic", {
-                topic: this.props.model.getTitle()
+                topic: TopicTreeHelper.getTitle(this.props.topicTreeCursor)
             });
         }
         return <div>
@@ -62,7 +63,7 @@ class TopicSearch extends React.Component {
     }
 }
 TopicSearch.propTypes = {
-    model: React.PropTypes.object.isRequired,
+    topicTreeCursor: React.PropTypes.object.isRequired,
     onTopicSearch: React.PropTypes.func.isRequired
 };
 

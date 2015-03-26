@@ -30,17 +30,27 @@ const getKind = (topicTreeCursor) => {
     return Minify.getLongValue("kind", topicTreeCursor.get(Minify.getShortName("kind")));
 }
 
-const isVideo = (topicTreeCursor) => {
-    return getKind(topicTreeCursor) === "Video";
+const genIsKindFn = (kind) => {
+    return (topicTreeCursor) => {
+        return getKind(topicTreeCursor) === kind;
+    }
 };
 
-const isArticle = (topicTreeCursor) => {
-    return getKind(topicTreeCursor) === "Article";
-};
+const isTopic = genIsKindFn("Topic");
+const isVideo = genIsKindFn("Video");
+const isArticle = genIsKindFn("Article");
+const isExercise = genIsKindFn("Exercise");
 
-const isExercise = (topicTreeCursor) => {
-    return getKind(topicTreeCursor) === "Exercise";
+const genCheckAnyFn = () => {
+    var validators = _.toArray(arguments);
+    return function(topicTreeCursor) {
+        return _.any(validators, (validator) => {
+            return validator(topicTreeCursor);
+        });
+    }
 }
+
+const isContent = genCheckAnyFn(isVideo,isArticle, isExercise);
 
 const getId = (topicTreeCursor) => {
     if (isExercise(topicTreeCursor)) {
@@ -81,6 +91,8 @@ module.exports = {
     getDownloadCount,
     mapChildTopicCursors,
     mapChildContentCursors,
+    isContent,
+    isTopic,
     isArticle,
     isVideo,
     isExercise,
