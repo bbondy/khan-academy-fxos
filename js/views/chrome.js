@@ -597,12 +597,12 @@ var MainView = React.createClass({
                                            onClickContentItem={this.onClickContentItem.bind(this)}
                                            optionsCursor={this.props.optionsCursor}/>;
         } else if (TopicTreeHelper.isVideo(this.state.topicTreeCursor)) {
-            control = <VideoViewer video={this.state.topicTreeCursor}
+            control = <VideoViewer topicTreeCursor={this.state.topicTreeCursor}
                                    optionsCursor={this.props.optionsCursor}/>;
         } else if (TopicTreeHelper.isArticle(this.state.topicTreeCursor)) {
-            control = <ArticleViewer  article={this.state.topicTreeCursor}/>;
+            control = <ArticleViewer  topicTreeCursor={this.state.topicTreeCursor}/>;
         } else if (TopicTreeHelper.isExercise(this.state.topicTreeCursor)) {
-            control = <ExerciseViewer  exercise={this.state.topicTreeCursor}/>;
+            control = <ExerciseViewer  topicTreeCursor={this.state.topicTreeCursor}/>;
         } else {
             Util.error("Unrecognized content item!");
         }

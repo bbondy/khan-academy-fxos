@@ -54,10 +54,15 @@ Storage.init().then(function() {
     // We don't want to have to wait for results, so just start this and don't wait
     models.CurrentUser.init();
 
+
+
     readTopicTree().then((immutableTopicTree) => {
-        var topicTreeCursor = Cursor.from(immutableTopicTree);
-        mainView.setProps({topicTreeRootCursor: topicTreeCursor});
-        mainView.setState({topicTreeCursor: topicTreeCursor});
+        var updateTopicTreeCursor = (newTopicTreeRoot) => {
+            var topicTreeCursor = Cursor.from(immutableTopicTree, updateTopicTreeCursor);
+            mainView.setProps({topicTreeRootCursor: topicTreeCursor});
+            mainView.setState({topicTreeCursor: topicTreeCursor});
+        };
+        updateTopicTreeCursor(immutableTopicTree);
     });
 
     // Start showing the topic tree

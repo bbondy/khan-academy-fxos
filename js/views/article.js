@@ -6,6 +6,7 @@ var React = require("react"),
     Util = require("../util"),
     models = require("../models"),
     APIClient = require("../apiclient"),
+    TopicTreeHelper = require("../data/topic-tree-helper"),
     Storage = require("../storage");
 
 /**
@@ -14,7 +15,7 @@ var React = require("react"),
  */
 var ArticleViewer = React.createClass({
     propTypes: {
-        article: React.PropTypes.object.isRequired
+        topicTreeCursor: React.PropTypes.object.isRequired
     },
     //mixins: [Util.BackboneMixin],
     //getBackboneModels: function(): Array<any> {
@@ -24,15 +25,15 @@ var ArticleViewer = React.createClass({
         return {};
     },
     componentWillMount: function() {
-        if (this.props.article.isDownloaded()) {
-            this.p1 = Storage.readText(this.props.article.getId()).then((result) => {
+        if (TopicTreeHelper.isDownloaded(this.props.topicTreeCursor)) {
+            this.p1 = Storage.readText(TopicTreeHelper.getId(this.props.topicTreeCursor)).then((result) => {
                 Util.log("rendered article from storage");
-                this.props.article.set("content", result);
+                this.props.topicTreeCursor.set("content", result);
             });
         } else {
-            this.p1 = APIClient.getArticle(this.props.article.getId()).then((result) => {
+            this.p1 = APIClient.getArticle(TopicTreeHelper.getId(this.props.topicTreeCursor)).then((result) => {
                 Util.log("rendered article from web");
-                this.props.article.set("content", result.translated_html_content);
+                this.props.topicTreeCursor.set("content", result.translated_html_content);
             }).catch(() => {
                 if (!this.isMounted()) {
                     return;
@@ -46,19 +47,19 @@ var ArticleViewer = React.createClass({
     },
     onReportComplete: function() {
         if (models.CurrentUser.isSignedIn()) {
-            models.CurrentUser.reportArticleRead(this.props.article);
+            models.CurrentUser.reportArticleRead(this.props.topicTreeCursor);
         }
     },
     componentWillUnmount: function() {
         clearTimeout(this.timerId);
     },
     render: function(): any {
-        Util.log("render article: :%o", this.props.article);
+        Util.log("render article: :%o", this.props.topicTreeCursor);
         if (this.state.articleDownloadError) {
             return <img className="video-placeholder" src="img/offline.png"/>;
-        } else if (this.props.article.get("content")) {
+        } else if (this.props.topicTreeCursor.get("content")) {
             return <article dangerouslySetInnerHTML={{
-                __html: this.props.article.get("content")
+                __html: this.props.topicTreeCursor.get("content")
             }}/>;
 
         }

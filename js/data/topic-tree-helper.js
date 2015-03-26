@@ -84,6 +84,54 @@ const isCompleted = (topicTreeCursor) => {
     return topicTreeCursor.get("completed");
 };
 
+const getYoutubeId = (topicTreeCursor) => {
+    return topicTreeCursor.get(Minify.getShortName("youtube_id"));
+};
+
+const getDuration = (topicTreeCursor) => {
+    return topicTreeCursor.get(Minify.getShortName("duration"));
+};
+
+const getPoints = (topicTreeCursor) => {
+    return topicTreeCursor.get("points") || 0;
+};
+
+const getContentMimeType = (topicTreeCursor) => {
+     return isVideo(topicTreeCursor) ? "video/mp4" : "text/html";
+};
+
+const getDownloadUrl = (topicTreeCursor) => {
+    var value = topicTreeCursor.get(Minify.getShortName("download_urls"));
+    if (!value) {
+        return null;
+    }
+    if (value.substring(0, 4) !== "http") {
+        value = "http://fastly.kastatic.org/KA-youtube-converted/" + value + ".mp4";
+    }
+    return value;
+};
+
+const getName = (topicTreeCursor)  => {
+    return topicTreeCursor.get(Minify.getShortName("name"));
+};
+
+const isPerseusExercise = (topicTreeCursor) => {
+    return !topicTreeCursor.get(Minify.getShortName("file_name"));
+};
+
+const isKhanExercisesExercise = (topicTreeCursor) => {
+    return !!topicTreeCursor.get(Minify.getShortName("file_name"));
+};
+
+const getFilename = (topicTreeCursor) => {
+    return topicTreeCursor.get(Minify.getShortName("file_name"));
+};
+
+// TODO: remove all dependencies on this and remove this
+const getParentDomain = (topicTreeCursor) => {
+    return null;
+};
+
 module.exports = {
     getId,
     getTitle,
@@ -99,5 +147,14 @@ module.exports = {
     isStarted,
     isCompleted,
     isDownloaded,
+    getYoutubeId,
+    getDuration,
+    getPoints,
+    getContentMimeType,
+    getDownloadUrl,
+    getName,
+    isPerseusExercise,
+    isKhanExercisesExercise,
+    getFilename,
+    getParentDomain,
 };
-

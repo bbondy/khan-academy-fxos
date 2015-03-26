@@ -15,6 +15,7 @@ var React = require("react"),
     Util = require("../util"),
     APIClient = require("../apiclient"),
     l10n = require("../l10n"),
+    TopicTreeHelper = require("../data/topic-tree-helper"),
     _ = require("underscore"),
     $ = require("jquery");
 
@@ -33,12 +34,8 @@ class TaskCompleteView extends React.Component {
  */
 var ExerciseViewer = React.createClass({
     propTypes: {
-        exercise: React.PropTypes.object.isRequired
+        topicTreeCursor: React.PropTypes.object.isRequired
     },
-    //mixins: [Util.BackboneMixin],
-    //getBackboneModels: function(): Array<any> {
-    //    return [this.props.exercise];
-    //},
     getInitialState: function() {
         return {
             hintsUsed: 0,
@@ -46,8 +43,8 @@ var ExerciseViewer = React.createClass({
     },
     refreshUserExerciseInfo: function() {
         return new Promise((resolve, reject) => {
-            $.when(APIClient.getTaskInfoByExerciseName(this.props.exercise.getName()),
-                    APIClient.getUserExercise(this.props.exercise.getName()))
+            $.when(APIClient.getTaskInfoByExerciseName(TopicTreeHelper.getName(this.props.topicTreeCursor)),
+                    APIClient.getUserExercise(TopicTreeHelper.getName(this.props.topicTreeCursor)))
             .then((taskInfo, exerciseInfo) => {
                 Util.log("getTaskInfoByExerciseName: %o", taskInfo);
                 Util.log("getUserExercise: %o", exerciseInfo);
@@ -111,7 +108,7 @@ var ExerciseViewer = React.createClass({
         var attemptNumber = 1; // TODO
         var isCorrect = score.correct;
         var secondsTaken = 10; //TODO
-        APIClient.reportExerciseProgress(this.props.exercise.getName(), this.state.problemNumber,
+        APIClient.reportExerciseProgress(TopicTreeHelper.getName(this.props.topicTreeCursor), this.state.problemNumber,
             this.randomAssessmentSHA1, this.randomAssessmentId,
             secondsTaken, this.state.hintsUsed, isCorrect,
             attemptNumber, this.problemTypeName, this.state.taskId).then(() => {
@@ -132,8 +129,8 @@ var ExerciseViewer = React.createClass({
             });
     },
     componentWillMount: function() {
-        if (this.props.exercise.isPerseusExercise()) {
-            APIClient.getExerciseByName(this.props.exercise.getName()).then((result) => {
+        if (TopicTreeHelper.isPerseusExercise(this.props.topicTreeCursor)) {
+            APIClient.getExerciseByName(TopicTreeHelper.getName(this.props.topicTreeCursor)).then((result) => {
                 this.exercise = result;
                 Util.log("got exercise: %o", result);
                 this.refreshRandomAssessment();
@@ -168,8 +165,8 @@ var ExerciseViewer = React.createClass({
         var content;
         if (this.state.error) {
             content = <div>Could not load exercise</div>;
-        } else if (this.props.exercise.isKhanExercisesExercise()) {
-            var path = `/khan-exercises/exercises/${this.props.exercise.getFilename()}`;
+        } else if (TopicTreeHelper.isKhanExercisesExercise(this.props.topicTreeCursor)) {
+            var path = `/khan-exercises/exercises/${TopicTreeHelper.getFilename(this.props.toipcTreeCursor)}`;
             content = <iframe src={path}/>;
         } else if (this.state.taskComplete) {
             return <TaskCompleteView/>;
@@ -238,7 +235,7 @@ var ExerciseViewer = React.createClass({
                       </div>;
         }
 
-        Util.log("render exercise: :%o", this.props.exercise);
+        Util.log("render exercise: :%o", this.props.topicTreeCursor);
         return <div className="exercise">
             {content}
         </div>;

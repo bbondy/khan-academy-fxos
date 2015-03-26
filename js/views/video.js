@@ -10,6 +10,7 @@ var $ = require("jquery"),
     Util = require("../util"),
     models = require("../models"),
     APIClient = require("../apiclient"),
+    TopicTreeHelper = require("../data/topic-tree-helper"),
     Storage = require("../storage");
 
 /**
@@ -82,7 +83,7 @@ var VideoViewerRawObj: {
     componentWillMount: function() {
         Util.log("VideoViewer will mount");
         if (this.props.optionsCursor.get("showTranscripts")) {
-            APIClient.getVideoTranscript(getYoutubeId(this.props.topicTreeCursor)).then((transcript) => {
+            APIClient.getVideoTranscript(TopicTreeHelper.getYoutubeId(this.props.topicTreeCursor)).then((transcript) => {
                 if (transcript && transcript.length === 0) {
                     return;
                 }
@@ -92,26 +93,26 @@ var VideoViewerRawObj: {
             });
         }
 
-        if (isDownloaded(this.props.topicTreeCursor)) {
-            Storage.readAsBlob(getId(this.props.topicTreeCursor)).then((result) => {
+        if (TopicTreeHelper.isDownloaded(this.props.topicTreeCursor)) {
+            Storage.readAsBlob(TopicTreeHelper.getId(this.props.topicTreeCursor)).then((result) => {
                 var download_url = window.URL.createObjectURL(result);
                 this.setState({downloadedUrl: download_url, showOfflineImage: false});
             });
         }
 
         Util.log("video: %o", this.props.topicTreeCursor);
-        this.videoId = getId(this.props.topicTreeCursor);
+        this.videoId = TopicTreeHelper.getId(this.props.topicTreeCursor);
         this.initSecondWatched = 0;
         this.lastSecondWatched = 0;
         if (this.props.topicTreeCursor.get("lastSecondWatched") &&
-                this.props.topicTreeCursor.get("lastSecondWatched") + 10 < this.props.topicTreeCursor.getDuration()) {
+                this.props.topicTreeCursor.get("lastSecondWatched") + 10 < TopicTreeHelper.getDuration(this.props.topicTreeCursor)) {
             this.initSecondWatched = this.props.topicTreeCursor.get("lastSecondWatched");
         }
         this.secondsWatched = 0;
         this.lastReportedTime = new Date();
         this.lastWatchedTimeSinceLastUpdate = new Date();
-        this.pointsPerReport = this.availablePoints * this.MIN_SECONDS_BETWEEN_REPORTS / getDuration(this.props.topicTreeCursor);
-        this.pointsObj = {num: getPoints(this.props.topicTreeCursor)};
+        this.pointsPerReport = this.availablePoints * this.MIN_SECONDS_BETWEEN_REPORTS / TopicTreeHelper.getDuration(this.props.topicTreeCursor);
+        this.pointsObj = {num: TopicTreeHelper.getPoints(this.props.topicTreeCursor)};
     },
     componentWillUnmount: function() {
         if (this.state.downloadedUrl) {
@@ -291,7 +292,7 @@ var VideoViewerRawObj: {
 
     componentDidMount: function() {
         var videoMountNode = this.refs.videoPlaceholder.getDOMNode();
-        this.videoNode = $("<video width='640' height='264' type='" + getContentMimeType(this.props.topicTreeCursor) + "'" +
+        this.videoNode = $("<video width='640' height='264' type='" + TopicTreeHelper.getContentMimeType(this.props.topicTreeCursor) + "'" +
             " id='video-player' class='" + this.videoClass + "' preload='auto' src='" + this.videoSrc + "' controls>" +
             "</video>");
         $(videoMountNode).append(this.videoNode);
@@ -374,14 +375,14 @@ var VideoViewerRawObj: {
         if (secondsSinceLastReport >= this.MIN_SECONDS_BETWEEN_REPORTS || this.lastSecondWatched >= (duration | 0)) {
             this.lastReportedTime = new Date();
             models.CurrentUser.reportVideoProgress(this.props.topicTreeCursor,
-                    getYoutubeId(this.props.topicTreeCursor),
+                    TopicTreeHelper.getYoutubeId(this.props.topicTreeCursor),
                     this.secondsWatched,
                     this.lastSecondWatched).then(() => {
                         // We could just add a backbone model to watch for video model
                         // changes and it would work automatically, but to get animated points
                         // growing, we need to do it manually.
                         // Re-animate the points
-                        this.pointsObj.num = getPoints(this.props.topicTreeCursor);
+                        this.pointsObj.num = TopicTreeHelper.getPoints(this.props.topicTreeCursor);
                         this.animatePoints();
                     });
             this.secondsWatched = 0;
@@ -403,13 +404,13 @@ var VideoViewerRawObj: {
                                                  onClickTranscript={this.onClickTranscript.bind(this)} />;
         }
 
-        this.videoSrc = getDownloadUrl(this.props.topicTreeCursor);
+        this.videoSrc = TopicTreeHelper.getDownloadUrl(this.props.topicTreeCursor);
         if (this.state.downloadedUrl) {
             this.videoSrc = this.state.downloadedUrl;
         }
         Util.log("video rendered with url: " + this.videoSrc);
         var pointsString = l10n.get("points-so-far", {
-            earned: getPoints(this.props.topicTreeCursor),
+            earned: TopicTreeHelper.getPoints(this.props.topicTreeCursor),
             available: this.availablePoints
         });
 
@@ -424,7 +425,7 @@ var VideoViewerRawObj: {
           "vjs-default-skin": true,
           "signed-in": models.CurrentUser.isSignedIn()
         };
-        var parentDomain = this.props.topicTreeCursor && getParentDomain(this.props.topicTreeCursor);
+        var parentDomain = this.props.topicTreeCursor && TopicTreeHelper.getParentDomain(this.props.topicTreeCursor);
         if (parentDomain) {
             videoClassObj[parentDomain.getId()] = true;
         }
