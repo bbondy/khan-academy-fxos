@@ -10,6 +10,7 @@ var React = require("react"),
     Downloads = require("./downloads"),
     Storage = require("./storage"),
     chromeViews = require("./views/chrome"),
+    {Stack} = require("immutable"),
     {readOptions, resetOptions, writeOptions} = require("./data/app-options"),
     {readTopicTree} = require("./data/topic-tree"),
     Cursor = require('immutable/contrib/cursor');
@@ -54,13 +55,17 @@ Storage.init().then(function() {
     // We don't want to have to wait for results, so just start this and don't wait
     models.CurrentUser.init();
 
-
-
     readTopicTree().then((immutableTopicTree) => {
         var updateTopicTreeCursor = (newTopicTreeRoot) => {
             var topicTreeCursor = Cursor.from(immutableTopicTree, updateTopicTreeCursor);
-            mainView.setProps({topicTreeRootCursor: topicTreeCursor});
-            mainView.setState({topicTreeCursor: topicTreeCursor});
+            mainView.setProps({
+                topicTreeRootCursor: topicTreeCursor,
+                rootTopicTreeCursor: topicTreeCursor,
+            });
+            mainView.setState({
+                topicTreeCursor: topicTreeCursor,
+                navigationStack: Stack.of(topicTreeCursor),
+            });
         };
         updateTopicTreeCursor(immutableTopicTree);
     });

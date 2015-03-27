@@ -21,6 +21,7 @@ var $ = require("jquery"),
     searchViews = require("./search"),
     paneViews = require("./pane"),
     TopicTreeHelper = require("../data/topic-tree-helper"),
+    Immutable = require("immutable"),
     { TopicTreeNode } = require("../data/topic-tree");
 
 var VideoViewer = videoViews.VideoViewer;
@@ -71,14 +72,6 @@ class MenuButton extends React.Component {
     }
 }
 
-// todo
-const isRoot = () => {
-    return false;
-};
-const getParnetDomain = () => {
-    return null;
-}
-
 /**
  * Represents the app header, it contains the back button, the menu button,
  * and a title.
@@ -86,24 +79,26 @@ const getParnetDomain = () => {
 class AppHeader extends React.Component {
     render(): any {
         var backButton;
-        var topicListCursor = this.props.topicListCursor;
-        if (topicListCursor && (this.props.isPaneShowing ||
-                isContent(topicListCursor) ||
-                isTopic(topicListCursor) && !isRoot(contentListCursor) ||
-                isContentList(topicListCursor))) {
-            backButton = <BackButton topicListCursor={topicListCursor}
+        var topicTreeCursor = this.props.topicTreeCursor;
+        if (topicTreeCursor &&
+                (this.props.isPaneShowing ||
+                    TopicTreeHelper.isContent(topicTreeCursor) ||
+                    TopicTreeHelper.isTopic(topicTreeCursor) &&
+                this.props.rootTopicTreeCursor !== topicTreeCursor) ||
+                TopicTreeHelper.isContentList(topicTreeCursor)) {
+            backButton = <BackButton topicTreeCursor={topicTreeCursor}
                                      onClickBack={this.props.onClickBack}/>;
         }
 
         var styleObj = {
             fixed: true,
-            "topic-header": topicListCursor && !isRoot(topicListCursor) &&
+            "topic-header": topicTreeCursor &&
+                topicTreeCursor !== this.props.rootTopicTreeCursor &&
                 !this.props.isPaneShowing &&
-                (isTopic(topicListCursor) || isContent(topicListCursor))
+                (TopicTreeHelper.isTopic(topicTreeCursor) || TopicTreeHelper.isContent(topicTreeCursor))
         };
-        var parentDomain = topicListCursor && getParentDomain(topicListCursor);
-        if (parentDomain && !this.props.isPaneShowing) {
-            styleObj[parentDomain.getId()] = true;
+        if (this.props.domainTopicTreeCursor && !this.props.isPaneShowing) {
+            styleObj[TopicTreeHelper.getId(this.props.domainTopicTreeCursor)] = true;
         }
         var styleClass = classNames(styleObj);
 
@@ -114,14 +109,14 @@ class AppHeader extends React.Component {
             title = l10n.get("view-profile");
         } else if (this.props.isSettingsShowing) {
             title = l10n.get("view-settings");
-        } else if (topicListCursor && getTitle(topicListCursor)) {
-            title = getTitle(topicListCursor);
-        } else if (topicListCursor && isContentList(topicListCursor)) {
+        } else if (topicTreeCursor && TopicTreeHelper.getTitle(topicTreeCursor)) {
+            title = TopicTreeHelper.getTitle(topicTreeCursor);
+        } else if (topicTreeCursor && TopicTreeHelper.isContentList(topicTreeCursor)) {
             title = l10n.get("search");
         }
 
         var menuButton;
-        if (topicListCursor) {
+        if (topicTreeCursor) {
             menuButton = <MenuButton/>;
         }
 
@@ -133,7 +128,8 @@ class AppHeader extends React.Component {
     }
 }
 AppHeader.propTypes = {
-    topicListCursor: React.PropTypes.object,
+    topicTreeCursor: React.PropTypes.object,
+    rootTopicTreeCursor: React.PropTypes.object,
     isPaneShowing: React.PropTypes.bool.isRequired
 };
 
@@ -166,43 +162,43 @@ class Sidebar extends React.Component {
         // Context sensitive actions first
         if (Storage.isEnabled()) {
             if (!this.props.isPaneShowing &&
-                    this.props.topicListCursor && isContent(this.props.topicListCursor)) {
-                if (isDownloaded(this.props.topicListCursor)) {
-                    var text = l10n.get(isVideo(this.props.topicListCursor) ? "delete-downloaded-video" : "delete-downloaded-article");
+                    this.props.topicTreeCursor && TopicTreeHelper.isContent(this.props.topicTreeCursor)) {
+                if (isDownloaded(this.props.topicTreeCursor)) {
+                    var text = l10n.get(isVideo(this.props.topicTreeCursor) ? "delete-downloaded-video" : "delete-downloaded-article");
                     items.push(<li key="delete-downloaded-video" className="hot-item">
-                            <a href="#" onClick={_.partial(this.props.onClickDeleteDownloadedContent, this.props.topicListCursor)}>{{text}}</a>
+                            <a href="#" onClick={_.partial(this.props.onClickDeleteDownloadedContent, this.props.topicTreeCursor)}>{{text}}</a>
                         </li>);
                 } else {
-                    var text = l10n.get(isVideo(this.props.topicListCursor) ? "download-video" : "download-article");
+                    var text = l10n.get(isVideo(this.props.topicTreeCursor) ? "download-video" : "download-article");
                     items.push(<li key="download-video" className="hot-item">
-                            <a href="#" className={isVideo(this.props.topicListCursor) ? "download-video-link" : "download-article-link"} onClick={_.partial(this.props.onClickDownloadContent, this.props.topicListCursor)}>{{text}}</a>
+                            <a href="#" className={isVideo(this.props.topicTreeCursor) ? "download-video-link" : "download-article-link"} onClick={_.partial(this.props.onClickDownloadContent, this.props.topicTreeCursor)}>{{text}}</a>
                         </li>);
                 }
             }
         }
 
         if (!this.props.isPaneShowing &&
-                this.props.topicListCursor &&
-                isContent(this.props.topicListCursor) &&
-                getKAUrl(this.props.topicListCursor)) {
+                this.props.topicTreeCursor &&
+                TopicTreeHelper.isContent(this.props.topicTreeCursor) &&
+                TopicTreeHelper.getKAUrl(this.props.topicTreeCursor)) {
             var viewOnKAMessage = l10n.get("open-in-website");
-            items.push(<li key="open-in-website"><a href="#" className="open-in-website-link" onClick={_.partial(this.props.onClickViewOnKA, this.props.topicListCursor)}>{{viewOnKAMessage}}</a></li>);
+            items.push(<li key="open-in-website"><a href="#" className="open-in-website-link" onClick={_.partial(this.props.onClickViewOnKA, this.props.topicTreeCursor)}>{{viewOnKAMessage}}</a></li>);
 
             if (window.MozActivity) {
                 var shareMessage = l10n.get("share");
-                items.push(<li key="share-link"><a href="#" className="share-link" onClick={_.partial(this.props.onClickShare, this.props.topicListCursor)}>{{shareMessage}}</a></li>);
+                items.push(<li key="share-link"><a href="#" className="share-link" onClick={_.partial(this.props.onClickShare, this.props.topicTreeCursor)}>{{shareMessage}}</a></li>);
             }
         }
 
         if (Storage.isEnabled()) {
             if (Downloads.canCancelDownload()) {
                 items.push(<li key="cancel-downloading" className="hot-item">
-                        <a href="#" data-l10n-id="cancel-downloading" onClick={_.partial(this.props.onClickCancelDownloadContent, this.props.topicListCursor)}>Cancel Downloading</a>
+                        <a href="#" data-l10n-id="cancel-downloading" onClick={_.partial(this.props.onClickCancelDownloadContent, this.props.topicTreeCursor)}>Cancel Downloading</a>
                     </li>);
             } else if (!this.props.isPaneShowing &&
-                        this.props.topicListCursor && isTopic(this.props.topicListCursor)) {
+                        this.props.topicTreeCursor && TopicTreeHelper.isTopic(this.props.topicTreeCursor)) {
                 items.push(<li key="download-topic" className="hot-item">
-                        <a href="#" data-l10n-id="download-topic" onClick={_.partial(this.props.onClickDownloadContent, this.props.topicListCursor)}>Download Topic</a>
+                        <a href="#" data-l10n-id="download-topic" onClick={_.partial(this.props.onClickDownloadContent, this.props.topicTreeCursor)}>Download Topic</a>
                     </li>);
             }
         }
@@ -250,7 +246,7 @@ class Sidebar extends React.Component {
     }
 }
 Sidebar.propTypes = {
-    topicListCursor: React.PropTypes.object.isRequired,
+    topicTreeCursor: React.PropTypes.object.isRequired,
     isPaneShowing: React.PropTypes.bool.isRequired,
     isSettingsShowing: React.PropTypes.bool.isRequired,
     isProfileShowing: React.PropTypes.bool.isRequired,
@@ -268,12 +264,6 @@ Sidebar.propTypes = {
     onClickSignout: React.PropTypes.func.isRequired
 };
 
-
-// TODO
-const isContentList = () => {
-    return false;
-};
-
 /**
  * This is the main app container itself.
  * It implements most of the view based functionality for the rest of the views
@@ -284,7 +274,7 @@ const isContentList = () => {
 var MainView = React.createClass({
     propTypes: {
         // Optional because it's not specified until the topic tree is loaded
-        topicListCursor: React.PropTypes.object,
+        topicTreeCursor: React.PropTypes.object,
         cursorOptions: React.PropTypes.object.isRequired,
     },
     mixins: [Util.LocalizationMixin],
@@ -296,6 +286,8 @@ var MainView = React.createClass({
     getInitialState: function() {
         return {
             topicTreeCursor: this.props.topicTreeRootCursor,
+            domainTopicTreeCursor: null,
+            navigationStack: Immutable.Stack.of(this.props.topicTreeCursor),
             isPaneShowing: false,
             showProfile: false,
             showDownloads: false,
@@ -324,10 +316,20 @@ var MainView = React.createClass({
             showSettings: false
         });
     },
-    onClickTopic: function(newTopicTreeCursor: any, parentDomainCursor: any) {
+    getDomainTopicTreeCursor(newTopicTreeCursor) {
+        var domainTopicTreeCursor = this.state.domainTopicTreeCursor;
+        if (!domainTopicTreeCursor) {
+            domainTopicTreeCursor = newTopicTreeCursor;
+        } else if (this.props.rootTopicTreeCursor === newTopicTreeCursor) {
+            domainTopicTreeCursor = null;
+        }
+        return domainTopicTreeCursor;
+    },
+    onClickTopic: function(newTopicTreeCursor: any) {
         this.setState({
             topicTreeCursor: newTopicTreeCursor,
-            parentDomainCursor: parentDomainCursor,
+            domainTopicTreeCursor: this.getDomainTopicTreeCursor(newTopicTreeCursor),
+            navigationStack: this.state.navigationStack.unshift(newTopicTreeCursor),
             showProfile: false,
             showDownloads: false,
             showSettings: false,
@@ -339,7 +341,16 @@ var MainView = React.createClass({
      * TODO: This works fine as is, but the logic can be simplified and
      * be less ugly by simply using a stack of current pane views.
      */
-    onClickBack: function(topicListCursor: any) {
+    onClickBack: function(topicTreeCursor: any) {
+        var newStack = this.state.navigationStack.shift();
+        this.setState({
+            navigationStack: newStack,
+            topicTreeCursor: newStack.peek(),
+            domainTopicTreeCursor: this.getDomainTopicTreeCursor(newStack.peek()),
+        });
+
+
+        /*
         // If we were on a content item from downloads,
         // then go back to downloads.
         if (this.state.wasLastDownloads) {
@@ -362,10 +373,8 @@ var MainView = React.createClass({
             });
         }
 
-        /**
-         * If settings or profile or ... is set, then don't show it anymore.
-         * This effectively makes the topicTreeCursor be in use again.
-         */
+        // If settings or profile or ... is set, then don't show it anymore.
+        // This effectively makes the topicTreeCursor be in use again.
         if (this.isPaneShowing()) {
             this.setState({
                 showDownloads: false,
@@ -373,23 +382,24 @@ var MainView = React.createClass({
                 showSettings: false,
                 wasLastDownloads: false
             });
-            if (isContentList(this.state.topicTreeCursor)) {
+            if (TopicTreeHelper.isContentList(this.state.topicTreeCursor)) {
                 this.onTopicSearch("");
             }
             return;
         }
 
-        if (isContentList(this.state.topicTreeCursor)) {
+        if (TopicTreeHelper.isContentList(this.state.topicTreeCursor)) {
             return this.onTopicSearch("");
         }
 
         this.setState({
-            topicTreeCursor: getParent(topicListCursor),
+            topicTreeCursor: getParent(topicTreeCursor),
             showProfile: false,
             showDownloads: false,
             showSettings: false,
             wasLastDownloads: false
         });
+        */
     },
     onClickSignin: function() {
         APIClient.signIn();
@@ -441,22 +451,22 @@ var MainView = React.createClass({
         var url = "https://khanacademy.zendesk.com/hc/communities/public/topics/200155074-Mobile-Discussions";
         this._openUrl(url);
     },
-    onClickViewOnKA: function(topicListCursor: any) {
-        this._openUrl(getKAUrl(topicListCursor));
+    onClickViewOnKA: function(topicTreeCursor: any) {
+        this._openUrl(TopicTreeHelper.getKAUrl(topicTreeCursor));
     },
-    onClickShare: function(topicListCursor: any) {
+    onClickShare: function(topicTreeCursor: any) {
         new window.MozActivity({
             name: "share",
             data: {
                 type: "url",
-                url: getKAUrl(topicListCursor)
+                url: TopicTreeHelper.getKAUrl(topicTreeCursor)
             }
         });
     },
-    onClickDownloadContent: function(topicListCursor: any) {
+    onClickDownloadContent: function(topicTreeCursor: any) {
         var totalCount = 1;
-        if (isTopic(topicListCursor)) {
-            totalCount = getChildNotDownloadedCount(topicListCursor);
+        if (TopicTreeHelper.isTopic(topicTreeCursor)) {
+            totalCount = getChildNotDownloadedCount(topicTreeCursor);
         }
 
         // Check for errors
@@ -480,7 +490,7 @@ var MainView = React.createClass({
         var totalCountStr = Util.numberWithCommas(totalCount);
 
         // Prompt to download remaining
-        if (isTopic(topicListCursor)) {
+        if (TopicTreeHelper.isTopic(topicTreeCursor)) {
             if (!confirm(l10n.get("download-remaining", {
                         totalCount: totalCount,
                         totalCountStr: totalCountStr
@@ -572,7 +582,7 @@ var MainView = React.createClass({
     render: function(): any {
         // Make sure scrollTop is at the top of the page
         // This is in case the search box scrolling doesn't get an onblur
-        if (this.state.topicTreeCursor && !isContentList(this.state.topicTreeCursor)) {
+        if (this.state.topicTreeCursor && !TopicTreeHelper.isContentList(this.state.topicTreeCursor)) {
             $("html, body").scrollTop(0);
         }
 
@@ -588,16 +598,18 @@ var MainView = React.createClass({
         } else if (this.state.showSettings) {
             control = <SettingsViewer optionsCursor={this.props.optionsCursor}/>;
         } else if (TopicTreeHelper.isTopic(this.state.topicTreeCursor)) {
-            control = <TopicViewer topicCursor={this.state.topicTreeCursor}
+            control = <TopicViewer topicTreeCursor={this.state.topicTreeCursor}
+                                   domainTopicTreeCursor={this.state.domainTopicTreeCursor}
                                    onClickTopic={this.onClickTopic.bind(this)}
                                    optionsCursor={this.props.optionsCursor}
                                    onClickContentItem={this.onClickContentItem.bind(this)}/>;
-        } else if (isContentList(this.state.topicTreeCursor)) {
+        } else if (TopicTreeHelper.isContentList(this.state.topicTreeCursor)) {
             control = <SearchResultsViewer collection={this.state.topicTreeCursor}
                                            onClickContentItem={this.onClickContentItem.bind(this)}
                                            optionsCursor={this.props.optionsCursor}/>;
         } else if (TopicTreeHelper.isVideo(this.state.topicTreeCursor)) {
             control = <VideoViewer topicTreeCursor={this.state.topicTreeCursor}
+                                   domainTopicTreeCursor={this.state.domainTopicTreeCursor}
                                    optionsCursor={this.props.optionsCursor}/>;
         } else if (TopicTreeHelper.isArticle(this.state.topicTreeCursor)) {
             control = <ArticleViewer  topicTreeCursor={this.state.topicTreeCursor}/>;
@@ -639,6 +651,8 @@ var MainView = React.createClass({
             {sidebar}
             <section id="main-content" role="region" className="skin-dark">
                 <AppHeader topicTreeCursor={this.state.topicTreeCursor}
+                           domainTopicTreeCursor={this.state.domainTopicTreeCursor}
+                           rootTopicTreeCursor={this.props.rootTopicTreeCursor}
                            onClickBack={this.onClickBack.bind(this)}
                            onTopicSearch={this.onTopicSearch.bind(this)}
                            isPaneShowing={this.isPaneShowing()}

@@ -22,23 +22,23 @@ class TopicListItem extends React.Component {
         var topicClassObj = {
             "topic-item": true,
             faded: this.props.optionsCursor.get("showDownloadsOnly") &&
-                TopicTreeHelper.getDownloadCount(this.props.topicCursor),
+                TopicTreeHelper.getDownloadCount(this.props.topicTreeCursor),
         };
-        topicClassObj[TopicTreeHelper.getId(this.props.parentDomainCursor)] = true;
+        topicClassObj[TopicTreeHelper.getId(this.props.domainTopicTreeCursor)] = true;
         var topicClass = classNames(topicClassObj);
         return <li className={topicClass}>
-            { this.props.topicCursor === this.props.parentDomainCursor &&
+            { this.props.topicTreeCursor === this.props.domainTopicTreeCursor &&
                 <div className="color-block"/> }
             <a href="javascript:void(0)"
-               onClick={_.partial(this.props.onClickTopic, this.props.topicCursor,this.props.parentDomainCursor)}>
-                <p className="topic-title">{TopicTreeHelper.getTitle(this.props.topicCursor)}</p>
+               onClick={_.partial(this.props.onClickTopic, this.props.topicTreeCursor,this.props.domainTopicTreeCursor)}>
+                <p className="topic-title">{TopicTreeHelper.getTitle(this.props.topicTreeCursor)}</p>
             </a>
         </li>;
     }
 }
 TopicListItem.propTypes = {
-    topicCursor: React.PropTypes.object.isRequired,
-    parentDomainCursor: React.PropTypes.object.isRequired,
+    topicTreeCursor: React.PropTypes.object.isRequired,
+    domainTopicTreeCursor: React.PropTypes.object.isRequired,
     onClickTopic: React.PropTypes.func.isRequired,
     optionsCursor: React.PropTypes.func.isRequired,
 };
@@ -72,10 +72,10 @@ class ContentListItem extends React.Component {
             faded: this.props.optionsCursor.get("showDownloadsOnly") &&
                 !TopicTreeHelper.isDownloaded(this.props.topicTreeCursor)
         };
-        if (this.props.parentDomainCursor) {
-            subwayIconClassObj[TopicTreeHelper.getId(this.props.parentDomainCursor)] = true;
-            contentClassObj[TopicTreeHelper.getId(this.props.parentDomainCursor)] = true;
-            pipeClassObj[TopicTreeHelper.getId(this.props.parentDomainCursor)] = true;
+        if (this.props.domainTopicTreeCursor) {
+            subwayIconClassObj[TopicTreeHelper.getId(this.props.domainTopicTreeCursor)] = true;
+            contentClassObj[TopicTreeHelper.getId(this.props.domainTopicTreeCursor)] = true;
+            pipeClassObj[TopicTreeHelper.getId(this.props.domainTopicTreeCursor)] = true;
         }
         var subwayIconClass = classNames(subwayIconClassObj);
         var pipeClass = classNames(pipeClassObj);
@@ -97,7 +97,7 @@ class ContentListItem extends React.Component {
 }
 ContentListItem.propTypes = {
     topicTreeCursor: React.PropTypes.object.isRequired,
-    parentDomainCursor: React.PropTypes.object.isRequired,
+    domainTopicTreeCursor: React.PropTypes.object.isRequired,
     onClick: React.PropTypes.func.isRequired,
     optionsCursor: React.PropTypes.func.isRequired,
 };
@@ -108,19 +108,19 @@ ContentListItem.propTypes = {
  */
 class TopicViewer extends React.Component {
     render(): any {
-        var topics = TopicTreeHelper.mapChildTopicCursors(this.props.topicCursor, (childTopicCursor) => {
-            return <TopicListItem topicCursor={childTopicCursor}
+        var topics = TopicTreeHelper.mapChildTopicCursors(this.props.topicTreeCursor, (childTopicCursor) => {
+            return <TopicListItem topicTreeCursor={childTopicCursor}
                                   onClickTopic={this.props.onClickTopic}
                                   optionsCursor={this.props.optionsCursor}
-                                  parentDomainCursor={this.props.parentDomainCursor || childTopicCursor}
+                                  domainTopicTreeCursor={this.props.domainTopicTreeCursor || childTopicCursor}
                                   key={TopicTreeHelper.getKey(childTopicCursor)} />;
         });
 
-        var contentItems = TopicTreeHelper.mapChildContentCursors(this.props.topicCursor, (topicTreeCursor) => {
+        var contentItems = TopicTreeHelper.mapChildContentCursors(this.props.topicTreeCursor, (topicTreeCursor) => {
             return <ContentListItem topicTreeCursor={topicTreeCursor}
                                     onClick={this.props.onClickContentItem}
                                     optionsCursor={this.props.optionsCursor}
-                                    parentDomainCursor={this.props.parentDomainCursor}
+                                    domainTopicTreeCursor={this.props.domainTopicTreeCursor}
                                     key={TopicTreeHelper.getKey(topicTreeCursor)} />;
         });
 
@@ -135,7 +135,7 @@ class TopicViewer extends React.Component {
     }
 }
 TopicViewer.propTypes = {
-    topicCursor: React.PropTypes.object.isRequired,
+    topicTreeCursor: React.PropTypes.object.isRequired,
     onClickTopic: React.PropTypes.func.isRequired,
     onClickContentItem: React.PropTypes.func.isRequired,
 };

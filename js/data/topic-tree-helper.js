@@ -51,6 +51,7 @@ const genCheckAnyFn = () => {
 }
 
 const isContent = genCheckAnyFn(isVideo,isArticle, isExercise);
+const isContentList = () => false;
 
 const getId = (topicTreeCursor) => {
     if (isExercise(topicTreeCursor)) {
@@ -70,6 +71,17 @@ const getSlug = (topicTreeCursor) => {
 
 const getKey = (topicTreeCursor) => {
     return getId(topicTreeCursor) || getSlug(topicTreeCursor) || getTitle(topicTreeCursor);
+};
+
+const getKAUrl = (topicTreeCursor) => {
+    var value = topicTreeCursor.get(Minify.getShortName("ka_url"));
+    if (!value) {
+        return null;
+    }
+    if (value.substring(0, 4) !== "http") {
+        value = "http://www.khanacademy.org/video/" + value;
+    }
+    return value;
 };
 
 const isDownloaded = (topicTreeCursor) => {
@@ -136,10 +148,12 @@ module.exports = {
     getId,
     getTitle,
     getKey,
+    getKAUrl,
     getDownloadCount,
     mapChildTopicCursors,
     mapChildContentCursors,
     isContent,
+    isContentList,
     isTopic,
     isArticle,
     isVideo,

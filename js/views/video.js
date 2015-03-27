@@ -77,8 +77,9 @@ var VideoViewerRawObj: {
         videojs: any;
     } = {
     propTypes: {
-        video: React.PropTypes.object.isRequired,
-        optionsCursor: React.PropTypes.object.isRequired
+        topicTreeCursor: React.PropTypes.object.isRequired,
+        domainTopicTreeCursor: React.PropTypes.object.isRequired,
+        optionsCursor: React.PropTypes.object.isRequired,
     },
     componentWillMount: function() {
         Util.log("VideoViewer will mount");
@@ -425,10 +426,7 @@ var VideoViewerRawObj: {
           "vjs-default-skin": true,
           "signed-in": models.CurrentUser.isSignedIn()
         };
-        var parentDomain = this.props.topicTreeCursor && TopicTreeHelper.getParentDomain(this.props.topicTreeCursor);
-        if (parentDomain) {
-            videoClassObj[parentDomain.getId()] = true;
-        }
+        videoClassObj[TopicTreeHelper.getId(this.props.domainTopicTreeCursor)] = true;
         this.videoClass = classNames(videoClassObj);
 
         var control;
