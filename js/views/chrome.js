@@ -22,6 +22,7 @@ var $ = require("jquery"),
     paneViews = require("./pane"),
     TopicTreeHelper = require("../data/topic-tree-helper"),
     Immutable = require("immutable"),
+    component = require('omniscient'),
     { TopicTreeNode } = require("../data/topic-tree");
 
 var VideoViewer = videoViews.VideoViewer;
@@ -34,235 +35,197 @@ var DownloadsViewer = paneViews.DownloadsViewer;
 var SettingsViewer = paneViews.SettingsViewer;
 var ProfileViewer = paneViews.ProfileViewer;
 
-
 /**
  * Represents the back button which is found on the top left of the header
  * on all screens except when the Root topic is displayed.
  * In general, when clicked it will take the user to the last view they were
  * at before.
  */
-class BackButton extends React.Component {
-    render() : any {
-        return <div>
-            <a className="icon-back-link " href="javascript:void(0)" onClick={_.partial(this.props.onClickBack, this.props.topicTreeCursor)}>
-                <span className="icon icon-back">Back</span>
-            </a>
-        </div>;
-    }
-}
-BackButton.propTypes = {
-    topicTreeCursor: React.PropTypes.object.isRequired,
-    onClickBack: React.PropTypes.func.isRequired
-};
+const BackButton = component(({topicTreeCursor, onClickBack}) => {
+    return <div>
+        <a className="icon-back-link " href="javascript:void(0)" onClick={_.partial(onClickBack, topicTreeCursor)}>
+            <span className="icon icon-back">Back</span>
+        </a>
+    </div>;
+}).jsx;
 
 /**
  * Represents the menu button which is found on the top right of the header
  * on all screens.
  * When clicked it will expand a drawer with context sensitive options.
  */
-class MenuButton extends React.Component {
-    render(): any {
-        return <div>
-            <menu type="toolbar" className="icon-menu-link ">
-                <a href="#main-content">
-                    <span className="icon icon-menu">Menu</span>
-                </a>
-            </menu>
-        </div>;
-    }
-}
+const MenuButton = component(() => {
+    return <div>
+        <menu type="toolbar" className="icon-menu-link ">
+            <a href="#main-content">
+                <span className="icon icon-menu">Menu</span>
+            </a>
+        </menu>
+    </div>;
+}).jsx;
 
 /**
  * Represents the app header, it contains the back button, the menu button,
  * and a title.
  */
-class AppHeader extends React.Component {
-    render(): any {
-        var backButton;
-        var topicTreeCursor = this.props.topicTreeCursor;
-        if (topicTreeCursor &&
-                (this.props.isPaneShowing ||
-                    TopicTreeHelper.isContent(topicTreeCursor) ||
-                    TopicTreeHelper.isTopic(topicTreeCursor) &&
-                this.props.rootTopicTreeCursor !== topicTreeCursor) ||
-                TopicTreeHelper.isContentList(topicTreeCursor)) {
-            backButton = <BackButton topicTreeCursor={topicTreeCursor}
-                                     onClickBack={this.props.onClickBack}/>;
-        }
-
-        var styleObj = {
-            fixed: true,
-            "topic-header": topicTreeCursor &&
-                topicTreeCursor !== this.props.rootTopicTreeCursor &&
-                !this.props.isPaneShowing &&
-                (TopicTreeHelper.isTopic(topicTreeCursor) || TopicTreeHelper.isContent(topicTreeCursor))
-        };
-        if (this.props.domainTopicTreeCursor && !this.props.isPaneShowing) {
-            styleObj[TopicTreeHelper.getId(this.props.domainTopicTreeCursor)] = true;
-        }
-        var styleClass = classNames(styleObj);
-
-        var title = "Khan Academy";
-        if (this.props.isDownloadsShowing) {
-            title = l10n.get("view-downloads");
-        } else if (this.props.isProfileShowing) {
-            title = l10n.get("view-profile");
-        } else if (this.props.isSettingsShowing) {
-            title = l10n.get("view-settings");
-        } else if (topicTreeCursor && TopicTreeHelper.getTitle(topicTreeCursor)) {
-            title = TopicTreeHelper.getTitle(topicTreeCursor);
-        } else if (topicTreeCursor && TopicTreeHelper.isContentList(topicTreeCursor)) {
-            title = l10n.get("search");
-        }
-
-        var menuButton;
-        if (topicTreeCursor) {
-            menuButton = <MenuButton/>;
-        }
-
-        return <header className={styleClass}>
-                {backButton}
-                {menuButton}
-                <h1 className="header-title">{title}</h1>
-            </header>;
+const AppHeader = component((props) => {
+    var backButton;
+    var topicTreeCursor = props.topicTreeCursor;
+    if (topicTreeCursor &&
+            (props.isPaneShowing ||
+                TopicTreeHelper.isContent(topicTreeCursor) ||
+                TopicTreeHelper.isTopic(topicTreeCursor) &&
+            props.rootTopicTreeCursor !== topicTreeCursor) ||
+            TopicTreeHelper.isContentList(topicTreeCursor)) {
+        backButton = <BackButton topicTreeCursor={topicTreeCursor}
+                                 onClickBack={props.onClickBack}/>;
     }
-}
-AppHeader.propTypes = {
-    topicTreeCursor: React.PropTypes.object,
-    rootTopicTreeCursor: React.PropTypes.object,
-    isPaneShowing: React.PropTypes.bool.isRequired
-};
 
-class StatusBarViewer extends React.Component {
-    render(): any {
-        if (!models.TempAppState.get("status")) {
-            return <div/>;
-        }
-        var cancelButton;
-        if (Downloads.canCancelDownload()) {
-            cancelButton = <a className="status-button" href="#" onClick={this.props.onClickCancelDownloadContent}>{String.fromCharCode(215)}</a>;
-        }
-
-        return <div className="status-bar">
-            {models.TempAppState.get("status")}
-            {cancelButton}
-        </div>;
+    var styleObj = {
+        fixed: true,
+        "topic-header": topicTreeCursor &&
+            topicTreeCursor !== props.rootTopicTreeCursor &&
+            !props.isPaneShowing &&
+            (TopicTreeHelper.isTopic(topicTreeCursor) || TopicTreeHelper.isContent(topicTreeCursor))
+    };
+    if (props.domainTopicTreeCursor && !props.isPaneShowing) {
+        styleObj[TopicTreeHelper.getId(props.domainTopicTreeCursor)] = true;
     }
-}
+    var styleClass = classNames(styleObj);
+
+    var title = "Khan Academy";
+    if (props.isDownloadsShowing) {
+        title = l10n.get("view-downloads");
+    } else if (props.isProfileShowing) {
+        title = l10n.get("view-profile");
+    } else if (props.isSettingsShowing) {
+        title = l10n.get("view-settings");
+    } else if (topicTreeCursor && TopicTreeHelper.getTitle(topicTreeCursor)) {
+        title = TopicTreeHelper.getTitle(topicTreeCursor);
+    } else if (topicTreeCursor && TopicTreeHelper.isContentList(topicTreeCursor)) {
+        title = l10n.get("search");
+    }
+
+    var menuButton;
+    if (topicTreeCursor) {
+        menuButton = <MenuButton/>;
+    }
+
+    return <header className={styleClass}>
+            {backButton}
+            {menuButton}
+            <h1 className="header-title">{title}</h1>
+        </header>;
+}).jsx;
+
+const StatusBarViewer = component(({onClickCancelDownloadContent}) => {
+    if (!models.TempAppState.get("status")) {
+        return <div/>;
+    }
+    var cancelButton;
+    if (Downloads.canCancelDownload()) {
+        cancelButton = <a className="status-button" href="#" onClick={onClickCancelDownloadContent}>{String.fromCharCode(215)}</a>;
+    }
+
+    return <div className="status-bar">
+        {models.TempAppState.get("status")}
+        {cancelButton}
+    </div>;
+}).jsx;
 
 /**
  * Represents the sidebar drawer.
  * The sidebar drawer comes up when you click on the menu from the top header.
  */
-class Sidebar extends React.Component {
-    render(): any {
-        var items = [];
+const Sidebar = component((props) => {
+    var items = [];
 
-        ////////////////////
-        // Context sensitive actions first
-        if (Storage.isEnabled()) {
-            if (!this.props.isPaneShowing &&
-                    this.props.topicTreeCursor && TopicTreeHelper.isContent(this.props.topicTreeCursor)) {
-                if (isDownloaded(this.props.topicTreeCursor)) {
-                    var text = l10n.get(isVideo(this.props.topicTreeCursor) ? "delete-downloaded-video" : "delete-downloaded-article");
-                    items.push(<li key="delete-downloaded-video" className="hot-item">
-                            <a href="#" onClick={_.partial(this.props.onClickDeleteDownloadedContent, this.props.topicTreeCursor)}>{{text}}</a>
-                        </li>);
-                } else {
-                    var text = l10n.get(isVideo(this.props.topicTreeCursor) ? "download-video" : "download-article");
-                    items.push(<li key="download-video" className="hot-item">
-                            <a href="#" className={isVideo(this.props.topicTreeCursor) ? "download-video-link" : "download-article-link"} onClick={_.partial(this.props.onClickDownloadContent, this.props.topicTreeCursor)}>{{text}}</a>
-                        </li>);
-                }
-            }
-        }
-
-        if (!this.props.isPaneShowing &&
-                this.props.topicTreeCursor &&
-                TopicTreeHelper.isContent(this.props.topicTreeCursor) &&
-                TopicTreeHelper.getKAUrl(this.props.topicTreeCursor)) {
-            var viewOnKAMessage = l10n.get("open-in-website");
-            items.push(<li key="open-in-website"><a href="#" className="open-in-website-link" onClick={_.partial(this.props.onClickViewOnKA, this.props.topicTreeCursor)}>{{viewOnKAMessage}}</a></li>);
-
-            if (window.MozActivity) {
-                var shareMessage = l10n.get("share");
-                items.push(<li key="share-link"><a href="#" className="share-link" onClick={_.partial(this.props.onClickShare, this.props.topicTreeCursor)}>{{shareMessage}}</a></li>);
-            }
-        }
-
-        if (Storage.isEnabled()) {
-            if (Downloads.canCancelDownload()) {
-                items.push(<li key="cancel-downloading" className="hot-item">
-                        <a href="#" data-l10n-id="cancel-downloading" onClick={_.partial(this.props.onClickCancelDownloadContent, this.props.topicTreeCursor)}>Cancel Downloading</a>
+    ////////////////////
+    // Context sensitive actions first
+    if (Storage.isEnabled()) {
+        if (!props.isPaneShowing &&
+                props.topicTreeCursor && TopicTreeHelper.isContent(props.topicTreeCursor)) {
+            if (isDownloaded(props.topicTreeCursor)) {
+                var text = l10n.get(isVideo(props.topicTreeCursor) ? "delete-downloaded-video" : "delete-downloaded-article");
+                items.push(<li key="delete-downloaded-video" className="hot-item">
+                        <a href="#" onClick={_.partial(props.onClickDeleteDownloadedContent, props.topicTreeCursor)}>{{text}}</a>
                     </li>);
-            } else if (!this.props.isPaneShowing &&
-                        this.props.topicTreeCursor && TopicTreeHelper.isTopic(this.props.topicTreeCursor)) {
-                items.push(<li key="download-topic" className="hot-item">
-                        <a href="#" data-l10n-id="download-topic" onClick={_.partial(this.props.onClickDownloadContent, this.props.topicTreeCursor)}>Download Topic</a>
+            } else {
+                var text = l10n.get(isVideo(props.topicTreeCursor) ? "download-video" : "download-article");
+                items.push(<li key="download-video" className="hot-item">
+                        <a href="#" className={isVideo(props.topicTreeCursor) ? "download-video-link" : "download-article-link"} onClick={_.partial(props.onClickDownloadContent, props.topicTreeCursor)}>{{text}}</a>
                     </li>);
             }
         }
-
-        ////////////////////
-        // Followed by sign in
-        if (!models.CurrentUser.isSignedIn()) {
-            // If the user is not signed in, add that option first
-            items.push(<li key="sign-in"><a data-l10n-id="sign-in" href="#" onClick={this.props.onClickSignin}>Sign In</a></li>);
-        }
-
-        ////////////////////
-        // Followed by view pane items
-        if (models.CurrentUser.isSignedIn() && !this.props.isProfileShowing) {
-            // User is signed in, add all the signed in options here
-            items.push(<li key="view-profile"><a  data-l10n-id="view-profile" className="view-profile-link" href="#" onClick={this.props.onClickProfile}>View Profile</a></li>);
-        }
-        if (!this.props.isSettingsShowing) {
-            items.push(<li key="view-settings"><a data-l10n-id="view-settings" className="view-settings-link" href="#" onClick={this.props.onClickSettings}>View Settings</a></li>);
-        }
-        if (!this.props.isDownloadsShowing && Storage.isEnabled()) {
-            items.push(<li key="view-downloads"><a data-l10n-id="view-downloads" className="view-downloads-link" href="#" onClick={this.props.onClickDownloads}>View Downloads</a></li>);
-        }
-
-        items.push(<li key="open-support"><a data-l10n-id="open-support" className="open-support-link" href="#" onClick={this.props.onClickSupport}>Open support website</a></li>);
-
-        // Add the signout button last
-        if (models.CurrentUser.isSignedIn()) {
-            items.push(<li key="sign-out"><a data-l10n-id="sign-out" href="#" onClick={this.props.onClickSignout}>Sign Out</a></li>);
-        }
-
-        return <section className="sidebar" data-type="sidebar">
-            <header>
-                <menu type="toolbar">
-                    <a data-l10n-id="done" href="#">Done</a>
-                </menu>
-                <h1 data-l10n-id="options">Options</h1>
-            </header>
-            <nav>
-                <ul>
-                    {items}
-                </ul>
-            </nav>
-        </section>;
     }
-}
-Sidebar.propTypes = {
-    topicTreeCursor: React.PropTypes.object.isRequired,
-    isPaneShowing: React.PropTypes.bool.isRequired,
-    isSettingsShowing: React.PropTypes.bool.isRequired,
-    isProfileShowing: React.PropTypes.bool.isRequired,
-    isDownloadsShowing: React.PropTypes.bool.isRequired,
-    onClickDeleteDownloadedContent: React.PropTypes.func.isRequired,
-    onClickDownloadContent: React.PropTypes.func.isRequired,
-    onClickViewOnKA: React.PropTypes.func.isRequired,
-    onClickShare: React.PropTypes.func.isRequired,
-    onClickSignin: React.PropTypes.func.isRequired,
-    onClickCancelDownloadContent: React.PropTypes.func.isRequired,
-    onClickProfile: React.PropTypes.func.isRequired,
-    onClickSettings: React.PropTypes.func.isRequired,
-    onClickDownloads: React.PropTypes.func.isRequired,
-    onClickSupport: React.PropTypes.func.isRequired,
-    onClickSignout: React.PropTypes.func.isRequired
-};
+
+    if (!props.isPaneShowing &&
+            props.topicTreeCursor &&
+            TopicTreeHelper.isContent(props.topicTreeCursor) &&
+            TopicTreeHelper.getKAUrl(props.topicTreeCursor)) {
+        var viewOnKAMessage = l10n.get("open-in-website");
+        items.push(<li key="open-in-website"><a href="#" className="open-in-website-link" onClick={_.partial(props.onClickViewOnKA, props.topicTreeCursor)}>{{viewOnKAMessage}}</a></li>);
+
+        if (window.MozActivity) {
+            var shareMessage = l10n.get("share");
+            items.push(<li key="share-link"><a href="#" className="share-link" onClick={_.partial(props.onClickShare, props.topicTreeCursor)}>{{shareMessage}}</a></li>);
+        }
+    }
+
+    if (Storage.isEnabled()) {
+        if (Downloads.canCancelDownload()) {
+            items.push(<li key="cancel-downloading" className="hot-item">
+                    <a href="#" data-l10n-id="cancel-downloading" onClick={_.partial(props.onClickCancelDownloadContent, props.topicTreeCursor)}>Cancel Downloading</a>
+                </li>);
+        } else if (!props.isPaneShowing &&
+                    props.topicTreeCursor && TopicTreeHelper.isTopic(props.topicTreeCursor)) {
+            items.push(<li key="download-topic" className="hot-item">
+                    <a href="#" data-l10n-id="download-topic" onClick={_.partial(props.onClickDownloadContent, props.topicTreeCursor)}>Download Topic</a>
+                </li>);
+        }
+    }
+
+    ////////////////////
+    // Followed by sign in
+    if (!models.CurrentUser.isSignedIn()) {
+        // If the user is not signed in, add that option first
+        items.push(<li key="sign-in"><a data-l10n-id="sign-in" href="#" onClick={props.onClickSignin}>Sign In</a></li>);
+    }
+
+    ////////////////////
+    // Followed by view pane items
+    if (models.CurrentUser.isSignedIn() && !props.isProfileShowing) {
+        // User is signed in, add all the signed in options here
+        items.push(<li key="view-profile"><a  data-l10n-id="view-profile" className="view-profile-link" href="#" onClick={props.onClickProfile}>View Profile</a></li>);
+    }
+    if (!props.isSettingsShowing) {
+        items.push(<li key="view-settings"><a data-l10n-id="view-settings" className="view-settings-link" href="#" onClick={props.onClickSettings}>View Settings</a></li>);
+    }
+    if (!props.isDownloadsShowing && Storage.isEnabled()) {
+        items.push(<li key="view-downloads"><a data-l10n-id="view-downloads" className="view-downloads-link" href="#" onClick={props.onClickDownloads}>View Downloads</a></li>);
+    }
+
+    items.push(<li key="open-support"><a data-l10n-id="open-support" className="open-support-link" href="#" onClick={props.onClickSupport}>Open support website</a></li>);
+
+    // Add the signout button last
+    if (models.CurrentUser.isSignedIn()) {
+        items.push(<li key="sign-out"><a data-l10n-id="sign-out" href="#" onClick={props.onClickSignout}>Sign Out</a></li>);
+    }
+
+    return <section className="sidebar" data-type="sidebar">
+        <header>
+            <menu type="toolbar">
+                <a data-l10n-id="done" href="#">Done</a>
+            </menu>
+            <h1 data-l10n-id="options">Options</h1>
+        </header>
+        <nav>
+            <ul>
+                {items}
+            </ul>
+        </nav>
+        </section>;
+}).jsx;
 
 /**
  * This is the main app container itself.
