@@ -41,7 +41,7 @@ var ProfileViewer = paneViews.ProfileViewer;
  * In general, when clicked it will take the user to the last view they were
  * at before.
  */
-const BackButton = component(({topicTreeCursor, onClickBack}) => {
+const BackButton = component(({topicTreeCursor}, {onClickBack}) => {
     return <div>
         <a className="icon-back-link " href="javascript:void(0)" onClick={_.partial(onClickBack, topicTreeCursor)}>
             <span className="icon icon-back">Back</span>
@@ -68,7 +68,7 @@ const MenuButton = component(() => {
  * Represents the app header, it contains the back button, the menu button,
  * and a title.
  */
-const AppHeader = component((props) => {
+const AppHeader = component((props, {onClickBack}) => {
     var backButton;
     var topicTreeCursor = props.topicTreeCursor;
     if (topicTreeCursor &&
@@ -77,8 +77,10 @@ const AppHeader = component((props) => {
                 TopicTreeHelper.isTopic(topicTreeCursor) &&
             props.rootTopicTreeCursor !== topicTreeCursor) ||
             TopicTreeHelper.isContentList(topicTreeCursor)) {
-        backButton = <BackButton topicTreeCursor={topicTreeCursor}
-                                 onClickBack={props.onClickBack}/>;
+        backButton = <BackButton statics={{
+                                     onClickBack: onClickBack
+                                 }}
+                                 topicTreeCursor={topicTreeCursor}/>;
     }
 
     var styleObj = {
@@ -556,16 +558,20 @@ var MainView = React.createClass({
         } else if (this.state.showProfile) {
             control = <ProfileViewer/>;
         } else if (this.state.showDownloads) {
-            control = <DownloadsViewer onClickContentItem={this.onClickContentItemFromDownloads.bind(this)}
+            control = <DownloadsViewer statics={{
+                                           onClickContentItem: this.onClickContentItemFromDownloads.bind(this)
+                                       }}
                                        optionsCursor={this.props.optionsCursor}/>;
         } else if (this.state.showSettings) {
             control = <SettingsViewer optionsCursor={this.props.optionsCursor}/>;
         } else if (TopicTreeHelper.isTopic(this.state.topicTreeCursor)) {
-            control = <TopicViewer topicTreeCursor={this.state.topicTreeCursor}
+            control = <TopicViewer statics={{
+                                       onClickTopic: this.onClickTopic.bind(this),
+                                       onClickContentItem: this.onClickContentItem.bind(this),
+                                   }}
+                                   topicTreeCursor={this.state.topicTreeCursor}
                                    domainTopicTreeCursor={this.state.domainTopicTreeCursor}
-                                   onClickTopic={this.onClickTopic.bind(this)}
-                                   optionsCursor={this.props.optionsCursor}
-                                   onClickContentItem={this.onClickContentItem.bind(this)}/>;
+                                   optionsCursor={this.props.optionsCursor}/>;
         } else if (TopicTreeHelper.isContentList(this.state.topicTreeCursor)) {
             control = <SearchResultsViewer collection={this.state.topicTreeCursor}
                                            onClickContentItem={this.onClickContentItem.bind(this)}
@@ -613,19 +619,20 @@ var MainView = React.createClass({
         return <section className="current" id="index" data-position="current">
             {sidebar}
             <section id="main-content" role="region" className="skin-dark">
-                <AppHeader topicTreeCursor={this.state.topicTreeCursor}
+                <AppHeader statics={{
+                               onClickBack: this.onClickBack.bind(this)
+                           }}
+                           topicTreeCursor={this.state.topicTreeCursor}
                            domainTopicTreeCursor={this.state.domainTopicTreeCursor}
                            rootTopicTreeCursor={this.props.rootTopicTreeCursor}
-                           onClickBack={this.onClickBack.bind(this)}
-                           onTopicSearch={this.onTopicSearch.bind(this)}
                            isPaneShowing={this.isPaneShowing()}
                            isDownloadsShowing={this.state.showDownloads}
                            isProfileShowing={this.state.showProfile}
                            isSettingsShowing={this.state.showSettings}
                            />
-                    {topicSearch}
-                    {control}
-                    <StatusBarViewer onClickCancelDownloadContent={this.onClickCancelDownloadContent.bind(this)} />
+                {topicSearch}
+                {control}
+                <StatusBarViewer onClickCancelDownloadContent={this.onClickCancelDownloadContent.bind(this)} />
             </section>
         </section>;
     }

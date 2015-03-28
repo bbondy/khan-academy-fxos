@@ -17,7 +17,7 @@ var _ = require("underscore"),
  * list view will be replaced with a bunch of different TopicListItem
  * which are the children of the clicked item.
  */
-const TopicListItem = component(({topicTreeCursor, domainTopicTreeCursor, optionsCursor, onClickTopic}) => {
+const TopicListItem = component(({topicTreeCursor, domainTopicTreeCursor, optionsCursor}, {onClickTopic}) => {
     var topicClassObj = {
         "topic-item": true,
         faded: optionsCursor.get("showDownloadsOnly") &&
@@ -40,7 +40,7 @@ const TopicListItem = component(({topicTreeCursor, domainTopicTreeCursor, option
  * This renders the list item and not the actual video.
  * When clicked, it will render the video corresponding to this list item.
  */
-const ContentListItem = component(({topicTreeCursor, domainTopicTreeCursor, optionsCursor, onClick}) => {
+const ContentListItem = component(({topicTreeCursor, domainTopicTreeCursor, optionsCursor}, {onClick}) => {
     var contentNodeClass = classNames({
       "article-node": TopicTreeHelper.isArticle(topicTreeCursor),
       "video-node": TopicTreeHelper.isVideo(topicTreeCursor),
@@ -90,18 +90,22 @@ const ContentListItem = component(({topicTreeCursor, domainTopicTreeCursor, opti
  * Represents a single topic and it displays a list of all of its children.
  * Each child of the list is a ContentListItem
  */
-const TopicViewer = component(({topicTreeCursor, domainTopicTreeCursor, optionsCursor, onClickTopic, onClickContentItem}) => {
+const TopicViewer = component(({topicTreeCursor, domainTopicTreeCursor, optionsCursor}, {onClickTopic, onClickContentItem}) => {
     var topics = TopicTreeHelper.mapChildTopicCursors(topicTreeCursor, (childTopicCursor) => {
-        return <TopicListItem topicTreeCursor={childTopicCursor}
-                              onClickTopic={onClickTopic}
+        return <TopicListItem statics={{
+                                  onClickTopic: onClickTopic
+                              }}
+                              topicTreeCursor={childTopicCursor}
                               optionsCursor={optionsCursor}
                               domainTopicTreeCursor={domainTopicTreeCursor || childTopicCursor}
                               key={TopicTreeHelper.getKey(childTopicCursor)} />;
     });
 
     var contentItems = TopicTreeHelper.mapChildContentCursors(topicTreeCursor, (topicTreeCursor) => {
-        return <ContentListItem topicTreeCursor={topicTreeCursor}
-                                onClick={onClickContentItem}
+        return <ContentListItem statics={{
+                                    onClick: onClickContentItem
+                                }}
+                                topicTreeCursor={topicTreeCursor}
                                 optionsCursor={optionsCursor}
                                 domainTopicTreeCursor={domainTopicTreeCursor}
                                 key={TopicTreeHelper.getKey(topicTreeCursor)} />;
@@ -124,8 +128,10 @@ const TopicViewer = component(({topicTreeCursor, domainTopicTreeCursor, optionsC
  */
 const ContentListViewer = component(({topicTreeCursors, optionsCursor, onClickContentItem}) => {
     var contentItems = topicTreeCursors.map((topicTreeCursor) => {
-        return <ContentListItem videoCursor={topicTreeCursor}
-                                onClick={onClickContentItem}
+        return <ContentListItem statics={{
+                                    onClick: onClickContentItem
+                                }}
+                                videoCursor={topicTreeCursor}
                                 optionsCursor={optionsCursor}
                                 key={TopicTreeHelper.getKey(topicTreeCursor)} />;
     });

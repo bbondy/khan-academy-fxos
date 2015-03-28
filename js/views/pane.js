@@ -17,7 +17,7 @@ var ContentListViewer = topicViews.ContentListViewer;
  * Represents a downloads list which is basically just a wrapper around a
  * ContentListViewer for now.
  */
-const DownloadsViewer = component(({optionsCursor, onClickContentItem}) => {
+const DownloadsViewer = component(({optionsCursor}, {onClickContentItem}) => {
     if (!Downloads.contentList.length) {
         return <div className="downloads">
             <div data-l10n-id="no-downloads">You have no downloads yet!</div>
