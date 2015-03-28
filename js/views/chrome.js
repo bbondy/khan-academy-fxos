@@ -342,6 +342,21 @@ var MainView = React.createClass({
      * be less ugly by simply using a stack of current pane views.
      */
     onClickBack: function(topicTreeCursor: any) {
+        // If settings or profile or ... is set, then don't show it anymore.
+        // This effectively makes the topicTreeCursor be in use again.
+        if (this.isPaneShowing()) {
+            this.setState({
+                showDownloads: false,
+                showProfile: false,
+                showSettings: false,
+                wasLastDownloads: false
+            });
+            if (TopicTreeHelper.isContentList(this.state.topicTreeCursor)) {
+                this.onTopicSearch("");
+            }
+            return;
+        }
+
         var newStack = this.state.navigationStack.shift();
         this.setState({
             navigationStack: newStack,
@@ -371,21 +386,6 @@ var MainView = React.createClass({
                 showSettings: false,
                 wasLastDownloads: false
             });
-        }
-
-        // If settings or profile or ... is set, then don't show it anymore.
-        // This effectively makes the topicTreeCursor be in use again.
-        if (this.isPaneShowing()) {
-            this.setState({
-                showDownloads: false,
-                showProfile: false,
-                showSettings: false,
-                wasLastDownloads: false
-            });
-            if (TopicTreeHelper.isContentList(this.state.topicTreeCursor)) {
-                this.onTopicSearch("");
-            }
-            return;
         }
 
         if (TopicTreeHelper.isContentList(this.state.topicTreeCursor)) {
