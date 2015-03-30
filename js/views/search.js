@@ -5,6 +5,7 @@
 var $ = require("jquery"),
     React = require("react"),
     l10n = require("../l10n"),
+    component = require("omniscient"),
     TopicTreeHelper = require("../data/topic-tree-helper"),
     topicViews = require("./topic");
 
@@ -71,20 +72,14 @@ TopicSearch.propTypes = {
  * Represents a search result list which is basically just a wrapper around a
  * ContentListViewer for now.
  */
-class SearchResultsViewer extends React.Component {
-    render(): any {
-        var control = <ContentListViewer collection={this.props.collection}
-                                         optionsCursor={this.props.optionsCursor}
-                                         onClickContentItem={this.props.onClickContentItem} />;
-        return <div className="topic-list-container">
-            {control}
-        </div>;
-    }
-}
-SearchResultsViewer.propTypes = {
-    collection: React.PropTypes.object.isRequired,
-    onClickContentItem: React.PropTypes.func.isRequired
-};
+const SearchResultsViewer  = component(({collection}, {onClickContentItem}) => {
+    var control = <ContentListViewer collection={this.props.collection}
+                                     optionsCursor={this.props.optionsCursor}
+                                     onClickContentItem={this.props.onClickContentItem} />;
+    return <div className="topic-list-container">
+        {control}
+    </div>;
+}).jsx;
 
 module.exports = {
     TopicSearch,

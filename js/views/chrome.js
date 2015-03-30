@@ -5,7 +5,6 @@
 var $ = require("jquery"),
     _ = require("underscore"),
     l10n = require("../l10n"),
-    React = require("react"),
     classNames = require("classnames"),
     Util = require("../util"),
     models = require("../models"),
@@ -303,6 +302,7 @@ const MainView = component(({topicTreeRootCursor, navInfoCursor, optionsCursor})
         }
 
         var newStack = navInfoCursor.get("navStack").valueOf().shift();
+
         navInfoCursor.merge({
             navStack: newStack,
             topicTreeCursor: newStack.peek(),

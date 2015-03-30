@@ -3,7 +3,6 @@
 "use strict";
 
 var l10n = require("../l10n"),
-    React = require("react"),
     Util = require("../util"),
     models = require("../models"),
     Downloads = require("../downloads"),
@@ -36,87 +35,81 @@ const DownloadsViewer = component(({optionsCursor}, {onClickContentItem}) => {
  * Represents a list of settings which can be modified which affect
  * global state.
  */
-class SettingsViewer extends React.Component {
-    onShowDownloadsChange(event: any) {
-        this.props.optionsCursor.update("showDownloadsOnly", () => event.target.checked);
-    }
-    onShowTranscriptsChange(event: any) {
-        this.props.optionsCursor.update("showTranscripts", () => event.target.checked);
-    }
-    onAutoUpdateTopicTreeChange(event: any) {
-        this.props.optionsCursor.update("autoUpdateTopicTree", () => event.target.checked);
-    }
-    onSetPlaybackRateChange(event: any) {
+const SettingsViewer = component(({optionsCursor}) => {
+    const onShowDownloadsChange = (event) => {
+        optionsCursor.update("showDownloadsOnly", () => event.target.checked);
+    };
+    const onShowTranscriptsChange = (event) => {
+        optionsCursor.update("showTranscripts", () => event.target.checked);
+    };
+    const onAutoUpdateTopicTreeChange = (event) => {
+        optionsCursor.update("autoUpdateTopicTree", () => event.target.checked);
+    };
+    const onSetPlaybackRateChange = (event) => {
         // Convert a value like: 0, 1, 2, 3 to 50, 100, 150, 200
         var percentage = 50 + event.target.value * 50;
-        this.props.optionsCursor.update("playbackRate", () => percentage);
-    }
-    onReset(event: any) {
+        optionsCursor.update("playbackRate", () => percentage);
+    };
+    const onReset = (event) => {
         if (confirm(l10n.get("confirm-reset"))) {
-            this.props.optionsCursor.update(resetOptions);
+            optionsCursor.update(resetOptions);
         }
-    }
-    // YouTube player option is currently disabled due to a bug w/ the
-    // API when on the actual device.  Callbacks aren't always called.
-    render(): any {
-        return <div className="settings topic-list-container">
+    };
 
-            <div data-l10n-id="show-downloads-only">Show downloads only</div>
-            <label className="pack-switch">
-            <input ref="showDownloadsOnly"
-                   className="show-downloads-setting app-chrome"
-                   type="checkbox"
-                   checked={this.props.optionsCursor.get("showDownloadsOnly")}
-                   onChange={this.onShowDownloadsChange.bind(this)}></input>
+    return <div className="settings topic-list-container">
+
+        <div data-l10n-id="show-downloads-only">Show downloads only</div>
+        <label className="pack-switch">
+        <input ref="showDownloadsOnly"
+               className="show-downloads-setting app-chrome"
+               type="checkbox"
+               checked={optionsCursor.get("showDownloadsOnly")}
+               onChange={this.onShowDownloadsChange.bind(this)}></input>
+        <span></span>
+        </label>
+
+        <div data-l10n-id="show-transcripts">Show transcripts</div>
+        <label className="pack-switch">
+        <input ref="showTranscripts"
+               className="show-transcripts-setting app-chrome"
+               type="checkbox"
+               checked={optionsCursor.get("showTranscripts")}
+               onChange={this.onShowTranscriptsChange.bind(this)}></input>
+        <span></span>
+        </label>
+
+        <div data-l10n-id="auto-update-topic-tree">Automatically download new topics</div>
+        <label className="pack-switch">
+        <input ref="autoUpdateTopicTree"
+               className="auto-update-topic-tree-setting app-chrome"
+               type="checkbox"
+               checked={optionsCursor.get("autoUpdateTopicTree")}
+               onChange={this.onAutoUpdateTopicTreeChange.bind(this)}></input>
+        <span></span>
+        </label>
+
+        <div data-l10n-id="set-playback-speed">Set playback speed</div>
+        <label class="icon"></label>
+        <label className="bb-docs">
+        <section role="slider">
+            <input ref="setPlaybackRate"
+                   className="set-playback-speed-setting app-chrome"
+                   id="set-playback-speed"
+                   type="range"
+                   min="0" max="3"
+                   value={(optionsCursor.get("playbackRate") - 50) / 50}
+                   onChange={this.onSetPlaybackRateChange.bind(this)}></input>
+            <label class="icon">{optionsCursor.get("playbackRate")}%</label>
             <span></span>
-            </label>
+        </section>
+        </label>
 
-            <div data-l10n-id="show-transcripts">Show transcripts</div>
-            <label className="pack-switch">
-            <input ref="showTranscripts"
-                   className="show-transcripts-setting app-chrome"
-                   type="checkbox"
-                   checked={this.props.optionsCursor.get("showTranscripts")}
-                   onChange={this.onShowTranscriptsChange.bind(this)}></input>
-            <span></span>
-            </label>
-
-            <div data-l10n-id="auto-update-topic-tree">Automatically download new topics</div>
-            <label className="pack-switch">
-            <input ref="autoUpdateTopicTree"
-                   className="auto-update-topic-tree-setting app-chrome"
-                   type="checkbox"
-                   checked={this.props.optionsCursor.get("autoUpdateTopicTree")}
-                   onChange={this.onAutoUpdateTopicTreeChange.bind(this)}></input>
-            <span></span>
-            </label>
-
-            <div data-l10n-id="set-playback-speed">Set playback speed</div>
-            <label class="icon"></label>
-            <label className="bb-docs">
-            <section role="slider">
-                <input ref="setPlaybackRate"
-                       className="set-playback-speed-setting app-chrome"
-                       id="set-playback-speed"
-                       type="range"
-                       min="0" max="3"
-                       value={(this.props.optionsCursor.get("playbackRate") - 50) / 50}
-                       onChange={this.onSetPlaybackRateChange.bind(this)}></input>
-                <label class="icon">{this.props.optionsCursor.get("playbackRate")}%</label>
-                <span></span>
-            </section>
-            </label>
-
-            <button id="reset-button"
-                    className="reset-button"
-                    data-l10n-id="reset-setting"
-                    onClick={this.onReset.bind(this)}>Reset</button>
-        </div>;
-    }
-}
-SettingsViewer.propTypes = {
-    optionsCursor: React.PropTypes.object.isRequired
-};
+        <button id="reset-button"
+                className="reset-button"
+                data-l10n-id="reset-setting"
+                onClick={this.onReset.bind(this)}>Reset</button>
+    </div>;
+}).jsx;
 
 /**
  * Represents a user's profile. It gives the user information about their
