@@ -26,7 +26,7 @@ const TopicListItem = component(({topicTreeCursor, domainTopicTreeCursor, option
     topicClassObj[TopicTreeHelper.getId(domainTopicTreeCursor)] = true;
     var topicClass = classNames(topicClassObj);
     return <li className={topicClass}>
-        { topicTreeCursor === domainTopicTreeCursor &&
+        { TopicTreeHelper.getKey(topicTreeCursor) === TopicTreeHelper.getKey(domainTopicTreeCursor) &&
             <div className="color-block"/> }
         <a href="javascript:void(0)"
            onClick={_.partial(onClickTopic, topicTreeCursor, domainTopicTreeCursor)}>

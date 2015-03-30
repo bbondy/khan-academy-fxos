@@ -12,7 +12,10 @@ var React = require("react"),
     chromeViews = require("./views/chrome"),
     {Stack} = require("immutable"),
     {readOptions, resetOptions, writeOptions} = require("./data/app-options"),
+    {getId} = require("./data/topic-tree-helper"),
     {readTopicTree} = require("./data/topic-tree"),
+    {resetNavInfo} = require("./data/nav-info"),
+    Immutable = require("immutable"),
     Cursor = require('immutable/contrib/cursor');
 
 // TODO: remove, just for easy inpsection
@@ -41,8 +44,23 @@ document.addEventListener("visibilitychange", function(e) {
 var MainView = chromeViews.MainView;
 var mountNode = document.getElementById("app");
 
+// Start showing the topic tree
+var options = readOptions() || resetOptions();
+var updateOptionsCursor = (newOptions) => {
+    writeOptions(newOptions);
+    mainView.setProps({ optionsCursor: Cursor.from(newOptions, updateOptionsCursor) });
+};
+var optionsCursor = Cursor.from(options, updateOptionsCursor);
+var navInfo = resetNavInfo();
+
+var updateNavInfoCursor = (newNavInfo) => {
+    mainView.setProps({ navInfoCursor: Cursor.from(newNavInfo, updateNavInfoCursor) });
+};
+var navInfoCursor = Cursor.from(navInfo, updateNavInfoCursor);
+
 // Render the main app chrome
-var mainView = React.render(<MainView/>, mountNode);
+var mainView = React.render(<MainView optionsCursor={optionsCursor}
+                                      navInfoCursor={navInfoCursor} />, mountNode);
 
 // Init everything
 Storage.init().then(function() {
@@ -55,29 +73,15 @@ Storage.init().then(function() {
     // We don't want to have to wait for results, so just start this and don't wait
     models.CurrentUser.init();
 
-    readTopicTree().then((immutableTopicTree) => {
-        var updateTopicTreeCursor = (newTopicTreeRoot) => {
-            var topicTreeCursor = Cursor.from(immutableTopicTree, updateTopicTreeCursor);
-            mainView.setProps({
-                topicTreeRootCursor: topicTreeCursor,
-                rootTopicTreeCursor: topicTreeCursor,
-            });
-            mainView.setState({
-                topicTreeCursor: topicTreeCursor,
-                navigationStack: Stack.of(topicTreeCursor),
-            });
-        };
-        updateTopicTreeCursor(immutableTopicTree);
+    readTopicTree().then((rootTopicTreeCursor) => {
+        // Setup immutable nav info cursor
+        navInfoCursor.merge({
+            topicTreeCursor: rootTopicTreeCursor,
+            rootTopicTreeCursor,
+            navStack: Immutable.Stack.of(rootTopicTreeCursor),
+        });
     });
 
-    // Start showing the topic tree
-    var options = readOptions() || resetOptions();
-    var updateOptionsCursor = (newOptions) => {
-        writeOptions(newOptions);
-        mainView.setProps({ optionsCursor: Cursor.from(newOptions, updateOptionsCursor) });
-    };
-    var optionsCursor = Cursor.from(options, updateOptionsCursor);
-    mainView.setProps({optionsCursor});
 }).catch((error) => {
     alert(error);
     if (Util.isFirefoxOS()) {

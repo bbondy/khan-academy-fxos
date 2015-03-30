@@ -20,9 +20,10 @@ var $ = require("jquery"),
     topicViews = require("./topic"),
     searchViews = require("./search"),
     paneViews = require("./pane"),
-    TopicTreeHelper = require("../data/topic-tree-helper"),
     Immutable = require("immutable"),
     component = require('omniscient'),
+    TopicTreeHelper = require("../data/topic-tree-helper"),
+    { getDomainTopicTreeCursor } = require("../data/nav-info"),
     { TopicTreeNode } = require("../data/topic-tree");
 
 var VideoViewer = videoViews.VideoViewer;
@@ -75,7 +76,7 @@ const AppHeader = component((props, {onClickBack}) => {
             (props.isPaneShowing ||
                 TopicTreeHelper.isContent(topicTreeCursor) ||
                 TopicTreeHelper.isTopic(topicTreeCursor) &&
-            props.rootTopicTreeCursor !== topicTreeCursor) ||
+            TopicTreeHelper.getKey(props.rootTopicTreeCursor) !== TopicTreeHelper.getKey(topicTreeCursor)) ||
             TopicTreeHelper.isContentList(topicTreeCursor)) {
         backButton = <BackButton statics={{
                                      onClickBack: onClickBack
@@ -86,7 +87,7 @@ const AppHeader = component((props, {onClickBack}) => {
     var styleObj = {
         fixed: true,
         "topic-header": topicTreeCursor &&
-            topicTreeCursor !== props.rootTopicTreeCursor &&
+            TopicTreeHelper.getKey(topicTreeCursor) !== TopicTreeHelper.getKey(props.rootTopicTreeCursor) &&
             !props.isPaneShowing &&
             (TopicTreeHelper.isTopic(topicTreeCursor) || TopicTreeHelper.isContent(topicTreeCursor))
     };
@@ -236,105 +237,84 @@ const Sidebar = component((props) => {
  * things when certain page actions change.  No other part of the code is repsonsible
  * for the overall top level view (which is nice and clean ;)).
  */
-var MainView = React.createClass({
-    propTypes: {
-        // Optional because it's not specified until the topic tree is loaded
-        topicTreeCursor: React.PropTypes.object,
-        cursorOptions: React.PropTypes.object.isRequired,
-    },
-    mixins: [Util.LocalizationMixin],
+const MainView = component(({topicTreeRootCursor, navInfoCursor, optionsCursor}) => {
+    //mixins: [Util.LocalizationMixin],
     //mixins: [Util.BackboneMixin, Util.LocalizationMixin],
     //getBackboneModels: function(): Array<any> {
     //    return [new models.ContentList(models.TopicTree.allContentItems),
     //        models.AppOptions, models.TempAppState, models.CurrentUser];
     //},
-    getInitialState: function() {
-        return {
-            topicTreeCursor: this.props.topicTreeRootCursor,
-            domainTopicTreeCursor: null,
-            navigationStack: Immutable.Stack.of(this.props.topicTreeCursor),
-            isPaneShowing: false,
-            showProfile: false,
-            showDownloads: false,
-            showSettings: false,
-            wasLastDownloads: false,
-        };
-    },
-    onClickContentItemFromDownloads: function(topicTreeCursor: any) {
+
+
+    const onClickContentItemFromDownloads = (topicTreeCursor) => {
         // We need to keep track of the lastTopicTreeCursor here because
         // we're changing the topicTreeCursor, so going back from the
         // downloads pane would be impossible otherwise.
-        this.setState({
+        navInfoCursor.merge({
             topicTreeCursor,
             showProfile: false,
             showDownloads: false,
             showSettings: false,
             wasLastDownloads: true,
-            lastTopicTreeCursor: this.state.topicTreeCursor
+            lastTopicTreeCursor: navInfoCursor.get("lastTopicTreeCursor")
         });
-    },
-    onClickContentItem: function(topicTreeCursor: any) {
-        this.setState({
+    };
+
+    const onClickContentItem = (topicTreeCursor) => {
+        navInfoCursor.merge({
             topicTreeCursor,
             showProfile: false,
             showDownloads: false,
             showSettings: false
         });
-    },
-    getDomainTopicTreeCursor(newTopicTreeCursor) {
-        var domainTopicTreeCursor = this.state.domainTopicTreeCursor;
-        if (!domainTopicTreeCursor) {
-            domainTopicTreeCursor = newTopicTreeCursor;
-        } else if (this.props.rootTopicTreeCursor === newTopicTreeCursor) {
-            domainTopicTreeCursor = null;
-        }
-        return domainTopicTreeCursor;
-    },
-    onClickTopic: function(newTopicTreeCursor: any) {
-        this.setState({
+    };
+
+    const onClickTopic = (newTopicTreeCursor) => {
+        navInfoCursor.merge({
             topicTreeCursor: newTopicTreeCursor,
-            domainTopicTreeCursor: this.getDomainTopicTreeCursor(newTopicTreeCursor),
-            navigationStack: this.state.navigationStack.unshift(newTopicTreeCursor),
+            domainTopicTreeCursor: getDomainTopicTreeCursor(navInfoCursor, newTopicTreeCursor),
+            navStack: navInfoCursor.get("navStack").valueOf().unshift(newTopicTreeCursor),
             showProfile: false,
             showDownloads: false,
             showSettings: false,
             wasLastDownloads: false
         });
-    },
+    };
+
     /**
      * Performs the action users expect when pressing the back button.
      * TODO: This works fine as is, but the logic can be simplified and
      * be less ugly by simply using a stack of current pane views.
      */
-    onClickBack: function(topicTreeCursor: any) {
+    const onClickBack = (topicTreeCursor) => {
         // If settings or profile or ... is set, then don't show it anymore.
         // This effectively makes the topicTreeCursor be in use again.
-        if (this.isPaneShowing()) {
-            this.setState({
+        if (isPaneShowing()) {
+            navInfoCursor.merge({
                 showDownloads: false,
                 showProfile: false,
                 showSettings: false,
                 wasLastDownloads: false
             });
-            if (TopicTreeHelper.isContentList(this.state.topicTreeCursor)) {
-                this.onTopicSearch("");
+            if (TopicTreeHelper.isContentList(navInfoCursor.get("topicTreeCursor"))) {
+                onTopicSearch("");
             }
             return;
         }
 
-        var newStack = this.state.navigationStack.shift();
-        this.setState({
-            navigationStack: newStack,
+        var newStack = navInfoCursor.get("navStack").valueOf().shift();
+        navInfoCursor.merge({
+            navStack: newStack,
             topicTreeCursor: newStack.peek(),
-            domainTopicTreeCursor: this.getDomainTopicTreeCursor(newStack.peek()),
+            domainTopicTreeCursor: getDomainTopicTreeCursor(navInfoCursor, newStack.peek()),
         });
 
 
         /*
         // If we were on a content item from downloads,
         // then go back to downloads.
-        if (this.state.wasLastDownloads) {
-            this.onClickDownloads();
+        if (navInfoCursor.get("wasLastDownloads")) {
+            onClickDownloads();
             return;
         }
 
@@ -342,9 +322,9 @@ var MainView = React.createClass({
         // presisng back from the downloads screen itself.
         // The lastTopicTreeCursor is needed because the downloads pane is the
         // only pane where clicking on it can change the topicTreeCursor.
-        if (this.state.lastTopicTreeCursor) {
-            this.setState({
-                topicTreeCursor: this.state.lastTopicTreeCursor,
+        if (navInfoCursor.get("lastTopicTreeCursor")) {
+            navInfoCursor.merge({
+                topicTreeCursor: navInfoCursor.get("lastTopicTreeCursor"),
                 lastTopicTreeCursor: undefined,
                 showDownloads: false,
                 showProfile: false,
@@ -353,11 +333,11 @@ var MainView = React.createClass({
             });
         }
 
-        if (TopicTreeHelper.isContentList(this.state.topicTreeCursor)) {
-            return this.onTopicSearch("");
+        if (TopicTreeHelper.isContentList(navInfoCursor.get("topicTreeCursor"))) {
+            return onTopicSearch("");
         }
 
-        this.setState({
+        navInfoCursor.merge({
             topicTreeCursor: getParent(topicTreeCursor),
             showProfile: false,
             showDownloads: false,
@@ -365,40 +345,46 @@ var MainView = React.createClass({
             wasLastDownloads: false
         });
         */
-    },
-    onClickSignin: function() {
+    };
+
+    const onClickSignin = () => {
         APIClient.signIn();
-        this.forceUpdate();
-    },
-    onClickSignout: function() {
+        //this.forceUpdate();
+    };
+
+    const onClickSignout = () => {
         models.CurrentUser.signOut();
-        this.forceUpdate();
-    },
-    onClickProfile: function() {
-        this.setState({
+        //this.forceUpdate();
+    };
+
+    const onClickProfile = () => {
+        navInfoCursor.merge({
             showProfile: true,
             showDownloads: false,
             showSettings: false,
             wasLastDownloads: false
         });
-    },
-    onClickDownloads: function() {
-        this.setState({
+    };
+
+    const onClickDownloads = () => {
+        navInfoCursor.merge({
             showDownloads: true,
             showProfile: false,
             showSettings: false,
             wasLastDownloads: false
         });
-    },
-    onClickSettings: function() {
-        this.setState({
+    };
+
+    const onClickSettings = () => {
+        navInfoCursor.merge({
             showDownloads: false,
             showProfile: false,
             showSettings: true,
             wasLastDownloads: false
         });
-    },
-    _openUrl: function(url: string) {
+    };
+
+    const openUrl = (url) => {
         if (window.MozActivity) {
             new window.MozActivity({
                 name: "view",
@@ -411,15 +397,18 @@ var MainView = React.createClass({
             window.open(url, "_blank");
         }
 
-    },
-    onClickSupport: function() {
+    };
+
+    const onClickSupport = () => {
         var url = "https://khanacademy.zendesk.com/hc/communities/public/topics/200155074-Mobile-Discussions";
-        this._openUrl(url);
-    },
-    onClickViewOnKA: function(topicTreeCursor: any) {
-        this._openUrl(TopicTreeHelper.getKAUrl(topicTreeCursor));
-    },
-    onClickShare: function(topicTreeCursor: any) {
+        _openUrl(url);
+    };
+
+    const onClickViewOnKA = (topicTreeCursor) => {
+        _openUrl(TopicTreeHelper.getKAUrl(topicTreeCursor));
+    };
+
+    const onClickShare = (topicTreeCursor) => {
         new window.MozActivity({
             name: "share",
             data: {
@@ -427,8 +416,9 @@ var MainView = React.createClass({
                 url: TopicTreeHelper.getKAUrl(topicTreeCursor)
             }
         });
-    },
-    onClickDownloadContent: function(topicTreeCursor: any) {
+    };
+
+    const onClickDownloadContent = (topicTreeCursor) => {
         var totalCount = 1;
         if (TopicTreeHelper.isTopic(topicTreeCursor)) {
             totalCount = getChildNotDownloadedCount(topicTreeCursor);
@@ -516,127 +506,136 @@ var MainView = React.createClass({
             Status.stop();
             Notifications.info(title, message, () => {});
         });
-    },
-    onClickCancelDownloadContent: function() {
+    };
+
+    const onClickCancelDownloadContent = () => {
         if (!confirm(l10n.get("cancel-download-warning"))) {
             return;
         }
         Downloads.cancelDownloading();
-    },
-    onClickDeleteDownloadedContent: function(video: any) {
+    };
+
+    const onClickDeleteDownloadedContent = (video) => {
         Downloads.deleteContent(video);
-    },
-    isPaneShowing: function(): boolean {
-        return this.state.showDownloads ||
-            this.state.showProfile ||
-            this.state.showSettings;
-    },
-    onTopicSearch: function(topicSearch: string) {
+    };
+
+    const isPaneShowing = () => {
+        return navInfoCursor.get("showDownloads") ||
+            navInfoCursor.get("showProfile") ||
+            navInfoCursor.get("showSettings");
+    };
+
+    const onTopicSearch = (topicSearch) => {
         if (!topicSearch) {
-            this.setState({topicTreeCursor: this.state.searchingTopicTreeCursor, searchingTopicTreeCursor: null});
+            navInfoCursor.merge({
+                topicTreeCursor: navInfoCursor.get("searchingTopicTreeCursor"),
+                searchingTopicTreeCursor: null
+            });
             return;
         }
-        var searchingTopicTreeCursor = this.state.searchingTopicTreeCursor;
+        var searchingTopicTreeCursor = navInfoCursor.get("searchingTopicTreeCursor");
         if (!searchingTopicTreeCursor) {
-            searchingTopicTreeCursor = this.state.topicTreeCursor;
+            searchingTopicTreeCursor = navInfoCursor.get("topicTreeCursor");
         }
         var results = searchingtopicTreeCursor.findContentItems(topicSearch);
         var contentList = new models.ContentList(results);
-        this.setState({topicTreeCursor: contentList, searchingTopicTreeCursor: searchingTopicTreeCursor});
-    },
-    render: function(): any {
-        // Make sure scrollTop is at the top of the page
-        // This is in case the search box scrolling doesn't get an onblur
-        if (this.state.topicTreeCursor && !TopicTreeHelper.isContentList(this.state.topicTreeCursor)) {
-            $("html, body").scrollTop(0);
-        }
+        navInfoCursor.merge({
+            topicTreeCursor: contentList,
+            searchingTopicTreeCursor: searchingTopicTreeCursor
+        });
+    };
 
-        var control;
-        if (!this.state.topicTreeCursor) {
-            // Still loading topic tree
-            control = <div className="app-loading"/>;
-        } else if (this.state.showProfile) {
-            control = <ProfileViewer/>;
-        } else if (this.state.showDownloads) {
-            control = <DownloadsViewer statics={{
-                                           onClickContentItem: this.onClickContentItemFromDownloads.bind(this)
-                                       }}
-                                       optionsCursor={this.props.optionsCursor}/>;
-        } else if (this.state.showSettings) {
-            control = <SettingsViewer optionsCursor={this.props.optionsCursor}/>;
-        } else if (TopicTreeHelper.isTopic(this.state.topicTreeCursor)) {
-            control = <TopicViewer statics={{
-                                       onClickTopic: this.onClickTopic.bind(this),
-                                       onClickContentItem: this.onClickContentItem.bind(this),
-                                   }}
-                                   topicTreeCursor={this.state.topicTreeCursor}
-                                   domainTopicTreeCursor={this.state.domainTopicTreeCursor}
-                                   optionsCursor={this.props.optionsCursor}/>;
-        } else if (TopicTreeHelper.isContentList(this.state.topicTreeCursor)) {
-            control = <SearchResultsViewer collection={this.state.topicTreeCursor}
-                                           onClickContentItem={this.onClickContentItem.bind(this)}
-                                           optionsCursor={this.props.optionsCursor}/>;
-        } else if (TopicTreeHelper.isVideo(this.state.topicTreeCursor)) {
-            control = <VideoViewer topicTreeCursor={this.state.topicTreeCursor}
-                                   domainTopicTreeCursor={this.state.domainTopicTreeCursor}
-                                   optionsCursor={this.props.optionsCursor}/>;
-        } else if (TopicTreeHelper.isArticle(this.state.topicTreeCursor)) {
-            control = <ArticleViewer  topicTreeCursor={this.state.topicTreeCursor}/>;
-        } else if (TopicTreeHelper.isExercise(this.state.topicTreeCursor)) {
-            control = <ExerciseViewer  topicTreeCursor={this.state.topicTreeCursor}/>;
-        } else {
-            Util.error("Unrecognized content item!");
-        }
-
-        var topicSearch;
-        if (!this.isPaneShowing() && this.state.topicTreeCursor &&
-                !TopicTreeHelper.isContent(this.state.topicTreeCursor)) {
-            topicSearch = <TopicSearch topicTreeCursor={this.state.topicTreeCursor}
-                                       optionsCursor={this.props.optionsCursor}
-                                       onTopicSearch={this.onTopicSearch.bind(this)}/>;
-        }
-
-        var sidebar;
-        if (this.state.topicTreeCursor) {
-            sidebar = <Sidebar topicTreeCursor={this.state.topicTreeCursor}
-                               onClickSignin={this.onClickSignin.bind(this)}
-                               onClickSignout={this.onClickSignout.bind(this)}
-                               onClickProfile={this.onClickProfile.bind(this)}
-                               onClickDownloads={this.onClickDownloads.bind(this)}
-                               onClickSettings={this.onClickSettings.bind(this)}
-                               onClickSupport={this.onClickSupport.bind(this)}
-                               onClickDownloadContent={this.onClickDownloadContent.bind(this)}
-                               onClickViewOnKA={this.onClickViewOnKA.bind(this)}
-                               onClickShare={this.onClickShare.bind(this)}
-                               onClickCancelDownloadContent={this.onClickCancelDownloadContent.bind(this)}
-                               onClickDeleteDownloadedContent={this.onClickDeleteDownloadedContent.bind(this)}
-                               isPaneShowing={this.isPaneShowing()}
-                               isDownloadsShowing={this.state.showDownloads}
-                               isProfileShowing={this.state.showProfile}
-                               isSettingsShowing={this.state.showSettings} />;
-        }
-
-        return <section className="current" id="index" data-position="current">
-            {sidebar}
-            <section id="main-content" role="region" className="skin-dark">
-                <AppHeader statics={{
-                               onClickBack: this.onClickBack.bind(this)
-                           }}
-                           topicTreeCursor={this.state.topicTreeCursor}
-                           domainTopicTreeCursor={this.state.domainTopicTreeCursor}
-                           rootTopicTreeCursor={this.props.rootTopicTreeCursor}
-                           isPaneShowing={this.isPaneShowing()}
-                           isDownloadsShowing={this.state.showDownloads}
-                           isProfileShowing={this.state.showProfile}
-                           isSettingsShowing={this.state.showSettings}
-                           />
-                {topicSearch}
-                {control}
-                <StatusBarViewer onClickCancelDownloadContent={this.onClickCancelDownloadContent.bind(this)} />
-            </section>
-        </section>;
+    // Make sure scrollTop is at the top of the page
+    // This is in case the search box scrolling doesn't get an onblur
+    if (navInfoCursor.get("topicTreeCursor") && !TopicTreeHelper.isContentList(navInfoCursor.get("topicTreeCursor"))) {
+        $("html, body").scrollTop(0);
     }
-});
+
+    var control;
+    if (!navInfoCursor.get("topicTreeCursor")) {
+        // Still loading topic tree
+        control = <div className="app-loading"/>;
+    } else if (navInfoCursor.get("showProfile")) {
+        control = <ProfileViewer/>;
+    } else if (navInfoCursor.get("showDownloads")) {
+        control = <DownloadsViewer statics={{
+                                       onClickContentItem: onClickContentItemFromDownloads
+                                   }}
+                                   optionsCursor={optionsCursor}/>;
+    } else if (navInfoCursor.get("showSettings")) {
+        control = <SettingsViewer optionsCursor={optionsCursor}/>;
+    } else if (TopicTreeHelper.isTopic(navInfoCursor.get("topicTreeCursor"))) {
+        control = <TopicViewer statics={{
+                                   onClickTopic: onClickTopic,
+                                   onClickContentItem: onClickContentItem,
+                               }}
+                               topicTreeCursor={navInfoCursor.get("topicTreeCursor")}
+                               domainTopicTreeCursor={navInfoCursor.get("domainTopicTreeCursor")}
+                               optionsCursor={optionsCursor}/>;
+    } else if (TopicTreeHelper.isContentList(navInfoCursor.get("topicTreeCursor"))) {
+        control = <SearchResultsViewer collection={navInfoCursor.get("topicTreeCursor")}
+                                       onClickContentItem={onClickContentItem}
+                                       optionsCursor={optionsCursor}/>;
+    } else if (TopicTreeHelper.isVideo(navInfoCursor.get("topicTreeCursor"))) {
+        control = <VideoViewer topicTreeCursor={navInfoCursor.get("topicTreeCursor")}
+                               domainTopicTreeCursor={navInfoCursor.get("domainTopicTreeCursor")}
+                               optionsCursor={optionsCursor}/>;
+    } else if (TopicTreeHelper.isArticle(navInfoCursor.get("topicTreeCursor"))) {
+        control = <ArticleViewer  topicTreeCursor={navInfoCursor.get("topicTreeCursor")}/>;
+    } else if (TopicTreeHelper.isExercise(navInfoCursor.get("topicTreeCursor"))) {
+        control = <ExerciseViewer  topicTreeCursor={navInfoCursor.get("topicTreeCursor")}/>;
+    } else {
+        Util.error("Unrecognized content item!");
+    }
+
+    var topicSearch;
+    if (!isPaneShowing() && navInfoCursor.get("topicTreeCursor") &&
+            !TopicTreeHelper.isContent(navInfoCursor.get("topicTreeCursor"))) {
+        topicSearch = <TopicSearch topicTreeCursor={navInfoCursor.get("topicTreeCursor")}
+                                   optionsCursor={optionsCursor}
+                                   onTopicSearch={onTopicSearch}/>;
+    }
+
+    var sidebar;
+    if (navInfoCursor.get("topicTreeCursor")) {
+        sidebar = <Sidebar topicTreeCursor={navInfoCursor.get("topicTreeCursor")}
+                           onClickSignin={onClickSignin}
+                           onClickSignout={onClickSignout}
+                           onClickProfile={onClickProfile}
+                           onClickDownloads={onClickDownloads}
+                           onClickSettings={onClickSettings}
+                           onClickSupport={onClickSupport}
+                           onClickDownloadContent={onClickDownloadContent}
+                           onClickViewOnKA={onClickViewOnKA}
+                           onClickShare={onClickShare}
+                           onClickCancelDownloadContent={onClickCancelDownloadContent}
+                           onClickDeleteDownloadedContent={onClickDeleteDownloadedContent}
+                           isPaneShowing={isPaneShowing()}
+                           isDownloadsShowing={navInfoCursor.get("showDownloads")}
+                           isProfileShowing={navInfoCursor.get("showProfile")}
+                           isSettingsShowing={navInfoCursor.get("showSettings")} />;
+    }
+
+    return <section className="current" id="index" data-position="current">
+        {sidebar}
+        <section id="main-content" role="region" className="skin-dark">
+            <AppHeader statics={{
+                           onClickBack: onClickBack
+                       }}
+                       topicTreeCursor={navInfoCursor.get("topicTreeCursor")}
+                       domainTopicTreeCursor={navInfoCursor.get("domainTopicTreeCursor")}
+                       rootTopicTreeCursor={navInfoCursor.get("rootTopicTreeCursor")}
+                       isPaneShowing={isPaneShowing()}
+                       isDownloadsShowing={navInfoCursor.get("showDownloads")}
+                       isProfileShowing={navInfoCursor.get("showProfile")}
+                       isSettingsShowing={navInfoCursor.get("showSettings")}
+                       />
+            {topicSearch}
+            {control}
+            <StatusBarViewer onClickCancelDownloadContent={onClickCancelDownloadContent} />
+        </section>
+    </section>;
+}).jsx;
 
 module.exports = {
     BackButton,
