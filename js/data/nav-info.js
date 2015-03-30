@@ -24,8 +24,11 @@ const getDomainTopicTreeCursor = (navInfoCursor, newTopicTreeCursor) => {
     return domainTopicTreeCursor;
 };
 
+const isPaneShowing = (navInfoCursor) => navInfoCursor.get("showDownloads") ||
+    navInfoCursor.get("showProfile") || navInfoCursor.get("showSettings");
 
 module.exports = {
     resetNavInfo,
     getDomainTopicTreeCursor,
+    isPaneShowing,
 };
