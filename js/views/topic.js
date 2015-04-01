@@ -90,60 +90,65 @@ const ContentListItem = component(({topicTreeCursor, domainTopicTreeCursor, opti
  * Represents a single topic and it displays a list of all of its children.
  * Each child of the list is a ContentListItem
  */
-const TopicViewer = component(({topicTreeCursor, domainTopicTreeCursor, optionsCursor}, {onClickTopic, onClickContentItem}) => {
-    var topics = TopicTreeHelper.mapChildTopicCursors(topicTreeCursor, (childTopicCursor) => {
-        return <TopicListItem statics={{
-                                  onClickTopic: onClickTopic
-                              }}
-                              topicTreeCursor={childTopicCursor}
-                              optionsCursor={optionsCursor}
-                              domainTopicTreeCursor={domainTopicTreeCursor || childTopicCursor}
-                              key={TopicTreeHelper.getKey(childTopicCursor)} />;
-    });
-
-    var contentItems = TopicTreeHelper.mapChildContentCursors(topicTreeCursor, (topicTreeCursor) => {
-        return <ContentListItem statics={{
-                                    onClick: onClickContentItem
-                                }}
-                                topicTreeCursor={topicTreeCursor}
-                                optionsCursor={optionsCursor}
-                                domainTopicTreeCursor={domainTopicTreeCursor}
-                                key={TopicTreeHelper.getKey(topicTreeCursor)} />;
-    });
-
-    return <div className="topic-list-container">
+const TopicViewer = component(({topicTreeCursor, domainTopicTreeCursor, optionsCursor}, {onClickTopic, onClickContentItem}) =>
+    <div className="topic-list-container">
         <section data-type="list">
             <ul>
-                {topics}
-                {contentItems}
+                {
+                    // Output the child topics
+                    TopicTreeHelper.mapChildTopicCursors(topicTreeCursor, (childTopicCursor) =>
+                        <TopicListItem
+                            statics={{
+                                onClickTopic: onClickTopic
+                            }}
+                            topicTreeCursor={childTopicCursor}
+                            optionsCursor={optionsCursor}
+                            domainTopicTreeCursor={domainTopicTreeCursor || childTopicCursor}
+                            key={TopicTreeHelper.getKey(childTopicCursor)} />
+                    )
+                }
+
+                {
+                    // Output the child content items
+                    TopicTreeHelper.mapChildContentCursors(topicTreeCursor, (topicTreeCursor) =>
+                        <ContentListItem
+                            statics={{
+                                onClick: onClickContentItem
+                            }}
+                            topicTreeCursor={topicTreeCursor}
+                            optionsCursor={optionsCursor}
+                            domainTopicTreeCursor={domainTopicTreeCursor}
+                            key={TopicTreeHelper.getKey(topicTreeCursor)} />
+                    )
+                }
+
             </ul>
         </section>
-    </div>;
-}).jsx;
+    </div>
+).jsx;
 
 /**
  * Represents a list of content items.
  * This is used for displaying search results and download lists.
  * This always contains only a list of VideoListItems, or ARticleListItems.
  */
-const ContentListViewer = component(({topicTreeCursors, optionsCursor, onClickContentItem}) => {
-    var contentItems = topicTreeCursors.map((topicTreeCursor) => {
-        return <ContentListItem statics={{
-                                    onClick: onClickContentItem
-                                }}
-                                videoCursor={topicTreeCursor}
-                                optionsCursor={optionsCursor}
-                                key={TopicTreeHelper.getKey(topicTreeCursor)} />;
-    });
-
-    return <div className="topic-list-container">
+const ContentListViewer = component(({topicTreeCursors, optionsCursor, onClickContentItem}) =>
+    <div className="topic-list-container">
         <section data-type="list">
             <ul>
-                {contentItems}
+                {
+                    topicTreeCursors.map((topicTreeCursor) => <ContentListItem statics={{
+                            onClick: onClickContentItem
+                        }}
+                        videoCursor={topicTreeCursor}
+                        optionsCursor={optionsCursor}
+                        key={TopicTreeHelper.getKey(topicTreeCursor)} />
+                    )
+                }
             </ul>
         </section>
-    </div>;
-}).jsx;
+    </div>
+).jsx;
 
 module.exports = {
     ContentListItem,

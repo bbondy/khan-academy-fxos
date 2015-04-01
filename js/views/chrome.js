@@ -42,28 +42,28 @@ var ProfileViewer = paneViews.ProfileViewer;
  * In general, when clicked it will take the user to the last view they were
  * at before.
  */
-const BackButton = component(({topicTreeCursor}, {onClickBack}) => {
-    return <div>
+const BackButton = component(({topicTreeCursor}, {onClickBack}) =>
+    <div>
         <a className="icon-back-link " href="javascript:void(0)" onClick={onClickBack}>
             <span className="icon icon-back">Back</span>
         </a>
-    </div>;
-}).jsx;
+    </div>
+).jsx;
 
 /**
  * Represents the menu button which is found on the top right of the header
  * on all screens.
  * When clicked it will expand a drawer with context sensitive options.
  */
-const MenuButton = component(() => {
-    return <div>
+const MenuButton = component(() =>
+    <div>
         <menu type="toolbar" className="icon-menu-link ">
             <a href="#main-content">
                 <span className="icon icon-menu">Menu</span>
             </a>
         </menu>
-    </div>;
-}).jsx;
+    </div>
+).jsx;
 
 /**
  * Represents the app header, it contains the back button, the menu button,
