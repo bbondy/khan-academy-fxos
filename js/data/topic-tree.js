@@ -16,15 +16,12 @@ const readTopicTree = () => {
     return new Promise((resolve, reject) => {
         // Check if we have a local downloaded copy of the topic tree
         Util.log("loading topic tree from storage: " + getTopicTreeFilename());
-        var topicTreePromise = Storage.readText(getTopicTreeFilename());
-        topicTreePromise.then((topicTree) => {
+        Storage.readText(getTopicTreeFilename()).then((topicTree) => {
             Util.log("Loaded topic tree from local copy, parsing...");
             resolve(Immutable.fromJS(JSON.parse(topicTree)));
-        });
-
-        // If we don't have a local downloaded copy, load in the
-        // one we shipped with for the instaled app.
-        topicTreePromise.catch(() => {
+        }).catch(() => {
+            // If we don't have a local downloaded copy, load in the
+            // one we shipped with for the instaled app.
             var filename = `/data/topic-tree`;
             var lang = Util.getLang();
             if (lang) {

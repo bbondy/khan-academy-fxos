@@ -28,7 +28,7 @@ var Storage = {
     readAsBlob: function(filename: string): any {
         return new Promise((resolve, reject) => {
             if (!this.sdcard) {
-                return reject();
+                return setTimeout(reject, 0);
             }
             var request = this.sdcard.get(filename);
             request.onsuccess = function() {
@@ -46,7 +46,7 @@ var Storage = {
     readText: function(filename: string): any {
         return new Promise((resolve, reject) => {
             if (!this.sdcard) {
-                return reject();
+                return setTimeout(reject, 0);
             }
             var request = this.sdcard.get(filename);
             request.onsuccess = function() {
@@ -70,7 +70,7 @@ var Storage = {
     delete: function(filename: string): any {
         return new Promise((resolve, reject) => {
             if (!this.sdcard) {
-                return reject();
+                return setTimeout(reject, 0);
             }
             var request = this.sdcard.delete(filename);
             request.onsuccess = function() {
