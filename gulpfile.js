@@ -106,7 +106,7 @@ gulp.task("webpack", function(callback) {
 // Starts a webpack dev-server on port 8008
 // localhost:8008 can be used instead for development.
 // The bundle.js file will not be written out and will be served from memory.
-gulp.task("webpack-dev-server", function(callback) {
+gulp.task("server", function(callback) {
     var myConfig = Object.create(webpackConfig);
     myConfig.debug = true;
     myConfig.cache = true;
