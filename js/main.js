@@ -66,8 +66,6 @@ var mainView = React.render(<MainView optionsCursor={optionsCursor}
 Storage.init().then(function() {
     return APIClient.init();
 }).then(function() {
-    return models.TopicTree.init();
-}).then(function() {
     return Promise.all([Downloads.init(), Cache.init()]);
 }).then(function() {
     // We don't want to have to wait for results, so just start this and don't wait
