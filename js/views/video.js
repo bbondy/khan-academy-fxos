@@ -4,6 +4,7 @@
 
 var $ = require("jquery"),
     _ = require("underscore"),
+    component = require("omniscient"),
     l10n = require("../l10n"),
     React = require("react"),
     classNames = require("classnames"),
@@ -17,44 +18,36 @@ var $ = require("jquery"),
  * Represents a single transcript item for the list of transcript items.
  * When clicekd, it willl fast forward the video to that transcript item.
  */
-class TranscriptItem extends React.Component {
-    render(): any {
-        var totalSeconds = this.props.transcriptItem.start_time / 1000 | 0;
-        var startMinute = totalSeconds / 60 | 0;
-        var startSecond = totalSeconds % 60 | 0;
-        startSecond = ("0" + startSecond).slice(-2);
-        return <li className="transcript-item" data-time={totalSeconds}>
-            <a href="javascript:void(0)" onClick={_.partial(this.props.onClickTranscript, this.props.transcriptItem)}>
-                <div>{startMinute}:{startSecond}</div>
-                <div>{this.props.transcriptItem.text}</div>
-            </a>
-        </li>;
-    }
-}
-TranscriptItem.propTypes = {
-    transcriptItem: React.PropTypes.object.isRequired
-};
+var TranscriptItem = component(({transcriptItem}, {onClickTranscript}) => {
+    var totalSeconds = transcriptItem.start_time / 1000 | 0;
+    var startMinute = totalSeconds / 60 | 0;
+    var startSecond = totalSeconds % 60 | 0;
+    startSecond = ("0" + startSecond).slice(-2);
+    return <li className="transcript-item" data-time={totalSeconds}>
+        <a href="javascript:void(0)" onClick={_.partial(onClickTranscript, transcriptItem)}>
+            <div>{startMinute}:{startSecond}</div>
+            <div>{transcriptItem.text}</div>
+        </a>
+    </li>;
+}).jsx;
 
 /**
  * Represents the entire transcript, which is a list of TranscriptItems.
  */
-class TranscriptViewer extends React.Component {
-    render(): any {
-        if (!this.props.collection) {
-            return null;
+var TranscriptViewer = component(({collection}, {onClickTranscript}) =>
+    collection &&
+        <ul className="transcript">
+        {
+            _(collection).map((transcriptItem) => {
+                return <TranscriptItem transcriptItem={transcriptItem}
+                    key={transcriptItem.start_time}
+                    statics={{
+                        onClickTranscript: onClickTranscript
+                    }}/>;
+                })
         }
-        var transcriptItems = _(this.props.collection).map((transcriptItem) => {
-            return <TranscriptItem transcriptItem={transcriptItem}
-                                   key={transcriptItem.start_time}
-                                   onClickTranscript={this.props.onClickTranscript} />;
-        });
-        return <ul className="transcript">{transcriptItems}</ul>;
-    }
-}
-TranscriptViewer.propTypes = {
-    collection: React.PropTypes.array.isRequired,
-    onClickTranscript: React.PropTypes.func.isRequired
-};
+        </ul>
+).jsx;
 
 /**
  * Represents a single video, it will load the video dynamically and
@@ -402,7 +395,9 @@ var VideoViewerRawObj: {
         var transcriptViewer;
         if (!!this.state.transcript) {
             transcriptViewer = <TranscriptViewer collection={this.state.transcript}
-                                                 onClickTranscript={this.onClickTranscript.bind(this)} />;
+                                                 statics={{
+                                                     onClickTranscript: this.onClickTranscript.bind(this)
+                                                 }}/>;
         }
 
         this.videoSrc = TopicTreeHelper.getDownloadUrl(this.props.topicTreeCursor);
