@@ -28,12 +28,12 @@ var ArticleViewer = React.createClass({
         if (TopicTreeHelper.isDownloaded(this.props.topicTreeCursor)) {
             this.p1 = Storage.readText(TopicTreeHelper.getId(this.props.topicTreeCursor)).then((result) => {
                 Util.log("rendered article from storage");
-                this.props.topicTreeCursor.set("content", result);
+                this.props.optionsCursor.setIn(["temp", TopicTreeHelper.getKey(this.props.topicTreeCursor)], result);
             });
         } else {
             this.p1 = APIClient.getArticle(TopicTreeHelper.getId(this.props.topicTreeCursor)).then((result) => {
                 Util.log("rendered article from web");
-                this.props.topicTreeCursor.set("content", result.translated_html_content);
+                this.props.optionsCursor.setIn(["temp", TopicTreeHelper.getKey(this.props.topicTreeCursor)], result);
             }).catch(() => {
                 if (!this.isMounted()) {
                     return;
@@ -55,11 +55,12 @@ var ArticleViewer = React.createClass({
     },
     render: function(): any {
         Util.log("render article: :%o", this.props.topicTreeCursor);
+        var content = this.props.optionsCursor.getIn(["temp", TopicTreeHelper.getKey(this.props.topicTreeCursor)]);
         if (this.state.articleDownloadError) {
             return <img className="video-placeholder" src="img/offline.png"/>;
-        } else if (this.props.topicTreeCursor.get("content")) {
+        } else if (content) {
             return <article dangerouslySetInnerHTML={{
-                __html: this.props.topicTreeCursor.get("content")
+                __html: content.html_content
             }}/>;
 
         }

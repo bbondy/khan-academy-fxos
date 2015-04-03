@@ -281,7 +281,8 @@ const MainView = component(({topicTreeRootCursor, navInfoCursor, optionsCursor})
                                domainTopicTreeCursor={navInfoCursor.get("domainTopicTreeCursor")}
                                optionsCursor={optionsCursor}/>;
     } else if (TopicTreeHelper.isArticle(navInfoCursor.get("topicTreeCursor"))) {
-        control = <ArticleViewer  topicTreeCursor={navInfoCursor.get("topicTreeCursor")}/>;
+        control = <ArticleViewer  topicTreeCursor={navInfoCursor.get("topicTreeCursor")}
+                                  optionsCursor={optionsCursor}/>;
     } else if (TopicTreeHelper.isExercise(navInfoCursor.get("topicTreeCursor"))) {
         control = <ExerciseViewer  topicTreeCursor={navInfoCursor.get("topicTreeCursor")}/>;
     } else {
