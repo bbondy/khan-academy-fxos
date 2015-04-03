@@ -2,7 +2,7 @@
 
 "use strict";
 
-var $ = require("jquery"),
+const $ = require("jquery"),
     _ = require("underscore"),
     l10n = require("../l10n"),
     classNames = require("classnames"),
@@ -26,15 +26,15 @@ var $ = require("jquery"),
     { getDomainTopicTreeCursor, isPaneShowing } = require("../data/nav-info"),
     { TopicTreeNode } = require("../data/topic-tree");
 
-var VideoViewer = videoViews.VideoViewer;
-var ArticleViewer = articleViews.ArticleViewer;
-var ExerciseViewer = exerciseViews.ExerciseViewer;
-var TopicViewer = topicViews.TopicViewer;
-var TopicSearch = searchViews.TopicSearch;
-var SearchResultsViewer = searchViews.SearchResultsViewer;
-var DownloadsViewer = paneViews.DownloadsViewer;
-var SettingsViewer = paneViews.SettingsViewer;
-var ProfileViewer = paneViews.ProfileViewer;
+const VideoViewer = videoViews.VideoViewer,
+    ArticleViewer = articleViews.ArticleViewer,
+    ExerciseViewer = exerciseViews.ExerciseViewer,
+    TopicViewer = topicViews.TopicViewer,
+    TopicSearch = searchViews.TopicSearch,
+    SearchResultsViewer = searchViews.SearchResultsViewer,
+    DownloadsViewer = paneViews.DownloadsViewer,
+    SettingsViewer = paneViews.SettingsViewer,
+    ProfileViewer = paneViews.ProfileViewer;
 
 /**
  * Represents the back button which is found on the top left of the header

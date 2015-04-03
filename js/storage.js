@@ -2,9 +2,9 @@
 
 "use strict";
 
-var Util = require("./util");
+const Util = require("./util");
 
-var Storage = {
+const Storage = {
     /**
      * Initializes the device storage for the sd card.
      * Must be called before any other API.

@@ -2,7 +2,7 @@
 
 "use strict";
 
-var $ = require("jquery"),
+const $ = require("jquery"),
     _ = require("underscore"),
     component = require("omniscient"),
     l10n = require("../l10n"),
@@ -18,7 +18,7 @@ var $ = require("jquery"),
  * Represents a single transcript item for the list of transcript items.
  * When clicekd, it willl fast forward the video to that transcript item.
  */
-var TranscriptItem = component(({transcriptItem}, {onClickTranscript}) => {
+const TranscriptItem = component(({transcriptItem}, {onClickTranscript}) => {
     var totalSeconds = transcriptItem.start_time / 1000 | 0;
     var startMinute = totalSeconds / 60 | 0;
     var startSecond = totalSeconds % 60 | 0;
@@ -34,7 +34,7 @@ var TranscriptItem = component(({transcriptItem}, {onClickTranscript}) => {
 /**
  * Represents the entire transcript, which is a list of TranscriptItems.
  */
-var TranscriptViewer = component(({collection}, {onClickTranscript}) =>
+const TranscriptViewer = component(({collection}, {onClickTranscript}) =>
     collection &&
         <ul className="transcript">
         {
@@ -53,7 +53,7 @@ var TranscriptViewer = component(({collection}, {onClickTranscript}) =>
  * Represents a single video, it will load the video dynamically and
  * display it to the user.
  */
-var VideoViewerRawObj: {
+const VideoViewerRawObj: {
         videoClass: ?string;
         videoSrc: ?string;
         videoNode: any;
@@ -291,7 +291,7 @@ var VideoViewerRawObj: {
             "</video>");
         $(videoMountNode).append(this.videoNode);
 
-        var videojs = require("../../bower_components/videojs");
+        const videojs = require("../../bower_components/videojs");
         this.videojs = videojs(this._getVideoDOMNode(), {
                 width: "100%",
                 height: "100%"
@@ -444,7 +444,7 @@ var VideoViewerRawObj: {
     },
     MIN_SECONDS_BETWEEN_REPORTS: 10
 };
-var VideoViewer = React.createClass(VideoViewerRawObj);
+const VideoViewer = React.createClass(VideoViewerRawObj);
 
 module.exports = {
     VideoViewer: VideoViewer,

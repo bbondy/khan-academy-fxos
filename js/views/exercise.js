@@ -11,7 +11,7 @@ function perseusPrep(katex, KAS, MathJax) {
     window.KAS = KAS;
 }
 
-var React = require("react"),
+const React = require("react"),
     Util = require("../util"),
     APIClient = require("../apiclient"),
     l10n = require("../l10n"),
@@ -32,7 +32,7 @@ class TaskCompleteView extends React.Component {
  * Represents a single exercise, it will load the exercise dynamically and
  * display it to the user.
  */
-var ExerciseViewer = React.createClass({
+const ExerciseViewer = React.createClass({
     propTypes: {
         topicTreeCursor: React.PropTypes.object.isRequired
     },
@@ -107,51 +107,13 @@ var ExerciseViewer = React.createClass({
         Util.log("score: %o", score);
         var attemptNumber = 1; // TODO
         var isCorrect = score.correct;
-        var secondsTaken = 10; //TODO
-        APIClient.reportExerciseProgress(TopicTreeHelper.getName(this.props.topicTreeCursor), this.state.problemNumber,
-            this.randomAssessmentSHA1, this.randomAssessmentId,
-            secondsTaken, this.state.hintsUsed, isCorrect,
-            attemptNumber, this.problemTypeName, this.state.taskId).then(() => {
-                if (isCorrect) {
-                    // If we have another correct and we already have 4 correct,
-                    // then show task complete view.
-                    if (this.state.streak >= 4 && this.state.hintsUsed === 0) {
-                        this.setState({
-                            taskComplete: true
-                        });
-                        return;
-                    }
-                    this.refreshRandomAssessment();
-                } else {
-                    // Refresh attempt info so it shows up as wrong
-                    this.refreshUserExerciseInfo().then(this.setState.bind(this));
-                }
-            });
-    },
-    componentWillMount: function() {
-        if (TopicTreeHelper.isPerseusExercise(this.props.topicTreeCursor)) {
-            APIClient.getExerciseByName(TopicTreeHelper.getName(this.props.topicTreeCursor)).then((result) => {
-                this.exercise = result;
-                Util.log("got exercise: %o", result);
-                this.refreshRandomAssessment();
-            });
-        }
-
-        // TODO: Make this load async
-        window._ = _;
-        window.React = React;
-        window.$ = $;
-        $._ = (x) => x;
-        window.jQuery = $;
-
-
-        var Khan = require("../../khan-exercises/main");
-        var MathJax = require("../../bower_components/MathJax/MathJax.js");
+        const Khan = require("../../khan-exercises/main"),
+            MathJax = require("../../bower_components/MathJax/MathJax.js");
         Khan = window.Khan;
         MathJax = window.MathJax;
         window.KhanUtil = Khan.Util;
 
-        var katex = require("../../bower_components/katex/katex"),
+        const katex = require("../../bower_components/katex/katex"),
             KAS = require("../../bower_components/KAS/kas"),
             Perseus = require("../../bower_components/perseus/perseus-2");
         perseusPrep(katex, KAS, MathJax, Khan.Util);

@@ -2,7 +2,7 @@
 
 "use strict";
 
-var l10n = require("../l10n"),
+const l10n = require("../l10n"),
     Util = require("../util"),
     models = require("../models"),
     Downloads = require("../downloads"),
@@ -10,7 +10,7 @@ var l10n = require("../l10n"),
     component = require("omniscient"),
     { resetOptions } = require("../data/app-options");
 
-var ContentListViewer = topicViews.ContentListViewer;
+const ContentListViewer = topicViews.ContentListViewer;
 
 /**
  * Represents a downloads list which is basically just a wrapper around a

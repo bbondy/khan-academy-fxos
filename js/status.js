@@ -2,9 +2,9 @@
 
 "use strict";
 
-var models = require("./models");
+const models = require("./models");
 
-var Status = {
+const Status = {
     /**
      * Start showing a new status message
      */

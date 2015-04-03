@@ -1,4 +1,4 @@
-var Immutable = require("immutable"),
+const Immutable = require("immutable"),
     {getKey} = require("./topic-tree-helper");
 
 const resetNavInfo = () => Immutable.fromJS({

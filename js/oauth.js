@@ -10,7 +10,7 @@
  * See http://pajhome.org.uk/crypt/md5 for details.
  */
 
-var $ = require("jquery");
+const $ = require("jquery");
 
 /*
  * Configurable variables. You may need to tweak these to be compatible with

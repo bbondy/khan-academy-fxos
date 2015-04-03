@@ -2,7 +2,7 @@
 
 "use strict";
 
-var React = require("react"),
+const React = require("react"),
     Util = require("../util"),
     models = require("../models"),
     APIClient = require("../apiclient"),
@@ -13,7 +13,7 @@ var React = require("react"),
  * Represents a single article, it will load the article dynamically and
  * display it to the user.
  */
-var ArticleViewer = React.createClass({
+const ArticleViewer = React.createClass({
     propTypes: {
         topicTreeCursor: React.PropTypes.object.isRequired
     },

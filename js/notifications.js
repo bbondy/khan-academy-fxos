@@ -2,7 +2,7 @@
 
 "use strict";
 
-var Notifications = {
+const Notifications = {
     /**
      * Shows a system notification
      * @param title The title of the notification

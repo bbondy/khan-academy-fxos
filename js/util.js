@@ -4,13 +4,13 @@
 
 require("native-promise-only"); // For Jest!
 
-var _ = require("underscore"),
+const _ = require("underscore"),
     l10n = require("./l10n");
 
 /**
  * Mixin to help with localization
  */
-var LocalizationMixin: any = {
+const LocalizationMixin: any = {
     componentDidMount: function() {
         l10n.translate(this.getDOMNode());
     },
@@ -22,7 +22,7 @@ var LocalizationMixin: any = {
 /**
  * Various utility functions
  */
-var Util = {
+const Util = {
     /**
      * Wrapper around console.log
      */

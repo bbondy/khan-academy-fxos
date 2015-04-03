@@ -1,4 +1,4 @@
-var Downloads = require("../downloads"),
+const Downloads = require("../downloads"),
     TopicTreeHelper = require("../data/topic-tree-helper"),
     Downloads = require("../downloads"),
     Util = require("../util"),

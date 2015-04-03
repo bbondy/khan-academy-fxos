@@ -5,7 +5,7 @@
 "strict";
 "enable_regenerator";
 
-var _ = require("underscore"),
+const _ = require("underscore"),
     Util = require("./util"),
     APIClient = require("./apiclient"),
     Storage = require("./storage"),
@@ -976,7 +976,7 @@ UserModel._userInfoLocalStorageName = "userInfo-3";
 // For example we use this for isDownloadingTopic from
 // Downloads so we can easily adjust views based on that state
 // changing.
-var TempAppState = new BaseModel({
+const TempAppState = new BaseModel({
     defaults: {
         currentDownloadRequest: null,
         isTopicDownloading: false,
@@ -986,7 +986,7 @@ var TempAppState = new BaseModel({
 
 
 
-var CurrentUser = new UserModel();
+const CurrentUser = new UserModel();
 module.exports = {
     TopicModel,
     ContentModel,

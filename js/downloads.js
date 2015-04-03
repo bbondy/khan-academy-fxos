@@ -9,13 +9,13 @@
  *   - Provides the ability to delete those downloads
  */
 
-var _ = require("underscore"),
+const _ = require("underscore"),
     Util = require("./util"),
     Storage = require("./storage"),
     models = require("./models"),
     APIClient = require("./apiclient");
 
-var Downloads: { contentList: any; init: any; canCancelDownload: any; cancelDownloading: any; download: any; downloadContent: any; downloadTopic: any; deleteContent: any } = {
+const Downloads: { contentList: any; init: any; canCancelDownload: any; cancelDownloading: any; download: any; downloadContent: any; downloadTopic: any; deleteContent: any } = {
     contentList: null,
     /**
      * Initializes download manager

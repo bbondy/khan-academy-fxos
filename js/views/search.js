@@ -2,14 +2,14 @@
 
 "use strict";
 
-var $ = require("jquery"),
+const $ = require("jquery"),
     React = require("react"),
     l10n = require("../l10n"),
     component = require("omniscient"),
     TopicTreeHelper = require("../data/topic-tree-helper"),
     topicViews = require("./topic");
 
-var ContentListViewer = topicViews.ContentListViewer;
+const ContentListViewer = topicViews.ContentListViewer;
 
 /**
  * Represents the topic search input item which is right below the header.

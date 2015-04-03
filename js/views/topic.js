@@ -2,7 +2,7 @@
 
 "use strict";
 
-var _ = require("underscore"),
+const _ = require("underscore"),
     classNames = require("classNames"),
     models = require("../models"),
     Util = require("../util"),

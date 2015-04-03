@@ -1,4 +1,4 @@
-var Immutable = require("immutable");
+const Immutable = require("immutable");
 
 const appOptionsFilename = "appOptions.json";
 const readOptions = () => {

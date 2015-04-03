@@ -3,14 +3,14 @@
 "use strict";
 
 require("./oauth");
-var $ = require("jquery"),
+const $ = require("jquery"),
     _ = require("underscore"),
     Util = require("./util");
 
 /**
  * Client side library for the KA API
  */
-var APIClient = {
+const APIClient = {
     oauth: {
         consumerKey: "",
         consumerSecret: "",

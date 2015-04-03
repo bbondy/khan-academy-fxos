@@ -12,11 +12,11 @@
  * init will not wait for the result.
  */
 
-var Util = require("./util"),
+const Util = require("./util"),
     models = require("./models");
 
-var TEN_MINUTES = 1000 * 60 * 10;
-var Cache = {
+const TEN_MINUTES = 1000 * 60 * 10;
+const Cache = {
     heartbeatInterval: TEN_MINUTES,
 
     /**
