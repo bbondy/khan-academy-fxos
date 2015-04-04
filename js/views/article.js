@@ -7,6 +7,8 @@ const React = require("react"),
     models = require("../models"),
     APIClient = require("../apiclient"),
     TopicTreeHelper = require("../data/topic-tree-helper"),
+    Immutable = require("immutable"),
+    {reportArticleRead} = require("./article-actions");
     Storage = require("../storage");
 
 /**
@@ -17,28 +19,35 @@ const ArticleViewer = React.createClass({
     propTypes: {
         topicTreeCursor: React.PropTypes.object.isRequired
     },
-    //mixins: [Util.BackboneMixin],
-    //getBackboneModels: function(): Array<any> {
-    //    return [this.props.article];
-    //},
-    getInitialState: function() {
-        return {};
-    },
     componentWillMount: function() {
         if (TopicTreeHelper.isDownloaded(this.props.topicTreeCursor)) {
             this.p1 = Storage.readText(TopicTreeHelper.getId(this.props.topicTreeCursor)).then((result) => {
                 Util.log("rendered article from storage");
-                this.props.optionsCursor.setIn(["temp", TopicTreeHelper.getKey(this.props.topicTreeCursor)], result);
+                this.props.optionsCursor.setIn(
+                    ["temp", TopicTreeHelper.getKey(this.props.topicTreeCursor)],
+                    Immutable.fromJS({
+                        error: false,
+                        content: result,
+                    }));
             });
         } else {
             this.p1 = APIClient.getArticle(TopicTreeHelper.getId(this.props.topicTreeCursor)).then((result) => {
                 Util.log("rendered article from web");
-                this.props.optionsCursor.setIn(["temp", TopicTreeHelper.getKey(this.props.topicTreeCursor)], result);
+                this.props.optionsCursor.setIn(
+                    ["temp", TopicTreeHelper.getKey(this.props.topicTreeCursor)],
+                    Immutable.fromJS({
+                        error: false,
+                        content: result,
+                    }));
             }).catch(() => {
                 if (!this.isMounted()) {
                     return;
                 }
-                this.setState({articleDownloadError: true});
+                this.props.optionsCursor.setIn(
+                    ["temp", TopicTreeHelper.getKey(this.props.topicTreeCursor)],
+                    Immutable.fromJS({
+                        error: true,
+                    }));
             });
         }
     },
@@ -46,21 +55,19 @@ const ArticleViewer = React.createClass({
         this.timerId = setTimeout(this.onReportComplete.bind(this), 5000);
     },
     onReportComplete: function() {
-        if (models.CurrentUser.isSignedIn()) {
-            models.CurrentUser.reportArticleRead(this.props.topicTreeCursor);
-        }
+        reportArticleRead(this.props.topicTreeCursor);
     },
     componentWillUnmount: function() {
         clearTimeout(this.timerId);
     },
     render: function(): any {
         Util.log("render article: :%o", this.props.topicTreeCursor);
-        var content = this.props.optionsCursor.getIn(["temp", TopicTreeHelper.getKey(this.props.topicTreeCursor)]);
-        if (this.state.articleDownloadError) {
+        var articleObj = this.props.optionsCursor.getIn(["temp", TopicTreeHelper.getKey(this.props.topicTreeCursor)]);
+        if (articleObj && articleObj.error) {
             return <img className="video-placeholder" src="img/offline.png"/>;
-        } else if (content) {
+        } else if (articleObj && articleObj.content) {
             return <article dangerouslySetInnerHTML={{
-                __html: content.html_content
+                __html: articleObj.content.html_content
             }}/>;
 
         }

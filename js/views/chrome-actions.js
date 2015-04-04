@@ -1,6 +1,5 @@
 const Downloads = require("../downloads"),
     TopicTreeHelper = require("../data/topic-tree-helper"),
-    Downloads = require("../downloads"),
     Util = require("../util"),
     { getDomainTopicTreeCursor, isPaneShowing } = require("../data/nav-info"),
     Notifications = require("../notifications"),
@@ -17,12 +16,12 @@ const onClickContentItemFromDownloads = (navInfoCursor) => (topicTreeCursor) => 
     lastTopicTreeCursor: navInfoCursor.get("lastTopicTreeCursor")
 });
 
-const onClickContentItem = (navInfoCursor) => (topicTreeCursor) => navInfoCursor.merge({
+const onClickContentItem = (navInfoCursor) => (topicTreeCursor) => (navInfoCursor.merge({
     topicTreeCursor,
     showProfile: false,
     showDownloads: false,
     showSettings: false
-});
+}), topicTreeCursor);
 
 const onClickTopic = (navInfoCursor) => (newTopicTreeCursor) =>
     navInfoCursor.merge({

@@ -16,6 +16,7 @@ const $ = require("jquery"),
     Status = require("../status"),
     videoViews = require("./video"),
     articleViews = require("./article"),
+    {loadIfArticle} = require("./article-actions"),
     exerciseViews = require("./exercise"),
     topicViews = require("./topic"),
     searchViews = require("./search"),
@@ -265,9 +266,12 @@ const MainView = component(({topicTreeRootCursor, navInfoCursor, optionsCursor})
     } else if (navInfoCursor.get("showSettings")) {
         control = <SettingsViewer optionsCursor={optionsCursor}/>;
     } else if (TopicTreeHelper.isTopic(navInfoCursor.get("topicTreeCursor"))) {
+        var onClickContentItem = _.compose(
+            ChromeActions.onClickContentItem(navInfoCursor),
+            loadIfArticle(optionsCursor));
         control = <TopicViewer statics={{
                                    onClickTopic: ChromeActions.onClickTopic(navInfoCursor),
-                                   onClickContentItem: ChromeActions.onClickContentItem(navInfoCursor),
+                                   onClickContentItem,
                                }}
                                topicTreeCursor={navInfoCursor.get("topicTreeCursor")}
                                domainTopicTreeCursor={navInfoCursor.get("domainTopicTreeCursor")}
