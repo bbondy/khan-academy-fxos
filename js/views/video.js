@@ -12,63 +12,16 @@ const $ = require("jquery"),
     models = require("../models"),
     APIClient = require("../apiclient"),
     TopicTreeHelper = require("../data/topic-tree-helper"),
+    {TranscriptViewer} = require("./transcript.js"),
     Storage = require("../storage");
 
-/**
- * Represents a single transcript item for the list of transcript items.
- * When clicekd, it willl fast forward the video to that transcript item.
- */
-const TranscriptItem = component(({transcriptItem}, {onClickTranscript}) => {
-    var totalSeconds = transcriptItem.start_time / 1000 | 0;
-    var startMinute = totalSeconds / 60 | 0;
-    var startSecond = totalSeconds % 60 | 0;
-    startSecond = ("0" + startSecond).slice(-2);
-    return <li className="transcript-item" data-time={totalSeconds}>
-        <a href="javascript:void(0)" onClick={_.partial(onClickTranscript, transcriptItem)}>
-            <div>{startMinute}:{startSecond}</div>
-            <div>{transcriptItem.text}</div>
-        </a>
-    </li>;
-}).jsx;
-
-/**
- * Represents the entire transcript, which is a list of TranscriptItems.
- */
-const TranscriptViewer = component(({collection}, {onClickTranscript}) =>
-    collection &&
-        <ul className="transcript">
-        {
-            _(collection).map((transcriptItem) => {
-                return <TranscriptItem transcriptItem={transcriptItem}
-                    key={transcriptItem.start_time}
-                    statics={{
-                        onClickTranscript: onClickTranscript
-                    }}/>;
-                })
-        }
-        </ul>
-).jsx;
+const minSecondsBetweenReports = 10;
 
 /**
  * Represents a single video, it will load the video dynamically and
  * display it to the user.
  */
-const VideoViewerRawObj: {
-        videoClass: ?string;
-        videoSrc: ?string;
-        videoNode: any;
-        videoId: ?string;
-        initSecondWatched: number;
-        lastSecondWatched: number;
-        secondsWatched: number;
-        lastReportedTime: Date;
-        lastWatchedTimeSinceLastUpdate: Date;
-        pointsPerReport: number;
-        pointsObj: any;
-        isPlaying: boolean;
-        cleanedUp: boolean;
-        videojs: any;
-    } = {
+const VideoViewer = React.createClass({
     propTypes: {
         topicTreeCursor: React.PropTypes.object.isRequired,
         domainTopicTreeCursor: React.PropTypes.object.isRequired,
@@ -105,7 +58,7 @@ const VideoViewerRawObj: {
         this.secondsWatched = 0;
         this.lastReportedTime = new Date();
         this.lastWatchedTimeSinceLastUpdate = new Date();
-        this.pointsPerReport = this.availablePoints * this.MIN_SECONDS_BETWEEN_REPORTS / TopicTreeHelper.getDuration(this.props.topicTreeCursor);
+        this.pointsPerReport = this.availablePoints * minSecondsBetweenReports / TopicTreeHelper.getDuration(this.props.topicTreeCursor);
         this.pointsObj = {num: TopicTreeHelper.getPoints(this.props.topicTreeCursor)};
     },
     componentWillUnmount: function() {
@@ -136,14 +89,6 @@ const VideoViewerRawObj: {
             }
         }
         this.cleanedUp = true;
-    },
-    onClickTranscript: function(obj: any) {
-        var startSecond = obj.start_time / 1000 | 0;
-        var video = this._getVideoDOMNode();
-        if (video) {
-            video.currentTime = startSecond;
-            video.play();
-        }
     },
     getInitialState: function() {
         return {
@@ -337,7 +282,7 @@ const VideoViewerRawObj: {
         var points = Math.min(this.availablePoints, this.pointsObj.num + this.pointsPerReport);
         $(this.pointsObj).stop(true, false).animate({num: points}, {
             // Add an extra second to the duration so the UI never looks like it's stuck waiting for the HTTP reply
-            duration: this.MIN_SECONDS_BETWEEN_REPORTS * 1000,
+            duration: minSecondsBetweenReports * 1000,
             step: (num) => {
                 this.pointsObj.num = Math.ceil(num);
                 var pointsString = l10n.get("points-so-far", {
@@ -366,7 +311,7 @@ const VideoViewerRawObj: {
         this.updateSecondsWatched();
         var currentTime = new Date();
         var secondsSinceLastReport = (currentTime.getTime() - this.lastReportedTime.getTime()) / 1000;
-        if (secondsSinceLastReport >= this.MIN_SECONDS_BETWEEN_REPORTS || this.lastSecondWatched >= (duration | 0)) {
+        if (secondsSinceLastReport >= minSecondsBetweenReports || this.lastSecondWatched >= (duration | 0)) {
             this.lastReportedTime = new Date();
             models.CurrentUser.reportVideoProgress(this.props.topicTreeCursor,
                     TopicTreeHelper.getYoutubeId(this.props.topicTreeCursor),
@@ -383,20 +328,32 @@ const VideoViewerRawObj: {
         }
     },
 
-    onReloadVideo: function() {
-        Util.log("Calling video load!");
-        var video = this._getVideoDOMNode();
-        if (video) {
-            video.load();
-        }
-    },
-
     render(): any {
+
+        const onClickTranscript = (obj) => {
+            var startSecond = obj.start_time / 1000 | 0;
+            var video = this._getVideoDOMNode();
+            if (video) {
+                video.currentTime = startSecond;
+                video.play();
+            }
+        };
+
+        const onReloadVideo = () => {
+            Util.log("Calling video load!");
+            var video = this._getVideoDOMNode();
+            if (video) {
+                video.load();
+            }
+        };
+
+
+
         var transcriptViewer;
         if (!!this.state.transcript) {
             transcriptViewer = <TranscriptViewer collection={this.state.transcript}
                                                  statics={{
-                                                     onClickTranscript: this.onClickTranscript.bind(this)
+                                                     onClickTranscript
                                                  }}/>;
         }
 
@@ -426,7 +383,7 @@ const VideoViewerRawObj: {
 
         var control;
         if (this.state.showOfflineImage) {
-            control = <div className="video-placeholder" onClick={this.onReloadVideo.bind(this)}/>;
+            control = <div className="video-placeholder" onClick={onReloadVideo}/>;
         } else {
             control = <div className={this.videoClass} ref="videoPlaceholder" id="video-placeholder"/>;
         }
@@ -442,12 +399,8 @@ const VideoViewerRawObj: {
             {transcriptViewer}
         </div>;
     },
-    MIN_SECONDS_BETWEEN_REPORTS: 10
-};
-const VideoViewer = React.createClass(VideoViewerRawObj);
+});
 
 module.exports = {
-    VideoViewer: VideoViewer,
-    TranscriptViewer: TranscriptViewer,
-    TranscriptItem: TranscriptItem,
+    VideoViewer,
 };
