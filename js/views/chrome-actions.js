@@ -96,10 +96,9 @@ const onTopicSearch = (navInfoCursor) => (topicSearch) => {
     if (!searchingTopicTreeCursor) {
         searchingTopicTreeCursor = navInfoCursor.get("topicTreeCursor");
     }
-    var results = searchingtopicTreeCursor.findContentItems(topicSearch);
-    var contentList = new models.ContentList(results);
+    var results = TopicTreeHelper.findContentItems(searchingTopicTreeCursor, topicSearch);
     navInfoCursor.merge({
-        topicTreeCursor: contentList,
+        searchResults: results,
         searchingTopicTreeCursor: searchingTopicTreeCursor
     });
 };

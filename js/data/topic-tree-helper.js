@@ -144,6 +144,48 @@ const getParentDomain = (topicTreeCursor) => {
     return null;
 };
 
+/**
+ * Initiates a recursive search for the term `search`
+ */
+const findContentItems = (topicTreeCursor, search, maxResults) => {
+    if (_.isUndefined(maxResults)) {
+        maxResults = 40;
+    }
+
+    var results = [];
+    _findContentItems(topicTreeCursor, search, results, maxResults);
+    return results.slice(0, maxResults);
+};
+
+/**
+ * Recursively calls _findContentItems on all children and adds videos and articles with
+ * a matching title to the results array.
+ */
+const _findContentItems = (topicTreeCursor, search, results, maxResults) => {
+    if (results.length > maxResults) {
+        return;
+    }
+
+    /*
+    // TODO
+    _(this.getContentItems().models).each((item) => {
+        // TODO: Possibly search descriptions too?
+        // TODO: We could potentially index the transcripts for a really good search
+        // TODO: Tokenize the `search` string and do an indexOf for each token
+        // TODO: Allow for OR/AND search term strings
+        if (item.getTitle() &&
+                item.getTitle().toLowerCase().indexOf(search.toLowerCase()) !== -1) {
+            results.push(item);
+        }
+    });
+
+    _(this.getTopics().models).each((item) => {
+        _findContentItems(item, search, results, maxResults);
+    });
+    */
+    return [];
+};
+
 module.exports = {
     getId,
     getTitle,
@@ -171,4 +213,5 @@ module.exports = {
     isKhanExercisesExercise,
     getFilename,
     getParentDomain,
+    findContentItems,
 };
