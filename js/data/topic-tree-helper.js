@@ -2,19 +2,33 @@ var _ = require("underscore"),
     Immutable = require("immutable"),
     Minify = require("../minify");
 
-const genMapChildrenByKindFn = (kinds) => {
-    return (topicCursor, mapFn) => {
+/**
+ * Do something to {forEach: fn} child element
+ * @param fn A string function like "map", "forEach", etc.
+ * @param kinds An array of kinds to be filtered on
+ * @param topicCursor The topic to filter on
+ * @param callback The function that should be called for {forEach: fn} filtered child
+ */
+const fnChildrenByKind = (fn) => (kinds) => {
+    return (topicCursor, callback) => {
         return topicCursor.get(Minify.getShortName("children")).filter((child) => {
             return _.includes(kinds, child.get(Minify.getShortName("kind")));
-        }).map(mapFn);
+        })[fn](callback);
     };
 };
 
-const mapChildTopicCursors = genMapChildrenByKindFn([Minify.getShortValue("kind", "Topic")]);
-const mapChildContentCursors = genMapChildrenByKindFn([
-    Minify.getShortValue("kind", "Video"),
+const mapChildrenByKind = fnChildrenByKind("map");
+const eachChildrenByKind = fnChildrenByKind("forEach");
+
+const topicKind = [Minify.getShortValue("kind", "Topic")];
+const contentKinds = [Minify.getShortValue("kind", "Video"),
     Minify.getShortValue("kind", "Article"),
-    Minify.getShortValue("kind", "Exercise")]);
+    Minify.getShortValue("kind", "Exercise")];
+
+const eachChildTopicCursors = eachChildrenByKind(topicKind);
+const mapChildTopicCursors = mapChildrenByKind(topicKind);
+const eachChildContentCursors = eachChildrenByKind(contentKinds);
+const mapChildContentCursors = mapChildrenByKind(contentKinds);
 
 const getTitle = (tpoicTreeCursor) => {
     return tpoicTreeCursor.get(Minify.getShortName("translated_title")) ||
@@ -166,24 +180,20 @@ const _findContentItems = (topicTreeCursor, search, results, maxResults) => {
         return;
     }
 
-    /*
-    // TODO
-    _(this.getContentItems().models).each((item) => {
+    eachChildContentCursors(topicTreeCursor, (childCursor) => {
         // TODO: Possibly search descriptions too?
         // TODO: We could potentially index the transcripts for a really good search
         // TODO: Tokenize the `search` string and do an indexOf for each token
         // TODO: Allow for OR/AND search term strings
-        if (item.getTitle() &&
-                item.getTitle().toLowerCase().indexOf(search.toLowerCase()) !== -1) {
-            results.push(item);
+        if (getTitle(childCursor) &&
+                getTitle(childCursor).toLowerCase().indexOf(search.toLowerCase()) !== -1) {
+            results.push(childCursor);
         }
     });
 
-    _(this.getTopics().models).each((item) => {
-        _findContentItems(item, search, results, maxResults);
+    eachChildTopicCursors(topicTreeCursor, (childCursor) => {
+        _findContentItems(childCursor, search, results, maxResults);
     });
-    */
-    return [];
 };
 
 module.exports = {
@@ -193,7 +203,9 @@ module.exports = {
     getKAUrl,
     getDownloadCount,
     mapChildTopicCursors,
+    eachChildTopicCursors,
     mapChildContentCursors,
+    eachChildContentCursors,
     isContent,
     isContentList,
     isTopic,
