@@ -107,10 +107,8 @@ const ExerciseViewer = React.createClass({
         Util.log("score: %o", score);
         var attemptNumber = 1; // TODO
         var isCorrect = score.correct;
-        const Khan = require("../../khan-exercises/main"),
-            MathJax = require("../../bower_components/MathJax/MathJax.js");
-        Khan = window.Khan;
-        MathJax = window.MathJax;
+        const Khan = require("../../khan-exercises/main") || window.Khan,
+            MathJax = require("../../bower_components/MathJax/MathJax.js") || window.MathJax;
         window.KhanUtil = Khan.Util;
 
         const katex = require("../../bower_components/katex/katex"),
