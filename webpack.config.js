@@ -3,7 +3,7 @@ var path = require("path");
 module.exports = {
     cache: true,
     entry: "./js/main.js",
-    devtool: "#source-map",
+    devtool: "#eval-source-map",
     output: {
         path: path.resolve("./build"),
         filename: "bundle.js",
@@ -14,20 +14,29 @@ module.exports = {
     module: {
         noParse: [/node_modules\/react/,
                   /node_modules\/jquery/,
-                  /bower_components\/MathJax/,
-                  /bower_components\/KAS/,
+                  /bower_components/,
                   /node_modules\/underscore/],
         loaders: [
             {
                 //tell webpack to use jsx-loader for all *.jsx files
-                test: /\.js$/,
-                loader: "regenerator-loader"
+                test: /models\.js$/,
+                loader: "regenerator-loader",
+                exclude: [
+                    /node_modules/,
+                    /bower_components/,
+                    /\.min.js$/,
+                ],
             },
             {
                 //tell webpack to use jsx-loader for all *.jsx files
                 test: /\.js$/,
-                loader: "jsx-loader?insertPragma=React.DOM&harmony&stripTypes"
-            }
+                loader: "jsx-loader?harmony&stripTypes",
+                exclude: [
+                    /node_modules/,
+                    /bower_components/,
+                    /\.min.js$/,
+                ]
+            },
         ],
     },
     resolve: {
