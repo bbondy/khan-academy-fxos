@@ -41,7 +41,6 @@ const TopicSearch = component(({topicTreeCursor, optionsCursor}, {onTopicSearch}
         */
     };
 
-    console.log('render search');
     var text = l10n.get("search");
     if (TopicTreeHelper.getTitle(topicTreeCursor)) {
         text = l10n.get("search-topic", {
@@ -70,9 +69,9 @@ const TopicSearch = component(({topicTreeCursor, optionsCursor}, {onTopicSearch}
  * ContentListViewer for now.
  */
 const SearchResultsViewer  = component(({collection}, {onClickContentItem}) => {
-    var control = <ContentListViewer collection={this.props.collection}
-                                     optionsCursor={this.props.optionsCursor}
-                                     onClickContentItem={this.props.onClickContentItem} />;
+    var control = <ContentListViewer collection={collection}
+                                     optionsCursor={optionsCursor}
+                                     onClickContentItem={onClickContentItem} />;
     return <div className="topic-list-container">
         {control}
     </div>;

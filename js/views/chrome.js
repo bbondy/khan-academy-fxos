@@ -276,10 +276,12 @@ const MainView = component(({topicTreeRootCursor, navInfoCursor, optionsCursor})
                                topicTreeCursor={navInfoCursor.get("topicTreeCursor")}
                                domainTopicTreeCursor={navInfoCursor.get("domainTopicTreeCursor")}
                                optionsCursor={optionsCursor}/>;
-    } else if (TopicTreeHelper.isContentList(navInfoCursor.get("topicTreeCursor"))) {
-        control = <SearchResultsViewer collection={navInfoCursor.get("topicTreeCursor")}
-                                       onClickContentItem={ChromeActions.onClickContentItem(navInfoCursor)}
-                                       optionsCursor={optionsCursor}/>;
+    } else if (navInfoCursor.get("searchResults")) {
+        control = <SearchResultsViewer collection={navInfoCursor.get("searchResults")}
+                                       optionsCursor={optionsCursor}
+                                       statics={{
+                                           onClickContentItem: ChromeActions.onClickContentItem(navInfoCursor),
+                                       }}/>;
     } else if (TopicTreeHelper.isVideo(navInfoCursor.get("topicTreeCursor"))) {
         control = <VideoViewer topicTreeCursor={navInfoCursor.get("topicTreeCursor")}
                                domainTopicTreeCursor={navInfoCursor.get("domainTopicTreeCursor")}
