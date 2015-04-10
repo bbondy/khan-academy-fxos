@@ -14,59 +14,56 @@ const ContentListViewer = topicViews.ContentListViewer;
 /**
  * Represents the topic search input item which is right below the header.
  */
-class TopicSearch extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            searchValue: ""
-        };
-    }
-    onChange(event: any) {
+const TopicSearch = component(({topicTreeCursor, optionsCursor}, {onTopicSearch}) => {
+    const onChange = (event) => {
         var topicSearch = event.target.value;
-        this.setState({
-            searchValue: topicSearch
-        });
-        this.props.onTopicSearch(topicSearch);
-    }
-    onFocus(event: any) {
+        optionsCursor.setIn(["temp", "search"], topicSearch);
+        onTopicSearch(topicSearch);
+    };
+
+    const onFocus = (event) => {
+        // TODO
+        /*
         setTimeout(() => {
             $("html, body").stop(true, true).animate({
                 scrollTop: $(this.refs.search.getDOMNode()).offset().top
             }, 500);
         }, 500);
-    }
-    onBlur(event: any) {
+        */
+    };
+
+    const onBlur = (event) => {
+        // TODO
+        /*
         $("html, body").stop(true, true).animate({
             scrollTop: 0
         }, 700);
+        */
+    };
+
+    console.log('render search');
+    var text = l10n.get("search");
+    if (TopicTreeHelper.getTitle(topicTreeCursor)) {
+        text = l10n.get("search-topic", {
+            topic: TopicTreeHelper.getTitle(topicTreeCursor)
+        });
     }
 
-    render(): any {
-        var text = l10n.get("search");
-        if (TopicTreeHelper.getTitle(this.props.topicTreeCursor)) {
-            text = l10n.get("search-topic", {
-                topic: TopicTreeHelper.getTitle(this.props.topicTreeCursor)
-            });
-        }
-        return <div>
-            <input ref="search"
-                   className="search app-chrome"
-                   type="searh"
-                   placeholder={text}
-                   value={this.state.searchValue}
-                   required=""
-                   onChange={this.onChange.bind(this)}
-                   onFocus={this.onFocus.bind(this)}
-                   onBlur={this.onBlur.bind(this)}
-                   />
-        </div>;
+    var searchValue = optionsCursor.getIn(["temp", "search"]);
 
-    }
-}
-TopicSearch.propTypes = {
-    topicTreeCursor: React.PropTypes.object.isRequired,
-    onTopicSearch: React.PropTypes.func.isRequired
-};
+    return <div>
+        <input ref="search"
+               className="search app-chrome"
+               type="searh"
+               placeholder={text}
+               value={searchValue}
+               required=""
+               onChange={onChange.bind(this)}
+               onFocus={onFocus.bind(this)}
+               onBlur={onBlur.bind(this)}
+               />
+    </div>;
+}).jsx;
 
 /**
  * Represents a search result list which is basically just a wrapper around a

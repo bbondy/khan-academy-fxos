@@ -6,12 +6,12 @@ var _ = require("underscore"),
  * Do something to {forEach: fn} child element
  * @param fn A string function like "map", "forEach", etc.
  * @param kinds An array of kinds to be filtered on
- * @param topicCursor The topic to filter on
+ * @param topicTreeCursor The topic to filter on
  * @param callback The function that should be called for {forEach: fn} filtered child
  */
 const fnChildrenByKind = (fn) => (kinds) => {
-    return (topicCursor, callback) => {
-        return topicCursor.get(Minify.getShortName("children")).filter((child) => {
+    return (topicTreeCursor, callback) => {
+        return topicTreeCursor.get(Minify.getShortName("children")).filter((child) => {
             return _.includes(kinds, child.get(Minify.getShortName("kind")));
         })[fn](callback);
     };
@@ -167,7 +167,7 @@ const findContentItems = (topicTreeCursor, search, maxResults) => {
     }
 
     var results = [];
-    _findContentItems(topicTreeCursor, search, results, maxResults);
+    _findContentItems(topicTreeCursor, search.toLowerCase(), results, maxResults);
     return results.slice(0, maxResults);
 };
 
@@ -186,7 +186,7 @@ const _findContentItems = (topicTreeCursor, search, results, maxResults) => {
         // TODO: Tokenize the `search` string and do an indexOf for each token
         // TODO: Allow for OR/AND search term strings
         if (getTitle(childCursor) &&
-                getTitle(childCursor).toLowerCase().indexOf(search.toLowerCase()) !== -1) {
+                getTitle(childCursor).toLowerCase().indexOf(search) !== -1) {
             results.push(childCursor);
         }
     });

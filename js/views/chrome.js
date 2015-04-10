@@ -298,7 +298,9 @@ const MainView = component(({topicTreeRootCursor, navInfoCursor, optionsCursor})
             !TopicTreeHelper.isContent(navInfoCursor.get("topicTreeCursor"))) {
         topicSearch = <TopicSearch topicTreeCursor={navInfoCursor.get("topicTreeCursor")}
                                    optionsCursor={optionsCursor}
-                                   onTopicSearch={ChromeActions.onTopicSearch(navInfoCursor)}/>;
+                                   statics={{
+                                       onTopicSearch: ChromeActions.onTopicSearch(navInfoCursor),
+                                   }}/>;
     }
 
     var sidebar;
