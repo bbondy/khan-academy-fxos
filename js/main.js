@@ -90,6 +90,14 @@ const initialState = Immutable.fromJS({
 const renderer = new Renderer(MainView, mountNode, initialState);
 renderer.render();
 
+readTopicTree().then((rootTopicTreeNode) =>
+    renderer.edit((state) => state.mergeDeep({ navInfo: {
+        topicTreeNode: rootTopicTreeNode,
+        rootTopicTreeNode,
+        navStack: Immutable.Stack.of(rootTopicTreeNode),
+    }}))
+);
+
 // Init everything
 Storage.init().then(function() {
     return APIClient.init();
@@ -98,15 +106,6 @@ Storage.init().then(function() {
 }).then(function() {
     // We don't want to have to wait for results, so just start this and don't wait
     models.CurrentUser.init();
-
-    readTopicTree().then((rootTopicTreeNode) =>
-        renderer.edit((state) => state.mergeDeep({ navInfo: {
-            topicTreeNode: rootTopicTreeNode,
-            rootTopicTreeNode,
-            navStack: Immutable.Stack.of(rootTopicTreeNode),
-        }}))
-    );
-
 }).catch((error) => {
     alert(error);
     if (Util.isFirefoxOS()) {
