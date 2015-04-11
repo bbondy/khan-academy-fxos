@@ -2,10 +2,10 @@ const Immutable = require("immutable"),
     {getKey} = require("./topic-tree-helper");
 
 const resetNavInfo = () => Immutable.fromJS({
-    topicTreeCursor: null,
-    rootTopicTreeCursor: null,
-    lastTopicTreeCursor: null,
-    domainTopicTreeCursor: null,
+    topicTreeNode: null,
+    rootTopicTreeNode: null,
+    lastTopicTreeNode: null,
+    domainTopicTreeNode: null,
     navStack: null,
     isPaneShowing: false,
     showProfile: false,
@@ -14,21 +14,21 @@ const resetNavInfo = () => Immutable.fromJS({
     wasLastDownloads: false,
 });
 
-const getDomainTopicTreeCursor = (navInfoCursor, newTopicTreeCursor) => {
-    var domainTopicTreeCursor = navInfoCursor.get("domainTopicTreeCursor");
-    if (!domainTopicTreeCursor) {
-        domainTopicTreeCursor = newTopicTreeCursor;
-    } else if (getKey(navInfoCursor.get("rootTopicTreeCursor")) === getKey(newTopicTreeCursor)) {
-        domainTopicTreeCursor = null;
+const getDomainTopicTreeNode = (navInfo, newTopicTreeNode) => {
+    var domainTopicTreeNode = navInfo.get("domainTopicTreeNode");
+    if (!domainTopicTreeNode) {
+        domainTopicTreeNode = newTopicTreeNode;
+    } else if (getKey(navInfo.get("rootTopicTreeNode")) === getKey(newTopicTreeNode)) {
+        domainTopicTreeNode = null;
     }
-    return domainTopicTreeCursor;
+    return domainTopicTreeNode;
 };
 
-const isPaneShowing = (navInfoCursor) => navInfoCursor.get("showDownloads") ||
-    navInfoCursor.get("showProfile") || navInfoCursor.get("showSettings");
+const isPaneShowing = (navInfo) => navInfo.get("showDownloads") ||
+    navInfo.get("showProfile") || navInfo.get("showSettings");
 
 module.exports = {
     resetNavInfo,
-    getDomainTopicTreeCursor,
+    getDomainTopicTreeNode,
     isPaneShowing,
 };

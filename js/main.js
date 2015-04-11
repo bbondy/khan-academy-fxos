@@ -13,8 +13,7 @@ const React = require("react"),
     {readOptions, resetOptions, writeOptions} = require("./data/app-options"),
     {readTopicTree} = require("./data/topic-tree"),
     {resetNavInfo} = require("./data/nav-info"),
-    Immutable = require("immutable"),
-    Cursor = require('immutable/contrib/cursor');
+    Immutable = require("immutable");
 
 // TODO: remove, just for easy inpsection
 window.APIClient = APIClient;
@@ -44,21 +43,52 @@ var mountNode = document.getElementById("app");
 
 // Start showing the topic tree
 var options = readOptions() || resetOptions();
-var updateOptionsCursor = (newOptions) => {
-    writeOptions(newOptions);
-    mainView.setProps({ optionsCursor: Cursor.from(newOptions, updateOptionsCursor) });
-};
-var optionsCursor = Cursor.from(options, updateOptionsCursor);
 var navInfo = resetNavInfo();
 
-var updateNavInfoCursor = (newNavInfo) => {
-    mainView.setProps({ navInfoCursor: Cursor.from(newNavInfo, updateNavInfoCursor) });
-};
-var navInfoCursor = Cursor.from(navInfo, updateNavInfoCursor);
 
-// Render the main app chrome
-var mainView = React.render(<MainView optionsCursor={optionsCursor}
-                                      navInfoCursor={navInfoCursor} />, mountNode);
+/**
+ * Renderer used to manage state updates and render the root component.
+ * This is used so that we can avoid cursors.
+ * The problem with cursors is that they can be read and written to, so it's
+ * not obvious whether they should be passed to Omniscient statics or not.
+ */
+
+class Renderer {
+    constructor(component, target, state) {
+        this.component = component;
+        this.target = target;
+        this.state = state;
+        this.edit = this.edit.bind(this);
+        this.render = this.render.bind(this);
+    }
+
+    /**
+     * Function used to update the state
+     * @param updateStateFn The function to call to update state for this
+     *                      root component.
+     */
+    edit(updateStateFn) {
+        this.state = updateStateFn(this.state);
+        this.render();
+        return this.state;
+    }
+
+    render() {
+        React.render(<this.component options={this.state.get("options")}
+            navInfo={this.state.get("navInfo")}
+            statics={{
+                edit: this.edit
+            }}/>, this.target);
+    }
+}
+
+const initialState = Immutable.fromJS({
+    options,
+    navInfo,
+});
+
+const renderer = new Renderer(MainView, mountNode, initialState);
+renderer.render();
 
 // Init everything
 Storage.init().then(function() {
@@ -69,14 +99,13 @@ Storage.init().then(function() {
     // We don't want to have to wait for results, so just start this and don't wait
     models.CurrentUser.init();
 
-    readTopicTree().then((rootTopicTreeCursor) => {
-        // Setup immutable nav info cursor
-        navInfoCursor.merge({
-            topicTreeCursor: rootTopicTreeCursor,
-            rootTopicTreeCursor,
-            navStack: Immutable.Stack.of(rootTopicTreeCursor),
-        });
-    });
+    readTopicTree().then((rootTopicTreeNode) =>
+        renderer.edit((state) => state.mergeDeep({ navInfo: {
+            topicTreeNode: rootTopicTreeNode,
+            rootTopicTreeNode,
+            navStack: Immutable.Stack.of(rootTopicTreeNode),
+        }}))
+    );
 
 }).catch((error) => {
     alert(error);
@@ -86,4 +115,3 @@ Storage.init().then(function() {
         throw error;
     }
 });
-

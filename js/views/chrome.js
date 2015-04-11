@@ -24,7 +24,7 @@ const $ = require("jquery"),
     Immutable = require("immutable"),
     component = require('omniscient'),
     TopicTreeHelper = require("../data/topic-tree-helper"),
-    { getDomainTopicTreeCursor, isPaneShowing } = require("../data/nav-info"),
+    { getDomainTopicTreeNode, isPaneShowing } = require("../data/nav-info"),
     { TopicTreeNode } = require("../data/topic-tree");
 
 const VideoViewer = videoViews.VideoViewer,
@@ -43,7 +43,7 @@ const VideoViewer = videoViews.VideoViewer,
  * In general, when clicked it will take the user to the last view they were
  * at before.
  */
-const BackButton = component(({topicTreeCursor}, {onClickBack}) =>
+const BackButton = component(({topicTreeNode}, {onClickBack}) =>
     <div>
         <a className="icon-back-link " href="javascript:void(0)" onClick={onClickBack}>
             <span className="icon icon-back">Back</span>
@@ -72,28 +72,28 @@ const MenuButton = component(() =>
  */
 const AppHeader = component((props, {onClickBack}) => {
     var backButton;
-    var topicTreeCursor = props.topicTreeCursor;
-    if (topicTreeCursor &&
+    var topicTreeNode = props.topicTreeNode;
+    if (topicTreeNode &&
             (props.isPaneShowing ||
-                TopicTreeHelper.isContent(topicTreeCursor) ||
-                TopicTreeHelper.isTopic(topicTreeCursor) &&
-            TopicTreeHelper.getKey(props.rootTopicTreeCursor) !== TopicTreeHelper.getKey(topicTreeCursor)) ||
-            TopicTreeHelper.isContentList(topicTreeCursor)) {
+                TopicTreeHelper.isContent(topicTreeNode) ||
+                TopicTreeHelper.isTopic(topicTreeNode) &&
+            TopicTreeHelper.getKey(props.rootTopicTreeNode) !== TopicTreeHelper.getKey(topicTreeNode)) ||
+            TopicTreeHelper.isContentList(topicTreeNode)) {
         backButton = <BackButton statics={{
                                      onClickBack: onClickBack
                                  }}
-                                 topicTreeCursor={topicTreeCursor}/>;
+                                 topicTreeNode={topicTreeNode}/>;
     }
 
     var styleObj = {
         fixed: true,
-        "topic-header": topicTreeCursor &&
-            TopicTreeHelper.getKey(topicTreeCursor) !== TopicTreeHelper.getKey(props.rootTopicTreeCursor) &&
+        "topic-header": topicTreeNode &&
+            TopicTreeHelper.getKey(topicTreeNode) !== TopicTreeHelper.getKey(props.rootTopicTreeNode) &&
             !props.isPaneShowing &&
-            (TopicTreeHelper.isTopic(topicTreeCursor) || TopicTreeHelper.isContent(topicTreeCursor))
+            (TopicTreeHelper.isTopic(topicTreeNode) || TopicTreeHelper.isContent(topicTreeNode))
     };
-    if (props.domainTopicTreeCursor && !props.isPaneShowing) {
-        styleObj[TopicTreeHelper.getId(props.domainTopicTreeCursor)] = true;
+    if (props.domainTopicTreeNode && !props.isPaneShowing) {
+        styleObj[TopicTreeHelper.getId(props.domainTopicTreeNode)] = true;
     }
     var styleClass = classNames(styleObj);
 
@@ -104,14 +104,14 @@ const AppHeader = component((props, {onClickBack}) => {
         title = l10n.get("view-profile");
     } else if (props.isSettingsShowing) {
         title = l10n.get("view-settings");
-    } else if (topicTreeCursor && TopicTreeHelper.getTitle(topicTreeCursor)) {
-        title = TopicTreeHelper.getTitle(topicTreeCursor);
-    } else if (topicTreeCursor && TopicTreeHelper.isContentList(topicTreeCursor)) {
+    } else if (topicTreeNode && TopicTreeHelper.getTitle(topicTreeNode)) {
+        title = TopicTreeHelper.getTitle(topicTreeNode);
+    } else if (topicTreeNode && TopicTreeHelper.isContentList(topicTreeNode)) {
         title = l10n.get("search");
     }
 
     var menuButton;
-    if (topicTreeCursor) {
+    if (topicTreeNode) {
         menuButton = <MenuButton/>;
     }
 
@@ -148,25 +148,25 @@ const Sidebar = component((props, statics) => {
     // Context sensitive actions first
     if (Storage.isEnabled()) {
         if (!props.isPaneShowing &&
-                props.topicTreeCursor && TopicTreeHelper.isContent(props.topicTreeCursor)) {
-            if (isDownloaded(props.topicTreeCursor)) {
-                var text = l10n.get(isVideo(props.topicTreeCursor) ? "delete-downloaded-video" : "delete-downloaded-article");
+                props.topicTreeNode && TopicTreeHelper.isContent(props.topicTreeNode)) {
+            if (isDownloaded(props.topicTreeNode)) {
+                var text = l10n.get(isVideo(props.topicTreeNode) ? "delete-downloaded-video" : "delete-downloaded-article");
                 items.push(<li key="delete-downloaded-video" className="hot-item">
                         <a href="#" onClick={statics.onClickDeleteDownloadedContent}>{{text}}</a>
                     </li>);
             } else {
-                var text = l10n.get(isVideo(props.topicTreeCursor) ? "download-video" : "download-article");
+                var text = l10n.get(isVideo(props.topicTreeNode) ? "download-video" : "download-article");
                 items.push(<li key="download-video" className="hot-item">
-                        <a href="#" className={isVideo(props.topicTreeCursor) ? "download-video-link" : "download-article-link"} onClick={statics.onClickDownloadContent}>{{text}}</a>
+                        <a href="#" className={isVideo(props.topicTreeNode) ? "download-video-link" : "download-article-link"} onClick={statics.onClickDownloadContent}>{{text}}</a>
                     </li>);
             }
         }
     }
 
     if (!props.isPaneShowing &&
-            props.topicTreeCursor &&
-            TopicTreeHelper.isContent(props.topicTreeCursor) &&
-            TopicTreeHelper.getKAUrl(props.topicTreeCursor)) {
+            props.topicTreeNode &&
+            TopicTreeHelper.isContent(props.topicTreeNode) &&
+            TopicTreeHelper.getKAUrl(props.topicTreeNode)) {
         var viewOnKAMessage = l10n.get("open-in-website");
         items.push(<li key="open-in-website"><a href="#" className="open-in-website-link" onClick={statics.onClickViewOnKA}>{{viewOnKAMessage}}</a></li>);
 
@@ -182,7 +182,7 @@ const Sidebar = component((props, statics) => {
                     <a href="#" data-l10n-id="cancel-downloading" onClick={statics.onClickCancelDownloadContent}>Cancel Downloading</a>
                 </li>);
         } else if (!props.isPaneShowing &&
-                    props.topicTreeCursor && TopicTreeHelper.isTopic(props.topicTreeCursor)) {
+                    props.topicTreeNode && TopicTreeHelper.isTopic(props.topicTreeNode)) {
             items.push(<li key="download-topic" className="hot-item">
                     <a href="#" data-l10n-id="download-topic" onClick={statics.onClickDownloadContent}>Download Topic</a>
                 </li>);
@@ -238,7 +238,7 @@ const Sidebar = component((props, statics) => {
  * things when certain page actions change.  No other part of the code is repsonsible
  * for the overall top level view (which is nice and clean ;)).
  */
-const MainView = component(({topicTreeRootCursor, navInfoCursor, optionsCursor}) => {
+const MainView = component(({topicTreeRootNode, navInfo, options}, {edit}) => {
     //mixins: [Util.LocalizationMixin],
     //mixins: [Util.BackboneMixin, Util.LocalizationMixin],
     //getBackboneModels: function(): Array<any> {
@@ -248,98 +248,101 @@ const MainView = component(({topicTreeRootCursor, navInfoCursor, optionsCursor})
 
     // Make sure scrollTop is at the top of the page
     // This is in case the search box scrolling doesn't get an onblur
-    if (navInfoCursor.get("topicTreeCursor") && !TopicTreeHelper.isContentList(navInfoCursor.get("topicTreeCursor"))) {
+    if (navInfo.get("topicTreeNode") && !TopicTreeHelper.isContentList(navInfo.get("topicTreeNode"))) {
         $("html, body").scrollTop(0);
     }
 
+    const In = (path) => (edit) => (state) => state.update(path, edit);
+    const editNavInfo = _.compose(edit, In('navInfo'));
+
     var control;
-    if (!navInfoCursor.get("topicTreeCursor")) {
+    if (!navInfo.get("topicTreeNode")) {
         // Still loading topic tree
         control = <div className="app-loading"/>;
-    } else if (navInfoCursor.get("showProfile")) {
+    } else if (navInfo.get("showProfile")) {
         control = <ProfileViewer/>;
-    } else if (navInfoCursor.get("showDownloads")) {
+    } else if (navInfo.get("showDownloads")) {
         control = <DownloadsViewer statics={{
-                                       onClickContentItem: ChromeActions.onClickContentItemFromDownloads(navInfoCursor)
+                                       onClickContentItem: ChromeActions.onClickContentItemFromDownloads(navInfo)
                                    }}
-                                   optionsCursor={optionsCursor}/>;
-    } else if (navInfoCursor.get("showSettings")) {
-        control = <SettingsViewer optionsCursor={optionsCursor}/>;
-    } else if (TopicTreeHelper.isTopic(navInfoCursor.get("topicTreeCursor"))) {
+                                   options={options}/>;
+    } else if (navInfo.get("showSettings")) {
+        control = <SettingsViewer options={options}/>;
+    } else if (TopicTreeHelper.isTopic(navInfo.get("topicTreeNode"))) {
         var onClickContentItem = _.compose(
-            ChromeActions.onClickContentItem(navInfoCursor),
-            loadIfArticle(optionsCursor));
+            ChromeActions.onClickContentItem(navInfo),
+            loadIfArticle(options));
         control = <TopicViewer statics={{
-                                   onClickTopic: ChromeActions.onClickTopic(navInfoCursor),
+                                   onClickTopic: ChromeActions.onClickTopic(navInfo, editNavInfo),
                                    onClickContentItem,
                                }}
-                               topicTreeCursor={navInfoCursor.get("topicTreeCursor")}
-                               domainTopicTreeCursor={navInfoCursor.get("domainTopicTreeCursor")}
-                               optionsCursor={optionsCursor}/>;
-    } else if (navInfoCursor.get("searchResults")) {
-        control = <SearchResultsViewer collection={navInfoCursor.get("searchResults")}
-                                       optionsCursor={optionsCursor}
+                               topicTreeNode={navInfo.get("topicTreeNode")}
+                               domainTopicTreeNode={navInfo.get("domainTopicTreeNode")}
+                               options={options}/>;
+    } else if (navInfo.get("searchResults")) {
+        control = <SearchResultsViewer collection={navInfo.get("searchResults")}
+                                       options={options}
                                        statics={{
-                                           onClickContentItem: ChromeActions.onClickContentItem(navInfoCursor),
+                                           onClickContentItem: ChromeActions.onClickContentItem(navInfo),
                                        }}/>;
-    } else if (TopicTreeHelper.isVideo(navInfoCursor.get("topicTreeCursor"))) {
-        control = <VideoViewer topicTreeCursor={navInfoCursor.get("topicTreeCursor")}
-                               domainTopicTreeCursor={navInfoCursor.get("domainTopicTreeCursor")}
-                               optionsCursor={optionsCursor}/>;
-    } else if (TopicTreeHelper.isArticle(navInfoCursor.get("topicTreeCursor"))) {
-        control = <ArticleViewer  topicTreeCursor={navInfoCursor.get("topicTreeCursor")}
-                                  optionsCursor={optionsCursor}/>;
-    } else if (TopicTreeHelper.isExercise(navInfoCursor.get("topicTreeCursor"))) {
-        control = <ExerciseViewer  topicTreeCursor={navInfoCursor.get("topicTreeCursor")}/>;
+    } else if (TopicTreeHelper.isVideo(navInfo.get("topicTreeNode"))) {
+        control = <VideoViewer topicTreeNode={navInfo.get("topicTreeNode")}
+                               domainTopicTreeNode={navInfo.get("domainTopicTreeNode")}
+                               options={options}/>;
+    } else if (TopicTreeHelper.isArticle(navInfo.get("topicTreeNode"))) {
+        control = <ArticleViewer  topicTreeNode={navInfo.get("topicTreeNode")}
+                                  options={options}/>;
+    } else if (TopicTreeHelper.isExercise(navInfo.get("topicTreeNode"))) {
+        control = <ExerciseViewer  topicTreeNode={navInfo.get("topicTreeNode")}/>;
     } else {
         Util.error("Unrecognized content item!");
     }
 
     var topicSearch;
-    if (!isPaneShowing(navInfoCursor) && navInfoCursor.get("topicTreeCursor") &&
-            !TopicTreeHelper.isContent(navInfoCursor.get("topicTreeCursor"))) {
-        topicSearch = <TopicSearch topicTreeCursor={navInfoCursor.get("topicTreeCursor")}
-                                   optionsCursor={optionsCursor}
+    if (!isPaneShowing(navInfo) && navInfo.get("topicTreeNode") &&
+            !TopicTreeHelper.isContent(navInfo.get("topicTreeNode"))) {
+        topicSearch = <TopicSearch topicTreeNode={navInfo.get("topicTreeNode")}
+                                   options={options}
                                    statics={{
-                                       onTopicSearch: ChromeActions.onTopicSearch(navInfoCursor),
+                                       onTopicSearch: ChromeActions.onTopicSearch(navInfo),
                                    }}/>;
     }
 
     var sidebar;
-    if (navInfoCursor.get("topicTreeCursor")) {
-        sidebar = <Sidebar topicTreeCursor={navInfoCursor.get("topicTreeCursor")}
+    if (navInfo.get("topicTreeNode")) {
+        sidebar = <Sidebar topicTreeNode={navInfo.get("topicTreeNode")}
                            statics={{
                                onClickSignin: ChromeActions.onClickSignin,
                                onClickSignout: ChromeActions.onClickSignout,
-                               onClickProfile: ChromeActions.onClickProfile(navInfoCursor),
-                               onClickDownloads: ChromeActions.onClickDownloads(navInfoCursor),
-                               onClickSettings: ChromeActions.onClickSettings(navInfoCursor),
+                               onClickProfile: ChromeActions.onClickProfile(navInfo),
+                               onClickDownloads: ChromeActions.onClickDownloads(navInfo),
+                               onClickSettings: ChromeActions.onClickSettings(navInfo),
                                onClickSupport: ChromeActions.onClickSupport,
-                               onClickDownloadContent: ChromeActions.onClickDownloadContent(navInfoCursor.get("topicTreeCursor")),
-                               onClickViewOnKA: ChromeActions.onClickViewOnKA(navInfoCursor.get("topicTreeCursor")),
-                               onClickShare: ChromeActions.onClickShare(navInfoCursor.get("topicTreeCursor")),
+                               onClickDownloadContent: ChromeActions.onClickDownloadContent(navInfo.get("topicTreeNode")),
+                               onClickViewOnKA: ChromeActions.onClickViewOnKA(navInfo.get("topicTreeNode")),
+                               onClickShare: ChromeActions.onClickShare(navInfo.get("topicTreeNode")),
                                onClickCancelDownloadContent: ChromeActions.onClickCancelDownloadContent,
-                               onClickDeleteDownloadedContent: ChromeActions.onClickDeleteDownloadedContent(navInfoCursor.get("topicTreeCursor")),
+                               onClickDeleteDownloadedContent: ChromeActions.onClickDeleteDownloadedContent(navInfo.get("topicTreeNode")),
                            }}
-                           isPaneShowing={isPaneShowing(navInfoCursor)}
-                           isDownloadsShowing={navInfoCursor.get("showDownloads")}
-                           isProfileShowing={navInfoCursor.get("showProfile")}
-                           isSettingsShowing={navInfoCursor.get("showSettings")} />;
+                           isPaneShowing={isPaneShowing(navInfo)}
+                           isDownloadsShowing={navInfo.get("showDownloads")}
+                           isProfileShowing={navInfo.get("showProfile")}
+                           isSettingsShowing={navInfo.get("showSettings")} />;
     }
 
     return <section className="current" id="index" data-position="current">
         {sidebar}
         <section id="main-content" role="region" className="skin-dark">
             <AppHeader statics={{
-                           onClickBack: ChromeActions.onClickBack(navInfoCursor, navInfoCursor.get("topicTreeCursor"))
+                           onClickBack: ChromeActions.onClickBack(navInfo, navInfo.get("topicTreeNode"))
                        }}
-                       topicTreeCursor={navInfoCursor.get("topicTreeCursor")}
-                       domainTopicTreeCursor={navInfoCursor.get("domainTopicTreeCursor")}
-                       rootTopicTreeCursor={navInfoCursor.get("rootTopicTreeCursor")}
-                       isPaneShowing={isPaneShowing(navInfoCursor)}
-                       isDownloadsShowing={navInfoCursor.get("showDownloads")}
-                       isProfileShowing={navInfoCursor.get("showProfile")}
-                       isSettingsShowing={navInfoCursor.get("showSettings")}
+                       topicTreeNode={navInfo.get("topicTreeNode")}
+                       domainTopicTreeNode={navInfo.get("domainTopicTreeNode")}
+                       rootTopicTreeNode={navInfo.get("rootTopicTreeNode")}
+                       isPaneShowing={isPaneShowing(navInfo)}
+                       isDownloadsShowing={navInfo.get("showDownloads")}
+                       isProfileShowing={navInfo.get("showProfile")}
+                       isSettingsShowing={navInfo.get("showSettings")}
                        />
             {topicSearch}
             {control}

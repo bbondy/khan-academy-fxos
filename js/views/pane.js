@@ -16,7 +16,7 @@ const ContentListViewer = topicViews.ContentListViewer;
  * Represents a downloads list which is basically just a wrapper around a
  * ContentListViewer for now.
  */
-const DownloadsViewer = component(({optionsCursor}, {onClickContentItem}) => {
+const DownloadsViewer = component(({options}, {onClickContentItem}) => {
     if (!Downloads.contentList.length) {
         return <div className="downloads">
             <div data-l10n-id="no-downloads">You have no downloads yet!</div>
@@ -24,7 +24,7 @@ const DownloadsViewer = component(({optionsCursor}, {onClickContentItem}) => {
     }
 
     var control = <ContentListViewer collection={Downloads.contentList}
-                                     optionsCursor={optionsCursor}
+                                     options={options}
                                      onClickContentItem={onClickContentItem} />;
     return <div className="downloads topic-list-container">
         {control}
@@ -35,24 +35,24 @@ const DownloadsViewer = component(({optionsCursor}, {onClickContentItem}) => {
  * Represents a list of settings which can be modified which affect
  * global state.
  */
-const SettingsViewer = component(({optionsCursor}) => {
+const SettingsViewer = component(({options}) => {
     const onShowDownloadsChange = (event) => {
-        optionsCursor.update("showDownloadsOnly", () => event.target.checked);
+        options.update("showDownloadsOnly", () => event.target.checked);
     };
     const onShowTranscriptsChange = (event) => {
-        optionsCursor.update("showTranscripts", () => event.target.checked);
+        options.update("showTranscripts", () => event.target.checked);
     };
     const onAutoUpdateTopicTreeChange = (event) => {
-        optionsCursor.update("autoUpdateTopicTree", () => event.target.checked);
+        options.update("autoUpdateTopicTree", () => event.target.checked);
     };
     const onSetPlaybackRateChange = (event) => {
         // Convert a value like: 0, 1, 2, 3 to 50, 100, 150, 200
         var percentage = 50 + event.target.value * 50;
-        optionsCursor.update("playbackRate", () => percentage);
+        options.update("playbackRate", () => percentage);
     };
     const onReset = (event) => {
         if (confirm(l10n.get("confirm-reset"))) {
-            optionsCursor.update(resetOptions);
+            options.update(resetOptions);
         }
     };
 
@@ -63,7 +63,7 @@ const SettingsViewer = component(({optionsCursor}) => {
         <input ref="showDownloadsOnly"
                className="show-downloads-setting app-chrome"
                type="checkbox"
-               checked={optionsCursor.get("showDownloadsOnly")}
+               checked={options.get("showDownloadsOnly")}
                onChange={this.onShowDownloadsChange.bind(this)}></input>
         <span></span>
         </label>
@@ -73,7 +73,7 @@ const SettingsViewer = component(({optionsCursor}) => {
         <input ref="showTranscripts"
                className="show-transcripts-setting app-chrome"
                type="checkbox"
-               checked={optionsCursor.get("showTranscripts")}
+               checked={options.get("showTranscripts")}
                onChange={this.onShowTranscriptsChange.bind(this)}></input>
         <span></span>
         </label>
@@ -83,7 +83,7 @@ const SettingsViewer = component(({optionsCursor}) => {
         <input ref="autoUpdateTopicTree"
                className="auto-update-topic-tree-setting app-chrome"
                type="checkbox"
-               checked={optionsCursor.get("autoUpdateTopicTree")}
+               checked={options.get("autoUpdateTopicTree")}
                onChange={this.onAutoUpdateTopicTreeChange.bind(this)}></input>
         <span></span>
         </label>
@@ -97,9 +97,9 @@ const SettingsViewer = component(({optionsCursor}) => {
                    id="set-playback-speed"
                    type="range"
                    min="0" max="3"
-                   value={(optionsCursor.get("playbackRate") - 50) / 50}
+                   value={(options.get("playbackRate") - 50) / 50}
                    onChange={this.onSetPlaybackRateChange.bind(this)}></input>
-            <label class="icon">{optionsCursor.get("playbackRate")}%</label>
+            <label class="icon">{options.get("playbackRate")}%</label>
             <span></span>
         </section>
         </label>

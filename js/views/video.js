@@ -23,14 +23,14 @@ const minSecondsBetweenReports = 10;
  */
 const VideoViewer = React.createClass({
     propTypes: {
-        topicTreeCursor: React.PropTypes.object.isRequired,
-        domainTopicTreeCursor: React.PropTypes.object.isRequired,
-        optionsCursor: React.PropTypes.object.isRequired,
+        topicTreeNode: React.PropTypes.object.isRequired,
+        domainTopicTreeNode: React.PropTypes.object.isRequired,
+        options: React.PropTypes.object.isRequired,
     },
     componentWillMount: function() {
         Util.log("VideoViewer will mount");
-        if (this.props.optionsCursor.get("showTranscripts")) {
-            APIClient.getVideoTranscript(TopicTreeHelper.getYoutubeId(this.props.topicTreeCursor)).then((transcript) => {
+        if (this.props.options.get("showTranscripts")) {
+            APIClient.getVideoTranscript(TopicTreeHelper.getYoutubeId(this.props.topicTreeNode)).then((transcript) => {
                 if (transcript && transcript.length === 0) {
                     return;
                 }
@@ -40,26 +40,26 @@ const VideoViewer = React.createClass({
             });
         }
 
-        if (TopicTreeHelper.isDownloaded(this.props.topicTreeCursor)) {
-            Storage.readAsBlob(TopicTreeHelper.getId(this.props.topicTreeCursor)).then((result) => {
+        if (TopicTreeHelper.isDownloaded(this.props.topicTreeNode)) {
+            Storage.readAsBlob(TopicTreeHelper.getId(this.props.topicTreeNode)).then((result) => {
                 var download_url = window.URL.createObjectURL(result);
                 this.setState({downloadedUrl: download_url, showOfflineImage: false});
             });
         }
 
-        Util.log("video: %o", this.props.topicTreeCursor);
-        this.videoId = TopicTreeHelper.getId(this.props.topicTreeCursor);
+        Util.log("video: %o", this.props.topicTreeNode);
+        this.videoId = TopicTreeHelper.getId(this.props.topicTreeNode);
         this.initSecondWatched = 0;
         this.lastSecondWatched = 0;
-        if (this.props.topicTreeCursor.get("lastSecondWatched") &&
-                this.props.topicTreeCursor.get("lastSecondWatched") + 10 < TopicTreeHelper.getDuration(this.props.topicTreeCursor)) {
-            this.initSecondWatched = this.props.topicTreeCursor.get("lastSecondWatched");
+        if (this.props.topicTreeNode.get("lastSecondWatched") &&
+                this.props.topicTreeNode.get("lastSecondWatched") + 10 < TopicTreeHelper.getDuration(this.props.topicTreeNode)) {
+            this.initSecondWatched = this.props.topicTreeNode.get("lastSecondWatched");
         }
         this.secondsWatched = 0;
         this.lastReportedTime = new Date();
         this.lastWatchedTimeSinceLastUpdate = new Date();
-        this.pointsPerReport = this.availablePoints * minSecondsBetweenReports / TopicTreeHelper.getDuration(this.props.topicTreeCursor);
-        this.pointsObj = {num: TopicTreeHelper.getPoints(this.props.topicTreeCursor)};
+        this.pointsPerReport = this.availablePoints * minSecondsBetweenReports / TopicTreeHelper.getDuration(this.props.topicTreeNode);
+        this.pointsObj = {num: TopicTreeHelper.getPoints(this.props.topicTreeNode)};
     },
     componentWillUnmount: function() {
         if (this.state.downloadedUrl) {
@@ -231,7 +231,7 @@ const VideoViewer = React.createClass({
 
     componentDidMount: function() {
         var videoMountNode = this.refs.videoPlaceholder.getDOMNode();
-        this.videoNode = $("<video width='640' height='264' type='" + TopicTreeHelper.getContentMimeType(this.props.topicTreeCursor) + "'" +
+        this.videoNode = $("<video width='640' height='264' type='" + TopicTreeHelper.getContentMimeType(this.props.topicTreeNode) + "'" +
             " id='video-player' class='" + this.videoClass + "' preload='auto' src='" + this.videoSrc + "' controls>" +
             "</video>");
         $(videoMountNode).append(this.videoNode);
@@ -253,8 +253,8 @@ const VideoViewer = React.createClass({
                 video.addEventListener("stop", this._onStop, true);
                 video.addEventListener("ended", this._onEnded, true);
                 video.addEventListener("error", this._onError, true);
-                video.defaultPlaybackRate = this.props.optionsCursor.get("playbackRate") / 100;
-                video.playbackRate = this.props.optionsCursor.get("playbackRate") / 100;
+                video.defaultPlaybackRate = this.props.options.get("playbackRate") / 100;
+                video.playbackRate = this.props.options.get("playbackRate") / 100;
             }
         });
     },
@@ -313,15 +313,15 @@ const VideoViewer = React.createClass({
         var secondsSinceLastReport = (currentTime.getTime() - this.lastReportedTime.getTime()) / 1000;
         if (secondsSinceLastReport >= minSecondsBetweenReports || this.lastSecondWatched >= (duration | 0)) {
             this.lastReportedTime = new Date();
-            models.CurrentUser.reportVideoProgress(this.props.topicTreeCursor,
-                    TopicTreeHelper.getYoutubeId(this.props.topicTreeCursor),
+            models.CurrentUser.reportVideoProgress(this.props.topicTreeNode,
+                    TopicTreeHelper.getYoutubeId(this.props.topicTreeNode),
                     this.secondsWatched,
                     this.lastSecondWatched).then(() => {
                         // We could just add a backbone model to watch for video model
                         // changes and it would work automatically, but to get animated points
                         // growing, we need to do it manually.
                         // Re-animate the points
-                        this.pointsObj.num = TopicTreeHelper.getPoints(this.props.topicTreeCursor);
+                        this.pointsObj.num = TopicTreeHelper.getPoints(this.props.topicTreeNode);
                         this.animatePoints();
                     });
             this.secondsWatched = 0;
@@ -357,13 +357,13 @@ const VideoViewer = React.createClass({
                                                  }}/>;
         }
 
-        this.videoSrc = TopicTreeHelper.getDownloadUrl(this.props.topicTreeCursor);
+        this.videoSrc = TopicTreeHelper.getDownloadUrl(this.props.topicTreeNode);
         if (this.state.downloadedUrl) {
             this.videoSrc = this.state.downloadedUrl;
         }
         Util.log("video rendered with url: " + this.videoSrc);
         var pointsString = l10n.get("points-so-far", {
-            earned: TopicTreeHelper.getPoints(this.props.topicTreeCursor),
+            earned: TopicTreeHelper.getPoints(this.props.topicTreeNode),
             available: this.availablePoints
         });
 
@@ -378,7 +378,7 @@ const VideoViewer = React.createClass({
           "vjs-default-skin": true,
           "signed-in": models.CurrentUser.isSignedIn()
         };
-        videoClassObj[TopicTreeHelper.getId(this.props.domainTopicTreeCursor)] = true;
+        videoClassObj[TopicTreeHelper.getId(this.props.domainTopicTreeNode)] = true;
         this.videoClass = classNames(videoClassObj);
 
         var control;

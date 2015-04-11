@@ -1,38 +1,37 @@
 const Downloads = require("../downloads"),
     TopicTreeHelper = require("../data/topic-tree-helper"),
     Util = require("../util"),
-    { getDomainTopicTreeCursor, isPaneShowing } = require("../data/nav-info"),
+    { getDomainTopicTreeNode, isPaneShowing } = require("../data/nav-info"),
     Notifications = require("../notifications"),
     Status = require("../status"),
     models = require("../models");
 
-
-const onClickContentItemFromDownloads = (navInfoCursor) => (topicTreeCursor) => navInfoCursor.merge({
-    topicTreeCursor,
+const onClickContentItemFromDownloads = (navInfo) => (topicTreeNode) => navInfo.merge({
+    topicTreeNode,
     showProfile: false,
     showDownloads: false,
     showSettings: false,
     wasLastDownloads: true,
-    lastTopicTreeCursor: navInfoCursor.get("lastTopicTreeCursor")
+    lastTopicTreeNode: navInfo.get("lastTopicTreeNode")
 });
 
-const onClickContentItem = (navInfoCursor) => (topicTreeCursor) => (navInfoCursor.merge({
-    topicTreeCursor,
+const onClickContentItem = (navInfo) => (topicTreeNode) => (navInfo.merge({
+    topicTreeNode,
     showProfile: false,
     showDownloads: false,
     showSettings: false
-}), topicTreeCursor);
+}), topicTreeNode);
 
-const onClickTopic = (navInfoCursor) => (newTopicTreeCursor) =>
-    navInfoCursor.merge({
-        topicTreeCursor: newTopicTreeCursor,
-        domainTopicTreeCursor: getDomainTopicTreeCursor(navInfoCursor, newTopicTreeCursor),
-        navStack: navInfoCursor.get("navStack").valueOf().unshift(newTopicTreeCursor),
+const onClickTopic = (navInfo, editNavInfo) => (newTopicTreeNode) =>
+    editNavInfo((navInfo) => navInfo.merge({
+        topicTreeNode: newTopicTreeNode,
+        domainTopicTreeNode: getDomainTopicTreeNode(navInfo, newTopicTreeNode),
+        navStack: navInfo.get("navStack").unshift(newTopicTreeNode),
         showProfile: false,
         showDownloads: false,
         showSettings: false,
         wasLastDownloads: false
-    });
+    }));
 
 //TODO used to call: this.forceUpdate();
 const onClickSignin = () => APIClient.signIn();
@@ -62,86 +61,86 @@ const onClickCancelDownloadContent = () => {
 
 
 
-const onClickProfile = (navInfoCursor) => () => navInfoCursor.merge({
+const onClickProfile = (navInfo) => () => navInfo.merge({
     showProfile: true,
     showDownloads: false,
     showSettings: false,
     wasLastDownloads: false
 });
 
-const onClickDownloads = (navInfoCursor) => () => navInfoCursor.merge({
+const onClickDownloads = (navInfo) => () => navInfo.merge({
     showDownloads: true,
     showProfile: false,
     showSettings: false,
     wasLastDownloads: false
 });
 
-const onClickSettings = (navInfoCursor) => () => navInfoCursor.merge({
+const onClickSettings = (navInfo) => () => navInfo.merge({
     showDownloads: false,
     showProfile: false,
     showSettings: true,
     wasLastDownloads: false
 });
 
-const onTopicSearch = (navInfoCursor) => (topicSearch) => {
+const onTopicSearch = (navInfo) => (topicSearch) => {
     if (!topicSearch) {
-        navInfoCursor.merge({
-            topicTreeCursor: navInfoCursor.get("searchingTopicTreeCursor"),
-            searchingTopicTreeCursor: null
+        navInfo.merge({
+            topicTreeNode: navInfo.get("searchingTopicTreeNode"),
+            searchingTopicTreeNode: null
         });
         return;
     }
 
-    var searchingTopicTreeCursor = navInfoCursor.get("searchingTopicTreeCursor");
-    if (!searchingTopicTreeCursor) {
-        searchingTopicTreeCursor = navInfoCursor.get("topicTreeCursor");
+    var searchingTopicTreeNode = navInfo.get("searchingTopicTreeNode");
+    if (!searchingTopicTreeNode) {
+        searchingTopicTreeNode = navInfo.get("topicTreeNode");
     }
-    var results = TopicTreeHelper.findContentItems(searchingTopicTreeCursor, topicSearch);
-    navInfoCursor.merge({
+    var results = TopicTreeHelper.findContentItems(searchingTopicTreeNode, topicSearch);
+    navInfo.merge({
         searchResults: results,
-        searchingTopicTreeCursor: searchingTopicTreeCursor
+        searchingTopicTreeNode: searchingTopicTreeNode
     });
 };
 
-const onClickBack = (navInfoCursor, topicTreeCursor) => () => {
+const onClickBack = (navInfo, topicTreeNode) => () => {
     // If settings or profile or ... is set, then don't show it anymore.
-    // This effectively makes the topicTreeCursor be in use again.
-    if (isPaneShowing(navInfoCursor)) {
-        navInfoCursor.merge({
+    // This effectively makes the topicTreeNode be in use again.
+    if (isPaneShowing(navInfo)) {
+        navInfo.merge({
             showDownloads: false,
             showProfile: false,
             showSettings: false,
             wasLastDownloads: false
         });
-        if (TopicTreeHelper.isContentList(navInfoCursor.get("topicTreeCursor"))) {
+        if (TopicTreeHelper.isContentList(navInfo.get("topicTreeNode"))) {
             onTopicSearch("");
         }
         return;
     }
 
-    var newStack = navInfoCursor.get("navStack").valueOf().shift();
-    navInfoCursor.merge({
+    var newStack = navInfo.get("navStack").shift();
+    navInfo.merge({
         navStack: newStack,
-        topicTreeCursor: newStack.peek(),
-        domainTopicTreeCursor: getDomainTopicTreeCursor(navInfoCursor, newStack.peek()),
+        topicTreeNode: newStack.peek(),
+        domainTopicTreeNode: getDomainTopicTreeNode(navInfo, newStack.peek()),
     });
 
     /*
     // If we were on a content item from downloads,
     // then go back to downloads.
-    if (navInfoCursor.get("wasLastDownloads")) {
+    if (navInfo.get("wasLastDownloads")) {
         onClickDownloads();
         return;
     }
 
     // If we have a last model set, then we're effectively
     // presisng back from the downloads screen itself.
-    // The lastTopicTreeCursor is needed because the downloads pane is the
-    // only pane where clicking on it can change the topicTreeCursor.
-    if (navInfoCursor.get("lastTopicTreeCursor")) {
-        navInfoCursor.merge({
-            topicTreeCursor: navInfoCursor.get("lastTopicTreeCursor"),
-            lastTopicTreeCursor: undefined,
+    // The lastTopicTreeNode is needed because the downloads pane is the
+    // only pane where clicking on it can change the topicTreeNode.
+    if (navInfo.get("lastTopicTreeNode")) {
+        navInfo.merge({
+            topicTreeNode: navInfo.get("lastTopicTreeNode"),
+            lastTopicTreeNode: undefined,
             showDownloads: false,
             showProfile: false,
             showSettings: false,
@@ -149,12 +148,12 @@ const onClickBack = (navInfoCursor, topicTreeCursor) => () => {
         });
     }
 
-    if (TopicTreeHelper.isContentList(navInfoCursor.get("topicTreeCursor"))) {
+    if (TopicTreeHelper.isContentList(navInfo.get("topicTreeNode"))) {
         return onTopicSearch("");
     }
 
-    navInfoCursor.merge({
-        topicTreeCursor: getParent(topicTreeCursor),
+    navInfo.merge({
+        topicTreeNode: getParent(topicTreeNode),
         showProfile: false,
         showDownloads: false,
         showSettings: false,
@@ -163,22 +162,22 @@ const onClickBack = (navInfoCursor, topicTreeCursor) => () => {
     */
 };
 
-const onClickShare = (topicTreeCursor) => () => new window.MozActivity({
+const onClickShare = (topicTreeNode) => () => new window.MozActivity({
     name: "share",
     data: {
         type: "url",
-        url: TopicTreeHelper.getKAUrl(topicTreeCursor)
+        url: TopicTreeHelper.getKAUrl(topicTreeNode)
     }
 });
 
-const onClickViewOnKA = (topicTreeCursor) => () => openUrl(TopicTreeHelper.getKAUrl(topicTreeCursor));
+const onClickViewOnKA = (topicTreeNode) => () => openUrl(TopicTreeHelper.getKAUrl(topicTreeNode));
 
-const onClickDeleteDownloadedContent = (topicTreeCursor) => () => Downloads.deleteContent(topicTreeCursor);
+const onClickDeleteDownloadedContent = (topicTreeNode) => () => Downloads.deleteContent(topicTreeNode);
 
-const onClickDownloadContent = (topicTreeCursor) => () => {
+const onClickDownloadContent = (topicTreeNode) => () => {
     var totalCount = 1;
-    if (TopicTreeHelper.isTopic(topicTreeCursor)) {
-        totalCount = getChildNotDownloadedCount(topicTreeCursor);
+    if (TopicTreeHelper.isTopic(topicTreeNode)) {
+        totalCount = getChildNotDownloadedCount(topicTreeNode);
     }
 
     // Check for errors
@@ -202,7 +201,7 @@ const onClickDownloadContent = (topicTreeCursor) => () => {
     var totalCountStr = Util.numberWithCommas(totalCount);
 
     // Prompt to download remaining
-    if (TopicTreeHelper.isTopic(topicTreeCursor)) {
+    if (TopicTreeHelper.isTopic(topicTreeNode)) {
         if (!confirm(l10n.get("download-remaining", {
                 totalCount: totalCount,
                 totalCountStr: totalCountStr
@@ -229,11 +228,11 @@ const onClickDownloadContent = (topicTreeCursor) => () => {
     Status.start();
     var message;
     var title;
-    Downloads.download(topicTreeCursor, onProgress).then((topicTreeCursor, count) => {
+    Downloads.download(topicTreeNode, onProgress).then((topicTreeNode, count) => {
         var title = l10n.get("download-complete");
-        var contentTitle = TopicTreeHelper.getTitle(topicTreeCursor);
-        if (TopicTreeHelper.isContent(topicTreeCursor)) {
-            if (TopicTreeHelper.isVideo(topicTreeCursor)) {
+        var contentTitle = TopicTreeHelper.getTitle(topicTreeNode);
+        if (TopicTreeHelper.isContent(topicTreeNode)) {
+            if (TopicTreeHelper.isVideo(topicTreeNode)) {
                 message = l10n.get("video-complete-body", {
                     title: contentTitle
                 });

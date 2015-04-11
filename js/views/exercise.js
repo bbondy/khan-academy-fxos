@@ -34,7 +34,7 @@ class TaskCompleteView extends React.Component {
  */
 const ExerciseViewer = React.createClass({
     propTypes: {
-        topicTreeCursor: React.PropTypes.object.isRequired
+        topicTreeNode: React.PropTypes.object.isRequired
     },
     getInitialState: function() {
         return {
@@ -43,8 +43,8 @@ const ExerciseViewer = React.createClass({
     },
     refreshUserExerciseInfo: function() {
         return new Promise((resolve, reject) => {
-            $.when(APIClient.getTaskInfoByExerciseName(TopicTreeHelper.getName(this.props.topicTreeCursor)),
-                    APIClient.getUserExercise(TopicTreeHelper.getName(this.props.topicTreeCursor)))
+            $.when(APIClient.getTaskInfoByExerciseName(TopicTreeHelper.getName(this.props.topicTreeNode)),
+                    APIClient.getUserExercise(TopicTreeHelper.getName(this.props.topicTreeNode)))
             .then((taskInfo, exerciseInfo) => {
                 Util.log("getTaskInfoByExerciseName: %o", taskInfo);
                 Util.log("getUserExercise: %o", exerciseInfo);
@@ -125,8 +125,8 @@ const ExerciseViewer = React.createClass({
         var content;
         if (this.state.error) {
             content = <div>Could not load exercise</div>;
-        } else if (TopicTreeHelper.isKhanExercisesExercise(this.props.topicTreeCursor)) {
-            var path = `/khan-exercises/exercises/${TopicTreeHelper.getFilename(this.props.toipcTreeCursor)}`;
+        } else if (TopicTreeHelper.isKhanExercisesExercise(this.props.topicTreeNode)) {
+            var path = `/khan-exercises/exercises/${TopicTreeHelper.getFilename(this.props.toipcTreeNode)}`;
             content = <iframe src={path}/>;
         } else if (this.state.taskComplete) {
             return <TaskCompleteView/>;
@@ -195,7 +195,7 @@ const ExerciseViewer = React.createClass({
                       </div>;
         }
 
-        Util.log("render exercise: :%o", this.props.topicTreeCursor);
+        Util.log("render exercise: :%o", this.props.topicTreeNode);
         return <div className="exercise">
             {content}
         </div>;

@@ -7,8 +7,7 @@ const _ = require("underscore"),
     models = require("../models"),
     Util = require("../util"),
     TopicTreeHelper = require("../data/topic-tree-helper"),
-    component = require("omniscient"),
-    Cursor = require('immutable/contrib/cursor');
+    component = require("omniscient");
 
 /**
  * Represents a single root, domain, subject, topic, or tutorial
@@ -17,20 +16,20 @@ const _ = require("underscore"),
  * list view will be replaced with a bunch of different TopicListItem
  * which are the children of the clicked item.
  */
-const TopicListItem = component(({topicTreeCursor, domainTopicTreeCursor, optionsCursor}, {onClickTopic}) => {
+const TopicListItem = component(({topicTreeNode, domainTopicTreeNode, options}, {onClickTopic}) => {
     var topicClassObj = {
         "topic-item": true,
-        faded: optionsCursor.get("showDownloadsOnly") &&
-            TopicTreeHelper.getDownloadCount(topicTreeCursor),
+        faded: options.get("showDownloadsOnly") &&
+            TopicTreeHelper.getDownloadCount(topicTreeNode),
     };
-    topicClassObj[TopicTreeHelper.getId(domainTopicTreeCursor)] = true;
+    topicClassObj[TopicTreeHelper.getId(domainTopicTreeNode)] = true;
     var topicClass = classNames(topicClassObj);
     return <li className={topicClass}>
-        { TopicTreeHelper.getKey(topicTreeCursor) === TopicTreeHelper.getKey(domainTopicTreeCursor) &&
+        { TopicTreeHelper.getKey(topicTreeNode) === TopicTreeHelper.getKey(domainTopicTreeNode) &&
             <div className="color-block"/> }
         <a href="javascript:void(0)"
-           onClick={_.partial(onClickTopic, topicTreeCursor, domainTopicTreeCursor)}>
-            <p className="topic-title">{TopicTreeHelper.getTitle(topicTreeCursor)}</p>
+           onClick={_.partial(onClickTopic, topicTreeNode, domainTopicTreeNode)}>
+            <p className="topic-title">{TopicTreeHelper.getTitle(topicTreeNode)}</p>
         </a>
     </li>;
 }).jsx;
@@ -40,33 +39,33 @@ const TopicListItem = component(({topicTreeCursor, domainTopicTreeCursor, option
  * This renders the list item and not the actual video.
  * When clicked, it will render the video corresponding to this list item.
  */
-const ContentListItem = component(({topicTreeCursor, domainTopicTreeCursor, optionsCursor}, {onClick}) => {
+const ContentListItem = component(({topicTreeNode, domainTopicTreeNode, options}, {onClick}) => {
     var contentNodeClass = classNames({
-      "article-node": TopicTreeHelper.isArticle(topicTreeCursor),
-      "video-node": TopicTreeHelper.isVideo(topicTreeCursor),
-      "exercise-node": TopicTreeHelper.isExercise(topicTreeCursor),
-      completed: TopicTreeHelper.isCompleted(topicTreeCursor),
-      "in-progress": TopicTreeHelper.isStarted(topicTreeCursor),
+      "article-node": TopicTreeHelper.isArticle(topicTreeNode),
+      "video-node": TopicTreeHelper.isVideo(topicTreeNode),
+      "exercise-node": TopicTreeHelper.isExercise(topicTreeNode),
+      completed: TopicTreeHelper.isCompleted(topicTreeNode),
+      "in-progress": TopicTreeHelper.isStarted(topicTreeNode),
     });
     var pipeClassObj = {
         pipe: true,
-        completed: TopicTreeHelper.isCompleted(topicTreeCursor),
-        "in-progress": TopicTreeHelper.isStarted(topicTreeCursor),
+        completed: TopicTreeHelper.isCompleted(topicTreeNode),
+        "in-progress": TopicTreeHelper.isStarted(topicTreeNode),
     };
     var subwayIconClassObj = {
         "subway-icon": true,
     };
     var contentClassObj = {
-        "video-item": TopicTreeHelper.isVideo(topicTreeCursor),
-        "article-item": TopicTreeHelper.isArticle(topicTreeCursor),
-        "exercise-item": TopicTreeHelper.isExercise(topicTreeCursor),
-        faded: optionsCursor.get("showDownloadsOnly") &&
-            !TopicTreeHelper.isDownloaded(topicTreeCursor)
+        "video-item": TopicTreeHelper.isVideo(topicTreeNode),
+        "article-item": TopicTreeHelper.isArticle(topicTreeNode),
+        "exercise-item": TopicTreeHelper.isExercise(topicTreeNode),
+        faded: options.get("showDownloadsOnly") &&
+            !TopicTreeHelper.isDownloaded(topicTreeNode)
     };
-    if (domainTopicTreeCursor) {
-        subwayIconClassObj[TopicTreeHelper.getId(domainTopicTreeCursor)] = true;
-        contentClassObj[TopicTreeHelper.getId(domainTopicTreeCursor)] = true;
-        pipeClassObj[TopicTreeHelper.getId(domainTopicTreeCursor)] = true;
+    if (domainTopicTreeNode) {
+        subwayIconClassObj[TopicTreeHelper.getId(domainTopicTreeNode)] = true;
+        contentClassObj[TopicTreeHelper.getId(domainTopicTreeNode)] = true;
+        pipeClassObj[TopicTreeHelper.getId(domainTopicTreeNode)] = true;
     }
     var subwayIconClass = classNames(subwayIconClassObj);
     var pipeClass = classNames(pipeClassObj);
@@ -74,14 +73,14 @@ const ContentListItem = component(({topicTreeCursor, domainTopicTreeCursor, opti
     return <li className={contentClass}>
         <div className={subwayIconClass}>
             <a href="javascript:void(0)"
-               onClick={_.partial(onClick, topicTreeCursor)}>
+               onClick={_.partial(onClick, topicTreeNode)}>
                 <div className={contentNodeClass}/>
             </a>
             <div className={pipeClass}/>
         </div>
         <a href="javascript:void(0)"
-           onClick={_.partial(onClick, topicTreeCursor)}>
-            <p className="content-title">{TopicTreeHelper.getTitle(topicTreeCursor)}</p>
+           onClick={_.partial(onClick, topicTreeNode)}>
+            <p className="content-title">{TopicTreeHelper.getTitle(topicTreeNode)}</p>
         </a>
     </li>;
 }).jsx;
@@ -90,35 +89,35 @@ const ContentListItem = component(({topicTreeCursor, domainTopicTreeCursor, opti
  * Represents a single topic and it displays a list of all of its children.
  * Each child of the list is a ContentListItem
  */
-const TopicViewer = component(({topicTreeCursor, domainTopicTreeCursor, optionsCursor}, {onClickTopic, onClickContentItem}) =>
+const TopicViewer = component(({topicTreeNode, domainTopicTreeNode, options}, {onClickTopic, onClickContentItem, editNavInfo}) =>
     <div className="topic-list-container">
         <section data-type="list">
             <ul>
                 {
                     // Output the child topics
-                    TopicTreeHelper.mapChildTopicCursors(topicTreeCursor, (childTopicCursor) =>
+                    TopicTreeHelper.mapChildTopicNodes(topicTreeNode, (childTopicNode) =>
                         <TopicListItem
                             statics={{
                                 onClickTopic: onClickTopic
                             }}
-                            topicTreeCursor={childTopicCursor}
-                            optionsCursor={optionsCursor}
-                            domainTopicTreeCursor={domainTopicTreeCursor || childTopicCursor}
-                            key={TopicTreeHelper.getKey(childTopicCursor)} />
+                            topicTreeNode={childTopicNode}
+                            options={options}
+                            domainTopicTreeNode={domainTopicTreeNode || childTopicNode}
+                            key={TopicTreeHelper.getKey(childTopicNode)} />
                     )
                 }
 
                 {
                     // Output the child content items
-                    TopicTreeHelper.mapChildContentCursors(topicTreeCursor, (topicTreeCursor) =>
+                    TopicTreeHelper.mapChildContentNodes(topicTreeNode, (topicTreeNode) =>
                         <ContentListItem
                             statics={{
                                 onClick: onClickContentItem
                             }}
-                            topicTreeCursor={topicTreeCursor}
-                            optionsCursor={optionsCursor}
-                            domainTopicTreeCursor={domainTopicTreeCursor}
-                            key={TopicTreeHelper.getKey(topicTreeCursor)} />
+                            topicTreeNode={topicTreeNode}
+                            options={options}
+                            domainTopicTreeNode={domainTopicTreeNode}
+                            key={TopicTreeHelper.getKey(topicTreeNode)} />
                     )
                 }
 
@@ -132,17 +131,17 @@ const TopicViewer = component(({topicTreeCursor, domainTopicTreeCursor, optionsC
  * This is used for displaying search results and download lists.
  * This always contains only a list of VideoListItems, or ARticleListItems.
  */
-const ContentListViewer = component(({topicTreeCursors, optionsCursor, onClickContentItem}) =>
+const ContentListViewer = component(({topicTreeNodes, options, onClickContentItem}) =>
     <div className="topic-list-container">
         <section data-type="list">
             <ul>
                 {
-                    topicTreeCursors.map((topicTreeCursor) => <ContentListItem statics={{
+                    topicTreeNodes.map((topicTreeNode) => <ContentListItem statics={{
                             onClick: onClickContentItem
                         }}
-                        videoCursor={topicTreeCursor}
-                        optionsCursor={optionsCursor}
-                        key={TopicTreeHelper.getKey(topicTreeCursor)} />
+                        videoNode={topicTreeNode}
+                        options={options}
+                        key={TopicTreeHelper.getKey(topicTreeNode)} />
                     )
                 }
             </ul>

@@ -14,10 +14,10 @@ const ContentListViewer = topicViews.ContentListViewer;
 /**
  * Represents the topic search input item which is right below the header.
  */
-const TopicSearch = component(({topicTreeCursor, optionsCursor}, {onTopicSearch}) => {
+const TopicSearch = component(({topicTreeNode, options}, {onTopicSearch}) => {
     const onChange = (event) => {
         var topicSearch = event.target.value;
-        optionsCursor.setIn(["temp", "search"], topicSearch);
+        options.setIn(["temp", "search"], topicSearch);
         onTopicSearch(topicSearch);
     };
 
@@ -42,13 +42,13 @@ const TopicSearch = component(({topicTreeCursor, optionsCursor}, {onTopicSearch}
     };
 
     var text = l10n.get("search");
-    if (TopicTreeHelper.getTitle(topicTreeCursor)) {
+    if (TopicTreeHelper.getTitle(topicTreeNode)) {
         text = l10n.get("search-topic", {
-            topic: TopicTreeHelper.getTitle(topicTreeCursor)
+            topic: TopicTreeHelper.getTitle(topicTreeNode)
         });
     }
 
-    var searchValue = optionsCursor.getIn(["temp", "search"]);
+    var searchValue = options.getIn(["temp", "search"]);
 
     return <div>
         <input ref="search"
@@ -70,7 +70,7 @@ const TopicSearch = component(({topicTreeCursor, optionsCursor}, {onTopicSearch}
  */
 const SearchResultsViewer  = component(({collection}, {onClickContentItem}) => {
     var control = <ContentListViewer collection={collection}
-                                     optionsCursor={optionsCursor}
+                                     options={options}
                                      onClickContentItem={onClickContentItem} />;
     return <div className="topic-list-container">
         {control}

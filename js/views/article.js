@@ -11,7 +11,7 @@ const _ = require("underscore"),
 const ArticleReadMixin = {
     componentDidMount: function() {
         this.timerId = setTimeout(() => {
-            reportArticleRead(this.props.topicTreeCursor).catch(() => {});
+            reportArticleRead(this.props.topicTreeNode).catch(() => {});
         }, 5000);
     },
     componentWillUnmount: function() {
@@ -25,9 +25,9 @@ const ArticleReadMixin = {
  * Represents a single article, it will load the article dynamically and
  * display it to the user.
  */
-const ArticleViewer = component(ArticleReadMixin, ({topicTreeCursor, optionsCursor}) => {
-    Util.log("render article: :%o", topicTreeCursor);
-    var articleObj = optionsCursor.getIn(["temp", TopicTreeHelper.getKey(topicTreeCursor)]);
+const ArticleViewer = component(ArticleReadMixin, ({topicTreeNode, options}) => {
+    Util.log("render article: :%o", topicTreeNode);
+    var articleObj = options.getIn(["temp", TopicTreeHelper.getKey(topicTreeNode)]);
     if (articleObj && articleObj.error) {
         return <img className="video-placeholder" src="img/offline.png"/>;
     } else if (articleObj && articleObj.get("content")) {

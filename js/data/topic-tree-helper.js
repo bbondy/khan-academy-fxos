@@ -6,12 +6,12 @@ var _ = require("underscore"),
  * Do something to {forEach: fn} child element
  * @param fn A string function like "map", "forEach", etc.
  * @param kinds An array of kinds to be filtered on
- * @param topicTreeCursor The topic to filter on
+ * @param topicTreeNode The topic to filter on
  * @param callback The function that should be called for {forEach: fn} filtered child
  */
 const fnChildrenByKind = (fn) => (kinds) => {
-    return (topicTreeCursor, callback) => {
-        return topicTreeCursor.get(Minify.getShortName("children")).filter((child) => {
+    return (topicTreeNode, callback) => {
+        return topicTreeNode.get(Minify.getShortName("children")).filter((child) => {
             return _.includes(kinds, child.get(Minify.getShortName("kind")));
         })[fn](callback);
     };
@@ -25,28 +25,28 @@ const contentKinds = [Minify.getShortValue("kind", "Video"),
     Minify.getShortValue("kind", "Article"),
     Minify.getShortValue("kind", "Exercise")];
 
-const eachChildTopicCursors = eachChildrenByKind(topicKind);
-const mapChildTopicCursors = mapChildrenByKind(topicKind);
-const eachChildContentCursors = eachChildrenByKind(contentKinds);
-const mapChildContentCursors = mapChildrenByKind(contentKinds);
+const eachChildTopicNode = eachChildrenByKind(topicKind);
+const mapChildTopicNodes = mapChildrenByKind(topicKind);
+const eachChildContentNode = eachChildrenByKind(contentKinds);
+const mapChildContentNodes = mapChildrenByKind(contentKinds);
 
-const getTitle = (tpoicTreeCursor) => {
-    return tpoicTreeCursor.get(Minify.getShortName("translated_title")) ||
-            tpoicTreeCursor.get(Minify.getShortName("translated_display_name"));
+const getTitle = (tpoicTreeNode) => {
+    return tpoicTreeNode.get(Minify.getShortName("translated_title")) ||
+            tpoicTreeNode.get(Minify.getShortName("translated_display_name"));
 
 };
 
-const getProgressKey = (topicTreeCursor) => {
-    return topicTreeCursor.get(Minify.getShortName("progress_key"));
+const getProgressKey = (topicTreeNode) => {
+    return topicTreeNode.get(Minify.getShortName("progress_key"));
 };
 
-const getKind = (topicTreeCursor) => {
-    return Minify.getLongValue("kind", topicTreeCursor.get(Minify.getShortName("kind")));
+const getKind = (topicTreeNode) => {
+    return Minify.getLongValue("kind", topicTreeNode.get(Minify.getShortName("kind")));
 }
 
 const genIsKindFn = (kind) => {
-    return (topicTreeCursor) => {
-        return getKind(topicTreeCursor) === kind;
+    return (topicTreeNode) => {
+        return getKind(topicTreeNode) === kind;
     }
 };
 
@@ -57,9 +57,9 @@ const isExercise = genIsKindFn("Exercise");
 
 const genCheckAnyFn = () => {
     var validators = _.toArray(arguments);
-    return function(topicTreeCursor) {
+    return function(topicTreeNode) {
         return _.any(validators, (validator) => {
-            return validator(topicTreeCursor);
+            return validator(topicTreeNode);
         });
     }
 }
@@ -67,28 +67,28 @@ const genCheckAnyFn = () => {
 const isContent = genCheckAnyFn(isVideo,isArticle, isExercise);
 const isContentList = () => false;
 
-const getId = (topicTreeCursor) => {
-    if (isExercise(topicTreeCursor)) {
-        return getProgressKey(topicTreeCursor).substring(1);
+const getId = (topicTreeNode) => {
+    if (isExercise(topicTreeNode)) {
+        return getProgressKey(topicTreeNode).substring(1);
     }
-    return topicTreeCursor.get(Minify.getShortName("id"));
+    return topicTreeNode.get(Minify.getShortName("id"));
 };
 
 // todo: It's probably better to store this out of the topic tree
-const getDownloadCount = (topicTreeCursor) => {
-    return topicTreeCursor.get("downloadCount") === 0
+const getDownloadCount = (topicTreeNode) => {
+    return topicTreeNode.get("downloadCount") === 0
 };
 
-const getSlug = (topicTreeCursor) => {
-    return topicTreeCursor.get(Minify.getShortName("slug"));
+const getSlug = (topicTreeNode) => {
+    return topicTreeNode.get(Minify.getShortName("slug"));
 };
 
-const getKey = (topicTreeCursor) => {
-    return getId(topicTreeCursor) || getSlug(topicTreeCursor) || getTitle(topicTreeCursor);
+const getKey = (topicTreeNode) => {
+    return getId(topicTreeNode) || getSlug(topicTreeNode) || getTitle(topicTreeNode);
 };
 
-const getKAUrl = (topicTreeCursor) => {
-    var value = topicTreeCursor.get(Minify.getShortName("ka_url"));
+const getKAUrl = (topicTreeNode) => {
+    var value = topicTreeNode.get(Minify.getShortName("ka_url"));
     if (!value) {
         return null;
     }
@@ -98,36 +98,36 @@ const getKAUrl = (topicTreeCursor) => {
     return value;
 };
 
-const isDownloaded = (topicTreeCursor) => {
-    return !!topicTreeCursor.get("downloaded");
+const isDownloaded = (topicTreeNode) => {
+    return !!topicTreeNode.get("downloaded");
 };
 
-const isStarted = (topicTreeCursor) => {
-    return topicTreeCursor.get("started");
+const isStarted = (topicTreeNode) => {
+    return topicTreeNode.get("started");
 };
 
-const isCompleted = (topicTreeCursor) => {
-    return topicTreeCursor.get("completed");
+const isCompleted = (topicTreeNode) => {
+    return topicTreeNode.get("completed");
 };
 
-const getYoutubeId = (topicTreeCursor) => {
-    return topicTreeCursor.get(Minify.getShortName("youtube_id"));
+const getYoutubeId = (topicTreeNode) => {
+    return topicTreeNode.get(Minify.getShortName("youtube_id"));
 };
 
-const getDuration = (topicTreeCursor) => {
-    return topicTreeCursor.get(Minify.getShortName("duration"));
+const getDuration = (topicTreeNode) => {
+    return topicTreeNode.get(Minify.getShortName("duration"));
 };
 
-const getPoints = (topicTreeCursor) => {
-    return topicTreeCursor.get("points") || 0;
+const getPoints = (topicTreeNode) => {
+    return topicTreeNode.get("points") || 0;
 };
 
-const getContentMimeType = (topicTreeCursor) => {
-     return isVideo(topicTreeCursor) ? "video/mp4" : "text/html";
+const getContentMimeType = (topicTreeNode) => {
+     return isVideo(topicTreeNode) ? "video/mp4" : "text/html";
 };
 
-const getDownloadUrl = (topicTreeCursor) => {
-    var value = topicTreeCursor.get(Minify.getShortName("download_urls"));
+const getDownloadUrl = (topicTreeNode) => {
+    var value = topicTreeNode.get(Minify.getShortName("download_urls"));
     if (!value) {
         return null;
     }
@@ -137,37 +137,37 @@ const getDownloadUrl = (topicTreeCursor) => {
     return value;
 };
 
-const getName = (topicTreeCursor)  => {
-    return topicTreeCursor.get(Minify.getShortName("name"));
+const getName = (topicTreeNode)  => {
+    return topicTreeNode.get(Minify.getShortName("name"));
 };
 
-const isPerseusExercise = (topicTreeCursor) => {
-    return !topicTreeCursor.get(Minify.getShortName("file_name"));
+const isPerseusExercise = (topicTreeNode) => {
+    return !topicTreeNode.get(Minify.getShortName("file_name"));
 };
 
-const isKhanExercisesExercise = (topicTreeCursor) => {
-    return !!topicTreeCursor.get(Minify.getShortName("file_name"));
+const isKhanExercisesExercise = (topicTreeNode) => {
+    return !!topicTreeNode.get(Minify.getShortName("file_name"));
 };
 
-const getFilename = (topicTreeCursor) => {
-    return topicTreeCursor.get(Minify.getShortName("file_name"));
+const getFilename = (topicTreeNode) => {
+    return topicTreeNode.get(Minify.getShortName("file_name"));
 };
 
 // TODO: remove all dependencies on this and remove this
-const getParentDomain = (topicTreeCursor) => {
+const getParentDomain = (topicTreeNode) => {
     return null;
 };
 
 /**
  * Initiates a recursive search for the term `search`
  */
-const findContentItems = (topicTreeCursor, search, maxResults) => {
+const findContentItems = (topicTreeNode, search, maxResults) => {
     if (_.isUndefined(maxResults)) {
         maxResults = 40;
     }
 
     var results = [];
-    _findContentItems(topicTreeCursor, search.toLowerCase(), results, maxResults);
+    _findContentItems(topicTreeNode, search.toLowerCase(), results, maxResults);
     return results.slice(0, maxResults);
 };
 
@@ -175,24 +175,24 @@ const findContentItems = (topicTreeCursor, search, maxResults) => {
  * Recursively calls _findContentItems on all children and adds videos and articles with
  * a matching title to the results array.
  */
-const _findContentItems = (topicTreeCursor, search, results, maxResults) => {
+const _findContentItems = (topicTreeNode, search, results, maxResults) => {
     if (results.length > maxResults) {
         return;
     }
 
-    eachChildContentCursors(topicTreeCursor, (childCursor) => {
+    eachChildContentNode(topicTreeNode, (childNode) => {
         // TODO: Possibly search descriptions too?
         // TODO: We could potentially index the transcripts for a really good search
         // TODO: Tokenize the `search` string and do an indexOf for each token
         // TODO: Allow for OR/AND search term strings
-        if (getTitle(childCursor) &&
-                getTitle(childCursor).toLowerCase().indexOf(search) !== -1) {
-            results.push(childCursor);
+        if (getTitle(childNode) &&
+                getTitle(childNode).toLowerCase().indexOf(search) !== -1) {
+            results.push(childNode);
         }
     });
 
-    eachChildTopicCursors(topicTreeCursor, (childCursor) => {
-        _findContentItems(childCursor, search, results, maxResults);
+    eachChildTopicNode(topicTreeNode, (childNode) => {
+        _findContentItems(childNode, search, results, maxResults);
     });
 };
 
@@ -202,10 +202,10 @@ module.exports = {
     getKey,
     getKAUrl,
     getDownloadCount,
-    mapChildTopicCursors,
-    eachChildTopicCursors,
-    mapChildContentCursors,
-    eachChildContentCursors,
+    mapChildTopicNodes,
+    eachChildTopicNode,
+    mapChildContentNodes,
+    eachChildContentNode,
     isContent,
     isContentList,
     isTopic,

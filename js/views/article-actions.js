@@ -4,13 +4,13 @@ const TopicTreeHelper = require("../data/topic-tree-helper"),
     {isArticle} = require("../data/topic-tree-helper"),
     Storage = require("../storage");
 
-const reportArticleRead = (topicTreeCursor) => {
+const reportArticleRead = (topicTreeNode) => {
     return new Promise((resolve, reject) => {
         if (!models.CurrentUser.isSignedIn()) {
             return setTimeout(resolve, 0);
         }
 
-        APIClient.reportArticleRead(TopicTreeHelper.getId(topicTreeCursor)).then((result) => {
+        APIClient.reportArticleRead(TopicTreeHelper.getId(topicTreeNode)).then((result) => {
             Util.log("reported article complete: %o", result);
             article.set({
                 completed: true
@@ -31,32 +31,32 @@ const reportArticleRead = (topicTreeCursor) => {
     });
 };
 
-const setArticleContent = (topicTreeCursor, optionsCursor, result) => optionsCursor.setIn(
-    ["temp", TopicTreeHelper.getKey(topicTreeCursor)],
+const setArticleContent = (topicTreeNode, options, result) => options.setIn(
+    ["temp", TopicTreeHelper.getKey(topicTreeNode)],
     Immutable.fromJS({
         error: !!result,
         content: result,
     }));
 
-const loadIfArticle = (optionsCursor) => (topicTreeCursor) => {
-    if (!isArticle(topicTreeCursor)) {
-        return topicTreeCursor;
+const loadIfArticle = (options) => (topicTreeNode) => {
+    if (!isArticle(topicTreeNode)) {
+        return topicTreeNode;
     }
 
-    if (TopicTreeHelper.isDownloaded(topicTreeCursor)) {
-        this.p1 = Storage.readText(TopicTreeHelper.getId(topicTreeCursor)).then((result) => {
+    if (TopicTreeHelper.isDownloaded(topicTreeNode)) {
+        this.p1 = Storage.readText(TopicTreeHelper.getId(topicTreeNode)).then((result) => {
             Util.log("rendered article from storage");
-            setArticleContent(topicTreeCursor, optionsCursor, result);
+            setArticleContent(topicTreeNode, options, result);
         });
     } else {
-        this.p1 = APIClient.getArticle(TopicTreeHelper.getId(topicTreeCursor)).then((result) => {
+        this.p1 = APIClient.getArticle(TopicTreeHelper.getId(topicTreeNode)).then((result) => {
             Util.log("rendered article from web");
-            setArticleContent(topicTreeCursor, optionsCursor, result);
+            setArticleContent(topicTreeNode, options, result);
         }).catch(() => {
-            setArticleContent(topicTreeCursor, optionsCursor);
+            setArticleContent(topicTreeNode, options);
         });
     }
-    return topicTreeCursor;
+    return topicTreeNode;
 };
 
 module.exports = {
