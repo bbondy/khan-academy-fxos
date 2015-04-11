@@ -68,7 +68,7 @@ const TopicSearch = component(({topicTreeNode, options}, {onTopicSearch}) => {
  * Represents a search result list which is basically just a wrapper around a
  * ContentListViewer for now.
  */
-const SearchResultsViewer  = component(({collection}, {onClickContentItem}) => {
+const SearchResultsViewer  = component(({options, collection}, {onClickContentItem}) => {
     var control = <ContentListViewer collection={collection}
                                      options={options}
                                      onClickContentItem={onClickContentItem} />;

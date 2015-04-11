@@ -64,7 +64,7 @@ const SettingsViewer = component(({options}) => {
                className="show-downloads-setting app-chrome"
                type="checkbox"
                checked={options.get("showDownloadsOnly")}
-               onChange={this.onShowDownloadsChange.bind(this)}></input>
+               onChange={onShowDownloadsChange.bind(this)}></input>
         <span></span>
         </label>
 
@@ -74,7 +74,7 @@ const SettingsViewer = component(({options}) => {
                className="show-transcripts-setting app-chrome"
                type="checkbox"
                checked={options.get("showTranscripts")}
-               onChange={this.onShowTranscriptsChange.bind(this)}></input>
+               onChange={onShowTranscriptsChange.bind(this)}></input>
         <span></span>
         </label>
 
@@ -84,7 +84,7 @@ const SettingsViewer = component(({options}) => {
                className="auto-update-topic-tree-setting app-chrome"
                type="checkbox"
                checked={options.get("autoUpdateTopicTree")}
-               onChange={this.onAutoUpdateTopicTreeChange.bind(this)}></input>
+               onChange={onAutoUpdateTopicTreeChange.bind(this)}></input>
         <span></span>
         </label>
 
@@ -98,7 +98,7 @@ const SettingsViewer = component(({options}) => {
                    type="range"
                    min="0" max="3"
                    value={(options.get("playbackRate") - 50) / 50}
-                   onChange={this.onSetPlaybackRateChange.bind(this)}></input>
+                   onChange={onSetPlaybackRateChange.bind(this)}></input>
             <label class="icon">{options.get("playbackRate")}%</label>
             <span></span>
         </section>
@@ -107,7 +107,7 @@ const SettingsViewer = component(({options}) => {
         <button id="reset-button"
                 className="reset-button"
                 data-l10n-id="reset-setting"
-                onClick={this.onReset.bind(this)}>Reset</button>
+                onClick={onReset.bind(this)}>Reset</button>
     </div>;
 }).jsx;
 

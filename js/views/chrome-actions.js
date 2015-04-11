@@ -6,23 +6,25 @@ const Downloads = require("../downloads"),
     Status = require("../status"),
     models = require("../models");
 
-const onClickContentItemFromDownloads = (navInfo) => (topicTreeNode) => navInfo.merge({
-    topicTreeNode,
-    showProfile: false,
-    showDownloads: false,
-    showSettings: false,
-    wasLastDownloads: true,
-    lastTopicTreeNode: navInfo.get("lastTopicTreeNode")
-});
+const onClickContentItemFromDownloads = (editNavInfo) => (topicTreeNode) =>
+    editNavInfo((navInfo) => navInfo.merge({
+        topicTreeNode,
+        showProfile: false,
+        showDownloads: false,
+        showSettings: false,
+        wasLastDownloads: true,
+        lastTopicTreeNode: navInfo.get("lastTopicTreeNode")
+    }));
 
-const onClickContentItem = (navInfo) => (topicTreeNode) => (navInfo.merge({
-    topicTreeNode,
-    showProfile: false,
-    showDownloads: false,
-    showSettings: false
-}), topicTreeNode);
+const onClickContentItem = (editNavInfo) => (topicTreeNode) =>
+    (editNavInfo((navInfo) => navInfo.merge({
+        topicTreeNode,
+        showProfile: false,
+        showDownloads: false,
+        showSettings: false
+    })), topicTreeNode);
 
-const onClickTopic = (navInfo, editNavInfo) => (newTopicTreeNode) =>
+const onClickTopic = (editNavInfo) => (newTopicTreeNode) =>
     editNavInfo((navInfo) => navInfo.merge({
         topicTreeNode: newTopicTreeNode,
         domainTopicTreeNode: getDomainTopicTreeNode(navInfo, newTopicTreeNode),
@@ -58,36 +60,36 @@ const onClickCancelDownloadContent = () => {
     Downloads.cancelDownloading();
 };
 
+const onClickProfile = (editNavInfo) => () =>
+    editNavInfo((navInfo) => navInfo.merge({
+        showProfile: true,
+        showDownloads: false,
+        showSettings: false,
+        wasLastDownloads: false
+    }));
 
+const onClickDownloads = (editNavInfo) => () =>
+    editNavInfo((navInfo) => navInfo.merge({
+        showDownloads: true,
+        showProfile: false,
+        showSettings: false,
+        wasLastDownloads: false
+    }));
 
+const onClickSettings = (editNavInfo) => () =>
+    editNavInfo((navInfo) => navInfo.merge({
+        showDownloads: false,
+        showProfile: false,
+        showSettings: true,
+        wasLastDownloads: false
+    }));
 
-const onClickProfile = (navInfo) => () => navInfo.merge({
-    showProfile: true,
-    showDownloads: false,
-    showSettings: false,
-    wasLastDownloads: false
-});
-
-const onClickDownloads = (navInfo) => () => navInfo.merge({
-    showDownloads: true,
-    showProfile: false,
-    showSettings: false,
-    wasLastDownloads: false
-});
-
-const onClickSettings = (navInfo) => () => navInfo.merge({
-    showDownloads: false,
-    showProfile: false,
-    showSettings: true,
-    wasLastDownloads: false
-});
-
-const onTopicSearch = (navInfo) => (topicSearch) => {
+const onTopicSearch = (navInfo, editNavInfo) => (topicSearch) => {
     if (!topicSearch) {
-        navInfo.merge({
+        editNavInfo((navInfo) => navInfo.merge({
             topicTreeNode: navInfo.get("searchingTopicTreeNode"),
             searchingTopicTreeNode: null
-        });
+        }));
         return;
     }
 
@@ -96,22 +98,22 @@ const onTopicSearch = (navInfo) => (topicSearch) => {
         searchingTopicTreeNode = navInfo.get("topicTreeNode");
     }
     var results = TopicTreeHelper.findContentItems(searchingTopicTreeNode, topicSearch);
-    navInfo.merge({
+    editNavInfo((navInfo) => navInfo.merge({
         searchResults: results,
         searchingTopicTreeNode: searchingTopicTreeNode
-    });
+    }));
 };
 
-const onClickBack = (navInfo, topicTreeNode) => () => {
+const onClickBack = (topicTreeNode, navInfo, editNavInfo) => () => {
     // If settings or profile or ... is set, then don't show it anymore.
     // This effectively makes the topicTreeNode be in use again.
     if (isPaneShowing(navInfo)) {
-        navInfo.merge({
+        editNavInfo((navInfo) => navInfo.merge({
             showDownloads: false,
             showProfile: false,
             showSettings: false,
             wasLastDownloads: false
-        });
+        }));
         if (TopicTreeHelper.isContentList(navInfo.get("topicTreeNode"))) {
             onTopicSearch("");
         }
@@ -119,11 +121,11 @@ const onClickBack = (navInfo, topicTreeNode) => () => {
     }
 
     var newStack = navInfo.get("navStack").shift();
-    navInfo.merge({
+    editNavInfo((navInfo) => navInfo.merge({
         navStack: newStack,
         topicTreeNode: newStack.peek(),
         domainTopicTreeNode: getDomainTopicTreeNode(navInfo, newStack.peek()),
-    });
+    }));
 
     /*
     // If we were on a content item from downloads,

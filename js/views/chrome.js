@@ -263,17 +263,17 @@ const MainView = component(({topicTreeRootNode, navInfo, options}, {edit}) => {
         control = <ProfileViewer/>;
     } else if (navInfo.get("showDownloads")) {
         control = <DownloadsViewer statics={{
-                                       onClickContentItem: ChromeActions.onClickContentItemFromDownloads(navInfo)
+                                       onClickContentItem: ChromeActions.onClickContentItemFromDownloads(editNavInfo)
                                    }}
                                    options={options}/>;
     } else if (navInfo.get("showSettings")) {
         control = <SettingsViewer options={options}/>;
     } else if (TopicTreeHelper.isTopic(navInfo.get("topicTreeNode"))) {
         var onClickContentItem = _.compose(
-            ChromeActions.onClickContentItem(navInfo),
+            ChromeActions.onClickContentItem(editNavInfo),
             loadIfArticle(options));
         control = <TopicViewer statics={{
-                                   onClickTopic: ChromeActions.onClickTopic(navInfo, editNavInfo),
+                                   onClickTopic: ChromeActions.onClickTopic(editNavInfo),
                                    onClickContentItem,
                                }}
                                topicTreeNode={navInfo.get("topicTreeNode")}
@@ -283,7 +283,7 @@ const MainView = component(({topicTreeRootNode, navInfo, options}, {edit}) => {
         control = <SearchResultsViewer collection={navInfo.get("searchResults")}
                                        options={options}
                                        statics={{
-                                           onClickContentItem: ChromeActions.onClickContentItem(navInfo),
+                                           onClickContentItem: ChromeActions.onClickContentItem(editNavInfo),
                                        }}/>;
     } else if (TopicTreeHelper.isVideo(navInfo.get("topicTreeNode"))) {
         control = <VideoViewer topicTreeNode={navInfo.get("topicTreeNode")}
@@ -304,7 +304,7 @@ const MainView = component(({topicTreeRootNode, navInfo, options}, {edit}) => {
         topicSearch = <TopicSearch topicTreeNode={navInfo.get("topicTreeNode")}
                                    options={options}
                                    statics={{
-                                       onTopicSearch: ChromeActions.onTopicSearch(navInfo),
+                                       onTopicSearch: ChromeActions.onTopicSearch(navInfo, editNavInfo),
                                    }}/>;
     }
 
@@ -314,9 +314,9 @@ const MainView = component(({topicTreeRootNode, navInfo, options}, {edit}) => {
                            statics={{
                                onClickSignin: ChromeActions.onClickSignin,
                                onClickSignout: ChromeActions.onClickSignout,
-                               onClickProfile: ChromeActions.onClickProfile(navInfo),
-                               onClickDownloads: ChromeActions.onClickDownloads(navInfo),
-                               onClickSettings: ChromeActions.onClickSettings(navInfo),
+                               onClickProfile: ChromeActions.onClickProfile(editNavInfo),
+                               onClickDownloads: ChromeActions.onClickDownloads(editNavInfo),
+                               onClickSettings: ChromeActions.onClickSettings(editNavInfo),
                                onClickSupport: ChromeActions.onClickSupport,
                                onClickDownloadContent: ChromeActions.onClickDownloadContent(navInfo.get("topicTreeNode")),
                                onClickViewOnKA: ChromeActions.onClickViewOnKA(navInfo.get("topicTreeNode")),
@@ -334,7 +334,7 @@ const MainView = component(({topicTreeRootNode, navInfo, options}, {edit}) => {
         {sidebar}
         <section id="main-content" role="region" className="skin-dark">
             <AppHeader statics={{
-                           onClickBack: ChromeActions.onClickBack(navInfo, navInfo.get("topicTreeNode"))
+                           onClickBack: ChromeActions.onClickBack(navInfo.get("topicTreeNode"), navInfo, editNavInfo)
                        }}
                        topicTreeNode={navInfo.get("topicTreeNode")}
                        domainTopicTreeNode={navInfo.get("domainTopicTreeNode")}

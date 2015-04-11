@@ -89,7 +89,7 @@ const ContentListItem = component(({topicTreeNode, domainTopicTreeNode, options}
  * Represents a single topic and it displays a list of all of its children.
  * Each child of the list is a ContentListItem
  */
-const TopicViewer = component(({topicTreeNode, domainTopicTreeNode, options}, {onClickTopic, onClickContentItem, editNavInfo}) =>
+const TopicViewer = component(({topicTreeNode, domainTopicTreeNode, options}, {onClickTopic, onClickContentItem}) =>
     <div className="topic-list-container">
         <section data-type="list">
             <ul>
