@@ -2,7 +2,7 @@ var path = require("path");
 
 module.exports = {
     cache: true,
-    entry: "./js/main.js",
+    entry: "./src/main.js",
     //devtool: "#eval-source-map",
     devtool: "#source-map",
     output: {

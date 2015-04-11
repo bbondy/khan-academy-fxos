@@ -25,7 +25,7 @@ var gulp = require("gulp"),
 // Uses jsxcs, then strips Flow types and uses jshint.
 // Has no output.
 gulp.task("lint", function() {
-    return gulp.src("js/**/*.js")
+    return gulp.src("src/**/*.js")
         .pipe(jsxcs().on("error", function(err) {
             console.log(err.toString());
         }))
@@ -54,7 +54,7 @@ gulp.task("less", function() {
 // want to only try running react.
 // Puts output in the ./build folder
 gulp.task("react", function() {
-    return gulp.src(["./js/**/*.js"])
+    return gulp.src(["./src/**/*.js"])
         .pipe(react({
             harmony: true,
             // Skip Flow type annotations!
@@ -65,7 +65,7 @@ gulp.task("react", function() {
 
 // Copy minify.js to the build folder and strip out Flow typechecks
 gulp.task("copyMinifyScript", function() {
-    return gulp.src(["./js/minify.js"])
+    return gulp.src(["./src/minify.js"])
         .pipe(react({
             harmony: true,
             // Skip Flow type annotations!
@@ -138,14 +138,14 @@ gulp.task("package", function () {
 // Runs Jest tests
 gulp.task("test", function() {
      return gulp.src("__tests__").pipe(jest({
-        scriptPreprocessor: "./js/preprocessor.js",
+        scriptPreprocessor: "./src/preprocessor.js",
         unmockedModulePathPatterns: [
             "node_modules/react"
         ],
         testDirectoryName: "js",
         testPathIgnorePatterns: [
             "node_modules",
-            "js/preprocessor.js"
+            "src/preprocessor.js"
         ],
         moduleFileExtensions: [
             "js",
@@ -158,7 +158,7 @@ gulp.task("test", function() {
 // Watch Files For Changes, when there are some will run lint and webpack
 // Will also watch for .less changes and generate new .css.
 gulp.task("watch", function() {
-    gulp.watch("js/**/*.js", ["lint", "webpack"]);
+    gulp.watch("src/**/*.js", ["lint", "webpack"]);
     gulp.watch("style/**/*.less", ["less"]);
 });
 
