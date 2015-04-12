@@ -7,4 +7,4 @@ cp bower_components/MathJax/MathJax.js dist/package/bower_components/MathJax
 cp bower_components/MathJax/extensions/*.js dist/package/bower_components/MathJax/extensions
 cp bower_components/KAS/*.js dist/package/bower_components/KAS
 cp bower_components/katex/build/katex.min.css dist/package/bower_components/katex/build
-cp bower_components/perseus/perseus-2.css dist/package/bower_components/perseus
+cp bower_components/perseus/perseus-3.css dist/package/bower_components/perseus

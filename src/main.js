@@ -13,7 +13,7 @@ const React = require("react"),
     {readOptions, resetOptions} = require("./data/app-options"),
     {readTopicTree} = require("./data/topic-tree"),
     {resetNavInfo} = require("./data/nav-info"),
-    {Renderer} = require("./renderer")
+    {Renderer} = require("./renderer"),
     Immutable = require("immutable");
 
 // TODO: remove, just for easy inpsection

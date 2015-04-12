@@ -16,7 +16,8 @@ const React = require("react"),
     APIClient = require("../apiclient"),
     l10n = require("../l10n"),
     TopicTreeHelper = require("../data/topic-tree-helper"),
-    $ = require("jquery");
+    $ = require("jquery"),
+    _ = require("underscore");
 
 window.Exercises = {
     cluesEnabled: false
@@ -104,13 +105,55 @@ const ExerciseViewer = React.createClass({
     onClickSubmitAnswer: function() {
         var score = this.refs.itemRenderer.scoreInput();
         Util.log("score: %o", score);
-        const Khan = require("../../khan-exercises/main") || window.Khan,
-            MathJax = require("../../bower_components/MathJax/MathJax.js") || window.MathJax;
+        var attemptNumber = 1; // TODO
+        var isCorrect = score.correct;
+        var secondsTaken = 10; //TODO
+        APIClient.reportExerciseProgress(TopicTreeHelper.getName(this.props.topicTreeNode), this.state.problemNumber,
+            this.randomAssessmentSHA1, this.randomAssessmentId,
+            secondsTaken, this.state.hintsUsed, isCorrect,
+            attemptNumber, this.problemTypeName, this.state.taskId).then(() => {
+                if (isCorrect) {
+                    // If we have another correct and we already have 4 correct,
+                    // then show task complete view.
+                    if (this.state.streak >= 4 && this.state.hintsUsed === 0) {
+                        this.setState({
+                            taskComplete: true
+                        });
+                        return;
+                    }
+                    this.refreshRandomAssessment();
+                } else {
+                    // Refresh attempt info so it shows up as wrong
+                    this.refreshUserExerciseInfo().then(this.setState.bind(this));
+                }
+            });
+    },
+    componentWillMount: function() {
+        if (TopicTreeHelper.isPerseusExercise(this.props.topicTreeNode)) {
+            APIClient.getExerciseByName(TopicTreeHelper.getName(this.props.topicTreeNode)).then((result) => {
+                this.exercise = result;
+                Util.log("got exercise: %o", result);
+                this.refreshRandomAssessment();
+            });
+        }
+
+        // TODO: Make this load async
+        window._ = _;
+        window.React = React;
+        window.$ = $;
+        $._ = (x) => x;
+        window.jQuery = $;
+
+
+        var Khan = require("../../khan-exercises/main");
+        var MathJax = require("../../bower_components/MathJax/MathJax.js");
+        Khan = window.Khan;
+        MathJax = window.MathJax;
         window.KhanUtil = Khan.Util;
 
-        const katex = require("../../bower_components/katex/katex"),
+        const katex = require("katex"),
             KAS = require("../../bower_components/KAS/kas"),
-            Perseus = require("../../bower_components/perseus/perseus-2");
+            Perseus = require("../../bower_components/perseus/perseus-3");
         perseusPrep(katex, KAS, MathJax, Khan.Util);
         Perseus.init({}).then(() => {
             Util.log("Perseus init done %o, %o", Perseus);

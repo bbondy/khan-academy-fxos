@@ -266,7 +266,7 @@ const MainView = component(({navInfo, options, tempStore}, {edit}) => {
     } else if (navInfo.get("showSettings")) {
         control = <SettingsViewer options={options}/>;
     } else if (TopicTreeHelper.isTopic(navInfo.get("topicTreeNode"))) {
-                var onClickContentItem = _.compose(
+        var onClickContentItem = _.compose(
             ChromeActions.onClickContentItem(editNavInfo),
             loadIfArticle(editTempStore));
         control = <TopicViewer statics={{

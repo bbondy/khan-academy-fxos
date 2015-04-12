@@ -42,7 +42,8 @@ module.exports = {
     },
     resolve: {
         alias: {
-            "react": path.resolve("node_modules/react/dist/react.js"),
+            // The with-addons is only needed for perseus :(
+            "react": path.resolve("node_modules/react/dist/react-with-addons.js"),
             "underscore": path.resolve("node_modules/underscore/underscore-min.js"),
             "jquery": path.resolve("node_modules/jquery/dist/jquery.min.js"),
             "katex": path.resolve("bower_components/katex/build/katex.min.js"),

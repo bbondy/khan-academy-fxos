@@ -1,5 +1,4 @@
-const _ = require("underscore"),
-    TopicTreeHelper = require("../data/topic-tree-helper"),
+const TopicTreeHelper = require("../data/topic-tree-helper"),
     APIClient = require("../apiclient"),
     Immutable = require("immutable"),
     {isArticle} = require("../data/topic-tree-helper"),
@@ -35,10 +34,10 @@ const reportArticleRead = (topicTreeNode) => {
 
 const setArticleContent = (editArticleContent, result) =>
     editArticleContent((article) => {
-        return  Immutable.fromJS({
+        return Immutable.fromJS({
             error: !result,
             content: result,
-        })
+        });
     });
 
 const loadIfArticle = (editTempStore) => (topicTreeNode) => {
