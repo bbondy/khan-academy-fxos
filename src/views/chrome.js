@@ -234,7 +234,7 @@ const Sidebar = component((props, statics) => {
  * things when certain page actions change.  No other part of the code is repsonsible
  * for the overall top level view (which is nice and clean ;)).
  */
-const MainView = component(({navInfo, options}, {edit}) => {
+const MainView = component(({navInfo, options, tempStore}, {edit}) => {
     //mixins: [Util.LocalizationMixin],
     //mixins: [Util.BackboneMixin, Util.LocalizationMixin],
     //getBackboneModels: function(): Array<any> {
@@ -248,8 +248,9 @@ const MainView = component(({navInfo, options}, {edit}) => {
         $("html, body").scrollTop(0);
     }
 
-    const In = (path) => (edit) => (state) => state.update(path, edit);
-    const editNavInfo = _.compose(edit, In("navInfo"));
+    const In = (path) => (edit) => (state) => state.updateIn(path, edit);
+    const editNavInfo = _.compose(edit, In(["navInfo"]));
+    const editTempStore = _.compose(edit, In(["tempStore"]));
 
     var control;
     if (!navInfo.get("topicTreeNode")) {
@@ -265,9 +266,9 @@ const MainView = component(({navInfo, options}, {edit}) => {
     } else if (navInfo.get("showSettings")) {
         control = <SettingsViewer options={options}/>;
     } else if (TopicTreeHelper.isTopic(navInfo.get("topicTreeNode"))) {
-        var onClickContentItem = _.compose(
+                var onClickContentItem = _.compose(
             ChromeActions.onClickContentItem(editNavInfo),
-            loadIfArticle(options));
+            loadIfArticle(editTempStore));
         control = <TopicViewer statics={{
                                    onClickTopic: ChromeActions.onClickTopic(editNavInfo),
                                    onClickContentItem,
@@ -287,7 +288,7 @@ const MainView = component(({navInfo, options}, {edit}) => {
                                options={options}/>;
     } else if (TopicTreeHelper.isArticle(navInfo.get("topicTreeNode"))) {
         control = <ArticleViewer  topicTreeNode={navInfo.get("topicTreeNode")}
-                                  options={options}/>;
+                                  tempStore={tempStore}/>;
     } else if (TopicTreeHelper.isExercise(navInfo.get("topicTreeNode"))) {
         control = <ExerciseViewer  topicTreeNode={navInfo.get("topicTreeNode")}/>;
     } else {

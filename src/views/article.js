@@ -25,10 +25,10 @@ const ArticleReadMixin = {
  * Represents a single article, it will load the article dynamically and
  * display it to the user.
  */
-const ArticleViewer = component(ArticleReadMixin, ({topicTreeNode, options}) => {
+const ArticleViewer = component(ArticleReadMixin, ({topicTreeNode, tempStore}) => {
     Util.log("render article: :%o", topicTreeNode);
-    var articleObj = options.getIn(["temp", TopicTreeHelper.getKey(topicTreeNode)]);
-    if (articleObj && articleObj.error) {
+    var articleObj = tempStore.getIn([TopicTreeHelper.getKey(topicTreeNode)]);
+    if (articleObj && articleObj.get("error")) {
         return <img className="video-placeholder" src="img/offline.png"/>;
     } else if (articleObj && articleObj.get("content")) {
         return <article dangerouslySetInnerHTML={{

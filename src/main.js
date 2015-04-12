@@ -76,6 +76,7 @@ class Renderer {
     render() {
         React.render(<this.component options={this.state.get("options")}
             navInfo={this.state.get("navInfo")}
+            tempStore={this.state.get("tempStore")}
             statics={{
                 edit: this.edit
             }}/>, this.target);
@@ -85,6 +86,7 @@ class Renderer {
 const initialState = Immutable.fromJS({
     options,
     navInfo,
+    tempStore: {},
 });
 
 const renderer = new Renderer(MainView, mountNode, initialState);
@@ -92,11 +94,11 @@ renderer.render();
 
 readTopicTree().then((rootTopicTreeNode) =>
     renderer.edit((state) => state.mergeDeep({
-            navInfo: {
-                topicTreeNode: rootTopicTreeNode,
-                rootTopicTreeNode,
-                navStack: Immutable.Stack.of(rootTopicTreeNode),
-            }}))
+        navInfo: {
+            topicTreeNode: rootTopicTreeNode,
+            rootTopicTreeNode,
+            navStack: Immutable.Stack.of(rootTopicTreeNode),
+        }}))
 );
 
 // Init everything

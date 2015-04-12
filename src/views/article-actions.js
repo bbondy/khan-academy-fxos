@@ -1,4 +1,5 @@
-const TopicTreeHelper = require("../data/topic-tree-helper"),
+const _ = require("underscore"),
+    TopicTreeHelper = require("../data/topic-tree-helper"),
     APIClient = require("../apiclient"),
     Immutable = require("immutable"),
     {isArticle} = require("../data/topic-tree-helper"),
@@ -31,29 +32,32 @@ const reportArticleRead = (topicTreeNode) => {
     });
 };
 
-const setArticleContent = (topicTreeNode, options, result) => options.setIn(
-    ["temp", TopicTreeHelper.getKey(topicTreeNode)],
-    Immutable.fromJS({
-        error: !!result,
-        content: result,
-    }));
+const setArticleContent = (editArticleContent, result) =>
+    editArticleContent((article) => {
+        return  Immutable.fromJS({
+            error: !result,
+            content: result,
+        })
+    });
 
-const loadIfArticle = (options) => (topicTreeNode) => {
+const loadIfArticle = (editTempStore) => (topicTreeNode) => {
     if (!isArticle(topicTreeNode)) {
         return topicTreeNode;
     }
 
+    const In = (path) => (edit) => (state) => state.updateIn(path, edit);
+    const editArticleContent = _.compose(editTempStore, In([TopicTreeHelper.getKey(topicTreeNode)]));
     if (TopicTreeHelper.isDownloaded(topicTreeNode)) {
         this.p1 = Storage.readText(TopicTreeHelper.getId(topicTreeNode)).then((result) => {
             Util.log("rendered article from storage");
-            setArticleContent(topicTreeNode, options, result);
+            setArticleContent(editArticleContent, result);
         });
     } else {
         this.p1 = APIClient.getArticle(TopicTreeHelper.getId(topicTreeNode)).then((result) => {
-            Util.log("rendered article from web");
-            setArticleContent(topicTreeNode, options, result);
+            Util.log("rendered article from web: ", result);
+            setArticleContent(editArticleContent, result);
         }).catch(() => {
-            setArticleContent(topicTreeNode, options);
+            setArticleContent(editArticleContent);
         });
     }
     return topicTreeNode;
