@@ -43,9 +43,11 @@ const ExerciseViewer = React.createClass({
     },
     refreshUserExerciseInfo: function() {
         return new Promise((resolve, reject) => {
-            $.when(APIClient.getTaskInfoByExerciseName(TopicTreeHelper.getName(this.props.topicTreeNode)),
-                    APIClient.getUserExercise(TopicTreeHelper.getName(this.props.topicTreeNode)))
-            .then((taskInfo, exerciseInfo) => {
+            Promise.all([APIClient.getTaskInfoByExerciseName(TopicTreeHelper.getName(this.props.topicTreeNode)),
+                    APIClient.getUserExercise(TopicTreeHelper.getName(this.props.topicTreeNode))])
+            .then((result) => {
+                const taskInfo = result[0];
+                const exerciseInfo = result[1];
                 Util.log("getTaskInfoByExerciseName: %o", taskInfo);
                 Util.log("getUserExercise: %o", exerciseInfo);
                 resolve({
@@ -58,7 +60,7 @@ const ExerciseViewer = React.createClass({
                     taskAttemptHistory: taskInfo.task_attempt_history,
                     longestStreak: exerciseInfo.longest_streak
                 });
-            }).catch(() => {
+            }).catch((e) => {
                 reject();
             });
         });
@@ -81,7 +83,7 @@ const ExerciseViewer = React.createClass({
                 var userExerciseInfo = results[0],
                     assessmentItem = results[1];
                 var assessment = JSON.parse(assessmentItem.item_data);
-                Util.log("Got assessment item: %o: item data: %o", assessmentItem, assessment);
+                Util.log("Got assessment item: %o: item data: %o userExerciseInfo: %o", assessmentItem, assessment, userExerciseInfo);
                 this.setState({
                     hintsUsed: 0,
                     perseusItemData: assessment,
