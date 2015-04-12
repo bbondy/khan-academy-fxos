@@ -15,6 +15,7 @@ const $ = require("jquery"),
     videoViews = require("./video"),
     articleViews = require("./article"),
     {loadIfArticle} = require("./article-actions"),
+    {editorForPath} = require("../renderer"),
     exerciseViews = require("./exercise"),
     topicViews = require("./topic"),
     searchViews = require("./search"),
@@ -248,9 +249,8 @@ const MainView = component(({navInfo, options, tempStore}, {edit}) => {
         $("html, body").scrollTop(0);
     }
 
-    const In = (path) => (edit) => (state) => state.updateIn(path, edit);
-    const editNavInfo = _.compose(edit, In(["navInfo"]));
-    const editTempStore = _.compose(edit, In(["tempStore"]));
+    const editNavInfo = editorForPath(edit, "navInfo");
+    const editTempStore = editorForPath(edit, "tempStore");
 
     var control;
     if (!navInfo.get("topicTreeNode")) {

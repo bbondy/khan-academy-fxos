@@ -3,6 +3,7 @@ const _ = require("underscore"),
     APIClient = require("../apiclient"),
     Immutable = require("immutable"),
     {isArticle} = require("../data/topic-tree-helper"),
+    {editorForPath} = require("../renderer"),
     Storage = require("../storage");
 
 const reportArticleRead = (topicTreeNode) => {
@@ -45,8 +46,7 @@ const loadIfArticle = (editTempStore) => (topicTreeNode) => {
         return topicTreeNode;
     }
 
-    const In = (path) => (edit) => (state) => state.updateIn(path, edit);
-    const editArticleContent = _.compose(editTempStore, In([TopicTreeHelper.getKey(topicTreeNode)]));
+    const editArticleContent = editorForPath(editTempStore, TopicTreeHelper.getKey(topicTreeNode));
     if (TopicTreeHelper.isDownloaded(topicTreeNode)) {
         this.p1 = Storage.readText(TopicTreeHelper.getId(topicTreeNode)).then((result) => {
             Util.log("rendered article from storage");
@@ -56,7 +56,7 @@ const loadIfArticle = (editTempStore) => (topicTreeNode) => {
         this.p1 = APIClient.getArticle(TopicTreeHelper.getId(topicTreeNode)).then((result) => {
             Util.log("rendered article from web: ", result);
             setArticleContent(editArticleContent, result);
-        }).catch(() => {
+        }).catch((e) => {
             setArticleContent(editArticleContent);
         });
     }
