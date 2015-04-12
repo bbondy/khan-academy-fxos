@@ -10,7 +10,7 @@ const React = require("react"),
     Downloads = require("./downloads"),
     Storage = require("./storage"),
     chromeViews = require("./views/chrome"),
-    {readOptions, resetOptions, writeOptions} = require("./data/app-options"),
+    {readOptions, resetOptions} = require("./data/app-options"),
     {readTopicTree} = require("./data/topic-tree"),
     {resetNavInfo} = require("./data/nav-info"),
     Immutable = require("immutable");
@@ -91,11 +91,12 @@ const renderer = new Renderer(MainView, mountNode, initialState);
 renderer.render();
 
 readTopicTree().then((rootTopicTreeNode) =>
-    renderer.edit((state) => state.mergeDeep({ navInfo: {
-        topicTreeNode: rootTopicTreeNode,
-        rootTopicTreeNode,
-        navStack: Immutable.Stack.of(rootTopicTreeNode),
-    }}))
+    renderer.edit((state) => state.mergeDeep({
+            navInfo: {
+                topicTreeNode: rootTopicTreeNode,
+                rootTopicTreeNode,
+                navStack: Immutable.Stack.of(rootTopicTreeNode),
+            }}))
 );
 
 // Init everything

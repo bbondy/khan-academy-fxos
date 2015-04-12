@@ -206,9 +206,8 @@ const onClickDownloadContent = (topicTreeNode) => () => {
     if (TopicTreeHelper.isTopic(topicTreeNode)) {
         if (!confirm(l10n.get("download-remaining", {
                 totalCount: totalCount,
-                totalCountStr: totalCountStr
-            }))) {
-                return;
+                totalCountStr: totalCountStr}))) {
+            return;
         }
     }
 

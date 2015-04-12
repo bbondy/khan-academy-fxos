@@ -16,7 +16,6 @@ const React = require("react"),
     APIClient = require("../apiclient"),
     l10n = require("../l10n"),
     TopicTreeHelper = require("../data/topic-tree-helper"),
-    _ = require("underscore"),
     $ = require("jquery");
 
 window.Exercises = {
@@ -105,8 +104,6 @@ const ExerciseViewer = React.createClass({
     onClickSubmitAnswer: function() {
         var score = this.refs.itemRenderer.scoreInput();
         Util.log("score: %o", score);
-        var attemptNumber = 1; // TODO
-        var isCorrect = score.correct;
         const Khan = require("../../khan-exercises/main") || window.Khan,
             MathJax = require("../../bower_components/MathJax/MathJax.js") || window.MathJax;
         window.KhanUtil = Khan.Util;

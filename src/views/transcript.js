@@ -1,8 +1,5 @@
-const $ = require("jquery"),
-    _ = require("underscore"),
+const _ = require("underscore"),
     component = require("omniscient");
-
-const minSecondsBetweenReports = 10;
 
 /**
  * Represents a single transcript item for the list of transcript items.
@@ -34,7 +31,7 @@ const TranscriptViewer = component(({collection}, {onClickTranscript}) =>
                     statics={{
                         onClickTranscript: onClickTranscript
                     }}/>;
-                })
+            })
         }
         </ul>
 ).jsx;

@@ -2,8 +2,8 @@
 
 "use strict";
 
-const _ = require("underscore"),
-    Util = require("../util"),
+const Util = require("../util"),
+    React = require("react"),
     TopicTreeHelper = require("../data/topic-tree-helper"),
     {reportArticleRead} = require("./article-actions"),
     component = require("omniscient");

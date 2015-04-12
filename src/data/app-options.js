@@ -3,9 +3,9 @@ const Immutable = require("immutable");
 const appOptionsFilename = "appOptions.json";
 const readOptions = () => {
     try {
-      return Immutable.fromJS(JSON.parse(localStorage[appOptionsFilename]));
-    } catch(error) {
-      return null;
+        return Immutable.fromJS(JSON.parse(localStorage[appOptionsFilename]));
+    } catch (error) {
+        return null;
     }
 };
 

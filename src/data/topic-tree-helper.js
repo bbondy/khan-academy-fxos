@@ -1,5 +1,4 @@
 var _ = require("underscore"),
-    Immutable = require("immutable"),
     Minify = require("../minify");
 
 /**
@@ -42,12 +41,12 @@ const getProgressKey = (topicTreeNode) => {
 
 const getKind = (topicTreeNode) => {
     return Minify.getLongValue("kind", topicTreeNode.get(Minify.getShortName("kind")));
-}
+};
 
 const genIsKindFn = (kind) => {
     return (topicTreeNode) => {
         return getKind(topicTreeNode) === kind;
-    }
+    };
 };
 
 const isTopic = genIsKindFn("Topic");
@@ -61,10 +60,10 @@ const genCheckAnyFn = () => {
         return _.any(validators, (validator) => {
             return validator(topicTreeNode);
         });
-    }
-}
+    };
+};
 
-const isContent = genCheckAnyFn(isVideo,isArticle, isExercise);
+const isContent = genCheckAnyFn(isVideo, isArticle, isExercise);
 const isContentList = () => false;
 
 const getId = (topicTreeNode) => {
@@ -75,9 +74,8 @@ const getId = (topicTreeNode) => {
 };
 
 // todo: It's probably better to store this out of the topic tree
-const getDownloadCount = (topicTreeNode) => {
-    return topicTreeNode.get("downloadCount") === 0
-};
+const getDownloadCount = (topicTreeNode) =>
+    topicTreeNode.get("downloadCount") === 0;
 
 const getSlug = (topicTreeNode) => {
     return topicTreeNode.get(Minify.getShortName("slug"));
@@ -123,7 +121,7 @@ const getPoints = (topicTreeNode) => {
 };
 
 const getContentMimeType = (topicTreeNode) => {
-     return isVideo(topicTreeNode) ? "video/mp4" : "text/html";
+    return isVideo(topicTreeNode) ? "video/mp4" : "text/html";
 };
 
 const getDownloadUrl = (topicTreeNode) => {

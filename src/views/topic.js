@@ -4,9 +4,8 @@
 
 const _ = require("underscore"),
     classNames = require("classNames"),
-    models = require("../models"),
-    Util = require("../util"),
     TopicTreeHelper = require("../data/topic-tree-helper"),
+    React = require("react"),
     component = require("omniscient");
 
 /**

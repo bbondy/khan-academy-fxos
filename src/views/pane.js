@@ -6,6 +6,7 @@ const l10n = require("../l10n"),
     Util = require("../util"),
     models = require("../models"),
     Downloads = require("../downloads"),
+    React = require("react"),
     topicViews = require("./topic"),
     component = require("omniscient"),
     { resetOptions } = require("../data/app-options");

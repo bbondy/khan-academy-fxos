@@ -7,13 +7,11 @@ const $ = require("jquery"),
     l10n = require("../l10n"),
     classNames = require("classnames"),
     Util = require("../util"),
+    React = require("react"),
     models = require("../models"),
     ChromeActions = require("./chrome-actions"),
-    APIClient = require("../apiclient"),
     Storage = require("../storage"),
     Downloads = require("../downloads"),
-    Notifications = require("../notifications"),
-    Status = require("../status"),
     videoViews = require("./video"),
     articleViews = require("./article"),
     {loadIfArticle} = require("./article-actions"),
@@ -21,11 +19,9 @@ const $ = require("jquery"),
     topicViews = require("./topic"),
     searchViews = require("./search"),
     paneViews = require("./pane"),
-    Immutable = require("immutable"),
-    component = require('omniscient'),
+    component = require("omniscient"),
     TopicTreeHelper = require("../data/topic-tree-helper"),
-    { getDomainTopicTreeNode, isPaneShowing } = require("../data/nav-info"),
-    { TopicTreeNode } = require("../data/topic-tree");
+    { isPaneShowing } = require("../data/nav-info");
 
 const VideoViewer = videoViews.VideoViewer,
     ArticleViewer = articleViews.ArticleViewer,
@@ -43,7 +39,7 @@ const VideoViewer = videoViews.VideoViewer,
  * In general, when clicked it will take the user to the last view they were
  * at before.
  */
-const BackButton = component(({topicTreeNode}, {onClickBack}) =>
+const BackButton = component((prop, {onClickBack}) =>
     <div>
         <a className="icon-back-link " href="javascript:void(0)" onClick={onClickBack}>
             <span className="icon icon-back">Back</span>
@@ -149,15 +145,15 @@ const Sidebar = component((props, statics) => {
     if (Storage.isEnabled()) {
         if (!props.isPaneShowing &&
                 props.topicTreeNode && TopicTreeHelper.isContent(props.topicTreeNode)) {
-            if (isDownloaded(props.topicTreeNode)) {
-                var text = l10n.get(isVideo(props.topicTreeNode) ? "delete-downloaded-video" : "delete-downloaded-article");
+            if (TopicTreeHelper.isDownloaded(props.topicTreeNode)) {
+                var text = l10n.get(TopicTreeHelper.isVideo(props.topicTreeNode) ? "delete-downloaded-video" : "delete-downloaded-article");
                 items.push(<li key="delete-downloaded-video" className="hot-item">
                         <a href="#" onClick={statics.onClickDeleteDownloadedContent}>{{text}}</a>
                     </li>);
             } else {
-                var text = l10n.get(isVideo(props.topicTreeNode) ? "download-video" : "download-article");
+                var text = l10n.get(TopicTreeHelper.isVideo(props.topicTreeNode) ? "download-video" : "download-article");
                 items.push(<li key="download-video" className="hot-item">
-                        <a href="#" className={isVideo(props.topicTreeNode) ? "download-video-link" : "download-article-link"} onClick={statics.onClickDownloadContent}>{{text}}</a>
+                        <a href="#" className={TopicTreeHelper.isVideo(props.topicTreeNode) ? "download-video-link" : "download-article-link"} onClick={statics.onClickDownloadContent}>{{text}}</a>
                     </li>);
             }
         }
@@ -238,7 +234,7 @@ const Sidebar = component((props, statics) => {
  * things when certain page actions change.  No other part of the code is repsonsible
  * for the overall top level view (which is nice and clean ;)).
  */
-const MainView = component(({topicTreeRootNode, navInfo, options}, {edit}) => {
+const MainView = component(({navInfo, options}, {edit}) => {
     //mixins: [Util.LocalizationMixin],
     //mixins: [Util.BackboneMixin, Util.LocalizationMixin],
     //getBackboneModels: function(): Array<any> {
@@ -253,7 +249,7 @@ const MainView = component(({topicTreeRootNode, navInfo, options}, {edit}) => {
     }
 
     const In = (path) => (edit) => (state) => state.update(path, edit);
-    const editNavInfo = _.compose(edit, In('navInfo'));
+    const editNavInfo = _.compose(edit, In("navInfo"));
 
     var control;
     if (!navInfo.get("topicTreeNode")) {

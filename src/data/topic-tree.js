@@ -1,5 +1,4 @@
-const _ = require("underscore"),
-    Immutable = require("immutable"),
+const Immutable = require("immutable"),
     Storage = require("../storage"),
     Util = require("../util");
 

@@ -309,7 +309,10 @@ class TopicModel extends TopicTreeBase {
     getTopics() {
         var topics = new TopicList(this.get(Minify.getShortName("children")).filter((child) =>
             child[Minify.getShortName("kind")] === Minify.getShortValue("kind", "Topic")
-        ), { parse: true });
+        ),
+        {
+            parse: true
+        });
 
         this.parentListToThis(topics);
         return topics;
@@ -321,7 +324,10 @@ class TopicModel extends TopicTreeBase {
             return kind === Minify.getShortValue("kind", "Video") ||
                 kind === Minify.getShortValue("kind", "Article") ||
                 kind === Minify.getShortValue("kind", "Exercise");
-        }), { parse: true });
+        }),
+        {
+            parse: true
+        });
 
         this.parentListToThis(contentItems);
         return contentItems;

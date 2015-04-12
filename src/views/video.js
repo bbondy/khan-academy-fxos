@@ -3,8 +3,6 @@
 "use strict";
 
 const $ = require("jquery"),
-    _ = require("underscore"),
-    component = require("omniscient"),
     l10n = require("../l10n"),
     React = require("react"),
     classNames = require("classnames"),

@@ -2,8 +2,7 @@
 
 "use strict";
 
-const $ = require("jquery"),
-    React = require("react"),
+const React = require("react"),
     l10n = require("../l10n"),
     component = require("omniscient"),
     TopicTreeHelper = require("../data/topic-tree-helper"),
