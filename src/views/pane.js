@@ -38,24 +38,28 @@ const DownloadsViewer = component(({options}, {onClickContentItem}) => {
  * Represents a list of settings which can be modified which affect
  * global state.
  */
-const SettingsViewer = component(({options}) => {
+const SettingsViewer = component(({options}, {editOptions}) => {
     const onShowDownloadsChange = (event) => {
-        options.update("showDownloadsOnly", () => event.target.checked);
+        editOptions((options) =>
+            options.set("showDownloadsOnly", event.target.checked));
     };
     const onShowTranscriptsChange = (event) => {
-        options.update("showTranscripts", () => event.target.checked);
+        editOptions((options) =>
+            options.set("showTranscripts", event.target.checked));
     };
     const onAutoUpdateTopicTreeChange = (event) => {
-        options.update("autoUpdateTopicTree", () => event.target.checked);
+        editOptions((options) =>
+            options.set("autoUpdateTopicTree", event.target.checked));
     };
     const onSetPlaybackRateChange = (event) => {
         // Convert a value like: 0, 1, 2, 3 to 50, 100, 150, 200
         var percentage = 50 + event.target.value * 50;
-        options.update("playbackRate", () => percentage);
+        editOptions((options) =>
+            options.set("playbackRate", percentage));
     };
     const onReset = (event) => {
         if (confirm(l10n.get("confirm-reset"))) {
-            options.update(resetOptions);
+            editOptions(resetOptions);
         }
     };
 

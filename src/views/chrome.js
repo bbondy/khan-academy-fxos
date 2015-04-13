@@ -252,6 +252,7 @@ const MainView = component(({navInfo, options, tempStore}, {edit}) => {
 
     const editNavInfo = editorForPath(edit, "navInfo");
     const editTempStore = editorForPath(edit, "tempStore");
+    const editOptions = editorForPath(edit, "options");
     const editSearch = editorForPath(edit, ["tempStore", "search"]);
 
     var control;
@@ -266,7 +267,10 @@ const MainView = component(({navInfo, options, tempStore}, {edit}) => {
                                    }}
                                    options={options}/>;
     } else if (navInfo.get("showSettings")) {
-        control = <SettingsViewer options={options}/>;
+        control = <SettingsViewer options={options}
+                                  statics={{
+                                      editOptions,
+                                  }}/>;
     } else if (navInfo.get("searchResults")) {
         control = <SearchResultsViewer collection={navInfo.get("searchResults")}
                                        options={options}

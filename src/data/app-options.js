@@ -18,9 +18,7 @@ const resetOptions = () => Immutable.fromJS({
 });
 
 const writeOptions = options => {
-    options = options.toJSON();
-    delete options.temp;
-    localStorage[appOptionsFilename] = JSON.stringify(options);
+    localStorage[appOptionsFilename] = JSON.stringify(options.toJSON());
 };
 
 module.exports = {

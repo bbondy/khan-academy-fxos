@@ -1,4 +1,5 @@
-var _ = require("underscore");
+var _ = require("underscore"),
+    { writeOptions } = require("./data/app-options");
 
 /**
  * Renderer used to manage state updates and render the root component.
@@ -14,6 +15,7 @@ class Renderer {
         this.state = state;
         this.edit = this.edit.bind(this);
         this.render = this.render.bind(this);
+        this.lastOptions = this.state.get("options");
     }
 
     /**
@@ -23,6 +25,10 @@ class Renderer {
      */
     edit(updateStateFn) {
         this.state = updateStateFn(this.state);
+        if (this.lastOptions !== this.state.get("options")) {
+            this.lastOptions = this.state.get("options");
+            writeOptions(this.state.get("options"));
+        }
         this.render();
         return this.state;
     }
