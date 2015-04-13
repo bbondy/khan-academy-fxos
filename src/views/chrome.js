@@ -252,6 +252,7 @@ const MainView = component(({navInfo, options, tempStore}, {edit}) => {
 
     const editNavInfo = editorForPath(edit, "navInfo");
     const editTempStore = editorForPath(edit, "tempStore");
+    const editSearch = editorForPath(edit, ["tempStore", "search"]);
 
     var control;
     if (!navInfo.get("topicTreeNode")) {
@@ -300,9 +301,11 @@ const MainView = component(({navInfo, options, tempStore}, {edit}) => {
     if (!isPaneShowing(navInfo) && navInfo.get("topicTreeNode") &&
             !TopicTreeHelper.isContent(navInfo.get("topicTreeNode"))) {
         topicSearch = <TopicSearch topicTreeNode={navInfo.get("topicTreeNode")}
-                                   options={options}
+                                   searchValue={tempStore.get("search")}
+                                   navInfo={navInfo}
                                    statics={{
                                        onTopicSearch: ChromeActions.onTopicSearch(navInfo, editNavInfo),
+                                       editSearch,
                                    }}/>;
     }
 
@@ -332,7 +335,7 @@ const MainView = component(({navInfo, options, tempStore}, {edit}) => {
         {sidebar}
         <section id="main-content" role="region" className="skin-dark">
             <AppHeader statics={{
-                           onClickBack: ChromeActions.onClickBack(navInfo.get("topicTreeNode"), navInfo, editNavInfo)
+                           onClickBack: ChromeActions.onClickBack(navInfo.get("topicTreeNode"), navInfo, editNavInfo, editSearch)
                        }}
                        searchResults={navInfo.get("searchResults")}
                        topicTreeNode={navInfo.get("topicTreeNode")}

@@ -13,10 +13,10 @@ const ContentListViewer = topicViews.ContentListViewer;
 /**
  * Represents the topic search input item which is right below the header.
  */
-const TopicSearch = component(({topicTreeNode, options}, {onTopicSearch}) => {
+const TopicSearch = component(({topicTreeNode, searchValue, navInfo}, {onTopicSearch, editSearch}) => {
     const onChange = (event) => {
         var topicSearch = event.target.value;
-        options.setIn(["temp", "search"], topicSearch);
+        editSearch(() => topicSearch);
         onTopicSearch(topicSearch);
     };
 
@@ -47,14 +47,12 @@ const TopicSearch = component(({topicTreeNode, options}, {onTopicSearch}) => {
         });
     }
 
-    var searchValue = options.getIn(["temp", "search"]);
-
     return <div>
         <input ref="search"
                className="search app-chrome"
                type="searh"
                placeholder={text}
-               value={searchValue}
+               value={searchValue || ""}
                required=""
                onChange={onChange.bind(this)}
                onFocus={onFocus.bind(this)}

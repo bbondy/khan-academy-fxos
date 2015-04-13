@@ -105,7 +105,7 @@ const onTopicSearch = (navInfo, editNavInfo) => (topicSearch) => {
     }));
 };
 
-const onClickBack = (topicTreeNode, navInfo, editNavInfo) => () => {
+const onClickBack = (topicTreeNode, navInfo, editNavInfo, editSearch) => () => {
     // If settings or profile or ... is set, then don't show it anymore.
     // This effectively makes the topicTreeNode be in use again.
     if (isPaneShowing(navInfo)) {
@@ -118,6 +118,7 @@ const onClickBack = (topicTreeNode, navInfo, editNavInfo) => () => {
     }
 
     if (!!navInfo.get("searchResults")) {
+        editSearch(() => "");
         return onTopicSearch(navInfo, editNavInfo)("");
     }
 
