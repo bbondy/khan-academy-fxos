@@ -3,7 +3,7 @@
 "use strict";
 
 const _ = require("underscore"),
-    classNames = require("classNames"),
+    classNames = require("classnames"),
     TopicTreeHelper = require("../data/topic-tree-helper"),
     React = require("react"),
     component = require("omniscient");
