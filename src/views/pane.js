@@ -24,9 +24,11 @@ const DownloadsViewer = component(({options}, {onClickContentItem}) => {
         </div>;
     }
 
-    var control = <ContentListViewer collection={Downloads.contentList}
+    var control = <ContentListViewer topicTreeNodes={Downloads.contentList}
                                      options={options}
-                                     onClickContentItem={onClickContentItem} />;
+                                     statics={{
+                                         onClickContentItem,
+                                     }}/>;
     return <div className="downloads topic-list-container">
         {control}
     </div>;

@@ -265,6 +265,12 @@ const MainView = component(({navInfo, options, tempStore}, {edit}) => {
                                    options={options}/>;
     } else if (navInfo.get("showSettings")) {
         control = <SettingsViewer options={options}/>;
+    } else if (navInfo.get("searchResults")) {
+        control = <SearchResultsViewer collection={navInfo.get("searchResults")}
+                                       options={options}
+                                       statics={{
+                                           onClickContentItem: ChromeActions.onClickContentItem(editNavInfo),
+                                       }}/>;
     } else if (TopicTreeHelper.isTopic(navInfo.get("topicTreeNode"))) {
         var onClickContentItem = _.compose(
             ChromeActions.onClickContentItem(editNavInfo),
@@ -276,12 +282,6 @@ const MainView = component(({navInfo, options, tempStore}, {edit}) => {
                                topicTreeNode={navInfo.get("topicTreeNode")}
                                domainTopicTreeNode={navInfo.get("domainTopicTreeNode")}
                                options={options}/>;
-    } else if (navInfo.get("searchResults")) {
-        control = <SearchResultsViewer collection={navInfo.get("searchResults")}
-                                       options={options}
-                                       statics={{
-                                           onClickContentItem: ChromeActions.onClickContentItem(editNavInfo),
-                                       }}/>;
     } else if (TopicTreeHelper.isVideo(navInfo.get("topicTreeNode"))) {
         control = <VideoViewer topicTreeNode={navInfo.get("topicTreeNode")}
                                domainTopicTreeNode={navInfo.get("domainTopicTreeNode")}

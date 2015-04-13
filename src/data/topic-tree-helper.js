@@ -1,4 +1,5 @@
 var _ = require("underscore"),
+    Immutable = require("immutable"),
     Minify = require("../minify");
 
 /**
@@ -166,7 +167,7 @@ const findContentItems = (topicTreeNode, search, maxResults) => {
 
     var results = [];
     _findContentItems(topicTreeNode, search.toLowerCase(), results, maxResults);
-    return results.slice(0, maxResults);
+    return Immutable.fromJS(results.slice(0, maxResults));
 };
 
 /**

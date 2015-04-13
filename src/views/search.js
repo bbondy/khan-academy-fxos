@@ -68,9 +68,11 @@ const TopicSearch = component(({topicTreeNode, options}, {onTopicSearch}) => {
  * ContentListViewer for now.
  */
 const SearchResultsViewer  = component(({options, collection}, {onClickContentItem}) => {
-    var control = <ContentListViewer collection={collection}
+    var control = <ContentListViewer topicTreeNodes={collection}
                                      options={options}
-                                     onClickContentItem={onClickContentItem} />;
+                                     statics={{
+                                         onClickContentItem,
+                                     }}/>;
     return <div className="topic-list-container">
         {control}
     </div>;

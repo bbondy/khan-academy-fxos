@@ -100,7 +100,7 @@ const onTopicSearch = (navInfo, editNavInfo) => (topicSearch) => {
     var results = TopicTreeHelper.findContentItems(searchingTopicTreeNode, topicSearch);
     editNavInfo((navInfo) => navInfo.merge({
         searchResults: results,
-        searchingTopicTreeNode: searchingTopicTreeNode
+        searchingTopicTreeNode: searchingTopicTreeNode,
     }));
 };
 

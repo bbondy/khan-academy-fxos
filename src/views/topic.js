@@ -130,7 +130,7 @@ const TopicViewer = component(({topicTreeNode, domainTopicTreeNode, options}, {o
  * This is used for displaying search results and download lists.
  * This always contains only a list of VideoListItems, or ARticleListItems.
  */
-const ContentListViewer = component(({topicTreeNodes, options, onClickContentItem}) =>
+const ContentListViewer = component(({topicTreeNodes, options}, {onClickContentItem}) =>
     <div className="topic-list-container">
         <section data-type="list">
             <ul>
@@ -138,7 +138,7 @@ const ContentListViewer = component(({topicTreeNodes, options, onClickContentIte
                     topicTreeNodes.map((topicTreeNode) => <ContentListItem statics={{
                             onClick: onClickContentItem
                         }}
-                        videoNode={topicTreeNode}
+                        topicTreeNode={topicTreeNode}
                         options={options}
                         key={TopicTreeHelper.getKey(topicTreeNode)} />
                     )
