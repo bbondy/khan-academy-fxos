@@ -75,9 +75,10 @@ const AppHeader = component((props, {onClickBack}) => {
                 TopicTreeHelper.isContent(topicTreeNode) ||
                 TopicTreeHelper.isTopic(topicTreeNode) &&
             TopicTreeHelper.getKey(props.rootTopicTreeNode) !== TopicTreeHelper.getKey(topicTreeNode)) ||
-            TopicTreeHelper.isContentList(topicTreeNode)) {
+            TopicTreeHelper.isContentList(topicTreeNode) ||
+            !!props.searchResults) {
         backButton = <BackButton statics={{
-                                     onClickBack: onClickBack
+                                     onClickBack,
                                  }}
                                  topicTreeNode={topicTreeNode}/>;
     }
@@ -333,6 +334,7 @@ const MainView = component(({navInfo, options, tempStore}, {edit}) => {
             <AppHeader statics={{
                            onClickBack: ChromeActions.onClickBack(navInfo.get("topicTreeNode"), navInfo, editNavInfo)
                        }}
+                       searchResults={navInfo.get("searchResults")}
                        topicTreeNode={navInfo.get("topicTreeNode")}
                        domainTopicTreeNode={navInfo.get("domainTopicTreeNode")}
                        rootTopicTreeNode={navInfo.get("rootTopicTreeNode")}

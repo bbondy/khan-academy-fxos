@@ -88,7 +88,8 @@ const onTopicSearch = (navInfo, editNavInfo) => (topicSearch) => {
     if (!topicSearch) {
         editNavInfo((navInfo) => navInfo.merge({
             topicTreeNode: navInfo.get("searchingTopicTreeNode"),
-            searchingTopicTreeNode: null
+            searchingTopicTreeNode: null,
+            searchResults: null,
         }));
         return;
     }
@@ -108,16 +109,16 @@ const onClickBack = (topicTreeNode, navInfo, editNavInfo) => () => {
     // If settings or profile or ... is set, then don't show it anymore.
     // This effectively makes the topicTreeNode be in use again.
     if (isPaneShowing(navInfo)) {
-        editNavInfo((navInfo) => navInfo.merge({
+        return editNavInfo((navInfo) => navInfo.merge({
             showDownloads: false,
             showProfile: false,
             showSettings: false,
             wasLastDownloads: false
         }));
-        if (TopicTreeHelper.isContentList(navInfo.get("topicTreeNode"))) {
-            onTopicSearch("");
-        }
-        return;
+    }
+
+    if (!!navInfo.get("searchResults")) {
+        return onTopicSearch(navInfo, editNavInfo)("");
     }
 
     var newStack = navInfo.get("navStack").shift();
