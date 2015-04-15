@@ -376,7 +376,9 @@ const VideoViewer = React.createClass({
           "vjs-default-skin": true,
           "signed-in": models.CurrentUser.isSignedIn()
         };
-        videoClassObj[TopicTreeHelper.getId(this.props.domainTopicTreeNode)] = true;
+        if (this.props.domainTopicTreeNode) {
+            videoClassObj[TopicTreeHelper.getId(this.props.domainTopicTreeNode)] = true;
+        }
         this.videoClass = classNames(videoClassObj);
 
         var control;

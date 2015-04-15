@@ -21,7 +21,10 @@ const onClickContentItem = (editNavInfo) => (topicTreeNode) =>
         topicTreeNode,
         showProfile: false,
         showDownloads: false,
-        showSettings: false
+        showSettings: false,
+        // We purposely don't reset searchingTopicTreeNode so that back will work
+        // if the user hits a video after searching.
+        searchResults: null,
     })), topicTreeNode);
 
 const onClickTopic = (editNavInfo) => (newTopicTreeNode) =>
@@ -32,7 +35,7 @@ const onClickTopic = (editNavInfo) => (newTopicTreeNode) =>
         showProfile: false,
         showDownloads: false,
         showSettings: false,
-        wasLastDownloads: false
+        wasLastDownloads: false,
     }));
 
 //TODO used to call: this.forceUpdate();
@@ -117,7 +120,7 @@ const onClickBack = (topicTreeNode, navInfo, editNavInfo, editSearch) => () => {
         }));
     }
 
-    if (!!navInfo.get("searchResults")) {
+    if (!!navInfo.get("searchResults") || !!navInfo.get("searchingTopicTreeNode")) {
         editSearch(() => "");
         return onTopicSearch(navInfo, editNavInfo)("");
     }
