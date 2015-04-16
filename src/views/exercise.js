@@ -16,6 +16,7 @@ const React = require("react"),
     APIClient = require("../apiclient"),
     l10n = require("../l10n"),
     TopicTreeHelper = require("../data/topic-tree-helper"),
+    component = require("omniscient"),
     $ = require("jquery"),
     _ = require("underscore");
 
@@ -23,24 +24,15 @@ window.Exercises = {
     cluesEnabled: false
 };
 
-class TaskCompleteView extends React.Component {
-    render() {
-        console.log("Level is: " + this.props.level);
-
-        if (this.props.level === "practiced") {
-            level
+const TaskCompleteView = component(({level}) =>
+    <div>
+        <h1>You did it!</h1>
+        <p>Level: {level}</p>
+        { level !== "mastered" &&
+            <p>To level up more, you need to do mastery challenges.</p>
         }
-
-        var level;
-        return <div>
-            <h1>You did it!</h1>
-            <p>Level: {this.props.level}</p>
-            { this.props.level !== "mastered" &&
-                <p>To level up more, you need to do mastery challenges.</p>
-            }
-        </div>;
-    }
-}
+    </div>
+).jsx;
 
 /**
  * Represents a single exercise, it will load the exercise dynamically and
