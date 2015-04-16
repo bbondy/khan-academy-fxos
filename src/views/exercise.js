@@ -25,9 +25,23 @@ window.Exercises = {
 
 class TaskCompleteView extends React.Component {
     render() {
-        return <div>TODO: Task complete UI</div>;
+        console.log("Level is: " + this.props.level);
+
+        if (this.props.level === "practiced") {
+            level
+        }
+
+        var level;
+        return <div>
+            <h1>You did it!</h1>
+            <p>Level: {this.props.level}</p>
+            { this.props.level !== "mastered" &&
+                <p>To level up more, you need to do mastery challenges.</p>
+            }
+        </div>;
     }
 }
+
 /**
  * Represents a single exercise, it will load the exercise dynamically and
  * display it to the user.
@@ -171,7 +185,7 @@ const ExerciseViewer = React.createClass({
             var path = `/khan-exercises/exercises/${TopicTreeHelper.getFilename(this.props.toipcTreeNode)}`;
             content = <iframe src={path}/>;
         } else if (this.state.taskComplete) {
-            return <TaskCompleteView/>;
+            content = <TaskCompleteView level={this.state.level} mastered={this.state.mastered} />;
         } else if (this.ItemRenderer && this.state.perseusItemData) {
             var showHintsButton = this.state.perseusItemData.hints.length > this.state.hintsUsed;
             // Always show 5 attempt icons with either pending, correct, hint or wrong
