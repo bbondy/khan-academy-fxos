@@ -14,7 +14,7 @@ The Khan Academy app also functions as a:
 ## About the source
 
 Everything is built using JavaScript.
-[React](http://facebook.github.io/react/) is used for views and [ImmutableJS](https://github.com/facebook/immutable-js) is used for data.  The video player is using [VideoJS](http://www.videojs.com/).  The exercises are using Perseus.
+[Omniscient](https://github.com/omniscientjs/omniscient) which wraps [React](http://facebook.github.io/react/) is used for views and [ImmutableJS](https://github.com/facebook/immutable-js) is used for data.  The video player is using [VideoJS](http://www.videojs.com/).  The exercises are using Perseus.
 
 ## Getting setup
 
