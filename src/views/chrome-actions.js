@@ -4,7 +4,7 @@ const Downloads = require("../downloads"),
     { getDomainTopicTreeNode, isPaneShowing } = require("../data/nav-info"),
     Notifications = require("../notifications"),
     Status = require("../status"),
-    APIClient = require("../apiclient"),
+    {signIn, signOut} = require("../user"),
     models = require("../models");
 
 const onClickContentItemFromDownloads = (editNavInfo) => (topicTreeNode) =>
@@ -38,27 +38,6 @@ const onClickTopic = (editNavInfo) => (newTopicTreeNode) =>
         showSettings: false,
         wasLastDownloads: false,
     }));
-
-
-const userInfoLocalStorageName = "userInfo-3";
-
-const signIn = () => APIClient.signIn();
-const signOut = () => {
-    // Unbind user specific data from the topic tree
-    // TODO
-    /*
-    this._syncStartedToTopicTree(false);
-    this._syncCompletedToTopicTree(false);
-    this._syncUserVideoProgressToTopicTree(false);
-    this._syncUserExerciseProgressToTopicTree(false);
-
-    // Remove userInfo from the model and clear its local storage
-    this.unset("userInfo");
-    */
-    localStorage.removeItem(userInfoLocalStorageName);
-    return APIClient.signOut();
-};
-
 
 //TODO used to call: this.forceUpdate();
 const onClickSignin = signIn;
