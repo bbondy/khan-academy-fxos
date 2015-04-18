@@ -253,6 +253,7 @@ const MainView = component(({navInfo, options, tempStore}, {edit}) => {
 
     const editNavInfo = editorForPath(edit, "navInfo");
     const editTempStore = editorForPath(edit, "tempStore");
+    const editVideo = editorForPath(edit, ["tempStore", "video"]);
     const editOptions = editorForPath(edit, "options");
     const editSearch = editorForPath(edit, ["tempStore", "search"]);
 
@@ -281,8 +282,8 @@ const MainView = component(({navInfo, options, tempStore}, {edit}) => {
     } else if (TopicTreeHelper.isTopic(navInfo.get("topicTreeNode"))) {
         var onClickContentItem = _.compose(
             ChromeActions.onClickContentItem(editNavInfo),
-            loadTranscriptIfVideo(options, editTempStore),
-            loadVideoIfDownloadedVideo(editTempStore),
+            loadTranscriptIfVideo(options, editVideo),
+            loadVideoIfDownloadedVideo(editVideo),
             loadIfArticle(editTempStore));
         control = <TopicViewer statics={{
                                    onClickTopic: ChromeActions.onClickTopic(editNavInfo),
@@ -297,7 +298,7 @@ const MainView = component(({navInfo, options, tempStore}, {edit}) => {
                                tempStore={tempStore}
                                options={options}
                                statics={{
-                                   editTempStore,
+                                   editVideo,
                                }}/>;
     } else if (TopicTreeHelper.isArticle(navInfo.get("topicTreeNode"))) {
         control = <ArticleViewer  topicTreeNode={navInfo.get("topicTreeNode")}

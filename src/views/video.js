@@ -78,8 +78,7 @@ const VideoMixin = {
 
         if (this.props.tempStore.getIn(["video", "showOfflineImage"])) {
             this.stopAnimatingPoints(false);
-            const editVideo= editorForPath(this.props.statics.editTempStore, "video");
-            editVideo((video) => (video || Immutable.fromJS({})).merge({
+            this.props.statics.editVideo((video) => (video || Immutable.fromJS({})).merge({
                 showOfflineImage: false,
             }));
         }
@@ -132,8 +131,7 @@ const VideoMixin = {
             this.stopAnimatingPoints(false);
             var downloadedUrl = tempStore.getIn(["video", "downloadedUrl"]);
             if (!downloadedUrl && !this.cleanedUp) {
-                const editVideo= editorForPath(this.props.statics.editTempStore, "video");
-                editVideo((video) => (video || Immutable.fromJS({})).merge({
+                this.props.statics.editVideo((video) => (video || Immutable.fromJS({})).merge({
                     showOfflineImage: true,
                 }));
             }
