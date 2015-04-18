@@ -9,7 +9,7 @@ const React = require("react"),
     Cache = require("./cache"),
     Downloads = require("./downloads"),
     Storage = require("./storage"),
-    chromeViews = require("./views/chrome"),
+    MainView = require("./views/chrome").MainView,
     {readOptions, resetOptions} = require("./data/app-options"),
     {readTopicTree} = require("./data/topic-tree"),
     {resetNavInfo} = require("./data/nav-info"),
@@ -38,26 +38,18 @@ document.addEventListener("visibilitychange", function(e) {
     }
 });
 
-
-var MainView = chromeViews.MainView;
-var mountNode = document.getElementById("app");
-
-// Start showing the topic tree
-var options = readOptions() || resetOptions();
-var navInfo = resetNavInfo();
-
-
-
 const initialState = Immutable.fromJS({
-    options,
-    navInfo,
+    options: readOptions() || resetOptions(),
+    navInfo: resetNavInfo(),
     tempStore: {
         video: {},
         exercise: {},
     },
 });
-
+const mountNode = document.getElementById("app");
 const renderer = new Renderer(MainView, mountNode, initialState);
+// Note that we don't wait for the topic tree since it can take
+// relatively long on FxOS devices.
 renderer.render();
 
 readTopicTree().then((rootTopicTreeNode) =>
