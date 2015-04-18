@@ -254,6 +254,7 @@ const MainView = component(({navInfo, options, tempStore}, {edit}) => {
     const editNavInfo = editorForPath(edit, "navInfo");
     const editTempStore = editorForPath(edit, "tempStore");
     const editVideo = editorForPath(edit, ["tempStore", "video"]);
+    const editExercise = editorForPath(edit, ["tempStore", "exercise"]);
     const editOptions = editorForPath(edit, "options");
     const editSearch = editorForPath(edit, ["tempStore", "search"]);
 
@@ -304,7 +305,11 @@ const MainView = component(({navInfo, options, tempStore}, {edit}) => {
         control = <ArticleViewer  topicTreeNode={navInfo.get("topicTreeNode")}
                                   tempStore={tempStore}/>;
     } else if (TopicTreeHelper.isExercise(navInfo.get("topicTreeNode"))) {
-        control = <ExerciseViewer  topicTreeNode={navInfo.get("topicTreeNode")}/>;
+        control = <ExerciseViewer  topicTreeNode={navInfo.get("topicTreeNode")}
+                                   exerciseStore={tempStore.get("exercise")}
+                                   statics={{
+                                       editExercise,
+                                   }}/>;
     } else {
         Util.error("Unrecognized content item!");
     }

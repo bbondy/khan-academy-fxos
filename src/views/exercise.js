@@ -39,11 +39,6 @@ const TaskCompleteView = component(({level}) =>
  * Most of this will be refactored when parent state is brought up.
  */
 const ExerciseMixin = {
-    getInitialState: function() {
-        return {
-            hintsUsed: 0,
-        };
-    },
     refreshUserExerciseInfo: function() {
         return new Promise((resolve, reject) => {
             Promise.all([APIClient.getTaskInfoByExerciseName(TopicTreeHelper.getName(this.props.topicTreeNode)),
@@ -87,25 +82,27 @@ const ExerciseMixin = {
                     assessmentItem = results[1];
                 var assessment = JSON.parse(assessmentItem.item_data);
                 Util.log("Got assessment item: %o: item data: %o userExerciseInfo: %o", assessmentItem, assessment, userExerciseInfo);
-                this.setState({
-                    hintsUsed: 0,
-                    perseusItemData: assessment,
-                    level: userExerciseInfo.level,
-                    mastered: userExerciseInfo.mastered,
-                    practiced: userExerciseInfo.practiced,
-                    problemNumber: userExerciseInfo.problemNumber,
-                    streak: userExerciseInfo.streak,
-                    taskId: userExerciseInfo.taskId,
-                    taskAttemptHistory: userExerciseInfo.taskAttemptHistory || [],
-                    longestStreak: userExerciseInfo.longestStreak
-                });
+                this.props.statics.editExercise((exercise) =>
+                    exercise.merge({
+                        hintsUsed: 0,
+                        perseusItemData: assessment,
+                        level: userExerciseInfo.level,
+                        mastered: userExerciseInfo.mastered,
+                        practiced: userExerciseInfo.practiced,
+                        problemNumber: userExerciseInfo.problemNumber,
+                        streak: userExerciseInfo.streak,
+                        taskId: userExerciseInfo.taskId,
+                        taskAttemptHistory: userExerciseInfo.taskAttemptHistory || [],
+                        longestStreak: userExerciseInfo.longestStreak
+                    }));
             });
     },
     onClickRequestHint: function() {
         this.refs.itemRenderer.showHint();
-        this.setState({
-            hintsUsed: this.state.hintsUsed + 1,
-        });
+        this.props.statics.editExercise((exercise) => exercise.merge({
+                hintsUsed: (this.props.exerciseStore.get("hintsUsed") || 0) + 1,
+            })
+        );
     },
     onClickSubmitAnswer: function() {
         var score = this.refs.itemRenderer.scoreInput();
@@ -113,23 +110,26 @@ const ExerciseMixin = {
         var attemptNumber = 1; // TODO
         var isCorrect = score.correct;
         var secondsTaken = 10; //TODO
-        APIClient.reportExerciseProgress(TopicTreeHelper.getName(this.props.topicTreeNode), this.state.problemNumber,
+        var hintsUsed = this.props.exerciseStore.get("hintsUsed") || 0;
+        APIClient.reportExerciseProgress(TopicTreeHelper.getName(this.props.topicTreeNode), this.props.exerciseStore.get("problemNumber"),
             this.randomAssessmentSHA1, this.randomAssessmentId,
-            secondsTaken, this.state.hintsUsed, isCorrect,
-            attemptNumber, this.problemTypeName, this.state.taskId).then(() => {
+            secondsTaken, hintsUsed, isCorrect,
+            attemptNumber, this.problemTypeName, this.props.exerciseStore.get("taskId")).then(() => {
                 if (isCorrect) {
                     // If we have another correct and we already have 4 correct,
                     // then show task complete view.
-                    if (this.state.streak >= 4 && this.state.hintsUsed === 0) {
-                        this.setState({
-                            taskComplete: true
-                        });
+                    if (this.props.exerciseStore.get("streak") >= 4 && hintsUsed === 0) {
+                        this.props.statics.editExercise((exercise) =>
+                            exercise.merge({
+                                taskComplete: true
+                            })
+                        );
                         return;
                     }
                     this.refreshRandomAssessment();
                 } else {
                     // Refresh attempt info so it shows up as wrong
-                    this.refreshUserExerciseInfo().then(this.setState.bind(this));
+                    this.refreshUserExerciseInfo().then(this.forceUpdate.bind(this));
                 }
             });
     },
@@ -168,26 +168,26 @@ const ExerciseMixin = {
     },
 };
 
-const ExerciseViewer = component(ExerciseMixin, function({topicTreeNode}) {
+const ExerciseViewer = component(ExerciseMixin, function({topicTreeNode, exerciseStore}) {
     var content;
-    if (this.state.error) {
+    if (exerciseStore.get("error")) {
         content = <div>Could not load exercise</div>;
     } else if (TopicTreeHelper.isKhanExercisesExercise(topicTreeNode)) {
         var path = `/khan-exercises/exercises/${TopicTreeHelper.getFilename(toipcTreeNode)}`;
         content = <iframe src={path}/>;
-    } else if (this.state.taskComplete) {
-        content = <TaskCompleteView level={this.state.level} mastered={this.state.mastered} />;
-    } else if (this.ItemRenderer && this.state.perseusItemData) {
-        var showHintsButton = this.state.perseusItemData.hints.length > this.state.hintsUsed;
+    } else if (exerciseStore.get("taskComplete")) {
+        content = <TaskCompleteView level={exerciseStore.get("level")} mastered={exerciseStore.get("mastered")} />;
+    } else if (this.ItemRenderer && exerciseStore.get("perseusItemData")) {
+        var showHintsButton = exerciseStore.get("perseusItemData").get("hints").length > (exerciseStore.get("hintsUsed") || 0);
         // Always show 5 attempt icons with either pending, correct, hint or wrong
         var attemptIcons = [];
-        var taskAttemptHistory = this.state.taskAttemptHistory.slice(-5);
+        var taskAttemptHistory = exerciseStore.get("taskAttemptHistory").slice(-5);
         for (var i = 0; i < 5; i++) {
             if (i >= taskAttemptHistory.length) {
                 attemptIcons.push(<i className="attempt-icon attempt-pending fa fa-circle-o"></i>);
-            } else if (taskAttemptHistory[i].seen_hint) {
+            } else if (taskAttemptHistory.get(i).get("seen_hint")) {
                 attemptIcons.push(<i className="attempt-icon attempt-hint  fa fa-lightbulb-o"></i>);
-            } else if (!taskAttemptHistory[i].correct) {
+            } else if (!taskAttemptHistory.get(i).get("correct")) {
                 attemptIcons.push(<i className="attempt-icon attempt-wrong fa fa-times-circle-o"></i>);
             } else {
                 attemptIcons.push(<i className="attempt-icon attempt-correct fa fa-check-circle-o"></i>);
@@ -195,15 +195,15 @@ const ExerciseViewer = component(ExerciseMixin, function({topicTreeNode}) {
         }
 
         var streakText;
-        if (this.state.streak > 5) {
+        if (exerciseStore.get("streak") > 5) {
             streakText = l10n.get("correct-streak", {
-                count: this.state.streak
+                count: exerciseStore.get("streak"),
             });
         }
         var longestStreakText;
-        if (this.state.longestStreak > 5) {
+        if (exerciseStore.get("longestStreak") > 5) {
             longestStreakText = l10n.get("longest-correct-streak", {
-                count: this.state.longestStreak
+                count: exerciseStore.get("longestStreak"),
             });
         }
 
@@ -219,9 +219,9 @@ const ExerciseViewer = component(ExerciseMixin, function({topicTreeNode}) {
                       </div>
 
                       <this.ItemRenderer ref="itemRenderer"
-                                         item={this.state.perseusItemData}
-                                         key={this.state.problemNumber}
-                                         problemNum={this.state.problemNumber}
+                                         item={exerciseStore.get("perseusItemData").toJS()}
+                                         key={exerciseStore.get("problemNumber")}
+                                         problemNum={exerciseStore.get("problemNumber")}
                                          initialHintsVisible={0}
                                          enabledFeatures={{
                                              highlight: true,

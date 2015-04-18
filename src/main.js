@@ -51,7 +51,10 @@ var navInfo = resetNavInfo();
 const initialState = Immutable.fromJS({
     options,
     navInfo,
-    tempStore: {},
+    tempStore: {
+        video: {},
+        exercise: {},
+    },
 });
 
 const renderer = new Renderer(MainView, mountNode, initialState);
