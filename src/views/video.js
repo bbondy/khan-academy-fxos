@@ -9,6 +9,7 @@ const $ = require("jquery"),
     Util = require("../util"),
     models = require("../models"),
     APIClient = require("../apiclient"),
+    component = require("omniscient"),
     TopicTreeHelper = require("../data/topic-tree-helper"),
     {TranscriptViewer} = require("./transcript.js"),
     Storage = require("../storage");
@@ -16,15 +17,11 @@ const $ = require("jquery"),
 const minSecondsBetweenReports = 10;
 
 /**
- * Represents a single video, it will load the video dynamically and
- * display it to the user.
+ * Represents a single video
+ * This will mostly be refactored later once the state is brought up into the
+ * parent object state model.
  */
-const VideoViewer = React.createClass({
-    propTypes: {
-        topicTreeNode: React.PropTypes.object.isRequired,
-        domainTopicTreeNode: React.PropTypes.object.isRequired,
-        options: React.PropTypes.object.isRequired,
-    },
+const VideoMixin = {
     componentWillMount: function() {
         Util.log("VideoViewer will mount");
         if (this.props.options.get("showTranscripts")) {
@@ -325,81 +322,78 @@ const VideoViewer = React.createClass({
             this.secondsWatched = 0;
         }
     },
+};
 
-    render(): any {
-
-        const onClickTranscript = (obj) => {
-            var startSecond = obj.start_time / 1000 | 0;
-            var video = this._getVideoDOMNode();
-            if (video) {
-                video.currentTime = startSecond;
-                video.play();
-            }
-        };
-
-        const onReloadVideo = () => {
-            Util.log("Calling video load!");
-            var video = this._getVideoDOMNode();
-            if (video) {
-                video.load();
-            }
-        };
-
-
-
-        var transcriptViewer;
-        if (!!this.state.transcript) {
-            transcriptViewer = <TranscriptViewer collection={this.state.transcript}
-                                                 statics={{
-                                                     onClickTranscript
-                                                 }}/>;
+var VideoViewer = component(VideoMixin, function() {
+    const onClickTranscript = (obj) => {
+        var startSecond = obj.start_time / 1000 | 0;
+        var video = this._getVideoDOMNode();
+        if (video) {
+            video.currentTime = startSecond;
+            video.play();
         }
+    };
 
-        this.videoSrc = TopicTreeHelper.getDownloadUrl(this.props.topicTreeNode);
-        if (this.state.downloadedUrl) {
-            this.videoSrc = this.state.downloadedUrl;
+    const onReloadVideo = () => {
+        Util.log("Calling video load!");
+        var video = this._getVideoDOMNode();
+        if (video) {
+            video.load();
         }
-        Util.log("video rendered with url: " + this.videoSrc);
-        var pointsString = l10n.get("points-so-far", {
-            earned: TopicTreeHelper.getPoints(this.props.topicTreeNode),
-            available: this.availablePoints
-        });
+    };
 
-        var pointsDiv;
-        if (models.CurrentUser.isSignedIn()) {
-            pointsDiv = <div className="energy-points energy-points-video">{pointsString}</div>;
-        }
+    var transcriptViewer;
+    if (!!this.state.transcript) {
+        transcriptViewer = <TranscriptViewer collection={this.state.transcript}
+                                             statics={{
+                                                 onClickTranscript
+                                             }}/>;
+    }
 
-        var videoClassObj = {
-          "video-has-transcript": !!this.state.transcript,
-          "video-js": true,
-          "vjs-default-skin": true,
-          "signed-in": models.CurrentUser.isSignedIn()
-        };
-        if (this.props.domainTopicTreeNode) {
-            videoClassObj[TopicTreeHelper.getId(this.props.domainTopicTreeNode)] = true;
-        }
-        this.videoClass = classNames(videoClassObj);
+    this.videoSrc = TopicTreeHelper.getDownloadUrl(this.props.topicTreeNode);
+    if (this.state.downloadedUrl) {
+        this.videoSrc = this.state.downloadedUrl;
+    }
+    Util.log("video rendered with url: " + this.videoSrc);
+    var pointsString = l10n.get("points-so-far", {
+        earned: TopicTreeHelper.getPoints(this.props.topicTreeNode),
+        available: this.availablePoints
+    });
 
-        var control;
-        if (this.state.showOfflineImage) {
-            control = <div className="video-placeholder" onClick={onReloadVideo}/>;
-        } else {
-            control = <div className={this.videoClass} ref="videoPlaceholder" id="video-placeholder"/>;
-        }
+    var pointsDiv;
+    if (models.CurrentUser.isSignedIn()) {
+        pointsDiv = <div className="energy-points energy-points-video">{pointsString}</div>;
+    }
 
-        // The overlay div helps with a bug where html5 video sometimes doesn't render properly.
-        // I'm not sure exactly why but I guess maybe it pushes out the painting to its own layer
-        // or something along those lines.
-        // http://fastly.kastatic.org/KA-youtube-converted/wx2gI8iwMCA.mp4/wx2gI8iwMCA.mp4
-        return <div className="video-viewer-container">
-            {control}
-             <div className="video-info-bar">{pointsDiv}</div>
-             <div id="overlay"></div>
-            {transcriptViewer}
-        </div>;
-    },
-});
+    var videoClassObj = {
+      "video-has-transcript": !!this.state.transcript,
+      "video-js": true,
+      "vjs-default-skin": true,
+      "signed-in": models.CurrentUser.isSignedIn()
+    };
+    if (this.props.domainTopicTreeNode) {
+        videoClassObj[TopicTreeHelper.getId(this.props.domainTopicTreeNode)] = true;
+    }
+    this.videoClass = classNames(videoClassObj);
+
+    var control;
+    if (this.state.showOfflineImage) {
+        control = <div className="video-placeholder" onClick={onReloadVideo}/>;
+    } else {
+        control = <div className={this.videoClass} ref="videoPlaceholder" id="video-placeholder"/>;
+    }
+
+    // The overlay div helps with a bug where html5 video sometimes doesn't render properly.
+    // I'm not sure exactly why but I guess maybe it pushes out the painting to its own layer
+    // or something along those lines.
+    // http://fastly.kastatic.org/KA-youtube-converted/wx2gI8iwMCA.mp4/wx2gI8iwMCA.mp4
+    return <div className="video-viewer-container">
+        {control}
+         <div className="video-info-bar">{pointsDiv}</div>
+         <div id="overlay"></div>
+        {transcriptViewer}
+    </div>;
+}).jsx;
 
 module.exports = {
     VideoViewer,
