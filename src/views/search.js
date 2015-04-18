@@ -5,7 +5,7 @@
 const React = require("react"),
     l10n = require("../l10n"),
     component = require("omniscient"),
-    TopicTreeHelper = require("../data/topic-tree-helper"),
+    { getTitle } = require("../data/topic-tree-helper"),
     topicViews = require("./topic");
 
 const ContentListViewer = topicViews.ContentListViewer;
@@ -41,9 +41,9 @@ const TopicSearch = component(({topicTreeNode, searchValue, navInfo}, {onTopicSe
     };
 
     var text = l10n.get("search");
-    if (TopicTreeHelper.getTitle(topicTreeNode)) {
+    if (getTitle(topicTreeNode)) {
         text = l10n.get("search-topic", {
-            topic: TopicTreeHelper.getTitle(topicTreeNode)
+            topic: getTitle(topicTreeNode)
         });
     }
 

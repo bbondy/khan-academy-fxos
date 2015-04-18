@@ -15,7 +15,7 @@ const React = require("react"),
     Util = require("../util"),
     APIClient = require("../apiclient"),
     l10n = require("../l10n"),
-    TopicTreeHelper = require("../data/topic-tree-helper"),
+    {getName, getFilename, isPerseusExercise, isKhanExercisesExercise} = require("../data/topic-tree-helper"),
     component = require("omniscient"),
     $ = require("jquery"),
     _ = require("underscore");
@@ -41,8 +41,8 @@ const TaskCompleteView = component(({level}) =>
 const ExerciseMixin = {
     refreshUserExerciseInfo: function() {
         return new Promise((resolve, reject) => {
-            Promise.all([APIClient.getTaskInfoByExerciseName(TopicTreeHelper.getName(this.props.topicTreeNode)),
-                    APIClient.getUserExercise(TopicTreeHelper.getName(this.props.topicTreeNode))])
+            Promise.all([APIClient.getTaskInfoByExerciseName(getName(this.props.topicTreeNode)),
+                    APIClient.getUserExercise(getName(this.props.topicTreeNode))])
             .then((result) => {
                 const taskInfo = result[0];
                 const exerciseInfo = result[1];
@@ -111,7 +111,7 @@ const ExerciseMixin = {
         var isCorrect = score.correct;
         var secondsTaken = 10; //TODO
         var hintsUsed = this.props.exerciseStore.get("hintsUsed") || 0;
-        APIClient.reportExerciseProgress(TopicTreeHelper.getName(this.props.topicTreeNode), this.props.exerciseStore.get("problemNumber"),
+        APIClient.reportExerciseProgress(getName(this.props.topicTreeNode), this.props.exerciseStore.get("problemNumber"),
             this.randomAssessmentSHA1, this.randomAssessmentId,
             secondsTaken, hintsUsed, isCorrect,
             attemptNumber, this.problemTypeName, this.props.exerciseStore.get("taskId")).then(() => {
@@ -134,8 +134,8 @@ const ExerciseMixin = {
             });
     },
     componentWillMount: function() {
-        if (TopicTreeHelper.isPerseusExercise(this.props.topicTreeNode)) {
-            APIClient.getExerciseByName(TopicTreeHelper.getName(this.props.topicTreeNode)).then((result) => {
+        if (isPerseusExercise(this.props.topicTreeNode)) {
+            APIClient.getExerciseByName(getName(this.props.topicTreeNode)).then((result) => {
                 this.exercise = result;
                 Util.log("got exercise: %o", result);
                 this.refreshRandomAssessment();
@@ -172,8 +172,8 @@ const ExerciseViewer = component(ExerciseMixin, function({topicTreeNode, exercis
     var content;
     if (exerciseStore.get("error")) {
         content = <div>Could not load exercise</div>;
-    } else if (TopicTreeHelper.isKhanExercisesExercise(topicTreeNode)) {
-        var path = `/khan-exercises/exercises/${TopicTreeHelper.getFilename(toipcTreeNode)}`;
+    } else if (isKhanExercisesExercise(topicTreeNode)) {
+        var path = `/khan-exercises/exercises/${getFilename(toipcTreeNode)}`;
         content = <iframe src={path}/>;
     } else if (exerciseStore.get("taskComplete")) {
         content = <TaskCompleteView level={exerciseStore.get("level")} mastered={exerciseStore.get("mastered")} />;

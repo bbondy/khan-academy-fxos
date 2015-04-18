@@ -1,4 +1,4 @@
-const TopicTreeHelper = require("../data/topic-tree-helper"),
+const {getId, getKey, isDownloaded} = require("../data/topic-tree-helper"),
     APIClient = require("../apiclient"),
     Immutable = require("immutable"),
     {isArticle} = require("../data/topic-tree-helper"),
@@ -11,7 +11,7 @@ const reportArticleRead = (topicTreeNode) => {
             return setTimeout(resolve, 0);
         }
 
-        APIClient.reportArticleRead(TopicTreeHelper.getId(topicTreeNode)).then((result) => {
+        APIClient.reportArticleRead(getId(topicTreeNode)).then((result) => {
             Util.log("reported article complete: %o", result);
             article.set({
                 completed: true
@@ -45,14 +45,14 @@ const loadIfArticle = (editTempStore) => (topicTreeNode) => {
         return topicTreeNode;
     }
 
-    const editArticleContent = editorForPath(editTempStore, TopicTreeHelper.getKey(topicTreeNode));
-    if (TopicTreeHelper.isDownloaded(topicTreeNode)) {
-        this.p1 = Storage.readText(TopicTreeHelper.getId(topicTreeNode)).then((result) => {
+    const editArticleContent = editorForPath(editTempStore, getKey(topicTreeNode));
+    if (isDownloaded(topicTreeNode)) {
+        this.p1 = Storage.readText(getId(topicTreeNode)).then((result) => {
             Util.log("rendered article from storage");
             setArticleContent(editArticleContent, result);
         });
     } else {
-        this.p1 = APIClient.getArticle(TopicTreeHelper.getId(topicTreeNode)).then((result) => {
+        this.p1 = APIClient.getArticle(getId(topicTreeNode)).then((result) => {
             Util.log("rendered article from web: ", result);
             setArticleContent(editArticleContent, result);
         }).catch((e) => {

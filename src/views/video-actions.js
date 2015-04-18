@@ -1,4 +1,4 @@
-const {isVideo, getKey, getYoutubeId, isDownloaded} = require("../data/topic-tree-helper"),
+const {isVideo, getId, getKey, getYoutubeId, isDownloaded} = require("../data/topic-tree-helper"),
     Immutable = require("immutable"),
     {editorForPath} = require("../renderer");
 
@@ -33,7 +33,7 @@ const loadVideoIfDownloadedVideo = (editVideo) => (topicTreeNode) => {
         return topicTreeNode;
     }
 
-    Storage.readAsBlob(TopicTreeHelper.getId(topicTreeNode)).then((result) => {
+    Storage.readAsBlob(getId(topicTreeNode)).then((result) => {
         var download_url = window.URL.createObjectURL(result);
         editVideo((video) => (video || Immutable.fromJS({})).merge({
             downloadedUrl,

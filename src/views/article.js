@@ -4,7 +4,7 @@
 
 const Util = require("../util"),
     React = require("react"),
-    TopicTreeHelper = require("../data/topic-tree-helper"),
+    {getKey} = require("../data/topic-tree-helper"),
     {reportArticleRead} = require("./article-actions"),
     component = require("omniscient");
 
@@ -27,7 +27,7 @@ const ArticleReadMixin = {
  */
 const ArticleViewer = component(ArticleReadMixin, ({topicTreeNode, tempStore}) => {
     Util.log("render article: :%o", topicTreeNode);
-    var articleObj = tempStore.getIn([TopicTreeHelper.getKey(topicTreeNode)]);
+    var articleObj = tempStore.getIn([getKey(topicTreeNode)]);
     if (articleObj && articleObj.get("error")) {
         return <img className="video-placeholder" src="img/offline.png"/>;
     } else if (articleObj && articleObj.get("content")) {
