@@ -24,16 +24,6 @@ const minSecondsBetweenReports = 10;
 const VideoMixin = {
     componentWillMount: function() {
         Util.log("VideoViewer will mount");
-        if (this.props.options.get("showTranscripts")) {
-            APIClient.getVideoTranscript(TopicTreeHelper.getYoutubeId(this.props.topicTreeNode)).then((transcript) => {
-                if (transcript && transcript.length === 0) {
-                    return;
-                }
-                // This will cause a second re-render but that's OK
-                this.setState({transcript: transcript});
-            }).catch((e) => {
-            });
-        }
 
         if (TopicTreeHelper.isDownloaded(this.props.topicTreeNode)) {
             Storage.readAsBlob(TopicTreeHelper.getId(this.props.topicTreeNode)).then((result) => {
@@ -220,7 +210,6 @@ const VideoMixin = {
     pointsPerReport: 0,
     pointsObj: {},
     isPlaying: false,
-    transcriptPromise: null,
     cleanedUp: false,
     videojs: null,
 
@@ -324,9 +313,9 @@ const VideoMixin = {
     },
 };
 
-var VideoViewer = component(VideoMixin, function() {
+var VideoViewer = component(VideoMixin, function({tempStore, topicTreeNode, domainTopicTreeNode}) {
     const onClickTranscript = (obj) => {
-        var startSecond = obj.start_time / 1000 | 0;
+        var startSecond = obj.get("start_time") / 1000 | 0;
         var video = this._getVideoDOMNode();
         if (video) {
             video.currentTime = startSecond;
@@ -343,20 +332,21 @@ var VideoViewer = component(VideoMixin, function() {
     };
 
     var transcriptViewer;
-    if (!!this.state.transcript) {
-        transcriptViewer = <TranscriptViewer collection={this.state.transcript}
+    var transcript = tempStore.getIn(["video", "transcript"]);
+    if (transcript) {
+        transcriptViewer = <TranscriptViewer collection={transcript}
                                              statics={{
                                                  onClickTranscript
                                              }}/>;
     }
 
-    this.videoSrc = TopicTreeHelper.getDownloadUrl(this.props.topicTreeNode);
+    this.videoSrc = TopicTreeHelper.getDownloadUrl(topicTreeNode);
     if (this.state.downloadedUrl) {
         this.videoSrc = this.state.downloadedUrl;
     }
     Util.log("video rendered with url: " + this.videoSrc);
     var pointsString = l10n.get("points-so-far", {
-        earned: TopicTreeHelper.getPoints(this.props.topicTreeNode),
+        earned: TopicTreeHelper.getPoints(topicTreeNode),
         available: this.availablePoints
     });
 
@@ -366,13 +356,13 @@ var VideoViewer = component(VideoMixin, function() {
     }
 
     var videoClassObj = {
-      "video-has-transcript": !!this.state.transcript,
+      "video-has-transcript": !!transcript,
       "video-js": true,
       "vjs-default-skin": true,
       "signed-in": models.CurrentUser.isSignedIn()
     };
-    if (this.props.domainTopicTreeNode) {
-        videoClassObj[TopicTreeHelper.getId(this.props.domainTopicTreeNode)] = true;
+    if (domainTopicTreeNode) {
+        videoClassObj[TopicTreeHelper.getId(domainTopicTreeNode)] = true;
     }
     this.videoClass = classNames(videoClassObj);
 

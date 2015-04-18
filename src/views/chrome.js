@@ -15,6 +15,7 @@ const $ = require("jquery"),
     videoViews = require("./video"),
     articleViews = require("./article"),
     {loadIfArticle} = require("./article-actions"),
+    {loadTranscriptIfVideo} = require("./video-actions"),
     {editorForPath} = require("../renderer"),
     exerciseViews = require("./exercise"),
     topicViews = require("./topic"),
@@ -280,6 +281,7 @@ const MainView = component(({navInfo, options, tempStore}, {edit}) => {
     } else if (TopicTreeHelper.isTopic(navInfo.get("topicTreeNode"))) {
         var onClickContentItem = _.compose(
             ChromeActions.onClickContentItem(editNavInfo),
+            loadTranscriptIfVideo(options, editTempStore),
             loadIfArticle(editTempStore));
         control = <TopicViewer statics={{
                                    onClickTopic: ChromeActions.onClickTopic(editNavInfo),
@@ -291,6 +293,7 @@ const MainView = component(({navInfo, options, tempStore}, {edit}) => {
     } else if (TopicTreeHelper.isVideo(navInfo.get("topicTreeNode"))) {
         control = <VideoViewer topicTreeNode={navInfo.get("topicTreeNode")}
                                domainTopicTreeNode={navInfo.get("domainTopicTreeNode")}
+                               tempStore={tempStore}
                                options={options}/>;
     } else if (TopicTreeHelper.isArticle(navInfo.get("topicTreeNode"))) {
         control = <ArticleViewer  topicTreeNode={navInfo.get("topicTreeNode")}
