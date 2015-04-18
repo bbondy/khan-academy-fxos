@@ -35,13 +35,10 @@ const TaskCompleteView = component(({level}) =>
 ).jsx;
 
 /**
- * Represents a single exercise, it will load the exercise dynamically and
- * display it to the user.
+ * Represents a single exercise, it will load the exercise dynamically.
+ * Most of this will be refactored when parent state is brought up.
  */
-const ExerciseViewer = React.createClass({
-    propTypes: {
-        topicTreeNode: React.PropTypes.object.isRequired
-    },
+const ExerciseMixin = {
     getInitialState: function() {
         return {
             hintsUsed: 0,
@@ -169,86 +166,87 @@ const ExerciseViewer = React.createClass({
             this.forceUpdate();
         });
     },
-    render: function(): any {
-        var content;
-        if (this.state.error) {
-            content = <div>Could not load exercise</div>;
-        } else if (TopicTreeHelper.isKhanExercisesExercise(this.props.topicTreeNode)) {
-            var path = `/khan-exercises/exercises/${TopicTreeHelper.getFilename(this.props.toipcTreeNode)}`;
-            content = <iframe src={path}/>;
-        } else if (this.state.taskComplete) {
-            content = <TaskCompleteView level={this.state.level} mastered={this.state.mastered} />;
-        } else if (this.ItemRenderer && this.state.perseusItemData) {
-            var showHintsButton = this.state.perseusItemData.hints.length > this.state.hintsUsed;
-            // Always show 5 attempt icons with either pending, correct, hint or wrong
-            var attemptIcons = [];
-            var taskAttemptHistory = this.state.taskAttemptHistory.slice(-5);
-            for (var i = 0; i < 5; i++) {
-                if (i >= taskAttemptHistory.length) {
-                    attemptIcons.push(<i className="attempt-icon attempt-pending fa fa-circle-o"></i>);
-                } else if (taskAttemptHistory[i].seen_hint) {
-                    attemptIcons.push(<i className="attempt-icon attempt-hint  fa fa-lightbulb-o"></i>);
-                } else if (!taskAttemptHistory[i].correct) {
-                    attemptIcons.push(<i className="attempt-icon attempt-wrong fa fa-times-circle-o"></i>);
-                } else {
-                    attemptIcons.push(<i className="attempt-icon attempt-correct fa fa-check-circle-o"></i>);
-                }
+};
+
+const ExerciseViewer = component(ExerciseMixin, function({topicTreeNode}) {
+    var content;
+    if (this.state.error) {
+        content = <div>Could not load exercise</div>;
+    } else if (TopicTreeHelper.isKhanExercisesExercise(topicTreeNode)) {
+        var path = `/khan-exercises/exercises/${TopicTreeHelper.getFilename(toipcTreeNode)}`;
+        content = <iframe src={path}/>;
+    } else if (this.state.taskComplete) {
+        content = <TaskCompleteView level={this.state.level} mastered={this.state.mastered} />;
+    } else if (this.ItemRenderer && this.state.perseusItemData) {
+        var showHintsButton = this.state.perseusItemData.hints.length > this.state.hintsUsed;
+        // Always show 5 attempt icons with either pending, correct, hint or wrong
+        var attemptIcons = [];
+        var taskAttemptHistory = this.state.taskAttemptHistory.slice(-5);
+        for (var i = 0; i < 5; i++) {
+            if (i >= taskAttemptHistory.length) {
+                attemptIcons.push(<i className="attempt-icon attempt-pending fa fa-circle-o"></i>);
+            } else if (taskAttemptHistory[i].seen_hint) {
+                attemptIcons.push(<i className="attempt-icon attempt-hint  fa fa-lightbulb-o"></i>);
+            } else if (!taskAttemptHistory[i].correct) {
+                attemptIcons.push(<i className="attempt-icon attempt-wrong fa fa-times-circle-o"></i>);
+            } else {
+                attemptIcons.push(<i className="attempt-icon attempt-correct fa fa-check-circle-o"></i>);
             }
-
-            var streakText;
-            if (this.state.streak > 5) {
-                streakText = l10n.get("correct-streak", {
-                    count: this.state.streak
-                });
-            }
-            var longestStreakText;
-            if (this.state.longestStreak > 5) {
-                longestStreakText = l10n.get("longest-correct-streak", {
-                    count: this.state.longestStreak
-                });
-            }
-
-            content = <div className="framework-perseus">
-                          <div className="problem-history">
-                              {attemptIcons}
-                              <div>
-                                  {streakText}
-                              </div>
-                              <div>
-                                  {longestStreakText}
-                              </div>
-                          </div>
-
-                          <this.ItemRenderer ref="itemRenderer"
-                                             item={this.state.perseusItemData}
-                                             key={this.state.problemNumber}
-                                             problemNum={this.state.problemNumber}
-                                             initialHintsVisible={0}
-                                             enabledFeatures={{
-                                                 highlight: true,
-                                                 toolTipFormats: true
-                                             }} />
-                          <div id="workarea"/>
-                          <div id="solutionarea"/>
-
-                          <button className="submit-answer-button"
-                                  data-l10n-id="submit-answer"
-                                  onClick={this.onClickSubmitAnswer}>Submit Answer</button>
-                          { !showHintsButton ? null :
-                          <button className="submit-answer-button"
-                                  data-l10n-id="hint"
-                                  onClick={this.onClickRequestHint}>Hint</button>
-                          }
-                          <div id="hintsarea"/>
-                      </div>;
         }
 
-        Util.log("render exercise: :%o", this.props.topicTreeNode);
-        return <div className="exercise">
-            {content}
-        </div>;
+        var streakText;
+        if (this.state.streak > 5) {
+            streakText = l10n.get("correct-streak", {
+                count: this.state.streak
+            });
+        }
+        var longestStreakText;
+        if (this.state.longestStreak > 5) {
+            longestStreakText = l10n.get("longest-correct-streak", {
+                count: this.state.longestStreak
+            });
+        }
+
+        content = <div className="framework-perseus">
+                      <div className="problem-history">
+                          {attemptIcons}
+                          <div>
+                              {streakText}
+                          </div>
+                          <div>
+                              {longestStreakText}
+                          </div>
+                      </div>
+
+                      <this.ItemRenderer ref="itemRenderer"
+                                         item={this.state.perseusItemData}
+                                         key={this.state.problemNumber}
+                                         problemNum={this.state.problemNumber}
+                                         initialHintsVisible={0}
+                                         enabledFeatures={{
+                                             highlight: true,
+                                             toolTipFormats: true
+                                         }} />
+                      <div id="workarea"/>
+                      <div id="solutionarea"/>
+
+                      <button className="submit-answer-button"
+                              data-l10n-id="submit-answer"
+                              onClick={this.onClickSubmitAnswer}>Submit Answer</button>
+                      { !showHintsButton ? null :
+                      <button className="submit-answer-button"
+                              data-l10n-id="hint"
+                              onClick={this.onClickRequestHint}>Hint</button>
+                      }
+                      <div id="hintsarea"/>
+                  </div>;
     }
-});
+
+    Util.log("render exercise: :%o", topicTreeNode);
+    return <div className="exercise">
+        {content}
+    </div>;
+}).jsx;
 
 module.exports = {
     ExerciseViewer,
