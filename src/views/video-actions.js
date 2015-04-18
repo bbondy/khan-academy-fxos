@@ -1,4 +1,4 @@
-const {isVideo, getKey, getYoutubeId} = require("../data/topic-tree-helper"),
+const {isVideo, getKey, getYoutubeId, isDownloaded} = require("../data/topic-tree-helper"),
     Immutable = require("immutable"),
     {editorForPath} = require("../renderer");
 
@@ -16,7 +16,6 @@ const loadTranscriptIfVideo = (options, editTempStore) => (topicTreeNode) => {
         if (transcript && transcript.length === 0) {
             return;
         }
-        console.log("Setting video transcript to: " + transcript);
         editVideoTranscript((video) => {
             return Immutable.fromJS({
                 transcript,
@@ -26,6 +25,28 @@ const loadTranscriptIfVideo = (options, editTempStore) => (topicTreeNode) => {
     return topicTreeNode;
 };
 
+const loadVideoIfDownloadedVideo = (editTempStore) => (topicTreeNode) => {
+    if (!isVideo(topicTreeNode)) {
+        return topicTreeNode;
+    }
+
+    if (!isDownloaded(topicTreeNode)) {
+        return topicTreeNode;
+    }
+
+    Storage.readAsBlob(TopicTreeHelper.getId(topicTreeNode)).then((result) => {
+        const editVideoTranscript = editorForPath(editTempStore, "video");
+        var download_url = window.URL.createObjectURL(result);
+        editVideo((video) => (video || Immutable.fromJS({})).merge({
+            downloadedUrl,
+            showOfflineImage: false,
+        }));
+    });
+
+    return topicTreeNode;
+};
+
 module.exports = {
     loadTranscriptIfVideo,
+    loadVideoIfDownloadedVideo,
 };

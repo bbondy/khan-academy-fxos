@@ -23,16 +23,7 @@ const minSecondsBetweenReports = 10;
  */
 const VideoMixin = {
     componentWillMount: function() {
-        Util.log("VideoViewer will mount");
-
-        if (TopicTreeHelper.isDownloaded(this.props.topicTreeNode)) {
-            Storage.readAsBlob(TopicTreeHelper.getId(this.props.topicTreeNode)).then((result) => {
-                var download_url = window.URL.createObjectURL(result);
-                this.setState({downloadedUrl: download_url, showOfflineImage: false});
-            });
-        }
-
-        Util.log("video: %o", this.props.topicTreeNode);
+        Util.log("VideoMixin will mount: %o", this.props.topicTreeNode);
         this.videoId = TopicTreeHelper.getId(this.props.topicTreeNode);
         this.initSecondWatched = 0;
         this.lastSecondWatched = 0;
@@ -47,9 +38,10 @@ const VideoMixin = {
         this.pointsObj = {num: TopicTreeHelper.getPoints(this.props.topicTreeNode)};
     },
     componentWillUnmount: function() {
-        if (this.state.downloadedUrl) {
-            Util.log("Revoking: " + this.state.downloadedUrl);
-            window.URL.revokeObjectURL(this.state.downloadedUrl);
+        var downloadedUrl = this.props.tempStore.getIn(["video", "downloadedUrl"]);
+        if (downloadedUrl) {
+            Util.log("Revoking: " + downloadedUrl);
+            window.URL.revokeObjectURL(downloadedUrl);
         }
         var video = this._getVideoDOMNode();
         if (video) {
@@ -75,11 +67,6 @@ const VideoMixin = {
         }
         this.cleanedUp = true;
     },
-    getInitialState: function() {
-        return {
-            showOfflineImage: false
-        };
-    },
     _canPlayHTML5: function() {
         var video = this._getVideoDOMNode();
         if (video && this.initSecondWatched) {
@@ -87,9 +74,14 @@ const VideoMixin = {
             Util.log("set current time to: " + video.currentTime);
             delete this.initSecondWatched;
         }
-        if (this.state.showOfflineImage) {
+
+
+        if (this.props.tempStore.getIn(["video", "showOfflineImage"])) {
             this.stopAnimatingPoints(false);
-            this.setState({showOfflineImage: false});
+            const editVideo= editorForPath(this.props.statics.editTempStore, "video");
+            editVideo((video) => (video || Immutable.fromJS({})).merge({
+                showOfflineImage: false,
+            }));
         }
     },
     _onPlay: function(e: any) {
@@ -138,8 +130,12 @@ const VideoMixin = {
         if (video && video.networkState === window.HTMLMediaElement.NETWORK_NO_SOURCE) {
             Util.log("Video has no source.", e);
             this.stopAnimatingPoints(false);
-            if (!this.state.downloadedUrl && !this.cleanedUp) {
-                this.setState({showOfflineImage: true});
+            var downloadedUrl = tempStore.getIn(["video", "downloadedUrl"]);
+            if (!downloadedUrl && !this.cleanedUp) {
+                const editVideo= editorForPath(this.props.statics.editTempStore, "video");
+                editVideo((video) => (video || Immutable.fromJS({})).merge({
+                    showOfflineImage: true,
+                }));
             }
         }
 
@@ -341,8 +337,9 @@ var VideoViewer = component(VideoMixin, function({tempStore, topicTreeNode, doma
     }
 
     this.videoSrc = TopicTreeHelper.getDownloadUrl(topicTreeNode);
-    if (this.state.downloadedUrl) {
-        this.videoSrc = this.state.downloadedUrl;
+    var downloadedUrl = tempStore.getIn(["video", "downloadedUrl"]);
+    if (downloadedUrl) {
+        this.videoSrc = downloadedUrl;
     }
     Util.log("video rendered with url: " + this.videoSrc);
     var pointsString = l10n.get("points-so-far", {
@@ -367,7 +364,7 @@ var VideoViewer = component(VideoMixin, function({tempStore, topicTreeNode, doma
     this.videoClass = classNames(videoClassObj);
 
     var control;
-    if (this.state.showOfflineImage) {
+    if (tempStore.getIn(["video", "showOfflineImage"])) {
         control = <div className="video-placeholder" onClick={onReloadVideo}/>;
     } else {
         control = <div className={this.videoClass} ref="videoPlaceholder" id="video-placeholder"/>;
