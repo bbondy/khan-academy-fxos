@@ -38,7 +38,7 @@ const VideoMixin = {
         this.pointsObj = {num: TopicTreeHelper.getPoints(this.props.topicTreeNode)};
     },
     componentWillUnmount: function() {
-        var downloadedUrl = this.props.tempStore.getIn(["video", "downloadedUrl"]);
+        var downloadedUrl = this.props.videoStore.get("video");
         if (downloadedUrl) {
             Util.log("Revoking: " + downloadedUrl);
             window.URL.revokeObjectURL(downloadedUrl);
@@ -76,7 +76,7 @@ const VideoMixin = {
         }
 
 
-        if (this.props.tempStore.getIn(["video", "showOfflineImage"])) {
+        if (this.props.videoStore.get("showOfflineImage")) {
             this.stopAnimatingPoints(false);
             this.props.statics.editVideo((video) => video.merge({
                 showOfflineImage: false,
@@ -129,7 +129,7 @@ const VideoMixin = {
         if (video && video.networkState === window.HTMLMediaElement.NETWORK_NO_SOURCE) {
             Util.log("Video has no source.", e);
             this.stopAnimatingPoints(false);
-            var downloadedUrl = tempStore.getIn(["video", "downloadedUrl"]);
+            var downloadedUrl = videoStore.get("downloadedUrl");
             if (!downloadedUrl && !this.cleanedUp) {
                 this.props.statics.editVideo((video) => video.merge({
                     showOfflineImage: true,
@@ -307,7 +307,7 @@ const VideoMixin = {
     },
 };
 
-var VideoViewer = component(VideoMixin, function({tempStore, topicTreeNode, domainTopicTreeNode}) {
+var VideoViewer = component(VideoMixin, function({videoStore, topicTreeNode, domainTopicTreeNode}) {
     const onClickTranscript = (obj) => {
         var startSecond = obj.get("start_time") / 1000 | 0;
         var video = this._getVideoDOMNode();
@@ -326,7 +326,7 @@ var VideoViewer = component(VideoMixin, function({tempStore, topicTreeNode, doma
     };
 
     var transcriptViewer;
-    var transcript = tempStore.getIn(["video", "transcript"]);
+    var transcript = videoStore.get("transcript");
     if (transcript) {
         transcriptViewer = <TranscriptViewer collection={transcript}
                                              statics={{
@@ -335,7 +335,7 @@ var VideoViewer = component(VideoMixin, function({tempStore, topicTreeNode, doma
     }
 
     this.videoSrc = TopicTreeHelper.getDownloadUrl(topicTreeNode);
-    var downloadedUrl = tempStore.getIn(["video", "downloadedUrl"]);
+    var downloadedUrl = videoStore.get("downloadedUrl");
     if (downloadedUrl) {
         this.videoSrc = downloadedUrl;
     }
@@ -362,7 +362,7 @@ var VideoViewer = component(VideoMixin, function({tempStore, topicTreeNode, doma
     this.videoClass = classNames(videoClassObj);
 
     var control;
-    if (tempStore.getIn(["video", "showOfflineImage"])) {
+    if (videoStore.get("showOfflineImage")) {
         control = <div className="video-placeholder" onClick={onReloadVideo}/>;
     } else {
         control = <div className={this.videoClass} ref="videoPlaceholder" id="video-placeholder"/>;

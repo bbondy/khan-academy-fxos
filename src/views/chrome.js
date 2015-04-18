@@ -296,7 +296,7 @@ const MainView = component(({navInfo, options, tempStore}, {edit}) => {
     } else if (TopicTreeHelper.isVideo(navInfo.get("topicTreeNode"))) {
         control = <VideoViewer topicTreeNode={navInfo.get("topicTreeNode")}
                                domainTopicTreeNode={navInfo.get("domainTopicTreeNode")}
-                               tempStore={tempStore}
+                               videoStore={tempStore.get("video")}
                                options={options}
                                statics={{
                                    editVideo,
