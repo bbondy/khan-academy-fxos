@@ -7,11 +7,11 @@ const $ = require("jquery"),
     React = require("react"),
     classNames = require("classnames"),
     Util = require("../util"),
-    models = require("../models"),
     APIClient = require("../apiclient"),
     component = require("omniscient"),
     TopicTreeHelper = require("../data/topic-tree-helper"),
     {TranscriptViewer} = require("./transcript.js"),
+    {isSignedIn, reportVideoProgress} = require("../user"),
     Storage = require("../storage");
 
 const minSecondsBetweenReports = 10;
@@ -253,7 +253,7 @@ const VideoMixin = {
         // This was sometimes happening after the video was complete,
         // and new progress responses were received.
         if (!this.isPlaying ||
-                !models.CurrentUser.isSignedIn()) {
+                !isSignedIn()) {
             return;
         }
 
@@ -280,7 +280,7 @@ const VideoMixin = {
     // Reports the seconds watched to the server if it hasn't been reported recently
     // or if the lastSecondWatched is at the end of the video.
     reportSecondsWatched: function(currentTime: Date, duration: number) {
-        if (!models.CurrentUser.isSignedIn()) {
+        if (!isSignedIn()) {
             return;
         }
 
@@ -291,8 +291,8 @@ const VideoMixin = {
         var secondsSinceLastReport = (currentTime.getTime() - this.lastReportedTime.getTime()) / 1000;
         if (secondsSinceLastReport >= minSecondsBetweenReports || this.lastSecondWatched >= (duration | 0)) {
             this.lastReportedTime = new Date();
-            models.CurrentUser.reportVideoProgress(this.props.topicTreeNode,
-                    TopicTreeHelper.getYoutubeId(this.props.topicTreeNode),
+            reportVideoProgress(this.props.topicTreeNode,
+                    this.props.statics.editVideo,
                     this.secondsWatched,
                     this.lastSecondWatched).then(() => {
                         // We could just add a backbone model to watch for video model
@@ -346,7 +346,7 @@ var VideoViewer = component(VideoMixin, function({videoStore, topicTreeNode, dom
     });
 
     var pointsDiv;
-    if (models.CurrentUser.isSignedIn()) {
+    if (isSignedIn()) {
         pointsDiv = <div className="energy-points energy-points-video">{pointsString}</div>;
     }
 
@@ -354,7 +354,7 @@ var VideoViewer = component(VideoMixin, function({videoStore, topicTreeNode, dom
       "video-has-transcript": !!transcript,
       "video-js": true,
       "vjs-default-skin": true,
-      "signed-in": models.CurrentUser.isSignedIn()
+      "signed-in": isSignedIn()
     };
     if (domainTopicTreeNode) {
         videoClassObj[TopicTreeHelper.getId(domainTopicTreeNode)] = true;
