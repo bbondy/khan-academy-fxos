@@ -1,5 +1,5 @@
 const APIClient = require("./apiclient"),
-    {getId, getDuration, getPoints, getYoutubeId} = require("./data/topic-tree-helper")
+    {getId, getDuration, getPoints, getYoutubeId} = require("./data/topic-tree-helper");
 
 const userInfoLocalStorageName = "userInfo-3";
 

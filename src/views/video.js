@@ -2,8 +2,8 @@
 
 "use strict";
 
-const $ = require("jquery"),
-    l10n = require("../l10n"),
+const l10n = require("../l10n"),
+    $ = require("jquery"),
     React = require("react"),
     classNames = require("classnames"),
     Util = require("../util"),
@@ -11,8 +11,7 @@ const $ = require("jquery"),
     component = require("omniscient"),
     TopicTreeHelper = require("../data/topic-tree-helper"),
     {TranscriptViewer} = require("./transcript.js"),
-    {isSignedIn, reportVideoProgress} = require("../user"),
-    Storage = require("../storage");
+    {isSignedIn, reportVideoProgress} = require("../user");
 
 const minSecondsBetweenReports = 10;
 
