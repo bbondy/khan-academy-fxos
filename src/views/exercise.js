@@ -168,6 +168,17 @@ const ExerciseMixin = {
     },
 };
 
+const hasFiveSuccess = (exerciseStore) => {
+    var taskAttemptHistory = exerciseStore.get("taskAttemptHistory");
+    if (!taskAttemptHistory) {
+        return 0;
+    }
+    taskAttemptHistory = taskAttemptHistory.slice(-5);
+    return _.reduce(taskAttemptHistory.toJS(), (total, task) => {
+        return total + task.correct && !task.seen_hint ? 1 : 0;
+    }, 0) === 5;
+};
+
 const ExerciseViewer = component(ExerciseMixin, function({topicTreeNode, exerciseStore}) {
     var content;
     if (exerciseStore.get("error")) {
@@ -175,7 +186,7 @@ const ExerciseViewer = component(ExerciseMixin, function({topicTreeNode, exercis
     } else if (isKhanExercisesExercise(topicTreeNode)) {
         var path = `/khan-exercises/exercises/${getFilename(toipcTreeNode)}`;
         content = <iframe src={path}/>;
-    } else if (exerciseStore.get("taskComplete")) {
+    } else if (exerciseStore.get("taskComplete") && hasFiveSuccess(exerciseStore)) {
         content = <TaskCompleteView level={exerciseStore.get("level")} mastered={exerciseStore.get("mastered")} />;
     } else if (this.ItemRenderer && exerciseStore.get("perseusItemData")) {
         var showHintsButton = exerciseStore.get("perseusItemData").get("hints").length > (exerciseStore.get("hintsUsed") || 0);
