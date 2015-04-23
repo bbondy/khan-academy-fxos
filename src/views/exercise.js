@@ -64,7 +64,6 @@ const ExerciseMixin = {
         });
     },
     refreshRandomAssessment: function() {
-
         // Pick a random problem type:
         var problemTypes = this.exercise.problem_types;
         var randomProblemTypeGroupIndex = Math.floor(Math.random() * problemTypes.length);
@@ -112,13 +111,15 @@ const ExerciseMixin = {
         var secondsTaken = 10; //TODO
         var hintsUsed = this.props.exerciseStore.get("hintsUsed") || 0;
         APIClient.reportExerciseProgress(getName(this.props.topicTreeNode), this.props.exerciseStore.get("problemNumber"),
+
             this.randomAssessmentSHA1, this.randomAssessmentId,
             secondsTaken, hintsUsed, isCorrect,
             attemptNumber, this.problemTypeName, this.props.exerciseStore.get("taskId")).then(() => {
                 if (isCorrect) {
                     // If we have another correct and we already have 4 correct,
                     // then show task complete view.
-                    if (this.props.exerciseStore.get("streak") >= 4 && hintsUsed === 0) {
+                    if (this.props.exerciseStore.get("streak") >= 4 &&
+                            hintsUsed === 0 && getNumSuccessful(this.props.exerciseStore) === 4) {
                         this.props.statics.editExercise((exercise) =>
                             exercise.merge({
                                 taskComplete: true
@@ -168,15 +169,15 @@ const ExerciseMixin = {
     },
 };
 
-const hasFiveSuccess = (exerciseStore) => {
+const getNumSuccessful = (exerciseStore) => {
     var taskAttemptHistory = exerciseStore.get("taskAttemptHistory");
     if (!taskAttemptHistory) {
         return 0;
     }
     taskAttemptHistory = taskAttemptHistory.slice(-5);
     return _.reduce(taskAttemptHistory.toJS(), (total, task) => {
-        return total + task.correct && !task.seen_hint ? 1 : 0;
-    }, 0) === 5;
+        return total + ((task.correct && !task.seen_hint) ? 1 : 0);
+    }, 0);
 };
 
 const ExerciseViewer = component(ExerciseMixin, function({topicTreeNode, exerciseStore}) {
@@ -186,7 +187,7 @@ const ExerciseViewer = component(ExerciseMixin, function({topicTreeNode, exercis
     } else if (isKhanExercisesExercise(topicTreeNode)) {
         var path = `/khan-exercises/exercises/${getFilename(toipcTreeNode)}`;
         content = <iframe src={path}/>;
-    } else if (exerciseStore.get("taskComplete") && hasFiveSuccess(exerciseStore)) {
+    } else if (exerciseStore.get("taskComplete")) {
         content = <TaskCompleteView level={exerciseStore.get("level")} mastered={exerciseStore.get("mastered")} />;
     } else if (this.ItemRenderer && exerciseStore.get("perseusItemData")) {
         var showHintsButton = exerciseStore.get("perseusItemData").get("hints").length > (exerciseStore.get("hintsUsed") || 0);
