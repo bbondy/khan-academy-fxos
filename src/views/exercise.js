@@ -18,6 +18,7 @@ const React = require("react"),
     {getName, getFilename, isPerseusExercise, isKhanExercisesExercise} = require("../data/topic-tree-helper"),
     component = require("omniscient"),
     $ = require("jquery"),
+    {isSignedIn} = require("../user"),
     _ = require("underscore");
 
 window.Exercises = {
@@ -40,23 +41,25 @@ const TaskCompleteView = component(({level}) =>
  */
 const ExerciseMixin = {
     refreshUserExerciseInfo: function() {
+        var promises = [APIClient.getTaskInfoByExerciseName(getName(this.props.topicTreeNode))];
+        if (isSignedIn()) {
+            promises.push(APIClient.getUserExercise(getName(this.props.topicTreeNode)));
+        }
         return new Promise((resolve, reject) => {
-            Promise.all([APIClient.getTaskInfoByExerciseName(getName(this.props.topicTreeNode)),
-                    APIClient.getUserExercise(getName(this.props.topicTreeNode))])
-            .then((result) => {
+            Promise.all(promises).then((result) => {
                 const taskInfo = result[0];
                 const exerciseInfo = result[1];
                 Util.log("getTaskInfoByExerciseName: %o", taskInfo);
                 Util.log("getUserExercise: %o", exerciseInfo);
                 resolve({
-                    level: exerciseInfo.exercise_progress && exerciseInfo.exercise_progress.level,
-                    mastered: exerciseInfo.exercise_progress && exerciseInfo.exercise_progress.mastered,
-                    practiced: exerciseInfo.exercise_progress && exerciseInfo.exercise_progress.practiced,
-                    problemNumber: exerciseInfo.total_done + 1,
-                    streak: exerciseInfo.streak,
+                    level: exerciseInfo && exerciseInfo.exercise_progress && exerciseInfo.exercise_progress.level,
+                    mastered: exerciseInfo && exerciseInfo.exercise_progress && exerciseInfo.exercise_progress.mastered,
+                    practiced: exerciseInfo && exerciseInfo.exercise_progress && exerciseInfo.exercise_progress.practiced,
+                    problemNumber: exerciseInfo && (exerciseInfo.total_done + 1) || 1,
+                    streak: exerciseInfo && exerciseInfo.streak,
                     taskId: taskInfo.id,
                     taskAttemptHistory: taskInfo.task_attempt_history,
-                    longestStreak: exerciseInfo.longest_streak
+                    longestStreak: exerciseInfo && exerciseInfo.longest_streak
                 });
             }).catch((e) => {
                 reject();
