@@ -49,6 +49,7 @@ const ExerciseMixin = {
             Promise.all(promises).then((result) => {
                 const taskInfo = result[0];
                 const exerciseInfo = result[1];
+                this.startTime = new Date().getTime();
                 Util.log("getTaskInfoByExerciseName: %o", taskInfo);
                 Util.log("getUserExercise: %o", exerciseInfo);
                 resolve({
@@ -80,7 +81,7 @@ const ExerciseMixin = {
 
         return Promise.all([this.refreshUserExerciseInfo(),
             APIClient.getAssessmentItem(this.randomAssessmentId)]).then((results) => {
-                this.startTime = new Date().getTime();
+                this.attemptNumber = 0;
                 var userExerciseInfo = results[0],
                     assessmentItem = results[1];
                 var assessment = JSON.parse(assessmentItem.item_data);
@@ -111,9 +112,7 @@ const ExerciseMixin = {
         var score = this.refs.itemRenderer.scoreInput();
         Util.log("score: %o", score);
         var secondsTaken = (new Date().getTime() - this.startTime) / 1000 | 0;
-        console.log("secondsTaken: ", secondsTaken);
-        console.log(secondsTaken);
-        var attemptNumber = 1; // TODO
+        var attemptNumber = ++this.attemptNumber;
         var isCorrect = score.correct;
         var hintsUsed = this.props.exerciseStore.get("hintsUsed") || 0;
         APIClient.reportExerciseProgress(getName(this.props.topicTreeNode), this.props.exerciseStore.get("problemNumber"),
@@ -136,7 +135,7 @@ const ExerciseMixin = {
                     this.refreshRandomAssessment();
                 } else {
                     // Refresh attempt info so it shows up as wrong
-                    this.refreshUserExerciseInfo().then(this.forceUpdate.bind(this));
+                    this.refreshUserExerciseInfo();
                 }
             });
     },
