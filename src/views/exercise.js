@@ -80,6 +80,7 @@ const ExerciseMixin = {
 
         return Promise.all([this.refreshUserExerciseInfo(),
             APIClient.getAssessmentItem(this.randomAssessmentId)]).then((results) => {
+                this.startTime = new Date().getTime();
                 var userExerciseInfo = results[0],
                     assessmentItem = results[1];
                 var assessment = JSON.parse(assessmentItem.item_data);
@@ -109,9 +110,11 @@ const ExerciseMixin = {
     onClickSubmitAnswer: function() {
         var score = this.refs.itemRenderer.scoreInput();
         Util.log("score: %o", score);
+        var secondsTaken = (new Date().getTime() - this.startTime) / 1000 | 0;
+        console.log("secondsTaken: ", secondsTaken);
+        console.log(secondsTaken);
         var attemptNumber = 1; // TODO
         var isCorrect = score.correct;
-        var secondsTaken = 10; //TODO
         var hintsUsed = this.props.exerciseStore.get("hintsUsed") || 0;
         APIClient.reportExerciseProgress(getName(this.props.topicTreeNode), this.props.exerciseStore.get("problemNumber"),
 
