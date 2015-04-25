@@ -27,10 +27,16 @@ window.Exercises = {
 
 const TaskCompleteView = component(({level}) =>
     <div>
-        <h1>You did it!</h1>
-        <p>Level: {level}</p>
+        <h1 data-l10n-id="you-did-it">You did it!</h1>
+        <p>
+        {
+            l10n.get("level-indicator", {
+                level: level
+            })
+        }
+        </p>
         { level !== "mastered" &&
-            <p>To level up more, you need to do mastery challenges.</p>
+            <p data-l10n-id="level-up-info">To level up more, you need to do mastery challenges.</p>
         }
     </div>
 ).jsx;
