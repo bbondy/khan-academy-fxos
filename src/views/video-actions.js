@@ -1,7 +1,7 @@
-const {isVideo, getId, getYoutubeId, isDownloaded} = require("../data/topic-tree-helper"),
-    Immutable = require("immutable");
+import {isVideo, getId, getYoutubeId, isDownloaded} from "../data/topic-tree-helper";
+import Immutable from "immutable";
 
-const loadTranscriptIfVideo = (options, editVideo) => (topicTreeNode) => {
+export const loadTranscriptIfVideo = (options, editVideo) => (topicTreeNode) => {
     if (!isVideo(topicTreeNode)) {
         return topicTreeNode;
     }
@@ -23,7 +23,7 @@ const loadTranscriptIfVideo = (options, editVideo) => (topicTreeNode) => {
     return topicTreeNode;
 };
 
-const loadVideoIfDownloadedVideo = (editVideo) => (topicTreeNode) => {
+export const loadVideoIfDownloadedVideo = (editVideo) => (topicTreeNode) => {
     if (!isVideo(topicTreeNode)) {
         return topicTreeNode;
     }
@@ -41,9 +41,4 @@ const loadVideoIfDownloadedVideo = (editVideo) => (topicTreeNode) => {
     });
 
     return topicTreeNode;
-};
-
-module.exports = {
-    loadTranscriptIfVideo,
-    loadVideoIfDownloadedVideo,
 };

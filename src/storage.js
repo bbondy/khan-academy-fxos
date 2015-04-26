@@ -2,7 +2,7 @@
 
 "use strict";
 
-const Util = require("./util");
+import Util from "./util";
 
 const Storage = {
     /**
@@ -121,4 +121,4 @@ const Storage = {
     }
 };
 
-module.exports = Storage;
+export default Storage;

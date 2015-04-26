@@ -1,10 +1,10 @@
-const APIClient = require("./apiclient"),
-    {getId, getDuration, getPoints, getYoutubeId} = require("./data/topic-tree-helper");
+import APIClient from "./apiclient";
+import {getId, getDuration, getPoints, getYoutubeId} from "./data/topic-tree-helper";
 
 const userInfoLocalStorageName = "userInfo-3";
 
-const signIn = () => APIClient.signIn();
-const signOut = () => {
+export const signIn = () => APIClient.signIn();
+export const signOut = () => {
     // Unbind user specific data from the topic tree
     // TODO
     /*
@@ -20,10 +20,10 @@ const signOut = () => {
     return APIClient.signOut();
 };
 
-const isSignedIn = () =>
+export const isSignedIn = () =>
     APIClient.isSignedIn();
 
-const reportVideoProgress = (topicTreeCursor, editVideo, secondsWatched, lastSecondWatched) => {
+export const reportVideoProgress = (topicTreeCursor, editVideo, secondsWatched, lastSecondWatched) => {
     return new Promise((resolve, reject) => {
         var youTubeId = getYoutubeId(topicTreeCursor);
         var videoId = getId(topicTreeCursor);
@@ -119,11 +119,4 @@ const reportVideoProgress = (topicTreeCursor, editVideo, secondsWatched, lastSec
             reject();
         });
     });
-};
-
-module.exports = {
-    signIn,
-    signOut,
-    isSignedIn,
-    reportVideoProgress,
 };

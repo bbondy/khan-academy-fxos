@@ -2,38 +2,32 @@
 
 "use strict";
 
-const $ = require("jquery"),
-    _ = require("underscore"),
-    l10n = require("../l10n"),
-    classNames = require("classnames"),
-    Util = require("../util"),
-    React = require("react"),
-    models = require("../models"),
-    ChromeActions = require("./chrome-actions"),
-    Storage = require("../storage"),
-    Downloads = require("../downloads"),
-    videoViews = require("./video"),
-    articleViews = require("./article"),
-    {loadIfArticle} = require("./article-actions"),
-    {loadTranscriptIfVideo, loadVideoIfDownloadedVideo} = require("./video-actions"),
-    {editorForPath} = require("../renderer"),
-    exerciseViews = require("./exercise"),
-    topicViews = require("./topic"),
-    searchViews = require("./search"),
-    paneViews = require("./pane"),
-    component = require("omniscient"),
-    TopicTreeHelper = require("../data/topic-tree-helper"),
-    { isPaneShowing } = require("../data/nav-info");
-
-const VideoViewer = videoViews.VideoViewer,
-    ArticleViewer = articleViews.ArticleViewer,
-    ExerciseViewer = exerciseViews.ExerciseViewer,
-    TopicViewer = topicViews.TopicViewer,
-    TopicSearch = searchViews.TopicSearch,
-    SearchResultsViewer = searchViews.SearchResultsViewer,
-    DownloadsViewer = paneViews.DownloadsViewer,
-    SettingsViewer = paneViews.SettingsViewer,
-    ProfileViewer = paneViews.ProfileViewer;
+import $ from "jquery";
+import _ from "underscore";
+import l10n from "../l10n";
+import classNames from "classnames";
+import Util from "../util";
+import React from "react";
+import {TempAppState, CurrentUser} from "../models";
+import {onClickBack, onClickTopic, onClickContentItemFromDownloads, onClickContentItem,
+    onClickSignin, onClickSignout, onClickProfile, onClickDownloads, onClickSettings,
+    onClickSupport, onClickDownloadContent, onClickViewOnKA, onClickShare, onTopicSearch,
+    onClickCancelDownloadContent, onClickDeleteDownloadedContent} from "./chrome-actions";
+import Storage from "../storage";
+import Downloads from "../downloads";
+import {VideoViewer} from "./video";
+import {ArticleViewer} from "./article";
+import {loadIfArticle} from "./article-actions";
+import {loadTranscriptIfVideo, loadVideoIfDownloadedVideo} from "./video-actions";
+import {editorForPath} from "../renderer";
+import {ExerciseViewer} from "./exercise";
+import {TopicViewer} from "./topic";
+import {TopicSearch, SearchResultsViewer} from "./search";
+import {DownloadsViewer, SettingsViewer, ProfileViewer} from "./pane";
+import component from "omniscient";
+import {isContent, isTopic, getKey, getTitle, isContentList, getId, isVideo,
+    isDownloaded, getKAUrl, isArticle, isExercise} from "../data/topic-tree-helper";
+import {isPaneShowing} from "../data/nav-info";
 
 /**
  * Represents the back button which is found on the top left of the header
@@ -41,7 +35,7 @@ const VideoViewer = videoViews.VideoViewer,
  * In general, when clicked it will take the user to the last view they were
  * at before.
  */
-const BackButton = component((prop, {onClickBack}) =>
+export const BackButton = component((prop, {onClickBack}) =>
     <div>
         <a className="icon-back-link " href="javascript:void(0)" onClick={onClickBack}>
             <span className="icon icon-back">Back</span>
@@ -54,7 +48,7 @@ const BackButton = component((prop, {onClickBack}) =>
  * on all screens.
  * When clicked it will expand a drawer with context sensitive options.
  */
-const MenuButton = component(() =>
+export const MenuButton = component(() =>
     <div>
         <menu type="toolbar" className="icon-menu-link ">
             <a href="#main-content">
@@ -68,15 +62,15 @@ const MenuButton = component(() =>
  * Represents the app header, it contains the back button, the menu button,
  * and a title.
  */
-const AppHeader = component((props, {onClickBack}) => {
+export const AppHeader = component((props, {onClickBack}) => {
     var backButton;
     var topicTreeNode = props.topicTreeNode;
     if (topicTreeNode &&
             (props.isPaneShowing ||
-                TopicTreeHelper.isContent(topicTreeNode) ||
-                TopicTreeHelper.isTopic(topicTreeNode) &&
-            TopicTreeHelper.getKey(props.rootTopicTreeNode) !== TopicTreeHelper.getKey(topicTreeNode)) ||
-            TopicTreeHelper.isContentList(topicTreeNode) ||
+                isContent(topicTreeNode) ||
+                isTopic(topicTreeNode) &&
+            getKey(props.rootTopicTreeNode) !== getKey(topicTreeNode)) ||
+            isContentList(topicTreeNode) ||
             !!props.searchResults) {
         backButton = <BackButton statics={{
                                      onClickBack,
@@ -87,12 +81,12 @@ const AppHeader = component((props, {onClickBack}) => {
     var styleObj = {
         fixed: true,
         "topic-header": topicTreeNode &&
-            TopicTreeHelper.getKey(topicTreeNode) !== TopicTreeHelper.getKey(props.rootTopicTreeNode) &&
+            getKey(topicTreeNode) !== getKey(props.rootTopicTreeNode) &&
             !props.isPaneShowing &&
-            (TopicTreeHelper.isTopic(topicTreeNode) || TopicTreeHelper.isContent(topicTreeNode))
+            (isTopic(topicTreeNode) || isContent(topicTreeNode))
     };
     if (props.domainTopicTreeNode && !props.isPaneShowing) {
-        styleObj[TopicTreeHelper.getId(props.domainTopicTreeNode)] = true;
+        styleObj[getId(props.domainTopicTreeNode)] = true;
     }
     var styleClass = classNames(styleObj);
 
@@ -103,9 +97,9 @@ const AppHeader = component((props, {onClickBack}) => {
         title = l10n.get("view-profile");
     } else if (props.isSettingsShowing) {
         title = l10n.get("view-settings");
-    } else if (topicTreeNode && TopicTreeHelper.getTitle(topicTreeNode)) {
-        title = TopicTreeHelper.getTitle(topicTreeNode);
-    } else if (topicTreeNode && TopicTreeHelper.isContentList(topicTreeNode)) {
+    } else if (topicTreeNode && getTitle(topicTreeNode)) {
+        title = getTitle(topicTreeNode);
+    } else if (topicTreeNode && isContentList(topicTreeNode)) {
         title = l10n.get("search");
     }
 
@@ -121,8 +115,8 @@ const AppHeader = component((props, {onClickBack}) => {
         </header>;
 }).jsx;
 
-const StatusBarViewer = component((props, {onClickCancelDownloadContent}) => {
-    if (!models.TempAppState.get("status")) {
+export const StatusBarViewer = component((props, {onClickCancelDownloadContent}) => {
+    if (!TempAppState.get("status")) {
         return <div/>;
     }
     var cancelButton;
@@ -131,7 +125,7 @@ const StatusBarViewer = component((props, {onClickCancelDownloadContent}) => {
     }
 
     return <div className="status-bar">
-        {models.TempAppState.get("status")}
+        {TempAppState.get("status")}
         {cancelButton}
     </div>;
 }).jsx;
@@ -140,23 +134,23 @@ const StatusBarViewer = component((props, {onClickCancelDownloadContent}) => {
  * Represents the sidebar drawer.
  * The sidebar drawer comes up when you click on the menu from the top header.
  */
-const Sidebar = component((props, statics) => {
+export const Sidebar = component((props, statics) => {
     var items = [];
 
     ////////////////////
     // Context sensitive actions first
     if (Storage.isEnabled()) {
         if (!props.isPaneShowing &&
-                props.topicTreeNode && TopicTreeHelper.isContent(props.topicTreeNode)) {
-            if (TopicTreeHelper.isDownloaded(props.topicTreeNode)) {
-                var text = l10n.get(TopicTreeHelper.isVideo(props.topicTreeNode) ? "delete-downloaded-video" : "delete-downloaded-article");
+                props.topicTreeNode && isContent(props.topicTreeNode)) {
+            if (isDownloaded(props.topicTreeNode)) {
+                var text = l10n.get(isVideo(props.topicTreeNode) ? "delete-downloaded-video" : "delete-downloaded-article");
                 items.push(<li key="delete-downloaded-video" className="hot-item">
                         <a href="#" onClick={statics.onClickDeleteDownloadedContent}>{{text}}</a>
                     </li>);
             } else {
-                var text = l10n.get(TopicTreeHelper.isVideo(props.topicTreeNode) ? "download-video" : "download-article");
+                var text = l10n.get(isVideo(props.topicTreeNode) ? "download-video" : "download-article");
                 items.push(<li key="download-video" className="hot-item">
-                        <a href="#" className={TopicTreeHelper.isVideo(props.topicTreeNode) ? "download-video-link" : "download-article-link"} onClick={statics.onClickDownloadContent}>{{text}}</a>
+                        <a href="#" className={isVideo(props.topicTreeNode) ? "download-video-link" : "download-article-link"} onClick={statics.onClickDownloadContent}>{{text}}</a>
                     </li>);
             }
         }
@@ -164,8 +158,8 @@ const Sidebar = component((props, statics) => {
 
     if (!props.isPaneShowing &&
             props.topicTreeNode &&
-            TopicTreeHelper.isContent(props.topicTreeNode) &&
-            TopicTreeHelper.getKAUrl(props.topicTreeNode)) {
+            isContent(props.topicTreeNode) &&
+            getKAUrl(props.topicTreeNode)) {
         var viewOnKAMessage = l10n.get("open-in-website");
         items.push(<li key="open-in-website"><a href="#" className="open-in-website-link" onClick={statics.onClickViewOnKA}>{{viewOnKAMessage}}</a></li>);
 
@@ -181,7 +175,7 @@ const Sidebar = component((props, statics) => {
                     <a href="#" data-l10n-id="cancel-downloading" onClick={statics.onClickCancelDownloadContent}>Cancel Downloading</a>
                 </li>);
         } else if (!props.isPaneShowing &&
-                    props.topicTreeNode && TopicTreeHelper.isTopic(props.topicTreeNode)) {
+                    props.topicTreeNode && isTopic(props.topicTreeNode)) {
             items.push(<li key="download-topic" className="hot-item">
                     <a href="#" data-l10n-id="download-topic" onClick={statics.onClickDownloadContent}>Download Topic</a>
                 </li>);
@@ -190,14 +184,14 @@ const Sidebar = component((props, statics) => {
 
     ////////////////////
     // Followed by sign in
-    if (!models.CurrentUser.isSignedIn()) {
+    if (!CurrentUser.isSignedIn()) {
         // If the user is not signed in, add that option first
         items.push(<li key="sign-in"><a data-l10n-id="sign-in" href="#" onClick={statics.onClickSignin}>Sign In</a></li>);
     }
 
     ////////////////////
     // Followed by view pane items
-    if (models.CurrentUser.isSignedIn() && !props.isProfileShowing) {
+    if (CurrentUser.isSignedIn() && !props.isProfileShowing) {
         // User is signed in, add all the signed in options here
         items.push(<li key="view-profile"><a  data-l10n-id="view-profile" className="view-profile-link" href="#" onClick={statics.onClickProfile}>View Profile</a></li>);
     }
@@ -211,7 +205,7 @@ const Sidebar = component((props, statics) => {
     items.push(<li key="open-support"><a data-l10n-id="open-support" className="open-support-link" href="#" onClick={statics.onClickSupport}>Open support website</a></li>);
 
     // Add the signout button last
-    if (models.CurrentUser.isSignedIn()) {
+    if (CurrentUser.isSignedIn()) {
         items.push(<li key="sign-out"><a data-l10n-id="sign-out" href="#" onClick={statics.onClickSignout}>Sign Out</a></li>);
     }
 
@@ -237,17 +231,10 @@ const Sidebar = component((props, statics) => {
  * things when certain page actions change.  No other part of the code is repsonsible
  * for the overall top level view (which is nice and clean ;)).
  */
-const MainView = component(({navInfo, options, tempStore}, {edit}) => {
-    //mixins: [Util.LocalizationMixin],
-    //mixins: [Util.BackboneMixin, Util.LocalizationMixin],
-    //getBackboneModels: function(): Array<any> {
-    //    return [new models.ContentList(models.TopicTree.allContentItems),
-    //        models.AppOptions, models.TempAppState, models.CurrentUser];
-    //},
-
+export const MainView = component(({navInfo, options, tempStore}, {edit}) => {
     // Make sure scrollTop is at the top of the page
     // This is in case the search box scrolling doesn't get an onblur
-    if (navInfo.get("topicTreeNode") && !TopicTreeHelper.isContentList(navInfo.get("topicTreeNode"))) {
+    if (navInfo.get("topicTreeNode") && !isContentList(navInfo.get("topicTreeNode"))) {
         $("html, body").scrollTop(0);
     }
 
@@ -266,7 +253,7 @@ const MainView = component(({navInfo, options, tempStore}, {edit}) => {
         control = <ProfileViewer/>;
     } else if (navInfo.get("showDownloads")) {
         control = <DownloadsViewer statics={{
-                                       onClickContentItem: ChromeActions.onClickContentItemFromDownloads(editNavInfo)
+                                       onClickContentItem: onClickContentItemFromDownloads(editNavInfo)
                                    }}
                                    options={options}/>;
     } else if (navInfo.get("showSettings")) {
@@ -278,22 +265,22 @@ const MainView = component(({navInfo, options, tempStore}, {edit}) => {
         control = <SearchResultsViewer collection={navInfo.get("searchResults")}
                                        options={options}
                                        statics={{
-                                           onClickContentItem: ChromeActions.onClickContentItem(editNavInfo),
+                                           onClickContentItem: onClickContentItem(editNavInfo),
                                        }}/>;
-    } else if (TopicTreeHelper.isTopic(navInfo.get("topicTreeNode"))) {
-        var onClickContentItem = _.compose(
-            ChromeActions.onClickContentItem(editNavInfo),
+    } else if (isTopic(navInfo.get("topicTreeNode"))) {
+        var onClickContentItemComposed = _.compose(
+            onClickContentItem(editNavInfo),
             loadTranscriptIfVideo(options, editVideo),
             loadVideoIfDownloadedVideo(editVideo),
             loadIfArticle(editTempStore));
         control = <TopicViewer statics={{
-                                   onClickTopic: ChromeActions.onClickTopic(editNavInfo),
-                                   onClickContentItem,
+                                   onClickTopic: onClickTopic(editNavInfo),
+                                   onClickContentItem: onClickContentItemComposed,
                                }}
                                topicTreeNode={navInfo.get("topicTreeNode")}
                                domainTopicTreeNode={navInfo.get("domainTopicTreeNode")}
                                options={options}/>;
-    } else if (TopicTreeHelper.isVideo(navInfo.get("topicTreeNode"))) {
+    } else if (isVideo(navInfo.get("topicTreeNode"))) {
         control = <VideoViewer topicTreeNode={navInfo.get("topicTreeNode")}
                                domainTopicTreeNode={navInfo.get("domainTopicTreeNode")}
                                videoStore={tempStore.get("video")}
@@ -301,10 +288,10 @@ const MainView = component(({navInfo, options, tempStore}, {edit}) => {
                                statics={{
                                    editVideo,
                                }}/>;
-    } else if (TopicTreeHelper.isArticle(navInfo.get("topicTreeNode"))) {
+    } else if (isArticle(navInfo.get("topicTreeNode"))) {
         control = <ArticleViewer  topicTreeNode={navInfo.get("topicTreeNode")}
                                   tempStore={tempStore}/>;
-    } else if (TopicTreeHelper.isExercise(navInfo.get("topicTreeNode"))) {
+    } else if (isExercise(navInfo.get("topicTreeNode"))) {
         control = <ExerciseViewer  topicTreeNode={navInfo.get("topicTreeNode")}
                                    exerciseStore={tempStore.get("exercise")}
                                    statics={{
@@ -316,12 +303,12 @@ const MainView = component(({navInfo, options, tempStore}, {edit}) => {
 
     var topicSearch;
     if (!isPaneShowing(navInfo) && navInfo.get("topicTreeNode") &&
-            !TopicTreeHelper.isContent(navInfo.get("topicTreeNode"))) {
+            !isContent(navInfo.get("topicTreeNode"))) {
         topicSearch = <TopicSearch topicTreeNode={navInfo.get("topicTreeNode")}
                                    searchValue={tempStore.get("search")}
                                    navInfo={navInfo}
                                    statics={{
-                                       onTopicSearch: ChromeActions.onTopicSearch(navInfo, editNavInfo),
+                                       onTopicSearch: onTopicSearch(navInfo, editNavInfo),
                                        editSearch,
                                    }}/>;
     }
@@ -330,17 +317,17 @@ const MainView = component(({navInfo, options, tempStore}, {edit}) => {
     if (navInfo.get("topicTreeNode")) {
         sidebar = <Sidebar topicTreeNode={navInfo.get("topicTreeNode")}
                            statics={{
-                               onClickSignin: ChromeActions.onClickSignin,
-                               onClickSignout: ChromeActions.onClickSignout,
-                               onClickProfile: ChromeActions.onClickProfile(editNavInfo),
-                               onClickDownloads: ChromeActions.onClickDownloads(editNavInfo),
-                               onClickSettings: ChromeActions.onClickSettings(editNavInfo),
-                               onClickSupport: ChromeActions.onClickSupport,
-                               onClickDownloadContent: ChromeActions.onClickDownloadContent(navInfo.get("topicTreeNode")),
-                               onClickViewOnKA: ChromeActions.onClickViewOnKA(navInfo.get("topicTreeNode")),
-                               onClickShare: ChromeActions.onClickShare(navInfo.get("topicTreeNode")),
-                               onClickCancelDownloadContent: ChromeActions.onClickCancelDownloadContent,
-                               onClickDeleteDownloadedContent: ChromeActions.onClickDeleteDownloadedContent(navInfo.get("topicTreeNode")),
+                               onClickSignin: onClickSignin,
+                               onClickSignout: onClickSignout,
+                               onClickProfile: onClickProfile(editNavInfo),
+                               onClickDownloads: onClickDownloads(editNavInfo),
+                               onClickSettings: onClickSettings(editNavInfo),
+                               onClickSupport: onClickSupport,
+                               onClickDownloadContent: onClickDownloadContent(navInfo.get("topicTreeNode")),
+                               onClickViewOnKA: onClickViewOnKA(navInfo.get("topicTreeNode")),
+                               onClickShare: onClickShare(navInfo.get("topicTreeNode")),
+                               onClickCancelDownloadContent: onClickCancelDownloadContent,
+                               onClickDeleteDownloadedContent: onClickDeleteDownloadedContent(navInfo.get("topicTreeNode")),
                            }}
                            isPaneShowing={isPaneShowing(navInfo)}
                            isDownloadsShowing={navInfo.get("showDownloads")}
@@ -352,7 +339,7 @@ const MainView = component(({navInfo, options, tempStore}, {edit}) => {
         {sidebar}
         <section id="main-content" role="region" className="skin-dark">
             <AppHeader statics={{
-                           onClickBack: ChromeActions.onClickBack(navInfo.get("topicTreeNode"), navInfo, editNavInfo, editSearch)
+                           onClickBack: onClickBack(navInfo.get("topicTreeNode"), navInfo, editNavInfo, editSearch)
                        }}
                        searchResults={navInfo.get("searchResults")}
                        topicTreeNode={navInfo.get("topicTreeNode")}
@@ -367,17 +354,8 @@ const MainView = component(({navInfo, options, tempStore}, {edit}) => {
             {control}
             <StatusBarViewer
                 statics={{
-                    onClickCancelDownloadContent: ChromeActions.onClickCancelDownloadContent
+                    onClickCancelDownloadContent: onClickCancelDownloadContent
                 }}/>
         </section>
     </section>;
 }).jsx;
-
-module.exports = {
-    BackButton,
-    MenuButton,
-    AppHeader,
-    StatusBarViewer,
-    Sidebar,
-    MainView,
-};

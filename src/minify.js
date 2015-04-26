@@ -2,7 +2,7 @@
 
 "use strict";
 
-const Minify: {excludedKinds: Array<string> } = {
+const Minify = {
     // Topic tree items with thees kinds will be ignored
     // Example value would be "Exercise".
     excludedKinds: [],
@@ -247,4 +247,4 @@ const Minify: {excludedKinds: Array<string> } = {
     }
 };
 
-module.exports = Minify;
+export default Minify;

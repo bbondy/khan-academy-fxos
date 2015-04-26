@@ -2,14 +2,14 @@
 
 "use strict";
 
-const models = require("./models");
+import {TempAppState} from "./models";
 
 const Status = {
     /**
      * Start showing a new status message
      */
     start: function() {
-        models.TempAppState.set("showingStatus", true);
+        TempAppState.set("showingStatus", true);
     },
     /**
      * Stop showing the status message.
@@ -19,8 +19,8 @@ const Status = {
     stop: function(delay: number) {
         delay = delay || 0;
         setTimeout(() => {
-            models.TempAppState.set("status", "");
-            models.TempAppState.set("showingStatus", false);
+            TempAppState.set("status", "");
+            TempAppState.set("showingStatus", false);
         }, delay);
     },
     /**
@@ -28,10 +28,10 @@ const Status = {
      * @param message The status message to show.
      */
     update: function(message: string) {
-        if (models.TempAppState.get("showingStatus")) {
-            models.TempAppState.set("status", message);
+        if (TempAppState.get("showingStatus")) {
+            TempAppState.set("status", message);
         }
     }
 };
 
-module.exports = Status;
+export default Status;

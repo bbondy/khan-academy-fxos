@@ -1,8 +1,8 @@
-const Immutable = require("immutable"),
-    Storage = require("../storage"),
-    Util = require("../util");
+import Immutable from "immutable";
+import Storage from "../storage";
+import Util from "../util";
 
-const getTopicTreeFilename = () => {
+export const getTopicTreeFilename = () => {
     var lang = Util.getLang();
     var path = "topictree";
     if (lang) {
@@ -11,7 +11,7 @@ const getTopicTreeFilename = () => {
     return path + ".min.json";
 };
 
-const readTopicTree = () => {
+export const readTopicTree = () => {
     return new Promise((resolve, reject) => {
         // Check if we have a local downloaded copy of the topic tree
         Util.log("loading topic tree from storage: " + getTopicTreeFilename());
@@ -36,8 +36,4 @@ const readTopicTree = () => {
             });
         });
     });
-};
-
-module.exports = {
-    readTopicTree,
 };

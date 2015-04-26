@@ -22,4 +22,4 @@ const Notifications = {
     }
 };
 
-module.exports = Notifications;
+export default Notifications;

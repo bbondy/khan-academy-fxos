@@ -1,13 +1,13 @@
-const Downloads = require("../downloads"),
-    TopicTreeHelper = require("../data/topic-tree-helper"),
-    Util = require("../util"),
-    { getDomainTopicTreeNode, isPaneShowing } = require("../data/nav-info"),
-    Notifications = require("../notifications"),
-    Status = require("../status"),
-    {signIn, signOut} = require("../user"),
-    models = require("../models");
+import Downloads from "../downloads";
+import {findContentItems, getKAUrl, isTopic, getTitle, isContent, isVideo} from "../data/topic-tree-helper";
+import Util from "../util"
+import { getDomainTopicTreeNode, isPaneShowing } from "../data/nav-info";
+import Notifications from "../notifications";
+import Status from "../status";
+import {signIn, signOut} from "../user";
+import {TempAppState} from "../models";
 
-const onClickContentItemFromDownloads = (editNavInfo) => (topicTreeNode) =>
+export const onClickContentItemFromDownloads = (editNavInfo) => (topicTreeNode) =>
     editNavInfo((navInfo) => navInfo.merge({
         topicTreeNode,
         showProfile: false,
@@ -17,7 +17,7 @@ const onClickContentItemFromDownloads = (editNavInfo) => (topicTreeNode) =>
         lastTopicTreeNode: navInfo.get("lastTopicTreeNode")
     }));
 
-const onClickContentItem = (editNavInfo) => (topicTreeNode) =>
+export const onClickContentItem = (editNavInfo) => (topicTreeNode) =>
     (editNavInfo((navInfo) => navInfo.merge({
         topicTreeNode,
         showProfile: false,
@@ -28,7 +28,7 @@ const onClickContentItem = (editNavInfo) => (topicTreeNode) =>
         searchResults: null,
     })), topicTreeNode);
 
-const onClickTopic = (editNavInfo) => (newTopicTreeNode) =>
+export const onClickTopic = (editNavInfo) => (newTopicTreeNode) =>
     editNavInfo((navInfo) => navInfo.merge({
         topicTreeNode: newTopicTreeNode,
         domainTopicTreeNode: getDomainTopicTreeNode(navInfo, newTopicTreeNode),
@@ -40,10 +40,10 @@ const onClickTopic = (editNavInfo) => (newTopicTreeNode) =>
     }));
 
 //TODO used to call: this.forceUpdate();
-const onClickSignin = signIn;
+export const onClickSignin = signIn;
 //TODO used to call: this.forceUpdate();
-const onClickSignout = signOut;
-const openUrl = (url) => {
+export const onClickSignout = signOut;
+export const openUrl = (url) => {
     if (window.MozActivity) {
         new window.MozActivity({
             name: "view",
@@ -56,15 +56,15 @@ const openUrl = (url) => {
         window.open(url, "_blank");
     }
 };
-const onClickSupport = () => openUrl("https://khanacademy.zendesk.com/hc/communities/public/topics/200155074-Mobile-Discussions");
-const onClickCancelDownloadContent = () => {
+export const onClickSupport = () => openUrl("https://khanacademy.zendesk.com/hc/communities/public/topics/200155074-Mobile-Discussions");
+export const onClickCancelDownloadContent = () => {
     if (!confirm(l10n.get("cancel-download-warning"))) {
         return;
     }
     Downloads.cancelDownloading();
 };
 
-const onClickProfile = (editNavInfo) => () =>
+export const onClickProfile = (editNavInfo) => () =>
     editNavInfo((navInfo) => navInfo.merge({
         showProfile: true,
         showDownloads: false,
@@ -72,7 +72,7 @@ const onClickProfile = (editNavInfo) => () =>
         wasLastDownloads: false
     }));
 
-const onClickDownloads = (editNavInfo) => () =>
+export const onClickDownloads = (editNavInfo) => () =>
     editNavInfo((navInfo) => navInfo.merge({
         showDownloads: true,
         showProfile: false,
@@ -80,7 +80,7 @@ const onClickDownloads = (editNavInfo) => () =>
         wasLastDownloads: false
     }));
 
-const onClickSettings = (editNavInfo) => () =>
+export const onClickSettings = (editNavInfo) => () =>
     editNavInfo((navInfo) => navInfo.merge({
         showDownloads: false,
         showProfile: false,
@@ -88,7 +88,7 @@ const onClickSettings = (editNavInfo) => () =>
         wasLastDownloads: false
     }));
 
-const onTopicSearch = (navInfo, editNavInfo) => (topicSearch) => {
+export const onTopicSearch = (navInfo, editNavInfo) => (topicSearch) => {
     if (!topicSearch) {
         editNavInfo((navInfo) => navInfo.merge({
             topicTreeNode: navInfo.get("searchingTopicTreeNode"),
@@ -102,14 +102,14 @@ const onTopicSearch = (navInfo, editNavInfo) => (topicSearch) => {
     if (!searchingTopicTreeNode) {
         searchingTopicTreeNode = navInfo.get("topicTreeNode");
     }
-    var results = TopicTreeHelper.findContentItems(searchingTopicTreeNode, topicSearch);
+    var results = findContentItems(searchingTopicTreeNode, topicSearch);
     editNavInfo((navInfo) => navInfo.merge({
         searchResults: results,
         searchingTopicTreeNode: searchingTopicTreeNode,
     }));
 };
 
-const onClickBack = (topicTreeNode, navInfo, editNavInfo, editSearch) => () => {
+export const onClickBack = (topicTreeNode, navInfo, editNavInfo, editSearch) => () => {
     // If settings or profile or ... is set, then don't show it anymore.
     // This effectively makes the topicTreeNode be in use again.
     if (isPaneShowing(navInfo)) {
@@ -156,7 +156,7 @@ const onClickBack = (topicTreeNode, navInfo, editNavInfo, editSearch) => () => {
         });
     }
 
-    if (TopicTreeHelper.isContentList(navInfo.get("topicTreeNode"))) {
+    if (isContentList(navInfo.get("topicTreeNode"))) {
         return onTopicSearch("");
     }
 
@@ -170,21 +170,21 @@ const onClickBack = (topicTreeNode, navInfo, editNavInfo, editSearch) => () => {
     */
 };
 
-const onClickShare = (topicTreeNode) => () => new window.MozActivity({
+export const onClickShare = (topicTreeNode) => () => new window.MozActivity({
     name: "share",
     data: {
         type: "url",
-        url: TopicTreeHelper.getKAUrl(topicTreeNode)
+        url: getKAUrl(topicTreeNode)
     }
 });
 
-const onClickViewOnKA = (topicTreeNode) => () => openUrl(TopicTreeHelper.getKAUrl(topicTreeNode));
+export const onClickViewOnKA = (topicTreeNode) => () => openUrl(getKAUrl(topicTreeNode));
 
-const onClickDeleteDownloadedContent = (topicTreeNode) => () => Downloads.deleteContent(topicTreeNode);
+export const onClickDeleteDownloadedContent = (topicTreeNode) => () => Downloads.deleteContent(topicTreeNode);
 
-const onClickDownloadContent = (topicTreeNode) => () => {
+export const onClickDownloadContent = (topicTreeNode) => () => {
     var totalCount = 1;
-    if (TopicTreeHelper.isTopic(topicTreeNode)) {
+    if (isTopic(topicTreeNode)) {
         totalCount = getChildNotDownloadedCount(topicTreeNode);
     }
 
@@ -192,7 +192,7 @@ const onClickDownloadContent = (topicTreeNode) => () => {
     if (totalCount === 0) {
         alert(l10n.get("already-downloaded"));
         return;
-    } else if (models.TempAppState.get("isDownloadingTopic")) {
+    } else if (TempAppState.get("isDownloadingTopic")) {
         alert(l10n.get("already-downloading"));
         return;
     } else if (Util.isMeteredConnection()) {
@@ -209,7 +209,7 @@ const onClickDownloadContent = (topicTreeNode) => () => {
     var totalCountStr = Util.numberWithCommas(totalCount);
 
     // Prompt to download remaining
-    if (TopicTreeHelper.isTopic(topicTreeNode)) {
+    if (isTopic(topicTreeNode)) {
         if (!confirm(l10n.get("download-remaining", {
                 totalCount: totalCount,
                 totalCountStr: totalCountStr}))) {
@@ -237,9 +237,9 @@ const onClickDownloadContent = (topicTreeNode) => () => {
     var title;
     Downloads.download(topicTreeNode, onProgress).then((topicTreeNode, count) => {
         var title = l10n.get("download-complete");
-        var contentTitle = TopicTreeHelper.getTitle(topicTreeNode);
-        if (TopicTreeHelper.isContent(topicTreeNode)) {
-            if (TopicTreeHelper.isVideo(topicTreeNode)) {
+        var contentTitle = getTitle(topicTreeNode);
+        if (isContent(topicTreeNode)) {
+            if (isVideo(topicTreeNode)) {
                 message = l10n.get("video-complete-body", {
                     title: contentTitle
                 });
@@ -271,26 +271,4 @@ const onClickDownloadContent = (topicTreeNode) => () => {
         Status.stop();
         Notifications.info(title, message, () => {});
     });
-};
-
-module.exports = {
-    onClickContentItemFromDownloads,
-    onClickContentItem,
-    onClickTopic,
-
-    onClickSignin,
-    onClickSignout,
-    openUrl,
-    onClickSupport,
-    onClickCancelDownloadContent,
-
-    onClickProfile,
-    onClickDownloads,
-    onClickSettings,
-    onTopicSearch,
-    onClickBack,
-    onClickShare,
-    onClickViewOnKA,
-    onClickDeleteDownloadedContent,
-    onClickDownloadContent,
 };

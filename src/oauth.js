@@ -10,7 +10,7 @@
  * See http://pajhome.org.uk/crypt/md5 for details.
  */
 
-const $ = require("jquery");
+import $ from "jquery";
 
 /*
  * Configurable variables. You may need to tweak these to be compatible with
@@ -756,7 +756,7 @@ OAuth.SignatureMethod.registerMethodClass(["HMAC-SHA1", "HMAC-SHA1-Accessor"],
 try {
 	OAuth.correctTimestampFromSrc();
 } catch(e) {
-	
+
 }
 
 // From:
@@ -782,9 +782,9 @@ try {
 
 	function addOAuthStuffs(options) {
 		options = $.extend({ type: 'GET', consumerKey: '', consumerSecret: '', tokenSecret: '', url: '' }, options);
-		
+
 		var data = options.data;
-		
+
 		if (options.data && typeof options.data !== "string") {
 			options.data = $.param(options.data);
 		}
@@ -818,10 +818,10 @@ try {
 			for ( var prop in data ) {
 				OAuth.setParameter(message, prop, data[ prop ]);
 			}
-			
+
 			options.data = null;
 		}
-		
+
 		OAuth.setTimestampAndNonce(message);
 		OAuth.SignatureMethod.sign(message, { consumerSecret: options.consumerSecret, tokenSecret: options.tokenSecret });
 
@@ -841,7 +841,7 @@ try {
 
 		if (options.url.indexOf('?') > -1)
 			options.url = options.url.substr(0, options.url.indexOf('?'));
-		
+
 		return options;
 	}
 

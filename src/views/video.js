@@ -2,15 +2,16 @@
 
 "use strict";
 
-const l10n = require("../l10n"),
-    $ = require("jquery"),
-    React = require("react"),
-    classNames = require("classnames"),
-    Util = require("../util"),
-    component = require("omniscient"),
-    TopicTreeHelper = require("../data/topic-tree-helper"),
-    {TranscriptViewer} = require("./transcript.js"),
-    {isSignedIn, reportVideoProgress} = require("../user");
+import l10n from "../l10n";
+import $ from "jquery";
+import React from "react";
+import classNames from "classnames";
+import Util from "../util";
+import component from "omniscient";
+import {getId, getContentMimeType, getPoints, getDownloadUrl,
+    getDuration} from "../data/topic-tree-helper";
+import {TranscriptViewer} from "./transcript.js";
+import {isSignedIn, reportVideoProgress} from "../user";
 
 const minSecondsBetweenReports = 10;
 
@@ -22,18 +23,18 @@ const minSecondsBetweenReports = 10;
 const VideoMixin = {
     componentWillMount: function() {
         Util.log("VideoMixin will mount: %o", this.props.topicTreeNode);
-        this.videoId = TopicTreeHelper.getId(this.props.topicTreeNode);
+        this.videoId = getId(this.props.topicTreeNode);
         this.initSecondWatched = 0;
         this.lastSecondWatched = 0;
         if (this.props.topicTreeNode.get("lastSecondWatched") &&
-                this.props.topicTreeNode.get("lastSecondWatched") + 10 < TopicTreeHelper.getDuration(this.props.topicTreeNode)) {
+                this.props.topicTreeNode.get("lastSecondWatched") + 10 < getDuration(this.props.topicTreeNode)) {
             this.initSecondWatched = this.props.topicTreeNode.get("lastSecondWatched");
         }
         this.secondsWatched = 0;
         this.lastReportedTime = new Date();
         this.lastWatchedTimeSinceLastUpdate = new Date();
-        this.pointsPerReport = this.availablePoints * minSecondsBetweenReports / TopicTreeHelper.getDuration(this.props.topicTreeNode);
-        this.pointsObj = {num: TopicTreeHelper.getPoints(this.props.topicTreeNode)};
+        this.pointsPerReport = this.availablePoints * minSecondsBetweenReports / getDuration(this.props.topicTreeNode);
+        this.pointsObj = {num: getPoints(this.props.topicTreeNode)};
     },
     componentWillUnmount: function() {
         var downloadedUrl = this.props.videoStore.get("video");
@@ -207,7 +208,7 @@ const VideoMixin = {
 
     componentDidMount: function() {
         var videoMountNode = this.refs.videoPlaceholder.getDOMNode();
-        this.videoNode = $("<video width='640' height='264' type='" + TopicTreeHelper.getContentMimeType(this.props.topicTreeNode) + "'" +
+        this.videoNode = $("<video width='640' height='264' type='" + getContentMimeType(this.props.topicTreeNode) + "'" +
             " id='video-player' class='" + this.videoClass + "' preload='auto' src='" + this.videoSrc + "' controls>" +
             "</video>");
         $(videoMountNode).append(this.videoNode);
@@ -297,7 +298,7 @@ const VideoMixin = {
                         // changes and it would work automatically, but to get animated points
                         // growing, we need to do it manually.
                         // Re-animate the points
-                        this.pointsObj.num = TopicTreeHelper.getPoints(this.props.topicTreeNode);
+                        this.pointsObj.num = getPoints(this.props.topicTreeNode);
                         this.animatePoints();
                     });
             this.secondsWatched = 0;
@@ -305,7 +306,7 @@ const VideoMixin = {
     },
 };
 
-var VideoViewer = component(VideoMixin, function({videoStore, topicTreeNode, domainTopicTreeNode}) {
+export const VideoViewer = component(VideoMixin, function({videoStore, topicTreeNode, domainTopicTreeNode}) {
     const onClickTranscript = (obj) => {
         var startSecond = obj.get("start_time") / 1000 | 0;
         var video = this._getVideoDOMNode();
@@ -332,14 +333,14 @@ var VideoViewer = component(VideoMixin, function({videoStore, topicTreeNode, dom
                                              }}/>;
     }
 
-    this.videoSrc = TopicTreeHelper.getDownloadUrl(topicTreeNode);
+    this.videoSrc = getDownloadUrl(topicTreeNode);
     var downloadedUrl = videoStore.get("downloadedUrl");
     if (downloadedUrl) {
         this.videoSrc = downloadedUrl;
     }
     Util.log("video rendered with url: " + this.videoSrc);
     var pointsString = l10n.get("points-so-far", {
-        earned: TopicTreeHelper.getPoints(topicTreeNode),
+        earned: getPoints(topicTreeNode),
         available: this.availablePoints
     });
 
@@ -355,7 +356,7 @@ var VideoViewer = component(VideoMixin, function({videoStore, topicTreeNode, dom
       "signed-in": isSignedIn()
     };
     if (domainTopicTreeNode) {
-        videoClassObj[TopicTreeHelper.getId(domainTopicTreeNode)] = true;
+        videoClassObj[getId(domainTopicTreeNode)] = true;
     }
     this.videoClass = classNames(videoClassObj);
 
@@ -377,7 +378,3 @@ var VideoViewer = component(VideoMixin, function({videoStore, topicTreeNode, dom
         {transcriptViewer}
     </div>;
 }).jsx;
-
-module.exports = {
-    VideoViewer,
-};

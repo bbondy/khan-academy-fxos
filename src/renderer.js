@@ -1,5 +1,5 @@
-var _ = require("underscore"),
-    { writeOptions } = require("./data/app-options");
+import _ from "underscore";
+import { writeOptions } from "./data/app-options";
 
 /**
  * Renderer used to manage state updates and render the root component.
@@ -8,7 +8,7 @@ var _ = require("underscore"),
  * not obvious whether they should be passed to Omniscient statics or not.
  */
 
-class Renderer {
+export class Renderer {
     constructor(component, target, state) {
         this.component = component;
         this.target = target;
@@ -43,11 +43,5 @@ class Renderer {
     }
 }
 
-const In = (path) => (edit) => (state) => state.updateIn(path, edit);
-const editorForPath = (edit, path) => _.compose(edit, In(_.isString(path) ? [path] : path));
-
-module.exports = {
-    Renderer,
-    editorForPath,
-    In,
-};
+export const In = (path) => (edit) => (state) => state.updateIn(path, edit);
+export const editorForPath = (edit, path) => _.compose(edit, In(_.isString(path) ? [path] : path));

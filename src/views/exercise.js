@@ -11,15 +11,15 @@ function perseusPrep(katex, KAS, MathJax) {
     window.KAS = KAS;
 }
 
-const React = require("react"),
-    Util = require("../util"),
-    APIClient = require("../apiclient"),
-    l10n = require("../l10n"),
-    {getName, getFilename, isPerseusExercise, isKhanExercisesExercise} = require("../data/topic-tree-helper"),
-    component = require("omniscient"),
-    $ = require("jquery"),
-    {isSignedIn} = require("../user"),
-    _ = require("underscore");
+import React from "react";
+import Util from "../util";
+import APIClient from "../apiclient";
+import l10n from "../l10n";
+import {getName, getFilename, isPerseusExercise, isKhanExercisesExercise} from "../data/topic-tree-helper";
+import component from "omniscient";
+import $ from "jquery";
+import {isSignedIn} from "../user";
+import _ from "underscore";
 
 window.Exercises = {
     cluesEnabled: false
@@ -172,8 +172,8 @@ const ExerciseMixin = {
         window.jQuery = $;
 
 
-        var Khan = require("../../khan-exercises/main");
-        var MathJax = require("../../bower_components/MathJax/MathJax.js");
+        var Khan = require("../../khan-exercises/main"),
+            MathJax = require("../../bower_components/MathJax/MathJax.js");
         Khan = window.Khan;
         MathJax = window.MathJax;
         window.KhanUtil = Khan.Util;
@@ -190,7 +190,7 @@ const ExerciseMixin = {
     },
 };
 
-const ExerciseViewer = component(ExerciseMixin, function({topicTreeNode, exerciseStore}) {
+export const ExerciseViewer = component(ExerciseMixin, function({topicTreeNode, exerciseStore}) {
     var content;
     if (exerciseStore.get("error")) {
         content = <div>Could not load exercise</div>;
@@ -269,7 +269,3 @@ const ExerciseViewer = component(ExerciseMixin, function({topicTreeNode, exercis
         {content}
     </div>;
 }).jsx;
-
-module.exports = {
-    ExerciseViewer,
-};

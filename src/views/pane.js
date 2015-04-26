@@ -2,22 +2,20 @@
 
 "use strict";
 
-const l10n = require("../l10n"),
-    Util = require("../util"),
-    models = require("../models"),
-    Downloads = require("../downloads"),
-    React = require("react"),
-    topicViews = require("./topic"),
-    component = require("omniscient"),
-    { resetOptions } = require("../data/app-options");
-
-const ContentListViewer = topicViews.ContentListViewer;
+import l10n from "../l10n";
+import Util from "../util";
+import {CurrentUser} from "../models";
+import Downloads from "../downloads";
+import React from "react";
+import {ContentListViewer} from "./topic";
+import component from "omniscient";
+import { resetOptions } from "../data/app-options";
 
 /**
  * Represents a downloads list which is basically just a wrapper around a
  * ContentListViewer for now.
  */
-const DownloadsViewer = component(({options}, {onClickContentItem}) => {
+export const DownloadsViewer = component(({options}, {onClickContentItem}) => {
     if (!Downloads.contentList.length) {
         return <div className="downloads">
             <div data-l10n-id="no-downloads">You have no downloads yet!</div>
@@ -38,7 +36,7 @@ const DownloadsViewer = component(({options}, {onClickContentItem}) => {
  * Represents a list of settings which can be modified which affect
  * global state.
  */
-const SettingsViewer = component(({options}, {editOptions}) => {
+export const SettingsViewer = component(({options}, {editOptions}) => {
     const onShowDownloadsChange = (event) => {
         editOptions((options) =>
             options.set("showDownloadsOnly", event.target.checked));
@@ -122,49 +120,43 @@ const SettingsViewer = component(({options}, {editOptions}) => {
  * Represents a user's profile. It gives the user information about their
  * username, badges, and points.
  */
-const ProfileViewer = component(() => {
+export const ProfileViewer = component(() => {
     var pointsString = l10n.get("points");
     // TODO(bbondy): The title attributes on the images need to change
     // because you can't hover with your finger on FxOS Maybe just
     // when you tap it, it gives you the name underneath or something
     // like that.
     return <div className="profile">
-        <img className="avatar" src={models.CurrentUser.get("userInfo").avatarUrl}/>
-        <div className="username">{models.CurrentUser.get("userInfo").nickname || models.CurrentUser.get("userInfo").username}</div>
-        <div className="points-header">{{pointsString}}: <div className="energy-points energy-points-profile">{Util.numberWithCommas(models.CurrentUser.get("userInfo").points)}</div></div>
+        <img className="avatar" src={CurrentUser.get("userInfo").avatarUrl}/>
+        <div className="username">{CurrentUser.get("userInfo").nickname || CurrentUser.get("userInfo").username}</div>
+        <div className="points-header">{{pointsString}}: <div className="energy-points energy-points-profile">{Util.numberWithCommas(CurrentUser.get("userInfo").points)}</div></div>
 
-        { models.CurrentUser.get("userInfo").badgeCounts ?
+        { CurrentUser.get("userInfo").badgeCounts ?
             <div>
             <span className="span2">
-                <div className="badge-category-count">{models.CurrentUser.get("userInfo").badgeCounts[5]}</div>
+                <div className="badge-category-count">{CurrentUser.get("userInfo").badgeCounts[5]}</div>
                 <img className="badge-category-icon" title="Challenge Patches" src="/img/badges/master-challenge-blue-60x60.png"/>
             </span>
             <span className="span2">
-                <div className="badge-category-count">{models.CurrentUser.get("userInfo").badgeCounts[4]}</div>
+                <div className="badge-category-count">{CurrentUser.get("userInfo").badgeCounts[4]}</div>
                 <img className="badge-category-icon" title="Black Hole Badges" src="/img/badges/eclipse-60x60.png"/>
             </span>
             <span className="span2">
-                <div className="badge-category-count">{models.CurrentUser.get("userInfo").badgeCounts[3]}</div>
+                <div className="badge-category-count">{CurrentUser.get("userInfo").badgeCounts[3]}</div>
                 <img className="badge-category-icon" title="Sun Badges" src="/img/badges/sun-60x60.png"/>
             </span>
             <span className="span2">
-                <div className="badge-category-count">{models.CurrentUser.get("userInfo").badgeCounts[2]}</div>
+                <div className="badge-category-count">{CurrentUser.get("userInfo").badgeCounts[2]}</div>
                 <img className="badge-category-icon" title="Earth Badges" src="/img/badges/earth-60x60.png"/>
             </span>
             <span className="span2">
-                <div className="badge-category-count">{models.CurrentUser.get("userInfo").badgeCounts[1]}</div>
+                <div className="badge-category-count">{CurrentUser.get("userInfo").badgeCounts[1]}</div>
                 <img className="badge-category-icon" title="Moon Badges" src="/img/badges/moon-60x60.png"/>
             </span>
             <span className="span2">
-                <div className="badge-category-count">{models.CurrentUser.get("userInfo").badgeCounts[0]}</div>
+                <div className="badge-category-count">{CurrentUser.get("userInfo").badgeCounts[0]}</div>
                 <img className="badge-category-icon" title="Meteorite Badges" src="/img/badges/meteorite-60x60.png"/>
             </span>
             </div> : null }
     </div>;
 }).jsx;
-
-module.exports = {
-    DownloadsViewer,
-    SettingsViewer,
-    ProfileViewer,
-};

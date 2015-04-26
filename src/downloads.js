@@ -9,11 +9,11 @@
  *   - Provides the ability to delete those downloads
  */
 
-const _ = require("underscore"),
-    Util = require("./util"),
-    Storage = require("./storage"),
-    models = require("./models"),
-    APIClient = require("./apiclient");
+import _ from "underscore";
+import Util from "./util";
+import Storage from "./storage";
+import {ContentList, TempAppState} from "./models";
+import APIClient from "./apiclient";
 
 const Downloads: { contentList: any; init: any; canCancelDownload: any; cancelDownloading: any; download: any; downloadContent: any; downloadTopic: any; deleteContent: any } = {
     contentList: null,
@@ -23,7 +23,7 @@ const Downloads: { contentList: any; init: any; canCancelDownload: any; cancelDo
     init: function() {
         // Force always resolve instead of just returning readManifest
         return new Promise((resolve) => {
-            this.contentList = new models.ContentList();
+            this.contentList = new ContentList();
             this._readManifest().then(() => {
                 resolve();
             }).catch(() => {
@@ -55,7 +55,7 @@ const Downloads: { contentList: any; init: any; canCancelDownload: any; cancelDo
                 _(contentListModels).each((model) => {
                     this._setDownloaded(model, true);
                 });
-                this.contentList = new models.ContentList(contentListModels);
+                this.contentList = new ContentList(contentListModels);
                 resolve();
             }).catch(() => {
                 reject();
@@ -79,19 +79,19 @@ const Downloads: { contentList: any; init: any; canCancelDownload: any; cancelDo
      * Returns whether there is a cancellable download in progress.
      */
     canCancelDownload: function() {
-        return models.TempAppState.get("isDownloadingTopic") || models.TempAppState.get("currentDownloadRequest");
+        return TempAppState.get("isDownloadingTopic") || TempAppState.get("currentDownloadRequest");
     },
 
     /**
      * Cancels downloading if it's in progress.
      */
     cancelDownloading: function() {
-        models.TempAppState.set("isDownloadingTopic", false);
-        var currentRequest = models.TempAppState.get("currentDownloadRequest");
+        TempAppState.set("isDownloadingTopic", false);
+        var currentRequest = TempAppState.get("currentDownloadRequest");
         // Cancel the XHR if it exists (it may not, in the case of article downloads).
         if (currentRequest) {
             currentRequest.abort();
-            models.TempAppState.set("currentDownloadRequest", null);
+            TempAppState.set("currentDownloadRequest", null);
         }
         if (this.currentProgress) {
             this.currentProgress(undefined, true);
@@ -117,7 +117,7 @@ const Downloads: { contentList: any; init: any; canCancelDownload: any; cancelDo
         return new Promise((resolve, reject) => {
             this.currentProgress = onProgress;
             var downloadedCount = 0;
-            models.TempAppState.set("isDownloadingTopic", true);
+            TempAppState.set("isDownloadingTopic", true);
             var predicate = (model) => !model.isDownloaded();
             var seq = topic.enumChildrenGenerator(predicate);
             var downloadOneAtATime = () => {
@@ -135,7 +135,7 @@ const Downloads: { contentList: any; init: any; canCancelDownload: any; cancelDo
                     });
                 } catch (e) {
                     // done, no more items in the generator
-                    models.TempAppState.set("isDownloadingTopic", false);
+                    TempAppState.set("isDownloadingTopic", false);
                     resolve(topic, downloadedCount);
                     delete this.currentProgress;
                 }
@@ -246,4 +246,4 @@ const Downloads: { contentList: any; init: any; canCancelDownload: any; cancelDo
     manifestFilename: "download-manifest.json"
 };
 
-module.exports = Downloads;
+export default Downloads;

@@ -2,11 +2,11 @@
 
 "use strict";
 
-const Util = require("../util"),
-    React = require("react"),
-    {getKey} = require("../data/topic-tree-helper"),
-    {reportArticleRead} = require("./article-actions"),
-    component = require("omniscient");
+import Util from "../util";
+import React from "react";
+import {getKey} from "../data/topic-tree-helper";
+import {reportArticleRead} from "./article-actions";
+import component from "omniscient";
 
 const ArticleReadMixin = {
     componentDidMount: function() {
@@ -25,7 +25,7 @@ const ArticleReadMixin = {
  * Represents a single article, it will load the article dynamically and
  * display it to the user.
  */
-const ArticleViewer = component(ArticleReadMixin, ({topicTreeNode, tempStore}) => {
+export const ArticleViewer = component(ArticleReadMixin, ({topicTreeNode, tempStore}) => {
     Util.log("render article: :%o", topicTreeNode);
     var articleObj = tempStore.getIn([getKey(topicTreeNode)]);
     if (articleObj && articleObj.get("error")) {
@@ -38,7 +38,3 @@ const ArticleViewer = component(ArticleReadMixin, ({topicTreeNode, tempStore}) =
     }
     return <article/>;
 }).jsx;
-
-module.exports = {
-    ArticleViewer,
-};

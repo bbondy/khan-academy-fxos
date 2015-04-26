@@ -4,8 +4,8 @@
 
 require("native-promise-only"); // For Jest!
 
-const _ = require("underscore"),
-    l10n = require("./l10n");
+import _ from "underscore";
+import l10n from "./l10n";
 
 /**
  * Mixin to help with localization
@@ -194,4 +194,4 @@ const Util = {
     }
 };
 
-module.exports = Util;
+export default Util;

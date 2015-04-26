@@ -12,8 +12,8 @@
  * init will not wait for the result.
  */
 
-const Util = require("./util"),
-    models = require("./models");
+import Util from "./util";
+import {CurrentUser, AppOptions, TopicTree} from "./models";
 
 const TEN_MINUTES = 1000 * 60 * 10;
 const Cache = {
@@ -58,7 +58,7 @@ const Cache = {
             Util.log("heartbeat: no need to refresh user info yet!");
         } else {
             Util.log("heartbeat: Refreshing logged in info!");
-            models.CurrentUser.refreshLoggedInInfo(true).then(() => {
+            CurrentUser.refreshLoggedInInfo(true).then(() => {
                 this.lastUserInfoRefresh = new Date();
                 localStorage.setItem(this.heartbeatUserInfoName, this.lastUserInfoRefresh);
             });
@@ -67,11 +67,11 @@ const Cache = {
         var ONE_WEEK = 1000 * 60 * 60 * 24 * 7;
         if (this.lastTopicTreeRefresh && new Date() - this.lastTopicTreeRefresh < ONE_WEEK) {
             Util.log("heartbeat: no need to refresh topic tree yet!");
-        } else if (!models.AppOptions.get("autoUpdateTopicTree")) {
+        } else if (!AppOptions.get("autoUpdateTopicTree")) {
             Util.log("heartbeat: not refreshing the topic tree because of user preference!");
         } else {
             Util.log("heartbeat: Refreshing topic tree!");
-            models.TopicTree.refreshTopicTreeInfo().then(() => {
+            TopicTree.refreshTopicTreeInfo().then(() => {
                 this.lastTopicTreeRefresh = new Date();
                 localStorage.setItem(this.heartbeatTopicTreeName, this.lastTopicTreeRefresh);
             });
@@ -81,4 +81,4 @@ const Cache = {
     heartbeatUserInfoName: "heartbeat-user-info-1"
 };
 
-module.exports = Cache;
+export default Cache;

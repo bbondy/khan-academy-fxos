@@ -1,5 +1,5 @@
-const _ = require("underscore"),
-    component = require("omniscient");
+import _ from "underscore";
+import component from "omniscient";
 
 const getTotalSeconds = (startMilliseconds) => {
     return startMilliseconds / 1000 | 0;
@@ -17,7 +17,7 @@ const getTimeFormat = (startMilliseconds) => {
  * Represents a single transcript item for the list of transcript items.
  * When clicekd, it willl fast forward the video to that transcript item.
  */
-const TranscriptItem = component(({transcriptItem}, {onClickTranscript}) =>
+export const TranscriptItem = component(({transcriptItem}, {onClickTranscript}) =>
     <li className="transcript-item" data-time={getTotalSeconds(transcriptItem.get("start_time"))}>
         <a href="javascript:void(0)" onClick={_.partial(onClickTranscript, transcriptItem)}>
             <div>{getTimeFormat(transcriptItem.get("start_time"))}</div>
@@ -29,7 +29,7 @@ const TranscriptItem = component(({transcriptItem}, {onClickTranscript}) =>
 /**
  * Represents the entire transcript, which is a list of TranscriptItems.
  */
-const TranscriptViewer = component(({collection}, {onClickTranscript}) =>
+export const TranscriptViewer = component(({collection}, {onClickTranscript}) =>
     <ul className="transcript">
     {
         collection.map((transcriptItem) => {
@@ -42,8 +42,3 @@ const TranscriptViewer = component(({collection}, {onClickTranscript}) =>
     }
     </ul>
 ).jsx;
-
-module.exports = {
-    TranscriptViewer,
-    TranscriptItem,
-};

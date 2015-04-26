@@ -1,10 +1,10 @@
 "strict";
 
-const _ = require("underscore"),
-    Util = require("./util"),
-    APIClient = require("./apiclient"),
-    Storage = require("./storage"),
-    Minify = require("./minify");
+import _ from "underscore";
+import Util from "./util";
+import APIClient from "./apiclient";
+import Storage from "./storage";
+import Minify from "./minify";
 
 // temporary helper to help
 class BaseModel {
@@ -45,7 +45,7 @@ class BaseCollection {
     }
 }
 
-class TopicTreeBase extends BaseModel {
+export class TopicTreeBase extends BaseModel {
     constructor(data, extra) {
         super(data, extra);
     }
@@ -295,7 +295,7 @@ var TopicTree: {
     }
 };
 
-class TopicModel extends TopicTreeBase {
+export class TopicModel extends TopicTreeBase {
 
     constructor(data, extra) {
         super(data, extra);
@@ -453,7 +453,7 @@ class TopicModel extends TopicTreeBase {
     }
 }
 
-class ContentModel extends TopicTreeBase {
+export class ContentModel extends TopicTreeBase {
     constructor(data, extra) {
         super(data, extra);
     }
@@ -520,17 +520,17 @@ class ContentModel extends TopicTreeBase {
     }
 }
 
-class VideoModel extends ContentModel {}
-class ArticleModel extends ContentModel {}
-class ExerciseModel extends ContentModel {}
-class TopicList extends TopicTreeCollection {
+export class VideoModel extends ContentModel {}
+export class ArticleModel extends ContentModel {}
+export class ExerciseModel extends ContentModel {}
+export class TopicList extends TopicTreeCollection {
     constructor(models, options) {
         options = options || {};
         options.modelClass = TopicModel;
         super(models, options);
     }
 }
-class ContentList extends TopicTreeCollection {
+export class ContentList extends TopicTreeCollection {
     constructor(models, options) {
         options = options || {};
         options.modelClass = ContentModel;
@@ -884,7 +884,7 @@ UserModel._userInfoLocalStorageName = "userInfo-3";
 // For example we use this for isDownloadingTopic from
 // Downloads so we can easily adjust views based on that state
 // changing.
-const TempAppState = new BaseModel({
+export const TempAppState = new BaseModel({
     defaults: {
         currentDownloadRequest: null,
         isTopicDownloading: false,
@@ -892,18 +892,4 @@ const TempAppState = new BaseModel({
     }
 });
 
-
-
-const CurrentUser = new UserModel();
-module.exports = {
-    TopicModel,
-    ContentModel,
-    VideoModel,
-    ArticleModel,
-    ExerciseModel,
-    TopicList,
-    ContentList,
-    TopicTree,
-    TempAppState,
-    CurrentUser,
-};
+export const CurrentUser = new UserModel();

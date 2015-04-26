@@ -1108,7 +1108,7 @@ if (!window.XMLHttpRequest) {
   }
 
   // cross-browser API (sorry, oldIE doesn't support getters & setters)
-  module.exports = {
+  export default {
     // get a localized string
     get: function(key, args, fallback) {
       var data = getL10nData(key, args) || fallback;

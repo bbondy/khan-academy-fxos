@@ -2,11 +2,13 @@
 
 "use strict";
 
-const _ = require("underscore"),
-    classNames = require("classnames"),
-    TopicTreeHelper = require("../data/topic-tree-helper"),
-    React = require("react"),
-    component = require("omniscient");
+import _ from "underscore";
+import classNames from "classnames";
+import {getDownloadCount, getId, getKey, getTitle, isArticle, isVideo,
+    isExercise, isCompleted, isStarted, isDownloaded, mapChildTopicNodes,
+    mapChildContentNodes} from "../data/topic-tree-helper";
+import React from "react";
+import component from "omniscient";
 
 /**
  * Represents a single root, domain, subject, topic, or tutorial
@@ -19,16 +21,16 @@ const TopicListItem = component(({topicTreeNode, domainTopicTreeNode, options}, 
     var topicClassObj = {
         "topic-item": true,
         faded: options.get("showDownloadsOnly") &&
-            TopicTreeHelper.getDownloadCount(topicTreeNode),
+            getDownloadCount(topicTreeNode),
     };
-    topicClassObj[TopicTreeHelper.getId(domainTopicTreeNode)] = true;
+    topicClassObj[getId(domainTopicTreeNode)] = true;
     var topicClass = classNames(topicClassObj);
     return <li className={topicClass}>
-        { TopicTreeHelper.getKey(topicTreeNode) === TopicTreeHelper.getKey(domainTopicTreeNode) &&
+        { getKey(topicTreeNode) === getKey(domainTopicTreeNode) &&
             <div className="color-block"/> }
         <a href="javascript:void(0)"
            onClick={_.partial(onClickTopic, topicTreeNode, domainTopicTreeNode)}>
-            <p className="topic-title">{TopicTreeHelper.getTitle(topicTreeNode)}</p>
+            <p className="topic-title">{getTitle(topicTreeNode)}</p>
         </a>
     </li>;
 }).jsx;
@@ -38,33 +40,33 @@ const TopicListItem = component(({topicTreeNode, domainTopicTreeNode, options}, 
  * This renders the list item and not the actual video.
  * When clicked, it will render the video corresponding to this list item.
  */
-const ContentListItem = component(({topicTreeNode, domainTopicTreeNode, options}, {onClick}) => {
+export const ContentListItem = component(({topicTreeNode, domainTopicTreeNode, options}, {onClick}) => {
     var contentNodeClass = classNames({
-      "article-node": TopicTreeHelper.isArticle(topicTreeNode),
-      "video-node": TopicTreeHelper.isVideo(topicTreeNode),
-      "exercise-node": TopicTreeHelper.isExercise(topicTreeNode),
-      completed: TopicTreeHelper.isCompleted(topicTreeNode),
-      "in-progress": TopicTreeHelper.isStarted(topicTreeNode),
+      "article-node": isArticle(topicTreeNode),
+      "video-node": isVideo(topicTreeNode),
+      "exercise-node": isExercise(topicTreeNode),
+      completed: isCompleted(topicTreeNode),
+      "in-progress": isStarted(topicTreeNode),
     });
     var pipeClassObj = {
         pipe: true,
-        completed: TopicTreeHelper.isCompleted(topicTreeNode),
-        "in-progress": TopicTreeHelper.isStarted(topicTreeNode),
+        completed: isCompleted(topicTreeNode),
+        "in-progress": isStarted(topicTreeNode),
     };
     var subwayIconClassObj = {
         "subway-icon": true,
     };
     var contentClassObj = {
-        "video-item": TopicTreeHelper.isVideo(topicTreeNode),
-        "article-item": TopicTreeHelper.isArticle(topicTreeNode),
-        "exercise-item": TopicTreeHelper.isExercise(topicTreeNode),
+        "video-item": isVideo(topicTreeNode),
+        "article-item": isArticle(topicTreeNode),
+        "exercise-item": isExercise(topicTreeNode),
         faded: options.get("showDownloadsOnly") &&
-            !TopicTreeHelper.isDownloaded(topicTreeNode)
+            !isDownloaded(topicTreeNode)
     };
     if (domainTopicTreeNode) {
-        subwayIconClassObj[TopicTreeHelper.getId(domainTopicTreeNode)] = true;
-        contentClassObj[TopicTreeHelper.getId(domainTopicTreeNode)] = true;
-        pipeClassObj[TopicTreeHelper.getId(domainTopicTreeNode)] = true;
+        subwayIconClassObj[getId(domainTopicTreeNode)] = true;
+        contentClassObj[getId(domainTopicTreeNode)] = true;
+        pipeClassObj[getId(domainTopicTreeNode)] = true;
     }
     var subwayIconClass = classNames(subwayIconClassObj);
     var pipeClass = classNames(pipeClassObj);
@@ -79,7 +81,7 @@ const ContentListItem = component(({topicTreeNode, domainTopicTreeNode, options}
         </div>
         <a href="javascript:void(0)"
            onClick={_.partial(onClick, topicTreeNode)}>
-            <p className="content-title">{TopicTreeHelper.getTitle(topicTreeNode)}</p>
+            <p className="content-title">{getTitle(topicTreeNode)}</p>
         </a>
     </li>;
 }).jsx;
@@ -88,13 +90,13 @@ const ContentListItem = component(({topicTreeNode, domainTopicTreeNode, options}
  * Represents a single topic and it displays a list of all of its children.
  * Each child of the list is a ContentListItem
  */
-const TopicViewer = component(({topicTreeNode, domainTopicTreeNode, options}, {onClickTopic, onClickContentItem}) =>
+export const TopicViewer = component(({topicTreeNode, domainTopicTreeNode, options}, {onClickTopic, onClickContentItem}) =>
     <div className="topic-list-container">
         <section data-type="list">
             <ul>
                 {
                     // Output the child topics
-                    TopicTreeHelper.mapChildTopicNodes(topicTreeNode, (childTopicNode) =>
+                    mapChildTopicNodes(topicTreeNode, (childTopicNode) =>
                         <TopicListItem
                             statics={{
                                 onClickTopic: onClickTopic
@@ -102,13 +104,13 @@ const TopicViewer = component(({topicTreeNode, domainTopicTreeNode, options}, {o
                             topicTreeNode={childTopicNode}
                             options={options}
                             domainTopicTreeNode={domainTopicTreeNode || childTopicNode}
-                            key={TopicTreeHelper.getKey(childTopicNode)} />
+                            key={getKey(childTopicNode)} />
                     )
                 }
 
                 {
                     // Output the child content items
-                    TopicTreeHelper.mapChildContentNodes(topicTreeNode, (topicTreeNode) =>
+                    mapChildContentNodes(topicTreeNode, (topicTreeNode) =>
                         <ContentListItem
                             statics={{
                                 onClick: onClickContentItem
@@ -116,7 +118,7 @@ const TopicViewer = component(({topicTreeNode, domainTopicTreeNode, options}, {o
                             topicTreeNode={topicTreeNode}
                             options={options}
                             domainTopicTreeNode={domainTopicTreeNode}
-                            key={TopicTreeHelper.getKey(topicTreeNode)} />
+                            key={getKey(topicTreeNode)} />
                     )
                 }
 
@@ -130,7 +132,7 @@ const TopicViewer = component(({topicTreeNode, domainTopicTreeNode, options}, {o
  * This is used for displaying search results and download lists.
  * This always contains only a list of VideoListItems, or ARticleListItems.
  */
-const ContentListViewer = component(({topicTreeNodes, options}, {onClickContentItem}) =>
+export const ContentListViewer = component(({topicTreeNodes, options}, {onClickContentItem}) =>
     <div className="topic-list-container">
         <section data-type="list">
             <ul>
@@ -140,16 +142,10 @@ const ContentListViewer = component(({topicTreeNodes, options}, {onClickContentI
                         }}
                         topicTreeNode={topicTreeNode}
                         options={options}
-                        key={TopicTreeHelper.getKey(topicTreeNode)} />
+                        key={getKey(topicTreeNode)} />
                     )
                 }
             </ul>
         </section>
     </div>
 ).jsx;
-
-module.exports = {
-    ContentListItem,
-    TopicViewer,
-    ContentListViewer,
-};

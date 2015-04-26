@@ -1,7 +1,7 @@
-const Immutable = require("immutable"),
-    {getKey} = require("./topic-tree-helper");
+import Immutable from "immutable";
+import {getKey} from "./topic-tree-helper";
 
-const resetNavInfo = () => Immutable.fromJS({
+export const resetNavInfo = () => Immutable.fromJS({
     topicTreeNode: null,
     rootTopicTreeNode: null,
     lastTopicTreeNode: null,
@@ -14,7 +14,7 @@ const resetNavInfo = () => Immutable.fromJS({
     wasLastDownloads: false,
 });
 
-const getDomainTopicTreeNode = (navInfo, newTopicTreeNode) => {
+export const getDomainTopicTreeNode = (navInfo, newTopicTreeNode) => {
     var domainTopicTreeNode = navInfo.get("domainTopicTreeNode");
     if (!domainTopicTreeNode) {
         domainTopicTreeNode = newTopicTreeNode;
@@ -24,11 +24,5 @@ const getDomainTopicTreeNode = (navInfo, newTopicTreeNode) => {
     return domainTopicTreeNode;
 };
 
-const isPaneShowing = (navInfo) => navInfo.get("showDownloads") ||
+export const isPaneShowing = (navInfo) => navInfo.get("showDownloads") ||
     navInfo.get("showProfile") || navInfo.get("showSettings");
-
-module.exports = {
-    resetNavInfo,
-    getDomainTopicTreeNode,
-    isPaneShowing,
-};

@@ -2,18 +2,16 @@
 
 "use strict";
 
-const React = require("react"),
-    l10n = require("../l10n"),
-    component = require("omniscient"),
-    { getTitle } = require("../data/topic-tree-helper"),
-    topicViews = require("./topic");
-
-const ContentListViewer = topicViews.ContentListViewer;
+import React from "react";
+import l10n from "../l10n";
+import component from "omniscient";
+import { getTitle } from "../data/topic-tree-helper";
+import {ContentListViewer} from "./topic";
 
 /**
  * Represents the topic search input item which is right below the header.
  */
-const TopicSearch = component(({topicTreeNode, searchValue}, {onTopicSearch, editSearch}) => {
+export const TopicSearch = component(({topicTreeNode, searchValue}, {onTopicSearch, editSearch}) => {
     const onChange = (event) => {
         var topicSearch = event.target.value;
         editSearch(() => topicSearch);
@@ -65,7 +63,7 @@ const TopicSearch = component(({topicTreeNode, searchValue}, {onTopicSearch, edi
  * Represents a search result list which is basically just a wrapper around a
  * ContentListViewer for now.
  */
-const SearchResultsViewer  = component(({options, collection}, {onClickContentItem}) => {
+export const SearchResultsViewer  = component(({options, collection}, {onClickContentItem}) => {
     var control = <ContentListViewer topicTreeNodes={collection}
                                      options={options}
                                      statics={{
@@ -75,8 +73,3 @@ const SearchResultsViewer  = component(({options, collection}, {onClickContentIt
         {control}
     </div>;
 }).jsx;
-
-module.exports = {
-    TopicSearch,
-    SearchResultsViewer,
-};

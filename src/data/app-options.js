@@ -1,7 +1,7 @@
-const Immutable = require("immutable");
+import Immutable from "immutable";
 
 const appOptionsFilename = "appOptions.json";
-const readOptions = () => {
+export const readOptions = () => {
     try {
         return Immutable.fromJS(JSON.parse(localStorage[appOptionsFilename]));
     } catch (error) {
@@ -9,7 +9,7 @@ const readOptions = () => {
     }
 };
 
-const resetOptions = () => Immutable.fromJS({
+export const resetOptions = () => Immutable.fromJS({
     autoUpdateTopicTree: true,
     showDownloadsOnly: false,
     showTranscripts: true,
@@ -17,12 +17,6 @@ const resetOptions = () => Immutable.fromJS({
     temp: Immutable.fromJS({}),
 });
 
-const writeOptions = options => {
+export const writeOptions = options => {
     localStorage[appOptionsFilename] = JSON.stringify(options.toJSON());
-};
-
-module.exports = {
-    readOptions,
-    resetOptions,
-    writeOptions,
 };

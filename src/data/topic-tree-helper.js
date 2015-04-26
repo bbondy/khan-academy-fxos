@@ -1,7 +1,6 @@
-const _ = require("underscore"),
-    Immutable = require("immutable"),
-    Minify = require("../minify");
-
+import _ from "underscore";
+import Immutable from "immutable";
+import Minify from "../minify";
 
 /**
  * Obtains a property from a minified topic tree node
@@ -24,47 +23,47 @@ const fnChildrenByKind = (fn) => (kinds) => {
     };
 };
 
-const mapChildrenByKind = fnChildrenByKind("map");
-const eachChildrenByKind = fnChildrenByKind("forEach");
+export const mapChildrenByKind = fnChildrenByKind("map");
+export const eachChildrenByKind = fnChildrenByKind("forEach");
 
-const topicKind = [Minify.getShortValue("kind", "Topic")];
-const contentKinds = [Minify.getShortValue("kind", "Video"),
+export const topicKind = [Minify.getShortValue("kind", "Topic")];
+export const contentKinds = [Minify.getShortValue("kind", "Video"),
     Minify.getShortValue("kind", "Article"),
     Minify.getShortValue("kind", "Exercise")];
 
-const eachChildTopicNode = eachChildrenByKind(topicKind);
-const mapChildTopicNodes = mapChildrenByKind(topicKind);
-const eachChildContentNode = eachChildrenByKind(contentKinds);
-const mapChildContentNodes = mapChildrenByKind(contentKinds);
+export const eachChildTopicNode = eachChildrenByKind(topicKind);
+export const mapChildTopicNodes = mapChildrenByKind(topicKind);
+export const eachChildContentNode = eachChildrenByKind(contentKinds);
+export const mapChildContentNodes = mapChildrenByKind(contentKinds);
 
-const getTitle = (topicTreeNode) =>
+export const getTitle = (topicTreeNode) =>
     getMinifiedPropFromNode(topicTreeNode, "translated_title") ||
     getMinifiedPropFromNode(topicTreeNode, "translated_display_name");
 
-const getProgressKey = (topicTreeNode) =>
+export const getProgressKey = (topicTreeNode) =>
     getMinifiedPropFromNode(topicTreeNode, "progress_key");
 
 
-const getKind = (topicTreeNode) =>
+export const getKind = (topicTreeNode) =>
     Minify.getLongValue("kind", getMinifiedPropFromNode(topicTreeNode, "kind"));
 
 const genIsKindFn = (kind) =>
     (topicTreeNode) =>
         getKind(topicTreeNode) === kind;
 
-const isTopic = genIsKindFn("Topic");
-const isVideo = genIsKindFn("Video");
-const isArticle = genIsKindFn("Article");
-const isExercise = genIsKindFn("Exercise");
+export const isTopic = genIsKindFn("Topic");
+export const isVideo = genIsKindFn("Video");
+export const isArticle = genIsKindFn("Article");
+export const isExercise = genIsKindFn("Exercise");
 
 const genCheckAnyFn = (...validators) =>
     (topicTreeNode) =>
         _.any(validators, (validator) => validator(topicTreeNode));
 
-const isContent = genCheckAnyFn(isVideo, isArticle, isExercise);
-const isContentList = () => false;
+export const isContent = genCheckAnyFn(isVideo, isArticle, isExercise);
+export const isContentList = () => false;
 
-const getId = (topicTreeNode) => {
+export const getId = (topicTreeNode) => {
     if (isExercise(topicTreeNode)) {
         return getProgressKey(topicTreeNode).substring(1);
     }
@@ -72,17 +71,17 @@ const getId = (topicTreeNode) => {
 };
 
 // todo: It's probably better to store this out of the topic tree
-const getDownloadCount = (topicTreeNode) =>
+export const getDownloadCount = (topicTreeNode) =>
     topicTreeNode.get("downloadCount") === 0;
 
-const getSlug = (topicTreeNode) =>
+export const getSlug = (topicTreeNode) =>
     getMinifiedPropFromNode(topicTreeNode, "slug");
 
-const getKey = (topicTreeNode) => {
+export const getKey = (topicTreeNode) => {
     return getId(topicTreeNode) || getSlug(topicTreeNode) || getTitle(topicTreeNode);
 };
 
-const getKAUrl = (topicTreeNode) => {
+export const getKAUrl = (topicTreeNode) => {
     var value = getMinifiedPropFromNode(topicTreeNode, "ka_url");
     if (!value) {
         return null;
@@ -93,28 +92,28 @@ const getKAUrl = (topicTreeNode) => {
     return value;
 };
 
-const isDownloaded = (topicTreeNode) =>
+export const isDownloaded = (topicTreeNode) =>
     !!topicTreeNode.get("downloaded");
 
-const isStarted = (topicTreeNode) =>
+export const isStarted = (topicTreeNode) =>
     topicTreeNode.get("started");
 
-const isCompleted = (topicTreeNode) =>
+export const isCompleted = (topicTreeNode) =>
     topicTreeNode.get("completed");
 
-const getYoutubeId = (topicTreeNode) =>
+export const getYoutubeId = (topicTreeNode) =>
     getMinifiedPropFromNode(topicTreeNode, "youtube_id");
 
-const getDuration = (topicTreeNode) =>
+export const getDuration = (topicTreeNode) =>
     getMinifiedPropFromNode(topicTreeNode, "duration");
 
-const getPoints = (topicTreeNode) =>
+export const getPoints = (topicTreeNode) =>
     topicTreeNode.get("points") || 0;
 
-const getContentMimeType = (topicTreeNode) =>
+export const getContentMimeType = (topicTreeNode) =>
     isVideo(topicTreeNode) ? "video/mp4" : "text/html";
 
-const getDownloadUrl = (topicTreeNode) => {
+export const getDownloadUrl = (topicTreeNode) => {
     var value = getMinifiedPropFromNode(topicTreeNode, "download_urls");
     if (!value) {
         return null;
@@ -125,27 +124,27 @@ const getDownloadUrl = (topicTreeNode) => {
     return value;
 };
 
-const getName = (topicTreeNode)  =>
+export const getName = (topicTreeNode)  =>
     getMinifiedPropFromNode(topicTreeNode, "name");
 
-const isPerseusExercise = (topicTreeNode) =>
+export const isPerseusExercise = (topicTreeNode) =>
     !getMinifiedPropFromNode(topicTreeNode, "file_name");
 
-const isKhanExercisesExercise = (topicTreeNode) =>
+export const isKhanExercisesExercise = (topicTreeNode) =>
     !!getMinifiedPropFromNode(topicTreeNode, "file_name");
 
-const getFilename = (topicTreeNode) =>
+export const getFilename = (topicTreeNode) =>
     getMinifiedPropFromNode(topicTreeNode, "file_name");
 
 // TODO: remove all dependencies on this and remove this
-const getParentDomain = (topicTreeNode) => {
+export const getParentDomain = (topicTreeNode) => {
     return null;
 };
 
 /**
  * Initiates a recursive search for the term `search`
  */
-const findContentItems = (topicTreeNode, search, maxResults) => {
+export const findContentItems = (topicTreeNode, search, maxResults) => {
     if (_.isUndefined(maxResults)) {
         maxResults = 40;
     }
@@ -178,36 +177,4 @@ const _findContentItems = (topicTreeNode, search, results, maxResults) => {
     eachChildTopicNode(topicTreeNode, (childNode) => {
         _findContentItems(childNode, search, results, maxResults);
     });
-};
-
-module.exports = {
-    getId,
-    getTitle,
-    getKey,
-    getKAUrl,
-    getDownloadCount,
-    mapChildTopicNodes,
-    eachChildTopicNode,
-    mapChildContentNodes,
-    eachChildContentNode,
-    isContent,
-    isContentList,
-    isTopic,
-    isArticle,
-    isVideo,
-    isExercise,
-    isStarted,
-    isCompleted,
-    isDownloaded,
-    getYoutubeId,
-    getDuration,
-    getPoints,
-    getContentMimeType,
-    getDownloadUrl,
-    getName,
-    isPerseusExercise,
-    isKhanExercisesExercise,
-    getFilename,
-    getParentDomain,
-    findContentItems,
 };

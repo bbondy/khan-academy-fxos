@@ -1,11 +1,10 @@
-const {getId, getKey, isDownloaded} = require("../data/topic-tree-helper"),
-    APIClient = require("../apiclient"),
-    Immutable = require("immutable"),
-    {isArticle} = require("../data/topic-tree-helper"),
-    {editorForPath} = require("../renderer"),
-    Storage = require("../storage");
+import {getId, getKey, isDownloaded, isArticle} from "../data/topic-tree-helper";
+import APIClient from "../apiclient";
+import Immutable from "immutable";
+import {editorForPath} from "../renderer";
+import Storage from "../storage";
 
-const reportArticleRead = (topicTreeNode) => {
+export const reportArticleRead = (topicTreeNode) => {
     return new Promise((resolve, reject) => {
         if (!models.CurrentUser.isSignedIn()) {
             return setTimeout(resolve, 0);
@@ -40,19 +39,19 @@ const setArticleContent = (editArticleContent, result) =>
         });
     });
 
-const loadIfArticle = (editTempStore) => (topicTreeNode) => {
+export const loadIfArticle = (editTempStore) => (topicTreeNode) => {
     if (!isArticle(topicTreeNode)) {
         return topicTreeNode;
     }
 
     const editArticleContent = editorForPath(editTempStore, getKey(topicTreeNode));
     if (isDownloaded(topicTreeNode)) {
-        this.p1 = Storage.readText(getId(topicTreeNode)).then((result) => {
+        Storage.readText(getId(topicTreeNode)).then((result) => {
             Util.log("rendered article from storage");
             setArticleContent(editArticleContent, result);
         });
     } else {
-        this.p1 = APIClient.getArticle(getId(topicTreeNode)).then((result) => {
+        APIClient.getArticle(getId(topicTreeNode)).then((result) => {
             Util.log("rendered article from web: ", result);
             setArticleContent(editArticleContent, result);
         }).catch((e) => {
@@ -60,9 +59,4 @@ const loadIfArticle = (editTempStore) => (topicTreeNode) => {
         });
     }
     return topicTreeNode;
-};
-
-module.exports = {
-    reportArticleRead,
-    loadIfArticle,
 };

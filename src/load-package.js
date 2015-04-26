@@ -1,5 +1,5 @@
 // TODO: Provide an async variant
-module.exports = function(packageFilename, async, callback) {
+export default function(packageFilename, async, callback) {
     // Check if the scripti s already loaded
     if (document.getElementById(packageFilename)) {
         return;

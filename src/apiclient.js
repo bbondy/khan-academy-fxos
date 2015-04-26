@@ -2,10 +2,10 @@
 
 "use strict";
 
-require("./oauth");
-const $ = require("jquery"),
-    _ = require("underscore"),
-    Util = require("./util");
+import "./oauth";
+import $ from "jquery";
+import _ from "underscore";
+import Util from "./util";
 
 /**
  * Client side library for the KA API
@@ -426,4 +426,4 @@ const APIClient = {
     //API_INTERNAL_BASE: "http://stable.ka.local:8080/api/internal",
 };
 
-module.exports = APIClient;
+export default APIClient;
