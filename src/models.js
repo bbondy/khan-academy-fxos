@@ -1,9 +1,4 @@
-// TODO: Use of generators stopping use of flow for this file.
-// Need to figure out how to transform using regenerator or something first before passing it to Flow.
-
-
 "strict";
-"enable_regenerator";
 
 const _ = require("underscore"),
     Util = require("./util"),
@@ -44,8 +39,8 @@ class BaseCollection {
                 this.models = models;
             }
         }
-        if (this.modelClass) {
-            this.models = _.map(this.models, (x) => new this.modelClass(x, {parse: true}));
+        if (options.modelClass) {
+            this.models = _.map(this.models, (x) => new options.modelClass(x, {parse: true}));
         }
     }
 }
@@ -530,13 +525,15 @@ class ArticleModel extends ContentModel {}
 class ExerciseModel extends ContentModel {}
 class TopicList extends TopicTreeCollection {
     constructor(models, options) {
-        this.modelClass = TopicModel;
+        options = options || {};
+        options.modelClass = TopicModel;
         super(models, options);
     }
 }
 class ContentList extends TopicTreeCollection {
     constructor(models, options) {
-        this.modelClass = ContentModel;
+        options = options || {};
+        options.modelClass = ContentModel;
         super(models, options);
     }
     isContentList() {

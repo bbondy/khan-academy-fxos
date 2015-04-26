@@ -19,25 +19,15 @@ module.exports = {
                   /node_modules\/underscore/],
         loaders: [
             {
-                //tell webpack to use jsx-loader for all *.jsx files
-                test: /models\.js$/,
-                loader: "regenerator-loader",
+                test: /\.js?$/,
                 exclude: [
                     /node_modules/,
                     /bower_components/,
+                    /khan-exercises/,
                     /\.min.js$/,
                 ],
-            },
-            {
-                //tell webpack to use jsx-loader for all *.jsx files
-                test: /\.js$/,
-                loader: "jsx-loader?harmony&stripTypes",
-                exclude: [
-                    /node_modules/,
-                    /bower_components/,
-                    /\.min.js$/,
-                ]
-            },
+                loader: 'babel-loader?stage=0&optional=runtime'
+            }
         ],
     },
     resolve: {

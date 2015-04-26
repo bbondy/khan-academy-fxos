@@ -57,14 +57,9 @@ const isVideo = genIsKindFn("Video");
 const isArticle = genIsKindFn("Article");
 const isExercise = genIsKindFn("Exercise");
 
-const genCheckAnyFn = () => {
-    var validators = _.toArray(arguments);
-    return function(topicTreeNode) {
-        return _.any(validators, (validator) => {
-            return validator(topicTreeNode);
-        });
-    };
-};
+const genCheckAnyFn = (...validators) =>
+    (topicTreeNode) =>
+        _.any(validators, (validator) => validator(topicTreeNode));
 
 const isContent = genCheckAnyFn(isVideo, isArticle, isExercise);
 const isContentList = () => false;
