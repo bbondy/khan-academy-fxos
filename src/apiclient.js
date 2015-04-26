@@ -162,10 +162,8 @@ const APIClient = {
      *
      * @return a promise with the results of the API call
      */
-    _basicAPICall: function(url: string, extraParams: any, method:?string, dataType: ?string): any {
+    _basicAPICall: function(url: string, extraParams={}, method:?string, dataType="json"): any {
         return new Promise((resolve, reject) => {
-            extraParams = extraParams || {};
-            dataType = dataType || "json";
             if (_.isUndefined(method)) {
                 method = "GET";
             }

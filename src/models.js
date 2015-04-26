@@ -524,15 +524,13 @@ export class VideoModel extends ContentModel {}
 export class ArticleModel extends ContentModel {}
 export class ExerciseModel extends ContentModel {}
 export class TopicList extends TopicTreeCollection {
-    constructor(models, options) {
-        options = options || {};
+    constructor(models, options={}) {
         options.modelClass = TopicModel;
         super(models, options);
     }
 }
 export class ContentList extends TopicTreeCollection {
-    constructor(models, options) {
-        options = options || {};
+    constructor(models, options={}) {
         options.modelClass = ContentModel;
         super(models, options);
     }
