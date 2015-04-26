@@ -13,7 +13,7 @@ const ContentListViewer = topicViews.ContentListViewer;
 /**
  * Represents the topic search input item which is right below the header.
  */
-const TopicSearch = component(({topicTreeNode, searchValue, navInfo}, {onTopicSearch, editSearch}) => {
+const TopicSearch = component(({topicTreeNode, searchValue}, {onTopicSearch, editSearch}) => {
     const onChange = (event) => {
         var topicSearch = event.target.value;
         editSearch(() => topicSearch);

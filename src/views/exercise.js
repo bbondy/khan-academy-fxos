@@ -127,6 +127,16 @@ const ExerciseMixin = {
             secondsTaken, hintsUsed, isCorrect,
             attemptNumber, this.problemTypeName, this.props.exerciseStore.get("taskId")).then(() => {
                 if (isCorrect) {
+                    const getNumSuccessful = (exerciseStore) => {
+                        var taskAttemptHistory = exerciseStore.get("taskAttemptHistory");
+                        if (!taskAttemptHistory) {
+                            return 0;
+                        }
+                        taskAttemptHistory = taskAttemptHistory.slice(-5);
+                        return _.reduce(taskAttemptHistory.toJS(), (total, task) => {
+                            return total + ((task.correct && !task.seen_hint) ? 1 : 0);
+                        }, 0);
+                    };
                     // If we have another correct and we already have 4 correct,
                     // then show task complete view.
                     if (this.props.exerciseStore.get("streak") >= 4 &&
@@ -180,23 +190,12 @@ const ExerciseMixin = {
     },
 };
 
-const getNumSuccessful = (exerciseStore) => {
-    var taskAttemptHistory = exerciseStore.get("taskAttemptHistory");
-    if (!taskAttemptHistory) {
-        return 0;
-    }
-    taskAttemptHistory = taskAttemptHistory.slice(-5);
-    return _.reduce(taskAttemptHistory.toJS(), (total, task) => {
-        return total + ((task.correct && !task.seen_hint) ? 1 : 0);
-    }, 0);
-};
-
 const ExerciseViewer = component(ExerciseMixin, function({topicTreeNode, exerciseStore}) {
     var content;
     if (exerciseStore.get("error")) {
         content = <div>Could not load exercise</div>;
     } else if (isKhanExercisesExercise(topicTreeNode)) {
-        var path = `/khan-exercises/exercises/${getFilename(toipcTreeNode)}`;
+        var path = `/khan-exercises/exercises/${getFilename(topicTreeNode)}`;
         content = <iframe src={path}/>;
     } else if (exerciseStore.get("taskComplete")) {
         content = <TaskCompleteView level={exerciseStore.get("level")} mastered={exerciseStore.get("mastered")} />;

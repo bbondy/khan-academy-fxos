@@ -7,7 +7,6 @@ const l10n = require("../l10n"),
     React = require("react"),
     classNames = require("classnames"),
     Util = require("../util"),
-    APIClient = require("../apiclient"),
     component = require("omniscient"),
     TopicTreeHelper = require("../data/topic-tree-helper"),
     {TranscriptViewer} = require("./transcript.js"),
@@ -128,7 +127,7 @@ const VideoMixin = {
         if (video && video.networkState === window.HTMLMediaElement.NETWORK_NO_SOURCE) {
             Util.log("Video has no source.", e);
             this.stopAnimatingPoints(false);
-            var downloadedUrl = videoStore.get("downloadedUrl");
+            var downloadedUrl = this.props.videoStore.get("downloadedUrl");
             if (!downloadedUrl && !this.cleanedUp) {
                 this.props.statics.editVideo((video) => video.merge({
                     showOfflineImage: true,

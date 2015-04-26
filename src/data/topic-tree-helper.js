@@ -88,7 +88,7 @@ const getKey = (topicTreeNode) => {
 };
 
 const getKAUrl = (topicTreeNode) => {
-    var value = getMinifiedPropFromNode(topicTreeNode,"ka_url");
+    var value = getMinifiedPropFromNode(topicTreeNode, "ka_url");
     if (!value) {
         return null;
     }
@@ -111,7 +111,7 @@ const getYoutubeId = (topicTreeNode) =>
     getMinifiedPropFromNode(topicTreeNode, "youtube_id");
 
 const getDuration = (topicTreeNode) =>
-    getMinifiedPropFromNode(topicTreeNode,"duration");
+    getMinifiedPropFromNode(topicTreeNode, "duration");
 
 const getPoints = (topicTreeNode) =>
     topicTreeNode.get("points") || 0;
@@ -120,7 +120,7 @@ const getContentMimeType = (topicTreeNode) =>
     isVideo(topicTreeNode) ? "video/mp4" : "text/html";
 
 const getDownloadUrl = (topicTreeNode) => {
-    var value = getMinifiedPropFromNode(topicTreeNode,"download_urls");
+    var value = getMinifiedPropFromNode(topicTreeNode, "download_urls");
     if (!value) {
         return null;
     }
@@ -131,10 +131,10 @@ const getDownloadUrl = (topicTreeNode) => {
 };
 
 const getName = (topicTreeNode)  =>
-    getMinifiedPropFromNode(topicTreeNode,"name");
+    getMinifiedPropFromNode(topicTreeNode, "name");
 
 const isPerseusExercise = (topicTreeNode) =>
-    !getMinifiedPropFromNode(topicTreeNode,"file_name");
+    !getMinifiedPropFromNode(topicTreeNode, "file_name");
 
 const isKhanExercisesExercise = (topicTreeNode) =>
     !!getMinifiedPropFromNode(topicTreeNode, "file_name");
