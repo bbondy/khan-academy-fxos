@@ -25,6 +25,10 @@ window.Exercises = {
     cluesEnabled: false
 };
 
+/**
+ * Component used to render a completion notice for when a stack of tasks
+ * is complete.
+ */
 const TaskCompleteView = component(({level}) =>
     <div>
         <h1 data-l10n-id="you-did-it">You did it!</h1>
@@ -190,6 +194,9 @@ const ExerciseMixin = {
     },
 };
 
+/**
+ * Component used to render an exercise.
+ */
 export const ExerciseViewer = component(ExerciseMixin, function({topicTreeNode, exerciseStore}) {
     var content;
     if (exerciseStore.get("error")) {
