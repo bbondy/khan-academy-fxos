@@ -26,25 +26,25 @@ const Util = {
     /**
      * Wrapper around console.log
      */
-    log: function() {
+    log: function(...args) {
         if (typeof console !== "undefined") {
-            console.log(Array.prototype.slice.call(arguments));
+            console.log(...args);
         }
     },
     /**
      * Wrapper around console.warn
      */
-    warn: function() {
+    warn: function(...args) {
         if (typeof console !== "undefined") {
-            console.warn(Array.prototype.slice.call(arguments));
+            console.warn(...args);
         }
     },
     /**
      * Wrapper around console.error
      */
-    error: function() {
+    error: function(...args) {
         if (typeof console !== "undefined") {
-            console.error(Array.prototype.slice.call(arguments));
+            console.error(...args);
         }
     },
     /**
