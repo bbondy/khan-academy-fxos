@@ -18,13 +18,12 @@ import component from "omniscient";
  * which are the children of the clicked item.
  */
 const TopicListItem = component(({topicTreeNode, domainTopicTreeNode, options}, {onClickTopic}) => {
-    var topicClassObj = {
+    const topicClass = classNames({
         "topic-item": true,
         faded: options.get("showDownloadsOnly") &&
             getDownloadCount(topicTreeNode),
-    };
-    topicClassObj[getId(domainTopicTreeNode)] = true;
-    var topicClass = classNames(topicClassObj);
+        [getId(domainTopicTreeNode)]: true,
+    });
     return <li className={topicClass}>
         { getKey(topicTreeNode) === getKey(domainTopicTreeNode) &&
             <div className="color-block"/> }
@@ -41,6 +40,7 @@ const TopicListItem = component(({topicTreeNode, domainTopicTreeNode, options}, 
  * When clicked, it will render the video corresponding to this list item.
  */
 export const ContentListItem = component(({topicTreeNode, domainTopicTreeNode, options}, {onClick}) => {
+    const domainId = domainTopicTreeNode && getId(domainTopicTreeNode) || "unknown";
     var contentNodeClass = classNames({
       "article-node": isArticle(topicTreeNode),
       "video-node": isVideo(topicTreeNode),
@@ -48,29 +48,24 @@ export const ContentListItem = component(({topicTreeNode, domainTopicTreeNode, o
       completed: isCompleted(topicTreeNode),
       "in-progress": isStarted(topicTreeNode),
     });
-    var pipeClassObj = {
+    const pipeClass = classNames({
         pipe: true,
         completed: isCompleted(topicTreeNode),
         "in-progress": isStarted(topicTreeNode),
-    };
-    var subwayIconClassObj = {
+        [domainId]: !!domainTopicTreeNode,
+    });
+    const subwayIconClass = classNames({
         "subway-icon": true,
-    };
-    var contentClassObj = {
+        [domainId]: !!domainTopicTreeNode,
+    });
+    const contentClass = classNames({
         "video-item": isVideo(topicTreeNode),
         "article-item": isArticle(topicTreeNode),
         "exercise-item": isExercise(topicTreeNode),
         faded: options.get("showDownloadsOnly") &&
-            !isDownloaded(topicTreeNode)
-    };
-    if (domainTopicTreeNode) {
-        subwayIconClassObj[getId(domainTopicTreeNode)] = true;
-        contentClassObj[getId(domainTopicTreeNode)] = true;
-        pipeClassObj[getId(domainTopicTreeNode)] = true;
-    }
-    var subwayIconClass = classNames(subwayIconClassObj);
-    var pipeClass = classNames(pipeClassObj);
-    var contentClass = classNames(contentClassObj);
+            !isDownloaded(topicTreeNode),
+        [domainId]: !!domainTopicTreeNode,
+    });
     return <li className={contentClass}>
         <div className={subwayIconClass}>
             <a href="javascript:void(0)"

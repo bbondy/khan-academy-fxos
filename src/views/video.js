@@ -191,7 +191,6 @@ const VideoMixin = {
         }
     },
 
-    videoClass: null,
     videoSrc: null,
     videoNode: null,
     videoId: null,
@@ -349,16 +348,14 @@ export const VideoViewer = component(VideoMixin, function({videoStore, topicTree
         pointsDiv = <div className="energy-points energy-points-video">{pointsString}</div>;
     }
 
-    var videoClassObj = {
+    const domainId = domainTopicTreeNode && getId(domainTopicTreeNode) || "unknown";
+    this.videoClass = classNames({
       "video-has-transcript": !!transcript,
       "video-js": true,
       "vjs-default-skin": true,
-      "signed-in": isSignedIn()
-    };
-    if (domainTopicTreeNode) {
-        videoClassObj[getId(domainTopicTreeNode)] = true;
-    }
-    this.videoClass = classNames(videoClassObj);
+      "signed-in": isSignedIn(),
+      [domainId]: !!domainTopicTreeNode,
+    });
 
     var control;
     if (videoStore.get("showOfflineImage")) {

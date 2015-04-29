@@ -78,17 +78,15 @@ export const AppHeader = component((props, {onClickBack}) => {
                                  topicTreeNode={topicTreeNode}/>;
     }
 
-    var styleObj = {
+    const domainId = props.domainTopicTreeNode && getId(props.domainTopicTreeNode) || "unknown";
+    const styleClass = classNames({
         fixed: true,
         "topic-header": topicTreeNode &&
             getKey(topicTreeNode) !== getKey(props.rootTopicTreeNode) &&
             !props.isPaneShowing &&
-            (isTopic(topicTreeNode) || isContent(topicTreeNode))
-    };
-    if (props.domainTopicTreeNode && !props.isPaneShowing) {
-        styleObj[getId(props.domainTopicTreeNode)] = true;
-    }
-    var styleClass = classNames(styleObj);
+            (isTopic(topicTreeNode) || isContent(topicTreeNode)),
+        [domainId]: !!props.domainTopicTreeNode && !props.isPaneShowing,
+    });
 
     var title = "Khan Academy";
     if (props.isDownloadsShowing) {
