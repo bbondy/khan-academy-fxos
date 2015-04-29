@@ -194,6 +194,49 @@ const ExerciseMixin = {
     },
 };
 
+const TaskAttempts = component(({taskAttemptHistory}) =>
+        <div>
+        {
+            _.map(_.range(5), (i) => {
+                if (i >= taskAttemptHistory.length) {
+                    return <i className="attempt-icon attempt-pending fa fa-circle-o"></i>;
+                } else if (taskAttemptHistory.get(i).get("seen_hint")) {
+                    return <i className="attempt-icon attempt-hint  fa fa-lightbulb-o"></i>;
+                } else if (!taskAttemptHistory.get(i).get("correct")) {
+                    return <i className="attempt-icon attempt-wrong fa fa-times-circle-o"></i>;
+                } else {
+                    return <i className="attempt-icon attempt-correct fa fa-check-circle-o"></i>;
+                }
+            })
+
+        }
+        </div>).jsx;
+
+const StreakInfo = component(({streak, longestStreak}) => {
+    var streakText;
+    if (streak > 5) {
+        streakText = l10n.get("correct-streak", {
+            count: streak,
+        });
+    }
+    var longestStreakText;
+    if (longestStreak > 5) {
+        longestStreakText = l10n.get("longest-correct-streak", {
+            count: longestStreak,
+        });
+    }
+
+    return <div>
+        <div>
+            {streakText}
+        </div>
+        <div>
+            {longestStreakText}
+        </div>
+    </div>;
+}).jsx;
+
+
 /**
  * Component used to render an exercise.
  */
@@ -208,43 +251,10 @@ export const ExerciseViewer = component(ExerciseMixin, function({topicTreeNode, 
         content = <TaskCompleteView level={exerciseStore.get("level")} mastered={exerciseStore.get("mastered")} />;
     } else if (this.ItemRenderer && exerciseStore.get("perseusItemData")) {
         var showHintsButton = exerciseStore.get("perseusItemData").get("hints").length > (exerciseStore.get("hintsUsed") || 0);
-        // Always show 5 attempt icons with either pending, correct, hint or wrong
-        var attemptIcons = [];
-        var taskAttemptHistory = exerciseStore.get("taskAttemptHistory").slice(-5);
-        for (var i = 0; i < 5; i++) {
-            if (i >= taskAttemptHistory.length) {
-                attemptIcons.push(<i className="attempt-icon attempt-pending fa fa-circle-o"></i>);
-            } else if (taskAttemptHistory.get(i).get("seen_hint")) {
-                attemptIcons.push(<i className="attempt-icon attempt-hint  fa fa-lightbulb-o"></i>);
-            } else if (!taskAttemptHistory.get(i).get("correct")) {
-                attemptIcons.push(<i className="attempt-icon attempt-wrong fa fa-times-circle-o"></i>);
-            } else {
-                attemptIcons.push(<i className="attempt-icon attempt-correct fa fa-check-circle-o"></i>);
-            }
-        }
-
-        var streakText;
-        if (exerciseStore.get("streak") > 5) {
-            streakText = l10n.get("correct-streak", {
-                count: exerciseStore.get("streak"),
-            });
-        }
-        var longestStreakText;
-        if (exerciseStore.get("longestStreak") > 5) {
-            longestStreakText = l10n.get("longest-correct-streak", {
-                count: exerciseStore.get("longestStreak"),
-            });
-        }
-
         content = <div className="framework-perseus">
                       <div className="problem-history">
-                          {attemptIcons}
-                          <div>
-                              {streakText}
-                          </div>
-                          <div>
-                              {longestStreakText}
-                          </div>
+                          <TaskAttempts taskAttemptHistory={exerciseStore.get("taskAttemptHistory").slice(-5)}/>
+                          <StreakInfo streak={exerciseStore.get("streak")} longestStreak={exerciseStore.get("longestStreak") }/>
                       </div>
 
                       <this.ItemRenderer ref="itemRenderer"
