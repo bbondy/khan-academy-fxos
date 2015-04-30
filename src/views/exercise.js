@@ -155,7 +155,20 @@ const ExerciseMixin = {
                     this.refreshRandomAssessment();
                 } else {
                     // Refresh attempt info so it shows up as wrong
-                    this.refreshUserExerciseInfo();
+                    this.refreshUserExerciseInfo().then((userExerciseInfo) => {
+                        this.props.statics.editExercise((exercise) =>
+                            exercise.merge({
+                                level: userExerciseInfo.level,
+                                mastered: userExerciseInfo.mastered,
+                                practiced: userExerciseInfo.practiced,
+                                problemNumber: userExerciseInfo.problemNumber,
+                                streak: userExerciseInfo.streak,
+                                taskId: userExerciseInfo.taskId,
+                                taskAttemptHistory: userExerciseInfo.taskAttemptHistory || [],
+                                longestStreak: userExerciseInfo.longestStreak
+                            })
+                        );
+                    });
                 }
             });
     },
