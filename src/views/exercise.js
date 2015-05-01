@@ -253,6 +253,7 @@ const StreakInfo = component(({streak, longestStreak}) => {
  * Component used to render a legacy exercise
  */
 const LegacyExerciseViewer = component(({filePath}) => <iframe src={filePath}/>).jsx;
+const ExerciseLoadError = component(() => <div data-l10n-id="exercise-load-error">Could not load exercise</div>).jsx;
 
 
 /**
@@ -261,10 +262,9 @@ const LegacyExerciseViewer = component(({filePath}) => <iframe src={filePath}/>)
 export const ExerciseViewer = component(ExerciseMixin, function({topicTreeNode, exerciseStore}) {
     var content;
     if (exerciseStore.get("error")) {
-        content = <div>Could not load exercise</div>;
+        content = <ExerciseLoadError/>;
     } else if (isKhanExercisesExercise(topicTreeNode)) {
-        var path = `/khan-exercises/exercises/${getFilename(topicTreeNode)}`;
-        content = <LegacyExerciseViewer filePath={path}/>;
+        content = <LegacyExerciseViewer filePath={`/khan-exercises/exercises/${getFilename(topicTreeNode)}`}/>;
     } else if (exerciseStore.get("taskComplete")) {
         content = <TaskCompleteView level={exerciseStore.get("level")} mastered={exerciseStore.get("mastered")} />;
     } else if (this.ItemRenderer && exerciseStore.get("perseusItemData")) {
