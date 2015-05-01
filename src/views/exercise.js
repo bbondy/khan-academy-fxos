@@ -249,6 +249,11 @@ const StreakInfo = component(({streak, longestStreak}) => {
     </div>;
 }).jsx;
 
+/**
+ * Component used to render a legacy exercise
+ */
+const LegacyExerciseViewer = component(({filePath}) => <iframe src={filePath}/>).jsx;
+
 
 /**
  * Component used to render an exercise.
@@ -259,7 +264,7 @@ export const ExerciseViewer = component(ExerciseMixin, function({topicTreeNode, 
         content = <div>Could not load exercise</div>;
     } else if (isKhanExercisesExercise(topicTreeNode)) {
         var path = `/khan-exercises/exercises/${getFilename(topicTreeNode)}`;
-        content = <iframe src={path}/>;
+        content = <LegacyExerciseViewer filePath={path}/>;
     } else if (exerciseStore.get("taskComplete")) {
         content = <TaskCompleteView level={exerciseStore.get("level")} mastered={exerciseStore.get("mastered")} />;
     } else if (this.ItemRenderer && exerciseStore.get("perseusItemData")) {
