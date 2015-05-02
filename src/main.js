@@ -40,6 +40,11 @@ document.addEventListener("visibilitychange", function(e) {
 const initialState = Immutable.fromJS({
     options: readOptions() || resetOptions(),
     navInfo: resetNavInfo(),
+    user: {
+        loggedIn: false,
+        startedEntities: [],
+        completedEntities: [],
+    },
     tempStore: {
         video: {},
         exercise: {},
