@@ -1,4 +1,5 @@
 import _ from "underscore";
+import React from "react";
 import { writeOptions } from "./data/app-options";
 
 /**

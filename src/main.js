@@ -13,13 +13,9 @@ import React from "react";
 import {readOptions, resetOptions} from "./data/app-options";
 import {readTopicTree} from "./data/topic-tree";
 import {resetNavInfo} from "./data/nav-info";
-import {Renderer} from "./renderer";
+import {editorForPath, Renderer} from "./renderer";
 import Immutable from "immutable";
-
-// TODO: remove, just for easy inpsection
-window.APIClient = APIClient;
-window.Util = Util;
-window.React = React;
+import {refreshLoggedInInfo} from "./user";
 
 document.querySelector("body").addEventListener("contextmenu", function(e) {
     Util.log("contextmenu!");
@@ -41,7 +37,7 @@ const initialState = Immutable.fromJS({
     options: readOptions() || resetOptions(),
     navInfo: resetNavInfo(),
     user: {
-        loggedIn: false,
+        userInfo: {},
         startedEntities: [],
         completedEntities: [],
     },
@@ -73,6 +69,10 @@ Storage.init().then(function() {
 }).then(function() {
     // We don't want to have to wait for results, so just start this and don't wait
     CurrentUser.init();
+
+    const editUser = editorForPath(renderer.edit, "user");
+    refreshLoggedInInfo(editUser);
+
 }).catch((error) => {
     alert(error);
     if (Util.isFirefoxOS()) {

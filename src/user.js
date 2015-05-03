@@ -1,5 +1,6 @@
 import APIClient from "./apiclient";
 import {getId, getDuration, getPoints, getYoutubeId} from "./data/topic-tree-helper";
+import _ from "underscore";
 
 const userInfoLocalStorageName = "userInfo-3";
 
@@ -120,3 +121,90 @@ export const reportVideoProgress = (topicTreeCursor, editVideo, secondsWatched, 
         });
     });
 };
+
+
+export const refreshLoggedInInfo = (editUser, forceRefreshAllInfo) => {
+    return new Promise((resolve, reject) => {
+        if (!isSignedIn()) {
+            return resolve();
+        }
+
+        // Get the user profile info
+        APIClient.getUserInfo().then((result) => {
+            Util.log("getUserInfo: %o", result);
+            editUser((user) => user.merge({
+                userInfo: {
+                    avatarUrl: result.avatar_url,
+                    joined: result.joined,
+                    nickname: result.nickname,
+                    username: result.username,
+                    points: result.points,
+                    badgeCounts: result.badge_counts
+                },
+            }));
+
+            // TODO
+            /*this._saveUserInfo();
+
+            if (!forceRefreshAllInfo && this._loadLocalStorageData()) {
+                Util.log("User info only obtained. Not obtaining user data because we have it cached already!");
+                return;
+            }
+            */
+
+            // The call is needed for completed/in progress status of content items
+            // Unlike getUserVideos, this includes both articles and videos.
+            return APIClient.getUserProgress();
+
+        }).then((data) => {
+            Util.log("getUserProgress: %o", data);
+            // Get rid of the 'a' and 'v' prefixes, and set the completed / started
+            // attributes accordingly.
+            const startedEntityIds = _.map(data.started, function(e) {
+                return e.substring(1);
+            });
+            const completedEntityIds = _.map(data.complete, function(e) {
+                return e.substring(1);
+            });
+
+            editUser((user) => user.merge({
+                startedEntities: startedEntityIds,
+                completedEntities: completedEntityIds,
+            }));
+
+            // Update topic tree models
+            // TODO
+            /*
+            this._syncStartedToTopicTree(true);
+            this._syncCompletedToTopicTree(true);
+
+            // Save to local storage
+            this._saveStarted();
+            this._saveCompleted();
+            */
+
+            return APIClient.getUserVideos();
+        }).then((userVideosResults) => {
+            // The call is needed for the last second watched and points of each watched item.
+            // TODO
+            /*
+            this.set("userVideos", userVideosResults);
+            this._syncUserVideoProgressToTopicTree(true);
+            this._saveUserVideos();
+            */
+
+            return APIClient.getUserExercises();
+        }).then((userExercisesResults) => {
+            // TODO
+            /*
+            this.set("userExercises", userExercisesResults);
+            this._syncUserExerciseProgressToTopicTree(true);
+            this._saveUserExercises();
+            */
+            resolve();
+        }).catch(() => {
+            reject();
+        });
+    });
+};
+

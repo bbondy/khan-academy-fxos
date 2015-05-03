@@ -1,5 +1,6 @@
 import {isVideo, getId, getYoutubeId, isDownloaded} from "../data/topic-tree-helper";
 import Immutable from "immutable";
+import APIClient from "../apiclient";
 
 export const loadTranscriptIfVideo = (options, editVideo) => (topicTreeNode) => {
     if (!isVideo(topicTreeNode)) {

@@ -1,4 +1,5 @@
 import _ from "underscore";
+import React from "react";
 import component from "omniscient";
 
 const getTotalSeconds = (startMilliseconds) => {

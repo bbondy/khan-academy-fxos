@@ -13,7 +13,8 @@
  */
 
 import Util from "./util";
-import {CurrentUser, AppOptions, TopicTree} from "./models";
+import {AppOptions, TopicTree} from "./models";
+import {refreshLoggedInInfo} from "./user"
 
 const TEN_MINUTES = 1000 * 60 * 10;
 const Cache = {
@@ -58,7 +59,7 @@ const Cache = {
             Util.log("heartbeat: no need to refresh user info yet!");
         } else {
             Util.log("heartbeat: Refreshing logged in info!");
-            CurrentUser.refreshLoggedInInfo(true).then(() => {
+            refreshLoggedInInfo(true).then(() => {
                 this.lastUserInfoRefresh = new Date();
                 localStorage.setItem(this.heartbeatUserInfoName, this.lastUserInfoRefresh);
             });
