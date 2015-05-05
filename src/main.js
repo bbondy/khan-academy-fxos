@@ -40,6 +40,8 @@ const initialState = Immutable.fromJS({
         userInfo: {},
         startedEntities: [],
         completedEntities: [],
+        userVideos: [],
+        userExercises: [],
     },
     tempStore: {
         video: {},
@@ -71,7 +73,7 @@ Storage.init().then(function() {
     CurrentUser.init();
 
     const editUser = editorForPath(renderer.edit, "user");
-    refreshLoggedInInfo(editUser);
+    refreshLoggedInInfo(renderer.state.get("user"), editUser);
 
 }).catch((error) => {
     alert(error);

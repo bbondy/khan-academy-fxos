@@ -1,30 +1,105 @@
 import APIClient from "./apiclient";
 import {getId, getDuration, getPoints, getYoutubeId} from "./data/topic-tree-helper";
 import _ from "underscore";
+import Util from "./util";
 
 const userInfoLocalStorageName = "userInfo-3";
 
 export const signIn = () => APIClient.signIn();
-export const signOut = () => {
-    // Unbind user specific data from the topic tree
-    // TODO
-    /*
-    this._syncStartedToTopicTree(false);
-    this._syncCompletedToTopicTree(false);
-    this._syncUserVideoProgressToTopicTree(false);
-    this._syncUserExerciseProgressToTopicTree(false);
-
-    // Remove userInfo from the model and clear its local storage
-    this.unset("userInfo");
-    */
+export const signOut = (editUser) => {
     localStorage.removeItem(userInfoLocalStorageName);
+
+    editUser((user) => user.merge({
+        userInfo: null,
+        startedEntities: [],
+        completedEntities: [],
+    }));
+
     return APIClient.signOut();
 };
 
 export const isSignedIn = () =>
     APIClient.isSignedIn();
 
-export const reportVideoProgress = (topicTreeCursor, editVideo, secondsWatched, lastSecondWatched) => {
+const getLocalStorageName = (base, userInfo) =>
+    base + "-uid-" + (userInfo.get("nickname") || userInfo.get("username"));
+
+const completedEntitiesLocalStorageName = _.partial(getLocalStorageName, "completed");
+const startedEntitiesLocalStorageName= _.partial(getLocalStorageName, "started");
+const userVideosLocalStorageName = _.partial(getLocalStorageName, "userVideos");
+const userExercisesLocalStorageName = _.partial(getLocalStorageName, "userExercises");
+
+const saveUserInfo = (userInfo) => {
+    localStorage.removeItem(userInfoLocalStorageName);
+    localStorage.setItem(userInfoLocalStorageName, JSON.stringify(userInfo));
+};
+
+const saveStarted = (userInfo, startedEntityIds) => {
+    localStorage.removeItem(startedEntitiesLocalStorageName(userInfo));
+    localStorage.setItem(startedEntitiesLocalStorageName(), JSON.stringify(startedEntityIds));
+};
+
+const saveCompleted = (userInfo, completedEntityIds) => {
+    localStorage.removeItem(completedEntitiesLocalStorageName(userInfo));
+    localStorage.setItem(completedEntitiesLocalStorageName(), JSON.stringify(completedEntityIds));
+};
+
+const saveUserVideos = (userInfo, userVideos) => {
+    userVideos = userVideos.map((userVideo) => {
+        return {
+            duration: userVideo.duration,
+            last_second_watched: userVideo.last_second_watched,
+            points: userVideo.points,
+            video: {
+                id: userVideo.id
+            }
+        };
+    });
+    localStorage.removeItem(userVideosLocalStorageName(userInfo));
+    localStorage.setItem(userVideosLocalStorageName(), JSON.stringify(userVideos));
+};
+
+const saveUserExercises = (userInfo, userExercises) => {
+    userExercises = userExercises.map((exercise) => {
+        return {
+            streak: exercise.streak,
+            total_correct: exercise.total_correct,
+            total_done: exercise.total_done,
+            exercise_model: {
+                content_id: exercise.exercise_model.content_id
+            }
+        };
+    });
+
+    // The extra removeItem calls before the setItem calls help in case local storage is almost full
+    localStorage.removeItem(userExercisesLocalStorageName(userInfo));
+    localStorage.setItem(userExercisesLocalStorageName(), JSON.stringify(userExercises));
+};
+
+const loadLocalStorageData = (userInfo) => {
+    var result = {};
+    var completedEntityIds = localStorage.getItem(completedEntitiesLocalStorageName(userInfo));
+    if (completedEntityIds) {
+        result.completedEntityIds = JSON.parse(completedEntityIds);
+    }
+    var startedEntityIds = localStorage.getItem(startedEntitiesLocalStorageName(userInfo));
+    if (startedEntityIds) {
+        result.startedEntityIds = JSON.parse(startedEntityIds);
+    }
+    var userVideos = localStorage.getItem(userVideosLocalStorageName(userInfo));
+    if (userVideos) {
+        result.userVideos = JSON.parse(userVideos);
+    }
+    var userExercises = localStorage.getItem(userExercisesLocalStorageName(userInfo));
+    if (userExercises) {
+        result.userExercises = JSON.parse(userExercises);
+    }
+
+    return result;
+};
+
+
+export const reportVideoProgress = (user, topicTreeCursor, editVideo, secondsWatched, lastSecondWatched) => {
     return new Promise((resolve, reject) => {
         var youTubeId = getYoutubeId(topicTreeCursor);
         var videoId = getId(topicTreeCursor);
@@ -58,7 +133,7 @@ export const reportVideoProgress = (topicTreeCursor, editVideo, secondsWatched, 
                 // That way notificaitons will go out automatically.
                 var userInfo = CurrentUser.get("userInfo");
                 userInfo.points += result.points_earned;
-                CurrentUser._saveUserInfo();
+                saveUserInfo(user.get("userInfo"));
             }
 
             editVideo((video) =>
@@ -103,10 +178,10 @@ export const reportVideoProgress = (topicTreeCursor, editVideo, secondsWatched, 
                 this.get("userVideos").push(foundUserVideo);
             }
 
-            this._saveStarted();
-            this._saveCompleted();
-            this._saveUserVideos();
-            this._saveUserExercises();
+            saveStarted(user.get("userInfo"), user.get("startedEntities"));
+            saveCompleted(user.get("userInfo"), user.get("completedEntities"));
+            saveUserVideos(user.get("userInfo"), user.get("userVideos"));
+            saveUserExercises(user.get("userInfo"), user.get("userExercises"));
 
             resolve({
                 completed: result.is_video_completed,
@@ -123,7 +198,7 @@ export const reportVideoProgress = (topicTreeCursor, editVideo, secondsWatched, 
 };
 
 
-export const refreshLoggedInInfo = (editUser, forceRefreshAllInfo) => {
+export const refreshLoggedInInfo = (user, editUser, forceRefreshAllInfo) => {
     return new Promise((resolve, reject) => {
         if (!isSignedIn()) {
             return resolve();
@@ -132,25 +207,25 @@ export const refreshLoggedInInfo = (editUser, forceRefreshAllInfo) => {
         // Get the user profile info
         APIClient.getUserInfo().then((result) => {
             Util.log("getUserInfo: %o", result);
+            const userInfo = {
+                avatarUrl: result.avatar_url,
+                joined: result.joined,
+                nickname: result.nickname,
+                username: result.username,
+                points: result.points,
+                badgeCounts: result.badge_counts
+            };
             editUser((user) => user.merge({
-                userInfo: {
-                    avatarUrl: result.avatar_url,
-                    joined: result.joined,
-                    nickname: result.nickname,
-                    username: result.username,
-                    points: result.points,
-                    badgeCounts: result.badge_counts
-                },
+                userInfo,
             }));
 
-            // TODO
-            /*this._saveUserInfo();
+            saveUserInfo(userInfo);
 
-            if (!forceRefreshAllInfo && this._loadLocalStorageData()) {
+            var result = loadLocalStorageData(user.get("userInfo"));
+            if (!forceRefreshAllInfo && result) {
                 Util.log("User info only obtained. Not obtaining user data because we have it cached already!");
-                return;
+                return result;
             }
-            */
 
             // The call is needed for completed/in progress status of content items
             // Unlike getUserVideos, this includes both articles and videos.
@@ -172,35 +247,15 @@ export const refreshLoggedInInfo = (editUser, forceRefreshAllInfo) => {
                 completedEntities: completedEntityIds,
             }));
 
-            // Update topic tree models
-            // TODO
-            /*
-            this._syncStartedToTopicTree(true);
-            this._syncCompletedToTopicTree(true);
-
             // Save to local storage
-            this._saveStarted();
-            this._saveCompleted();
-            */
-
+            saveStarted(user.get("userInfo"), startedEntityIds);
+            saveCompleted(user.get("userInfo"), completedEntityIds);
             return APIClient.getUserVideos();
         }).then((userVideosResults) => {
-            // The call is needed for the last second watched and points of each watched item.
-            // TODO
-            /*
-            this.set("userVideos", userVideosResults);
-            this._syncUserVideoProgressToTopicTree(true);
-            this._saveUserVideos();
-            */
-
+            saveUserVideos(user.get("userInfo"), userVideosResults);
             return APIClient.getUserExercises();
         }).then((userExercisesResults) => {
-            // TODO
-            /*
-            this.set("userExercises", userExercisesResults);
-            this._syncUserExerciseProgressToTopicTree(true);
-            this._saveUserExercises();
-            */
+            saveUserExercises(user.get("userInfo"), userExercisesResults);
             resolve();
         }).catch(() => {
             reject();
