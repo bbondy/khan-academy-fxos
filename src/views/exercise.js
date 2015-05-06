@@ -112,14 +112,14 @@ const ExerciseMixin = {
             });
     },
     onClickRequestHint: function() {
-        this.refs.itemRenderer.showHint();
+        this.refs.perseusExercise.refs.itemRenderer.showHint();
         this.props.statics.editExercise((exercise) => exercise.merge({
                 hintsUsed: (this.props.exerciseStore.get("hintsUsed") || 0) + 1,
             })
         );
     },
     onClickSubmitAnswer: function() {
-        var score = this.refs.itemRenderer.scoreInput();
+        var score = this.refs.perseusExercise.refs.itemRenderer.scoreInput();
         Util.log("score: %o", score);
         var secondsTaken = (new Date().getTime() - this.startTime) / 1000 | 0;
         var attemptNumber = ++this.attemptNumber;
@@ -254,6 +254,33 @@ const StreakInfo = component(({streak, longestStreak}) => {
  */
 const LegacyExerciseViewer = component(({filePath}) => <iframe src={filePath}/>).jsx;
 const ExerciseLoadError = component(() => <div data-l10n-id="exercise-load-error">Could not load exercise</div>).jsx;
+const ProblemHistory = component(({exerciseStore}) => <div className="problem-history">
+    <TaskAttempts taskAttemptHistory={exerciseStore.get("taskAttemptHistory").slice(-5)}/>
+    <StreakInfo streak={exerciseStore.get("streak")} longestStreak={exerciseStore.get("longestStreak") }/>
+</div>).jsx;
+
+const PerseusExercise = component(({exerciseStore, showHintsButton, ItemRenderer}, {onClickSubmitAnswer, onClickRequestHint}) => <div>
+    <ItemRenderer ref="itemRenderer"
+                       item={exerciseStore.get("perseusItemData").toJS()}
+                       key={exerciseStore.get("problemNumber")}
+                       problemNum={exerciseStore.get("problemNumber")}
+                       initialHintsVisible={0}
+                       enabledFeatures={{
+                         highlight: true,
+                         toolTipFormats: true
+                       }} />
+    <div id="workarea"/>
+    <div id="solutionarea"/>
+    <button className="submit-answer-button"
+            data-l10n-id="submit-answer"
+            onClick={onClickSubmitAnswer}>Submit Answer</button>
+    { !showHintsButton ? null :
+    <button className="submit-answer-button"
+            data-l10n-id="hint"
+            onClick={onClickRequestHint}>Hint</button>
+    }
+    <div id="hintsarea"/>
+</div>).jsx;
 
 
 /**
@@ -268,35 +295,17 @@ export const ExerciseViewer = component(ExerciseMixin, function({topicTreeNode, 
     } else if (exerciseStore.get("taskComplete")) {
         content = <TaskCompleteView level={exerciseStore.get("level")} mastered={exerciseStore.get("mastered")} />;
     } else if (this.ItemRenderer && exerciseStore.get("perseusItemData")) {
-        var showHintsButton = exerciseStore.get("perseusItemData").get("hints").length > (exerciseStore.get("hintsUsed") || 0);
         content = <div className="framework-perseus">
-                      <div className="problem-history">
-                          <TaskAttempts taskAttemptHistory={exerciseStore.get("taskAttemptHistory").slice(-5)}/>
-                          <StreakInfo streak={exerciseStore.get("streak")} longestStreak={exerciseStore.get("longestStreak") }/>
-                      </div>
-
-                      <this.ItemRenderer ref="itemRenderer"
-                                         item={exerciseStore.get("perseusItemData").toJS()}
-                                         key={exerciseStore.get("problemNumber")}
-                                         problemNum={exerciseStore.get("problemNumber")}
-                                         initialHintsVisible={0}
-                                         enabledFeatures={{
-                                             highlight: true,
-                                             toolTipFormats: true
-                                         }} />
-                      <div id="workarea"/>
-                      <div id="solutionarea"/>
-
-                      <button className="submit-answer-button"
-                              data-l10n-id="submit-answer"
-                              onClick={this.onClickSubmitAnswer}>Submit Answer</button>
-                      { !showHintsButton ? null :
-                      <button className="submit-answer-button"
-                              data-l10n-id="hint"
-                              onClick={this.onClickRequestHint}>Hint</button>
-                      }
-                      <div id="hintsarea"/>
-                  </div>;
+            <ProblemHistory exerciseStore={exerciseStore}/>
+            <PerseusExercise exerciseStore={exerciseStore}
+                             ref="perseusExercise"
+                             showHintsButton={exerciseStore.get("perseusItemData").get("hints").length > (exerciseStore.get("hintsUsed") || 0)}
+                             ItemRenderer={this.ItemRenderer}
+                             statics={{
+                                 onClickRequestHint: this.onClickRequestHint,
+                                 onClickSubmitAnswer: this.onClickSubmitAnswer,
+                             }}/>
+        </div>;
     }
 
     Util.log("render exercise: :%o", topicTreeNode);
