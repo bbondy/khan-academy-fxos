@@ -11,26 +11,26 @@ import {ContentListViewer} from "./topic";
 import component from "omniscient";
 import { resetOptions } from "../data/app-options";
 
+const NoDownloads = component(() =>
+    <div className="downloads">
+        <div data-l10n-id="no-downloads">You have no downloads yet!</div>
+    </div>
+).jsx;
+
 /**
  * Represents a downloads list which is basically just a wrapper around a
  * ContentListViewer for now.
  */
-export const DownloadsViewer = component(({options}, {onClickContentItem}) => {
-    if (!Downloads.contentList.length) {
-        return <div className="downloads">
-            <div data-l10n-id="no-downloads">You have no downloads yet!</div>
-        </div>;
-    }
-
-    var control = <ContentListViewer topicTreeNodes={Downloads.contentList}
-                                     options={options}
-                                     statics={{
-                                         onClickContentItem,
-                                     }}/>;
-    return <div className="downloads topic-list-container">
-        {control}
-    </div>;
-}).jsx;
+export const DownloadsViewer = component(({options}, {onClickContentItem}) =>
+    !Downloads.contentList.length ? <NoDownloads/> :
+    <div className="downloads topic-list-container">
+        <ContentListViewer topicTreeNodes={Downloads.contentList}
+                           options={options}
+                           statics={{
+                               onClickContentItem,
+                           }}/>;
+    </div>
+).jsx;
 
 /**
  * Represents a list of settings which can be modified which affect
