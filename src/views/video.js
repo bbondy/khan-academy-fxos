@@ -305,6 +305,17 @@ const VideoMixin = {
     },
 };
 
+export const VideoInfoBar = component(({earned, available}) =>
+    isSignedIn() && <div className="video-info-bar">
+       <div className="energy-points energy-points-video">{
+            l10n.get("points-so-far", {
+                earned,
+                available,
+            })
+        }</div>
+    </div>
+).jsx;
+
 export const VideoViewer = component(VideoMixin, function({videoStore, topicTreeNode, domainTopicTreeNode}) {
     const onClickTranscript = (obj) => {
         var startSecond = obj.get("start_time") / 1000 | 0;
@@ -338,15 +349,6 @@ export const VideoViewer = component(VideoMixin, function({videoStore, topicTree
         this.videoSrc = downloadedUrl;
     }
     Util.log("video rendered with url: " + this.videoSrc);
-    var pointsString = l10n.get("points-so-far", {
-        earned: getPoints(topicTreeNode),
-        available: this.availablePoints
-    });
-
-    var pointsDiv;
-    if (isSignedIn()) {
-        pointsDiv = <div className="energy-points energy-points-video">{pointsString}</div>;
-    }
 
     const domainId = domainTopicTreeNode && getId(domainTopicTreeNode) || "unknown";
     this.videoClass = classNames({
@@ -369,9 +371,9 @@ export const VideoViewer = component(VideoMixin, function({videoStore, topicTree
     // or something along those lines.
     // http://fastly.kastatic.org/KA-youtube-converted/wx2gI8iwMCA.mp4/wx2gI8iwMCA.mp4
     return <div className="video-viewer-container">
-        {control}
-         <div className="video-info-bar">{pointsDiv}</div>
-         <div id="overlay"></div>
-        {transcriptViewer}
+       {control}
+        <VideoInfoBar available={this.availablePoints} earned={getPoints(topicTreeNode)} />
+        <div id="overlay"></div>
+       {transcriptViewer}
     </div>;
 }).jsx;
