@@ -31,7 +31,7 @@ export const TranscriptItem = component(({transcriptItem}, {onClickTranscript}) 
  * Represents the entire transcript, which is a list of TranscriptItems.
  */
 export const TranscriptViewer = component(({collection}, {onClickTranscript}) =>
-    <ul className="transcript">
+    collection && <ul className="transcript">
     {
         collection.map((transcriptItem) => {
             return <TranscriptItem transcriptItem={transcriptItem}
@@ -41,5 +41,5 @@ export const TranscriptViewer = component(({collection}, {onClickTranscript}) =>
                 }}/>;
         })
     }
-    </ul>
+    </ul> || null
 ).jsx;

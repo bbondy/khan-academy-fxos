@@ -313,7 +313,7 @@ export const VideoInfoBar = component(({earned, available}) =>
                 available,
             })
         }</div>
-    </div>
+    </div> || null
 ).jsx;
 
 export const VideoViewer = component(VideoMixin, function({videoStore, topicTreeNode, domainTopicTreeNode}) {
@@ -334,15 +334,6 @@ export const VideoViewer = component(VideoMixin, function({videoStore, topicTree
         }
     };
 
-    var transcriptViewer;
-    var transcript = videoStore.get("transcript");
-    if (transcript) {
-        transcriptViewer = <TranscriptViewer collection={transcript}
-                                             statics={{
-                                                 onClickTranscript
-                                             }}/>;
-    }
-
     this.videoSrc = getDownloadUrl(topicTreeNode);
     var downloadedUrl = videoStore.get("downloadedUrl");
     if (downloadedUrl) {
@@ -352,7 +343,7 @@ export const VideoViewer = component(VideoMixin, function({videoStore, topicTree
 
     const domainId = domainTopicTreeNode && getId(domainTopicTreeNode) || "unknown";
     this.videoClass = classNames({
-      "video-has-transcript": !!transcript,
+      "video-has-transcript": !!videoStore.get("transcript"),
       "video-js": true,
       "vjs-default-skin": true,
       "signed-in": isSignedIn(),
@@ -371,9 +362,12 @@ export const VideoViewer = component(VideoMixin, function({videoStore, topicTree
     // or something along those lines.
     // http://fastly.kastatic.org/KA-youtube-converted/wx2gI8iwMCA.mp4/wx2gI8iwMCA.mp4
     return <div className="video-viewer-container">
-       {control}
+        {control}
         <VideoInfoBar available={this.availablePoints} earned={getPoints(topicTreeNode)} />
         <div id="overlay"></div>
-       {transcriptViewer}
+        <TranscriptViewer collection={videoStore.get("transcript")}
+                          statics={{
+                              onClickTranscript
+                          }}/>
     </div>;
 }).jsx;
