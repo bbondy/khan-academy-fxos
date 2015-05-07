@@ -305,6 +305,9 @@ const VideoMixin = {
     },
 };
 
+/**
+ * Renders the little bar underneath the video for showing points earned
+ */
 export const VideoInfoBar = component(({earned, available}) =>
     isSignedIn() && <div className="video-info-bar">
        <div className="energy-points energy-points-video">{
@@ -316,6 +319,9 @@ export const VideoInfoBar = component(({earned, available}) =>
     </div> || null
 ).jsx;
 
+/**
+ * Renders the entire video component
+ */
 export const VideoViewer = component(VideoMixin, function({videoStore, topicTreeNode, domainTopicTreeNode}) {
     const onClickTranscript = (obj) => {
         var startSecond = obj.get("start_time") / 1000 | 0;
@@ -334,11 +340,7 @@ export const VideoViewer = component(VideoMixin, function({videoStore, topicTree
         }
     };
 
-    this.videoSrc = getDownloadUrl(topicTreeNode);
-    var downloadedUrl = videoStore.get("downloadedUrl");
-    if (downloadedUrl) {
-        this.videoSrc = downloadedUrl;
-    }
+    this.videoSrc = videoStore.get("downloadedUrl") || getDownloadUrl(topicTreeNode);
     Util.log("video rendered with url: " + this.videoSrc);
 
     const domainId = domainTopicTreeNode && getId(domainTopicTreeNode) || "unknown";
