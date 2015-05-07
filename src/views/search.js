@@ -63,13 +63,12 @@ export const TopicSearch = component(({topicTreeNode, searchValue}, {onTopicSear
  * Represents a search result list which is basically just a wrapper around a
  * ContentListViewer for now.
  */
-export const SearchResultsViewer  = component(({options, collection}, {onClickContentItem}) => {
-    var control = <ContentListViewer topicTreeNodes={collection}
-                                     options={options}
-                                     statics={{
-                                         onClickContentItem,
-                                     }}/>;
-    return <div className="topic-list-container">
-        {control}
-    </div>;
-}).jsx;
+export const SearchResultsViewer  = component(({options, collection}, {onClickContentItem}) =>
+    <div className="topic-list-container">
+        <ContentListViewer topicTreeNodes={collection}
+                           options={options}
+                           statics={{
+                               onClickContentItem,
+                           }}/>
+    </div>
+).jsx;
