@@ -244,6 +244,12 @@ export const MainView = component(({navInfo, options, tempStore}, {edit}) => {
     const editOptions = editorForPath(edit, "options");
     const editSearch = editorForPath(edit, ["tempStore", "search"]);
 
+    const onClickContentItemComposed = _.compose(
+        onClickContentItem(editNavInfo),
+        loadTranscriptIfVideo(options, editVideo),
+        loadVideoIfDownloadedVideo(editVideo),
+        loadIfArticle(editTempStore));
+
     var control;
     if (!navInfo.get("topicTreeNode")) {
         // Still loading topic tree
@@ -264,14 +270,9 @@ export const MainView = component(({navInfo, options, tempStore}, {edit}) => {
         control = <SearchResultsViewer collection={navInfo.get("searchResults")}
                                        options={options}
                                        statics={{
-                                           onClickContentItem: onClickContentItem(editNavInfo),
+                                           onClickContentItem: onClickContentItemComposed,
                                        }}/>;
     } else if (isTopic(navInfo.get("topicTreeNode"))) {
-        var onClickContentItemComposed = _.compose(
-            onClickContentItem(editNavInfo),
-            loadTranscriptIfVideo(options, editVideo),
-            loadVideoIfDownloadedVideo(editVideo),
-            loadIfArticle(editTempStore));
         control = <TopicViewer statics={{
                                    onClickTopic: onClickTopic(editNavInfo),
                                    onClickContentItem: onClickContentItemComposed,
