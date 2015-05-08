@@ -36,12 +36,12 @@ const saveUserInfo = (userInfo) => {
 
 const saveStarted = (userInfo, startedEntityIds) => {
     localStorage.removeItem(startedEntitiesLocalStorageName(userInfo));
-    localStorage.setItem(startedEntitiesLocalStorageName(), JSON.stringify(startedEntityIds));
+    localStorage.setItem(startedEntitiesLocalStorageName(userInfo), JSON.stringify(startedEntityIds));
 };
 
 const saveCompleted = (userInfo, completedEntityIds) => {
     localStorage.removeItem(completedEntitiesLocalStorageName(userInfo));
-    localStorage.setItem(completedEntitiesLocalStorageName(), JSON.stringify(completedEntityIds));
+    localStorage.setItem(completedEntitiesLocalStorageName(userInfo), JSON.stringify(completedEntityIds));
 };
 
 const saveUserVideos = (userInfo, userVideos) => {
@@ -56,7 +56,7 @@ const saveUserVideos = (userInfo, userVideos) => {
         };
     });
     localStorage.removeItem(userVideosLocalStorageName(userInfo));
-    localStorage.setItem(userVideosLocalStorageName(), JSON.stringify(userVideos));
+    localStorage.setItem(userVideosLocalStorageName(userInfo), JSON.stringify(userVideos));
 };
 
 const saveUserExercises = (userInfo, userExercises) => {
@@ -73,7 +73,7 @@ const saveUserExercises = (userInfo, userExercises) => {
 
     // The extra removeItem calls before the setItem calls help in case local storage is almost full
     localStorage.removeItem(userExercisesLocalStorageName(userInfo));
-    localStorage.setItem(userExercisesLocalStorageName(), JSON.stringify(userExercises));
+    localStorage.setItem(userExercisesLocalStorageName(userInfo), JSON.stringify(userExercises));
 };
 
 const loadLocalStorageData = (userInfo) => {
