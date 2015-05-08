@@ -102,14 +102,9 @@ export const AppHeader = component((props, {onClickBack}) => {
         title = l10n.get("search");
     }
 
-    var menuButton;
-    if (topicTreeNode) {
-        menuButton = <MenuButton/>;
-    }
-
     return <header className={styleClass}>
             {backButton}
-            {menuButton}
+            {topicTreeNode && <MenuButton/> || null}
             <h1 className="header-title">{title}</h1>
         </header>;
 }).jsx;
