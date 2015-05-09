@@ -239,6 +239,7 @@ export const MainView = component(({navInfo, options, tempStore}, {edit}) => {
     const editExercise = editorForPath(edit, ["tempStore", "exercise"]);
     const editOptions = editorForPath(edit, "options");
     const editSearch = editorForPath(edit, ["tempStore", "search"]);
+    const editUser = editorForPath(edit, "user");
 
     const onClickContentItemComposed = _.compose(
         onClickContentItem(editNavInfo),
@@ -314,7 +315,7 @@ export const MainView = component(({navInfo, options, tempStore}, {edit}) => {
         sidebar = <Sidebar topicTreeNode={navInfo.get("topicTreeNode")}
                            statics={{
                                onClickSignin: onClickSignin,
-                               onClickSignout: onClickSignout,
+                               onClickSignout: _.partial(onClickSignout, editUser),
                                onClickProfile: onClickProfile(editNavInfo),
                                onClickDownloads: onClickDownloads(editNavInfo),
                                onClickSettings: onClickSettings(editNavInfo),
