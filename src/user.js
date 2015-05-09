@@ -131,8 +131,8 @@ export const reportVideoProgress = (user, topicTreeCursor, editVideo, secondsWat
             if (result.points_earned > 0) {
                 // TODO: It would be better to store userInfo properties directly
                 // That way notificaitons will go out automatically.
-                var userInfo = CurrentUser.get("userInfo");
-                userInfo.points += result.points_earned;
+                // var userInfo = CurrentUser.get("userInfo");
+                // userInfo.points += result.points_earned;
                 saveUserInfo(user.get("userInfo"));
             }
 

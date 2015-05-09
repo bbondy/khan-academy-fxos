@@ -37,6 +37,7 @@ export class Renderer {
     render() {
         React.render(<this.component options={this.state.get("options")}
             navInfo={this.state.get("navInfo")}
+            user={this.state.get("user")}
             tempStore={this.state.get("tempStore")}
             statics={{
                 edit: this.edit

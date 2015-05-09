@@ -889,5 +889,3 @@ export const TempAppState = new BaseModel({
         showingStatus: false,
     }
 });
-
-export const CurrentUser = new UserModel();

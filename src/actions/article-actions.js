@@ -3,10 +3,11 @@ import APIClient from "../apiclient";
 import Immutable from "immutable";
 import {editorForPath} from "../renderer";
 import Storage from "../storage";
+import {isSignedIn} from "../user";
 
 export const reportArticleRead = (topicTreeNode) => {
     return new Promise((resolve, reject) => {
-        if (!models.CurrentUser.isSignedIn()) {
+        if (!isSignedIn()) {
             return setTimeout(resolve, 0);
         }
 

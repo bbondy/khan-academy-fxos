@@ -8,7 +8,7 @@ import l10n from "../l10n";
 import classNames from "classnames";
 import Util from "../util";
 import React from "react";
-import {TempAppState, CurrentUser} from "../models";
+import {TempAppState} from "../models";
 import {onClickBack, onClickTopic, onClickContentItemFromDownloads, onClickContentItem,
     onClickSignin, onClickSignout, onClickProfile, onClickDownloads, onClickSettings,
     onClickSupport, onClickDownloadContent, onClickViewOnKA, onClickShare,
@@ -18,6 +18,7 @@ import Storage from "../storage";
 import Downloads from "../downloads";
 import {VideoViewer} from "./video";
 import {ArticleViewer} from "./article";
+import {isSignedIn} from "../user";
 import {loadIfArticle} from "../actions/article-actions";
 import {loadVideoIfDownloadedVideo} from "../actions/video-actions";
 import {loadTranscriptIfVideo} from "../actions/transcript-actions";
@@ -179,14 +180,14 @@ export const Sidebar = component((props, statics) => {
 
     ////////////////////
     // Followed by sign in
-    if (!CurrentUser.isSignedIn()) {
+    if (!isSignedIn()) {
         // If the user is not signed in, add that option first
         items.push(<li key="sign-in"><a data-l10n-id="sign-in" href="#" onClick={statics.onClickSignin}>Sign In</a></li>);
     }
 
     ////////////////////
     // Followed by view pane items
-    if (CurrentUser.isSignedIn() && !props.isProfileShowing) {
+    if (isSignedIn() && !props.isProfileShowing) {
         // User is signed in, add all the signed in options here
         items.push(<li key="view-profile"><a  data-l10n-id="view-profile" className="view-profile-link" href="#" onClick={statics.onClickProfile}>View Profile</a></li>);
     }
@@ -200,7 +201,7 @@ export const Sidebar = component((props, statics) => {
     items.push(<li key="open-support"><a data-l10n-id="open-support" className="open-support-link" href="#" onClick={statics.onClickSupport}>Open support website</a></li>);
 
     // Add the signout button last
-    if (CurrentUser.isSignedIn()) {
+    if (isSignedIn()) {
         items.push(<li key="sign-out"><a data-l10n-id="sign-out" href="#" onClick={statics.onClickSignout}>Sign Out</a></li>);
     }
 
@@ -226,7 +227,7 @@ export const Sidebar = component((props, statics) => {
  * things when certain page actions change.  No other part of the code is repsonsible
  * for the overall top level view (which is nice and clean ;)).
  */
-export const MainView = component(({navInfo, options, tempStore}, {edit}) => {
+export const MainView = component(({navInfo, options, user, tempStore}, {edit}) => {
     // Make sure scrollTop is at the top of the page
     // This is in case the search box scrolling doesn't get an onblur
     if (navInfo.get("topicTreeNode") && !isContentList(navInfo.get("topicTreeNode"))) {
@@ -252,7 +253,7 @@ export const MainView = component(({navInfo, options, tempStore}, {edit}) => {
         // Still loading topic tree
         control = <div className="app-loading"/>;
     } else if (navInfo.get("showProfile")) {
-        control = <ProfileViewer/>;
+        control = <ProfileViewer userInfo={user.get("userInfo")}/>;
     } else if (navInfo.get("showDownloads")) {
         control = <DownloadsViewer statics={{
                                        onClickContentItem: onClickContentItemFromDownloads(editNavInfo)

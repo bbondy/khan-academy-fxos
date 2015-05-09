@@ -3,7 +3,6 @@
 "strict";
 
 import Util from "./util";
-import {CurrentUser} from "./models";
 import APIClient from "./apiclient";
 import Cache from "./cache";
 import Downloads from "./downloads";
@@ -70,7 +69,6 @@ Storage.init().then(function() {
     return Promise.all([Downloads.init(), Cache.init()]);
 }).then(function() {
     // We don't want to have to wait for results, so just start this and don't wait
-    CurrentUser.init();
 
     const editUser = editorForPath(renderer.edit, "user");
     refreshLoggedInInfo(renderer.state.get("user"), editUser);
