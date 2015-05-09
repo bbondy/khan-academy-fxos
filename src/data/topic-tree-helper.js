@@ -169,7 +169,8 @@ const _findContentItems = (topicTreeNode, search, results, maxResults) => {
         // TODO: Tokenize the `search` string and do an indexOf for each token
         // TODO: Allow for OR/AND search term strings
         if (getTitle(childNode) &&
-                getTitle(childNode).toLowerCase().indexOf(search) !== -1) {
+                getTitle(childNode).toLowerCase().indexOf(search) !== -1 ||
+                getId(childNode).indexOf(search) !== -1) {
             results.push(childNode);
         }
     });
