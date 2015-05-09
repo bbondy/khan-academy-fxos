@@ -87,7 +87,7 @@ export const ContentListItem = component(({topicTreeNode, domainTopicTreeNode, o
  * Represents a single topic and it displays a list of all of its children.
  * Each child of the list is a ContentListItem
  */
-export const TopicViewer = component(({topicTreeNode, domainTopicTreeNode, options, startedEntities, completedEntities},
+export const TopicViewer = component(({topicTreeNode, domainTopicTreeNode, options, startedEntityIds, completedEntityIds},
                                       {onClickTopic, onClickContentItem}) =>
     <div className="topic-list-container">
         <section data-type="list">
@@ -113,8 +113,8 @@ export const TopicViewer = component(({topicTreeNode, domainTopicTreeNode, optio
                             statics={{
                                 onClick: onClickContentItem
                             }}
-                            completed={completedEntities.contains(getId(topicTreeNode))}
-                            started={startedEntities.contains(getId(topicTreeNode))}
+                            completed={completedEntityIds.contains(getId(topicTreeNode))}
+                            started={startedEntityIds.contains(getId(topicTreeNode))}
                             topicTreeNode={topicTreeNode}
                             options={options}
                             domainTopicTreeNode={domainTopicTreeNode}
@@ -132,7 +132,7 @@ export const TopicViewer = component(({topicTreeNode, domainTopicTreeNode, optio
  * This is used for displaying search results and download lists.
  * This always contains only a list of VideoListItems, or ARticleListItems.
  */
-export const ContentListViewer = component(({topicTreeNodes, options, startedEntities, completedEntities},
+export const ContentListViewer = component(({topicTreeNodes, options, startedEntityIds, completedEntityIds},
                                             {onClickContentItem}) =>
     <div className="topic-list-container">
         <section data-type="list">
@@ -143,8 +143,8 @@ export const ContentListViewer = component(({topicTreeNodes, options, startedEnt
                         }}
                         topicTreeNode={topicTreeNode}
                         options={options}
-                        completed={completedEntities.contains(getId(topicTreeNode))}
-                        started={startedEntities.contains(getId(topicTreeNode))}
+                        completed={completedEntityIds.contains(getId(topicTreeNode))}
+                        started={startedEntityIds.contains(getId(topicTreeNode))}
                         key={getKey(topicTreeNode)} />
                     )
                 }

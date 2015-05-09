@@ -37,8 +37,8 @@ const initialState = Immutable.fromJS({
     navInfo: resetNavInfo(),
     user: {
         userInfo: {},
-        startedEntities: [],
-        completedEntities: [],
+        startedEntityIds: [],
+        completedEntityIds: [],
         userVideos: [],
         userExercises: [],
     },

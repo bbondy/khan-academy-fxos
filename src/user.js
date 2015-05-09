@@ -11,8 +11,8 @@ export const signOut = (editUser) => {
 
     editUser((user) => user.merge({
         userInfo: null,
-        startedEntities: [],
-        completedEntities: [],
+        startedEntityIds: [],
+        completedEntityIds: [],
     }));
 
     return APIClient.signOut();
@@ -24,8 +24,8 @@ export const isSignedIn = () =>
 const getLocalStorageName = (base, userInfo) =>
     base + "-uid-" + (userInfo.get("nickname") || userInfo.get("username"));
 
-const completedEntitiesLocalStorageName = _.partial(getLocalStorageName, "completed");
-const startedEntitiesLocalStorageName= _.partial(getLocalStorageName, "started");
+const completedEntityIdsLocalStorageName = _.partial(getLocalStorageName, "completed");
+const startedEntityIdsLocalStorageName= _.partial(getLocalStorageName, "started");
 const userVideosLocalStorageName = _.partial(getLocalStorageName, "userVideos");
 const userExercisesLocalStorageName = _.partial(getLocalStorageName, "userExercises");
 
@@ -35,13 +35,13 @@ const saveUserInfo = (userInfo) => {
 };
 
 const saveStarted = (userInfo, startedEntityIds) => {
-    localStorage.removeItem(startedEntitiesLocalStorageName(userInfo));
-    localStorage.setItem(startedEntitiesLocalStorageName(userInfo), JSON.stringify(startedEntityIds));
+    localStorage.removeItem(startedEntityIdsLocalStorageName(userInfo));
+    localStorage.setItem(startedEntityIdsLocalStorageName(userInfo), JSON.stringify(startedEntityIds));
 };
 
 const saveCompleted = (userInfo, completedEntityIds) => {
-    localStorage.removeItem(completedEntitiesLocalStorageName(userInfo));
-    localStorage.setItem(completedEntitiesLocalStorageName(userInfo), JSON.stringify(completedEntityIds));
+    localStorage.removeItem(completedEntityIdsLocalStorageName(userInfo));
+    localStorage.setItem(completedEntityIdsLocalStorageName(userInfo), JSON.stringify(completedEntityIds));
 };
 
 const saveUserVideos = (userInfo, userVideos) => {
@@ -78,11 +78,11 @@ const saveUserExercises = (userInfo, userExercises) => {
 
 const loadLocalStorageData = (userInfo) => {
     var result = {};
-    var completedEntityIds = localStorage.getItem(completedEntitiesLocalStorageName(userInfo));
+    var completedEntityIds = localStorage.getItem(completedEntityIdsLocalStorageName(userInfo));
     if (completedEntityIds) {
         result.completedEntityIds = JSON.parse(completedEntityIds);
     }
-    var startedEntityIds = localStorage.getItem(startedEntitiesLocalStorageName(userInfo));
+    var startedEntityIds = localStorage.getItem(startedEntityIdsLocalStorageName(userInfo));
     if (startedEntityIds) {
         result.startedEntityIds = JSON.parse(startedEntityIds);
     }
@@ -178,8 +178,8 @@ export const reportVideoProgress = (user, topicTreeCursor, editVideo, secondsWat
                 this.get("userVideos").push(foundUserVideo);
             }
 
-            saveStarted(user.get("userInfo"), user.get("startedEntities"));
-            saveCompleted(user.get("userInfo"), user.get("completedEntities"));
+            saveStarted(user.get("userInfo"), user.get("startedEntityId"));
+            saveCompleted(user.get("userInfo"), user.get("completedEntityIds"));
             saveUserVideos(user.get("userInfo"), user.get("userVideos"));
             saveUserExercises(user.get("userInfo"), user.get("userExercises"));
 
@@ -252,8 +252,8 @@ export const refreshLoggedInInfo = (user, editUser, forceRefreshAllInfo) => {
             }
 
             editUser((user) => user.merge({
-                startedEntities: data.startedEntityIds,
-                completedEntities: data.completedEntityIds,
+                startedEntityIds: data.startedEntityIds,
+                completedEntityIds: data.completedEntityIds,
             }));
 
             return APIClient.getUserVideos();
