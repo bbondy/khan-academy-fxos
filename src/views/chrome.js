@@ -11,8 +11,9 @@ import React from "react";
 import {TempAppState, CurrentUser} from "../models";
 import {onClickBack, onClickTopic, onClickContentItemFromDownloads, onClickContentItem,
     onClickSignin, onClickSignout, onClickProfile, onClickDownloads, onClickSettings,
-    onClickSupport, onClickDownloadContent, onClickViewOnKA, onClickShare, onTopicSearch,
+    onClickSupport, onClickDownloadContent, onClickViewOnKA, onClickShare,
     onClickCancelDownloadContent, onClickDeleteDownloadedContent} from "./chrome-actions";
+import {onTopicSearch} from "./search-actions";
 import Storage from "../storage";
 import Downloads from "../downloads";
 import {VideoViewer} from "./video";

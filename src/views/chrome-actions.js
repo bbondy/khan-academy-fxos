@@ -1,5 +1,6 @@
 import Downloads from "../downloads";
-import {findContentItems, getKAUrl, isTopic, getTitle, isContent, isVideo} from "../data/topic-tree-helper";
+import {getKAUrl, isTopic, getTitle, isContent, isVideo} from "../data/topic-tree-helper";
+import {onTopicSearch} from "./search-actions.js";
 import Util from "../util"
 import { getDomainTopicTreeNode, isPaneShowing } from "../data/nav-info";
 import Notifications from "../notifications";
@@ -87,27 +88,6 @@ export const onClickSettings = (editNavInfo) => () =>
         showSettings: true,
         wasLastDownloads: false
     }));
-
-export const onTopicSearch = (navInfo, editNavInfo) => (topicSearch) => {
-    if (!topicSearch) {
-        editNavInfo((navInfo) => navInfo.merge({
-            topicTreeNode: navInfo.get("searchingTopicTreeNode"),
-            searchingTopicTreeNode: null,
-            searchResults: null,
-        }));
-        return;
-    }
-
-    var searchingTopicTreeNode = navInfo.get("searchingTopicTreeNode");
-    if (!searchingTopicTreeNode) {
-        searchingTopicTreeNode = navInfo.get("topicTreeNode");
-    }
-    var results = findContentItems(searchingTopicTreeNode, topicSearch);
-    editNavInfo((navInfo) => navInfo.merge({
-        searchResults: results,
-        searchingTopicTreeNode: searchingTopicTreeNode,
-    }));
-};
 
 export const onClickBack = (topicTreeNode, navInfo, editNavInfo, editSearch) => () => {
     // If settings or profile or ... is set, then don't show it anymore.
