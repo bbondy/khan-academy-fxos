@@ -5,7 +5,7 @@
 import _ from "underscore";
 import classNames from "classnames";
 import {getDownloadCount, getId, getKey, getTitle, isArticle, isVideo,
-    isExercise, isCompleted, isStarted, isDownloaded, mapChildTopicNodes,
+    isExercise, isDownloaded, mapChildTopicNodes,
     mapChildContentNodes} from "../data/topic-tree-helper";
 import React from "react";
 import component from "omniscient";
@@ -17,7 +17,8 @@ import component from "omniscient";
  * list view will be replaced with a bunch of different TopicListItem
  * which are the children of the clicked item.
  */
-const TopicListItem = component(({topicTreeNode, domainTopicTreeNode, options}, {onClickTopic}) => {
+const TopicListItem = component(({topicTreeNode, domainTopicTreeNode, options},
+                                 {onClickTopic}) => {
     const topicClass = classNames({
         "topic-item": true,
         faded: options.get("showDownloadsOnly") &&
@@ -39,19 +40,20 @@ const TopicListItem = component(({topicTreeNode, domainTopicTreeNode, options}, 
  * This renders the list item and not the actual video.
  * When clicked, it will render the video corresponding to this list item.
  */
-export const ContentListItem = component(({topicTreeNode, domainTopicTreeNode, options}, {onClick}) => {
+export const ContentListItem = component(({topicTreeNode, domainTopicTreeNode, options, completed, started},
+                                          {onClick}) => {
     const domainId = domainTopicTreeNode && getId(domainTopicTreeNode) || "unknown";
     var contentNodeClass = classNames({
       "article-node": isArticle(topicTreeNode),
       "video-node": isVideo(topicTreeNode),
       "exercise-node": isExercise(topicTreeNode),
-      completed: isCompleted(topicTreeNode),
-      "in-progress": isStarted(topicTreeNode),
+      completed,
+      "in-progress": started,
     });
     const pipeClass = classNames({
         pipe: true,
-        completed: isCompleted(topicTreeNode),
-        "in-progress": isStarted(topicTreeNode),
+        completed,
+        "in-progress": started,
         [domainId]: !!domainTopicTreeNode,
     });
     const subwayIconClass = classNames({
@@ -85,7 +87,8 @@ export const ContentListItem = component(({topicTreeNode, domainTopicTreeNode, o
  * Represents a single topic and it displays a list of all of its children.
  * Each child of the list is a ContentListItem
  */
-export const TopicViewer = component(({topicTreeNode, domainTopicTreeNode, options}, {onClickTopic, onClickContentItem}) =>
+export const TopicViewer = component(({topicTreeNode, domainTopicTreeNode, options, startedEntities, completedEntities},
+                                      {onClickTopic, onClickContentItem}) =>
     <div className="topic-list-container">
         <section data-type="list">
             <ul>
@@ -110,6 +113,8 @@ export const TopicViewer = component(({topicTreeNode, domainTopicTreeNode, optio
                             statics={{
                                 onClick: onClickContentItem
                             }}
+                            completed={completedEntities.contains(getId(topicTreeNode))}
+                            started={startedEntities.contains(getId(topicTreeNode))}
                             topicTreeNode={topicTreeNode}
                             options={options}
                             domainTopicTreeNode={domainTopicTreeNode}
@@ -127,7 +132,8 @@ export const TopicViewer = component(({topicTreeNode, domainTopicTreeNode, optio
  * This is used for displaying search results and download lists.
  * This always contains only a list of VideoListItems, or ARticleListItems.
  */
-export const ContentListViewer = component(({topicTreeNodes, options}, {onClickContentItem}) =>
+export const ContentListViewer = component(({topicTreeNodes, options, startedEntities, completedEntities},
+                                            {onClickContentItem}) =>
     <div className="topic-list-container">
         <section data-type="list">
             <ul>
@@ -137,6 +143,8 @@ export const ContentListViewer = component(({topicTreeNodes, options}, {onClickC
                         }}
                         topicTreeNode={topicTreeNode}
                         options={options}
+                        completed={completedEntities.contains(getId(topicTreeNode))}
+                        started={startedEntities.contains(getId(topicTreeNode))}
                         key={getKey(topicTreeNode)} />
                     )
                 }

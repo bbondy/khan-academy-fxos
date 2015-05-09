@@ -63,10 +63,12 @@ export const TopicSearch = component(({topicTreeNode, searchValue}, {onTopicSear
  * Represents a search result list which is basically just a wrapper around a
  * ContentListViewer for now.
  */
-export const SearchResultsViewer  = component(({options, collection}, {onClickContentItem}) =>
+export const SearchResultsViewer  = component(({options, collection, startedEntities, completedEntities}, {onClickContentItem}) =>
     <div className="topic-list-container">
         <ContentListViewer topicTreeNodes={collection}
                            options={options}
+                           startedEntities={startedEntities}
+                           completedEntities={completedEntities}
                            statics={{
                                onClickContentItem,
                            }}/>

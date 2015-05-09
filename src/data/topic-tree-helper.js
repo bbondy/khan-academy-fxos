@@ -94,12 +94,6 @@ export const getKAUrl = (topicTreeNode) => {
 export const isDownloaded = (topicTreeNode) =>
     !!topicTreeNode.get("downloaded");
 
-export const isStarted = (topicTreeNode) =>
-    topicTreeNode.get("started");
-
-export const isCompleted = (topicTreeNode) =>
-    topicTreeNode.get("completed");
-
 export const getYoutubeId = (topicTreeNode) =>
     getMinifiedPropFromNode(topicTreeNode, "youtube_id");
 

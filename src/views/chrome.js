@@ -266,6 +266,8 @@ export const MainView = component(({navInfo, options, user, tempStore}, {edit}) 
                                   }}/>;
     } else if (navInfo.get("searchResults")) {
         control = <SearchResultsViewer collection={navInfo.get("searchResults")}
+                                       startedEntities={user.get("startedEntities")}
+                                       completedEntities={user.get("completedEntities")}
                                        options={options}
                                        statics={{
                                            onClickContentItem: onClickContentItemComposed,
@@ -275,6 +277,8 @@ export const MainView = component(({navInfo, options, user, tempStore}, {edit}) 
                                    onClickTopic: onClickTopic(editNavInfo),
                                    onClickContentItem: onClickContentItemComposed,
                                }}
+                               startedEntities={user.get("startedEntities")}
+                               completedEntities={user.get("completedEntities")}
                                topicTreeNode={navInfo.get("topicTreeNode")}
                                domainTopicTreeNode={navInfo.get("domainTopicTreeNode")}
                                options={options}/>;

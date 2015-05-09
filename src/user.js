@@ -222,7 +222,7 @@ export const refreshLoggedInInfo = (user, editUser, forceRefreshAllInfo) => {
             saveUserInfo(userInfo);
 
             var result = loadLocalStorageData(user.get("userInfo"));
-            if (!forceRefreshAllInfo && result) {
+            if (!forceRefreshAllInfo && result.completedEntityIds) {
                 Util.log("User info only obtained. Not obtaining user data because we have it cached already!");
                 return result;
             }
@@ -233,23 +233,29 @@ export const refreshLoggedInInfo = (user, editUser, forceRefreshAllInfo) => {
 
         }).then((data) => {
             Util.log("getUserProgress: %o", data);
-            // Get rid of the 'a' and 'v' prefixes, and set the completed / started
-            // attributes accordingly.
-            const startedEntityIds = _.map(data.started, function(e) {
-                return e.substring(1);
-            });
-            const completedEntityIds = _.map(data.complete, function(e) {
-                return e.substring(1);
-            });
+            // data.complete will be returned from the API but not when loaded
+            // directly from localStorage.  When loaded directly from localstorage
+            // you'll already have result.startedEntityIds.
+            if (data.complete) {
+                // Get rid of the 'a' and 'v' prefixes, and set the completed / started
+                // attributes accordingly.
+                data.startedEntityIds = _.map(data.started, function(e) {
+                    return e.substring(1);
+                });
+                data.completedEntityIds = _.map(data.complete, function(e) {
+                    return e.substring(1);
+                });
+
+                // Save to local storage
+                saveStarted(user.get("userInfo"), data.startedEntityIds);
+                saveCompleted(user.get("userInfo"), data.completedEntityIds);
+            }
 
             editUser((user) => user.merge({
-                startedEntities: startedEntityIds,
-                completedEntities: completedEntityIds,
+                startedEntities: data.startedEntityIds,
+                completedEntities: data.completedEntityIds,
             }));
 
-            // Save to local storage
-            saveStarted(user.get("userInfo"), startedEntityIds);
-            saveCompleted(user.get("userInfo"), completedEntityIds);
             return APIClient.getUserVideos();
         }).then((userVideosResults) => {
             saveUserVideos(user.get("userInfo"), userVideosResults);
