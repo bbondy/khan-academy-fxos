@@ -5,7 +5,7 @@
 import Util from "../util";
 import React from "react";
 import {getKey} from "../data/topic-tree-helper";
-import {reportArticleRead} from "./article-actions";
+import {reportArticleRead} from "../actions/article-actions";
 import component from "omniscient";
 
 const ArticleReadMixin = {

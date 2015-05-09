@@ -12,15 +12,15 @@ import {TempAppState, CurrentUser} from "../models";
 import {onClickBack, onClickTopic, onClickContentItemFromDownloads, onClickContentItem,
     onClickSignin, onClickSignout, onClickProfile, onClickDownloads, onClickSettings,
     onClickSupport, onClickDownloadContent, onClickViewOnKA, onClickShare,
-    onClickCancelDownloadContent, onClickDeleteDownloadedContent} from "./chrome-actions";
-import {onTopicSearch} from "./search-actions";
+    onClickCancelDownloadContent, onClickDeleteDownloadedContent} from "../actions/chrome-actions";
+import {onTopicSearch} from "../actions/search-actions";
 import Storage from "../storage";
 import Downloads from "../downloads";
 import {VideoViewer} from "./video";
 import {ArticleViewer} from "./article";
-import {loadIfArticle} from "./article-actions";
-import {loadVideoIfDownloadedVideo} from "./video-actions";
-import {loadTranscriptIfVideo} from "./transcript-actions";
+import {loadIfArticle} from "../actions/article-actions";
+import {loadVideoIfDownloadedVideo} from "../actions/video-actions";
+import {loadTranscriptIfVideo} from "../actions/transcript-actions";
 import {editorForPath} from "../renderer";
 import {ExerciseViewer} from "./exercise";
 import {TopicViewer} from "./topic";

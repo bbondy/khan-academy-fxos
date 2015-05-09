@@ -1,6 +1,6 @@
 import Downloads from "../downloads";
 import {getKAUrl, isTopic, getTitle, isContent, isVideo} from "../data/topic-tree-helper";
-import {onTopicSearch} from "./search-actions.js";
+import {onTopicSearch} from "../actions/search-actions.js";
 import Util from "../util"
 import { getDomainTopicTreeNode, isPaneShowing } from "../data/nav-info";
 import Notifications from "../notifications";
