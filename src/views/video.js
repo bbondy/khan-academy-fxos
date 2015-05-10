@@ -289,10 +289,12 @@ const VideoMixin = {
         var secondsSinceLastReport = (currentTime.getTime() - this.lastReportedTime.getTime()) / 1000;
         if (secondsSinceLastReport >= minSecondsBetweenReports || this.lastSecondWatched >= (duration | 0)) {
             this.lastReportedTime = new Date();
-            reportVideoProgress(this.props.topicTreeNode,
-                    this.props.statics.editVideo,
+            reportVideoProgress(this.props.user,
+                    this.props.topicTreeNode,
                     this.secondsWatched,
-                    this.lastSecondWatched).then(() => {
+                    this.lastSecondWatched,
+                    this.props.statics.editVideo,
+                    this.props.statics.editUser).then(() => {
                         // We could just add a backbone model to watch for video model
                         // changes and it would work automatically, but to get animated points
                         // growing, we need to do it manually.

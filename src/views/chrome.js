@@ -287,8 +287,10 @@ export const MainView = component(({navInfo, options, user, tempStore}, {edit}) 
                                domainTopicTreeNode={navInfo.get("domainTopicTreeNode")}
                                videoStore={tempStore.get("video")}
                                options={options}
+                               user={user}
                                statics={{
                                    editVideo,
+                                   editUser,
                                }}/>;
     } else if (isArticle(navInfo.get("topicTreeNode"))) {
         control = <ArticleViewer  topicTreeNode={navInfo.get("topicTreeNode")}

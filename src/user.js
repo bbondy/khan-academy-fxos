@@ -2,6 +2,7 @@ import APIClient from "./apiclient";
 import {getId, getDuration, getPoints, getYoutubeId} from "./data/topic-tree-helper";
 import _ from "underscore";
 import Util from "./util";
+import {editorForPath} from "./renderer";
 
 const userInfoLocalStorageName = "userInfo-3";
 
@@ -99,11 +100,18 @@ const loadLocalStorageData = (userInfo) => {
 };
 
 
-export const reportVideoProgress = (user, topicTreeCursor, editVideo, secondsWatched, lastSecondWatched) => {
+export const reportVideoProgress = (user, topicTreeNode, secondsWatched, lastSecondWatched, editVideo, editUser) => {
     return new Promise((resolve, reject) => {
-        var youTubeId = getYoutubeId(topicTreeCursor);
-        var videoId = getId(topicTreeCursor);
-        var duration = getDuration(topicTreeCursor);
+        const youTubeId = getYoutubeId(topicTreeNode),
+            videoId = getId(topicTreeNode),
+            duration = getDuration(topicTreeNode),
+            editCompletedEntityIds = editorForPath(editUser, "completedEntityIds"),
+            editStartedEntityIds = editorForPath(editUser, "startedEntityIds"),
+            editUserVideos = editorForPath(editUser, "userVideos");
+        let completedEntityIds = user.get("completedEntityIds"),
+            startedEntityIds = user.get("startedEntityIds"),
+            userVideos = user.get("userVideos");
+
         APIClient.reportVideoProgress(videoId, youTubeId, duration, secondsWatched, lastSecondWatched).then((result) => {
             if (!result) {
                 Util.warn("Video progress report returned null results!");
@@ -111,7 +119,7 @@ export const reportVideoProgress = (user, topicTreeCursor, editVideo, secondsWat
             }
             Util.log("reportVideoProgress result: %o", result);
 
-            var lastPoints = getPoints(topicTreeCursor);
+            var lastPoints = getPoints(topicTreeNode);
             var newPoints = lastPoints + result.points_earned;
             if (newPoints > 750) {
                 newPoints = 750;
@@ -145,25 +153,24 @@ export const reportVideoProgress = (user, topicTreeCursor, editVideo, secondsWat
                 }));
 
             // Update locally stored cached info
-            var index;
             if (result.is_video_completed) {
-                index = this.get("startedEntityIds").indexOf(getId(topicTreeCursor));
-                if (index !== -1) {
-                    this.get("startedEntityIds").splice(index, 1);
+                if (startedEntityIds.contains(getId(topicTreeNode))) {
+                    startedEntityIds = startedEntityIds.remove(getId(topicTreeNode));
+                    editStartedEntityIds(() => startedEntityIds);
                 }
-                index = this.get("completedEntityIds").indexOf(getId(topicTreeCursor));
-                if (index === -1) {
-                    this.get("completedEntityIds").push(getId(topicTreeCursor));
+                if (!completedEntityIds.contains(getId(topicTreeNode))) {
+                    completedEntityIds = completedEntityIds.unshift(getId(topicTreeNode));
+                    editCompletedEntityIds(() => completedEntityIds);
                 }
             } else {
-                index = this.get("startedEntityIds").indexOf(getId(topicTreeCursor));
-                if (index === -1) {
-                    this.get("startedEntityIds").push(getId(topicTreeCursor));
+                if (!startedEntityIds.contains(getId(topicTreeNode))) {
+                    startedEntityIds = startedEntityIds.unshift(getId(topicTreeNode));
+                    editStartedEntityIds(() => startedEntityIds);
                 }
             }
 
-            var foundUserVideo = _(this.get("userVideos")).find((info) => {
-                info.video.id === getId(topicTreeCursor);
+            var foundUserVideo = _(userVideos).find((info) => {
+                info.video.id === getId(topicTreeNode);
             });
             var isNew = !foundUserVideo;
             foundUserVideo = foundUserVideo || {
@@ -175,10 +182,13 @@ export const reportVideoProgress = (user, topicTreeCursor, editVideo, secondsWat
             foundUserVideo["points"] = newPoints;
             foundUserVideo["last_second_watched"] = lastSecondWatched;
             if (isNew) {
-                this.get("userVideos").push(foundUserVideo);
+                editUser(() => startedEntityIds);
+
+                userVideos = userVideos.unshift(Immutable.fromJS(foundUserVideo));
+                editUserVideos(() => userVideos);
             }
 
-            saveStarted(user.get("userInfo"), user.get("startedEntityId"));
+            saveStarted(user.get("userInfo"), user.get("startedEntityIds"));
             saveCompleted(user.get("userInfo"), user.get("completedEntityIds"));
             saveUserVideos(user.get("userInfo"), user.get("userVideos"));
             saveUserExercises(user.get("userInfo"), user.get("userExercises"));
@@ -188,8 +198,8 @@ export const reportVideoProgress = (user, topicTreeCursor, editVideo, secondsWat
                 lastSecondWatched: result.last_second_watched,
                 pointsEarned: result.points_earned,
                 youtubeId: result.youtube_id,
-                videoId: videoId,
-                id: getId(topicTreeCursor)
+                videoId,
+                id: getId(topicTreeNode)
             });
         }).catch(() => {
             reject();
