@@ -3,6 +3,7 @@ import {getId, getDuration, getPoints, getYoutubeId} from "./data/topic-tree-hel
 import _ from "underscore";
 import Util from "./util";
 import {editorForPath} from "./renderer";
+import Immutable from "immutable";
 
 const userInfoLocalStorageName = "userInfo-3";
 
@@ -26,7 +27,7 @@ const getLocalStorageName = (base, userInfo) =>
     base + "-uid-" + (userInfo.get("nickname") || userInfo.get("username"));
 
 const completedEntityIdsLocalStorageName = _.partial(getLocalStorageName, "completed");
-const startedEntityIdsLocalStorageName= _.partial(getLocalStorageName, "started");
+const startedEntityIdsLocalStorageName = _.partial(getLocalStorageName, "started");
 const userVideosLocalStorageName = _.partial(getLocalStorageName, "userVideos");
 const userExercisesLocalStorageName = _.partial(getLocalStorageName, "userExercises");
 
@@ -169,9 +170,11 @@ export const reportVideoProgress = (user, topicTreeNode, secondsWatched, lastSec
                 }
             }
 
-            var foundUserVideo = _(userVideos).find((info) => {
-                info.video.id === getId(topicTreeNode);
-            });
+            var foundUserVideo = userVideos.find((info) =>
+                info.getIn(["video", "id"]) === getId(topicTreeNode));
+            if (foundUserVideo) {
+                foundUserVideo = foundUserVideo.toJS();
+            }
             var isNew = !foundUserVideo;
             foundUserVideo = foundUserVideo || {
                 video: {
@@ -182,8 +185,6 @@ export const reportVideoProgress = (user, topicTreeNode, secondsWatched, lastSec
             foundUserVideo["points"] = newPoints;
             foundUserVideo["last_second_watched"] = lastSecondWatched;
             if (isNew) {
-                editUser(() => startedEntityIds);
-
                 userVideos = userVideos.unshift(Immutable.fromJS(foundUserVideo));
                 editUserVideos(() => userVideos);
             }
