@@ -156,7 +156,7 @@ export const reportVideoProgress = (user, topicTreeNode, secondsWatched, lastSec
             // Update locally stored cached info
             if (result.is_video_completed) {
                 if (startedEntityIds.contains(getId(topicTreeNode))) {
-                    startedEntityIds = startedEntityIds.remove(getId(topicTreeNode));
+                    startedEntityIds = startedEntityIds.remove(startedEntityIds.indexOf(getId(topicTreeNode)));
                     editStartedEntityIds(() => startedEntityIds);
                 }
                 if (!completedEntityIds.contains(getId(topicTreeNode))) {
@@ -189,10 +189,9 @@ export const reportVideoProgress = (user, topicTreeNode, secondsWatched, lastSec
                 editUserVideos(() => userVideos);
             }
 
-            saveStarted(user.get("userInfo"), user.get("startedEntityIds"));
-            saveCompleted(user.get("userInfo"), user.get("completedEntityIds"));
-            saveUserVideos(user.get("userInfo"), user.get("userVideos"));
-            saveUserExercises(user.get("userInfo"), user.get("userExercises"));
+            saveStarted(user.get("userInfo"), startedEntityIds);
+            saveCompleted(user.get("userInfo"), completedEntityIds);
+            saveUserVideos(user.get("userInfo"), userVideos);
 
             resolve({
                 completed: result.is_video_completed,
@@ -218,21 +217,20 @@ export const refreshLoggedInInfo = (user, editUser, forceRefreshAllInfo) => {
         // Get the user profile info
         APIClient.getUserInfo().then((result) => {
             Util.log("getUserInfo: %o", result);
-            const userInfo = {
+            const userInfo = Immutable.fromJS({
                 avatarUrl: result.avatar_url,
                 joined: result.joined,
                 nickname: result.nickname,
                 username: result.username,
                 points: result.points,
                 badgeCounts: result.badge_counts
-            };
-            editUser((user) => user.merge({
-                userInfo,
-            }));
+            });
 
-            saveUserInfo(userInfo);
+            editUser((user) => user.set("userInfo", userInfo));
 
-            var result = loadLocalStorageData(user.get("userInfo"));
+            saveUserInfo(userInfo.toJS());
+
+            var result = loadLocalStorageData(userInfo);
             if (!forceRefreshAllInfo && result.completedEntityIds) {
                 Util.log("User info only obtained. Not obtaining user data because we have it cached already!");
                 return result;
