@@ -294,6 +294,10 @@ export const MainView = component(({navInfo, options, user, tempStore}, {edit}) 
                                }}/>;
     } else if (isArticle(navInfo.get("topicTreeNode"))) {
         control = <ArticleViewer  topicTreeNode={navInfo.get("topicTreeNode")}
+                                  user={user}
+                                  statics={{
+                                   editUser,
+                                  }}
                                   tempStore={tempStore}/>;
     } else if (isExercise(navInfo.get("topicTreeNode"))) {
         control = <ExerciseViewer  topicTreeNode={navInfo.get("topicTreeNode")}

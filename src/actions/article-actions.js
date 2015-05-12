@@ -4,33 +4,7 @@ import Immutable from "immutable";
 import {editorForPath} from "../renderer";
 import Storage from "../storage";
 import {isSignedIn} from "../user";
-
-export const reportArticleRead = (topicTreeNode) => {
-    return new Promise((resolve, reject) => {
-        if (!isSignedIn()) {
-            return setTimeout(resolve, 0);
-        }
-
-        APIClient.reportArticleRead(getId(topicTreeNode)).then((result) => {
-            Util.log("reported article complete: %o", result);
-            article.set({
-                completed: true
-            });
-
-            /*
-            // TODO: Re-enable when completed entities is figured out in new data model
-            var index = this.get("completedEntityIds").indexOf(article.getId());
-            if (index === -1) {
-                this.get("completedEntityIds").push(article.getId());
-            }
-            this._saveCompleted();
-            */
-            resolve(result);
-        }).catch(() => {
-            reject();
-        });
-    });
-};
+import Util from "../util";
 
 const setArticleContent = (editArticleContent, result) =>
     editArticleContent((article) => {

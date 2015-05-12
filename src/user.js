@@ -207,6 +207,27 @@ export const reportVideoProgress = (user, topicTreeNode, secondsWatched, lastSec
     });
 };
 
+export const reportArticleRead = (user, topicTreeNode, editUser) => {
+    return new Promise((resolve, reject) => {
+        if (!isSignedIn()) {
+            return setTimeout(resolve, 0);
+        }
+
+        APIClient.reportArticleRead(getId(topicTreeNode)).then((result) => {
+            Util.log("reported article complete: %o", result);
+            let completedEntityIds = user.get("completedEntityIds");
+            if (!completedEntityIds.contains(getId(topicTreeNode))) {
+              completedEntityIds = completedEntityIds.unshift(getId(topicTreeNode));
+              const editCompletedEntityIds = editorForPath(editUser, "completedEntityIds");
+              editCompletedEntityIds(() => completedEntityIds);
+            }
+            saveCompleted(user.get("userInfo"), completedEntityIds);
+            resolve(result);
+        }).catch(() => {
+            reject();
+        });
+    });
+};
 
 export const refreshLoggedInInfo = (user, editUser, forceRefreshAllInfo) => {
     return new Promise((resolve, reject) => {
