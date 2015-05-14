@@ -108,12 +108,13 @@ export const reportVideoProgress = (user, topicTreeNode, secondsWatched, lastSec
             duration = getDuration(topicTreeNode),
             editCompletedEntityIds = editorForPath(editUser, "completedEntityIds"),
             editStartedEntityIds = editorForPath(editUser, "startedEntityIds"),
+            editUserInfo = editorForPath(editUser, "userInfo"),
             editUserVideos = editorForPath(editUser, "userVideos");
         let completedEntityIds = user.get("completedEntityIds"),
             startedEntityIds = user.get("startedEntityIds"),
             userVideos = user.get("userVideos");
 
-        APIClient.reportVideoProgress(videoId, youTubeId, duration, secondsWatched, lastSecondWatched).then((result) => {
+        APIClient.reportVideoProgress(videoId, youTubeId, secondsWatched, lastSecondWatched).then((result) => {
             if (!result) {
                 Util.warn("Video progress report returned null results!");
                 return;
