@@ -40,9 +40,7 @@ export const onClickTopic = (editNavInfo) => (newTopicTreeNode) =>
         wasLastDownloads: false,
     }));
 
-//TODO used to call: this.forceUpdate();
 export const onClickSignin = signIn;
-//TODO used to call: this.forceUpdate();
 export const onClickSignout = signOut;
 export const openUrl = (url) => {
     if (window.MozActivity) {

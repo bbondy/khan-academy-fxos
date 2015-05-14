@@ -329,14 +329,12 @@ const APIClient = {
      *
      * @param videoId The ID of the video to report progress on
      * @param youTubeId The youtube ID of the video to report progress on
-     * @param duration The duration of the video (TODO: unused)
      * @param secondswatched The number of seconds watched
      * @param lastSecondWatched The last second watched of the video (for resume support)
      * @return a promise with some extra information like the points earned.
      */
     reportVideoProgress: function(videoId: string,
                                   youTubeId: string,
-                                  duration: string,
                                   secondsWatched: string,
                                   lastSecondWatched: string): any {
         var extraParams = {

@@ -128,8 +128,3 @@ export const isKhanExercisesExercise = (topicTreeNode) =>
 
 export const getFilename = (topicTreeNode) =>
     getMinifiedPropFromNode(topicTreeNode, "file_name");
-
-// TODO: remove all dependencies on this and remove this
-export const getParentDomain = (topicTreeNode) => {
-    return null;
-};
