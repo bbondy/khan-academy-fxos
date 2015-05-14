@@ -139,11 +139,11 @@ export const reportVideoProgress = (user, topicTreeNode, secondsWatched, lastSec
             // If we're just getting a completion of a video update
             // the user's overall points locally.
             if (result.points_earned > 0) {
-                // TODO: It would be better to store userInfo properties directly
-                // That way notificaitons will go out automatically.
-                // var userInfo = CurrentUser.get("userInfo");
-                // userInfo.points += result.points_earned;
-                saveUserInfo(user.get("userInfo"));
+                var userInfo = user.get("userInfo");
+                userInfo = userInfo.set("points",
+                    userInfo.get("points") + result.points_earned);
+                editUserInfo(() => userInfo);
+                saveUserInfo(userInfo);
             }
 
             editVideo((video) =>
