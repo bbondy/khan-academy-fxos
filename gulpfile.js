@@ -1,5 +1,6 @@
 var gulp = require("gulp"),
     gutil = require("gulp-util"),
+    sourcemaps = require('gulp-sourcemaps'),
     jshint = require("gulp-jshint"),
     less = require("gulp-less"),
     concat = require("gulp-concat"),
@@ -20,12 +21,13 @@ var gulp = require("gulp"),
     webpackConfig = require("./webpack.config.js"),
     WebpackDevServer = require("webpack-dev-server");
 
-
 // Lint Task
 // Uses jsxcs, then strips Flow types and uses jshint.
 // Has no output.
 gulp.task("lint", function() {
-    return gulp.src("src/**/*.js")
+    return gulp.src("src/**/*.js");
+    // TODO: Move to eslint
+    /*
         .pipe(jsxcs().on("error", function(err) {
             console.log(err.toString());
         }))
@@ -38,15 +40,23 @@ gulp.task("lint", function() {
             esnext: true
         }))
         .pipe(jshint.reporter("default"));
+    */
 });
 
-// Compile LESS into CSS puts output in ./build/css
-gulp.task("less", function() {
-    return gulp.src("./style/**/*.less")
-        .pipe(less({
+/**
+ * Compile LESS into CSS puts output in ./build/css
+ */
+gulp.task("less", function () {
+  return gulp.src("./style/**/*.less")
+    .pipe(sourcemaps.init())
+    .pipe(less({
             paths: [ path.join(__dirname, "style") ]
+        }).on('error', function(e) {
+          console.log('error running less', e);
+          this.emit('end');
         }))
-        .pipe(gulp.dest("./build/css"));
+    .pipe(sourcemaps.write())
+    .pipe(gulp.dest("./build/css"));
 });
 
 // The react task should not normally be needed.
