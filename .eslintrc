@@ -1,0 +1,90 @@
+{
+  "parser": "babel-eslint",
+  "env": {
+    "es6": true,
+    "jasmine": true,
+    "node": true,
+    "browser": true,
+    "builtin": true,
+    "jquery": false
+  },
+  "plugins": [
+      "eslint-plugin-react"
+  ],
+  "ecmaFeatures": {
+    "jsx": true,
+  },
+  "rules": {
+    "react/jsx-uses-vars": 1,
+    "comma-dangle": 0,
+    "block-scoped-var": 2,
+    "camelcase": 0,
+    "curly": [
+      2,
+      "all"
+    ],
+    "dot-notation": [
+      2,
+      {
+        "allowKeywords": true
+      }
+    ],
+    "eqeqeq": [
+      2,
+      "allow-null"
+    ],
+    "global-strict": [
+      2,
+      "never"
+    ],
+    "guard-for-in": 0,
+    "max-len": [
+      2,
+      200,
+      2
+    ],
+    "new-cap": 2,
+    "no-bitwise": 2,
+    "no-caller": 2,
+    "no-cond-assign": [
+      2,
+      "except-parens"
+    ],
+    "no-debugger": 2,
+    "no-empty": 2,
+    "no-eval": 2,
+    "no-extend-native": 2,
+    "no-extra-parens": 2,
+    "no-irregular-whitespace": 2,
+    "no-iterator": 2,
+    "no-loop-func": 2,
+    "no-multi-str": 2,
+    "no-new": 0,
+    "no-plusplus": 0,
+    "no-proto": 2,
+    "no-script-url": 2,
+    "no-sequences": 2,
+    "no-shadow": 2,
+    "no-undef": 2,
+    "no-unused-vars": 2,
+    "no-use-before-define": [
+      2,
+      "nofunc"
+    ],
+    "no-with": 2,
+    "quotes": [
+      2,
+      "single"
+    ],
+    "semi": [
+      0,
+      "never"
+    ],
+    "strict": 0,
+    "valid-typeof": 2,
+    "wrap-iife": [
+      2,
+      "inside"
+    ]
+  }
+}

@@ -1,7 +1,7 @@
 var gulp = require("gulp"),
     gutil = require("gulp-util"),
     sourcemaps = require('gulp-sourcemaps'),
-    jshint = require("gulp-jshint"),
+    eslint = require('gulp-eslint');
     less = require("gulp-less"),
     concat = require("gulp-concat"),
     uglify = require("gulp-uglify"),
@@ -25,22 +25,9 @@ var gulp = require("gulp"),
 // Uses jsxcs, then strips Flow types and uses jshint.
 // Has no output.
 gulp.task("lint", function() {
-    return gulp.src("src/**/*.js");
-    // TODO: Move to eslint
-    /*
-        .pipe(jsxcs().on("error", function(err) {
-            console.log(err.toString());
-        }))
-        .pipe(react({
-            harmony: true,
-            // Skip Flow type annotations!
-            stripTypes: true
-        }))
-        .pipe(jshint({
-            esnext: true
-        }))
-        .pipe(jshint.reporter("default"));
-    */
+    return gulp.src(['./src/**/*.js'])
+    .pipe(eslint())
+    .pipe(eslint.format());
 });
 
 /**
