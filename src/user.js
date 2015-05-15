@@ -7,7 +7,14 @@ import Immutable from "immutable";
 
 const userInfoLocalStorageName = "userInfo-3";
 
+/**
+ * Signs the user in by redirecting them to the KA auth page
+ */
 export const signIn = () => APIClient.signIn();
+
+/**
+ * Signs the user out and resets user data back to empty
+ */
 export const signOut = (editUser) => {
     localStorage.removeItem(userInfoLocalStorageName);
 
@@ -20,6 +27,9 @@ export const signOut = (editUser) => {
     return APIClient.signOut();
 };
 
+/**
+ * Determines if a user is signed in or not
+ */
 export const isSignedIn = () =>
     APIClient.isSignedIn();
 
@@ -31,21 +41,34 @@ const startedEntityIdsLocalStorageName = _.partial(getLocalStorageName, "started
 const userVideosLocalStorageName = _.partial(getLocalStorageName, "userVideos");
 const userExercisesLocalStorageName = _.partial(getLocalStorageName, "userExercises");
 
+/**
+ * Saves a userInfo object (not ImmutableJS)
+ */
 const saveUserInfo = (userInfo) => {
     localStorage.removeItem(userInfoLocalStorageName);
     localStorage.setItem(userInfoLocalStorageName, JSON.stringify(userInfo));
 };
 
+/**
+ * Saves a list of started entities (not ImmutableJS)
+ */
 const saveStarted = (userInfo, startedEntityIds) => {
     localStorage.removeItem(startedEntityIdsLocalStorageName(userInfo));
     localStorage.setItem(startedEntityIdsLocalStorageName(userInfo), JSON.stringify(startedEntityIds));
 };
 
+/**
+ * Saves a list of completed entities (not ImmutableJS)
+ */
 const saveCompleted = (userInfo, completedEntityIds) => {
     localStorage.removeItem(completedEntityIdsLocalStorageName(userInfo));
     localStorage.setItem(completedEntityIdsLocalStorageName(userInfo), JSON.stringify(completedEntityIds));
 };
 
+/**
+ * Saves a list of user entities (not ImmutableJS).
+ * THis is mostly used for tracking the last position of the watched video.
+ */
 const saveUserVideos = (userInfo, userVideos) => {
     userVideos = userVideos.map((userVideo) => {
         return {
@@ -61,6 +84,9 @@ const saveUserVideos = (userInfo, userVideos) => {
     localStorage.setItem(userVideosLocalStorageName(userInfo), JSON.stringify(userVideos));
 };
 
+/**
+ * Saves a list of information on the exercise.
+ */
 const saveUserExercises = (userInfo, userExercises) => {
     userExercises = userExercises.map((exercise) => {
         return {
@@ -78,6 +104,9 @@ const saveUserExercises = (userInfo, userExercises) => {
     localStorage.setItem(userExercisesLocalStorageName(userInfo), JSON.stringify(userExercises));
 };
 
+/**
+ * Loads all of the different types of user data from local storage.
+ */
 const loadLocalStorageData = (userInfo) => {
     var result = {};
     var completedEntityIds = localStorage.getItem(completedEntityIdsLocalStorageName(userInfo));
@@ -100,7 +129,9 @@ const loadLocalStorageData = (userInfo) => {
     return result;
 };
 
-
+/**
+ * Reports video progress for the user back to KA
+ */
 export const reportVideoProgress = (user, topicTreeNode, secondsWatched, lastSecondWatched, editVideo, editUser) => {
     return new Promise((resolve, reject) => {
         const youTubeId = getYoutubeId(topicTreeNode),
@@ -208,6 +239,9 @@ export const reportVideoProgress = (user, topicTreeNode, secondsWatched, lastSec
     });
 };
 
+/**
+ * Reports article progress for the user back to KA
+ */
 export const reportArticleRead = (user, topicTreeNode, editUser) => {
     return new Promise((resolve, reject) => {
         if (!isSignedIn()) {
@@ -230,6 +264,9 @@ export const reportArticleRead = (user, topicTreeNode, editUser) => {
     });
 };
 
+/**
+ * Refreshes the logged in info either from local storage or from the server
+ */
 export const refreshLoggedInInfo = (user, editUser, forceRefreshAllInfo) => {
     return new Promise((resolve, reject) => {
         if (!isSignedIn()) {
@@ -299,4 +336,3 @@ export const refreshLoggedInInfo = (user, editUser, forceRefreshAllInfo) => {
         });
     });
 };
-
