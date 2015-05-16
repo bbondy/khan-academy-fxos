@@ -141,38 +141,42 @@ header.topic-header {
  * New and noteworthy x29232c6b (we don't show this on purpose)
  */
 
-/**
- * Math "x7a488390"
- */
-ul li div.subway-icon.x7a488390 div.video-node {
-    background-image: url('/img/progress-icons/subway-sprites-video-math.svg');
+@MathId: x7a488390;
+ul li div.subway-icon {
+    &.@{MathId} {
+        div.video-node {
+            background-image: url('/img/progress-icons/subway-sprites-video-math.svg');
+        }
+        div.article-node {
+            background-image: url('/img/progress-icons/subway-sprites-article-math.svg');
+        }
+        div.exercise-node {
+            background-image: url('/img/progress-icons/subway-sprites-exercise-math.svg');
+        }
+        div.pipe.completed,
+        div.pipe.in-progress {
+            background-color: @mathDomainColor;
+        }
+    }
 }
 
-ul li div.subway-icon.x7a488390 div.article-node {
-    background-image: url('/img/progress-icons/subway-sprites-article-math.svg');
+[data-type="list"] li {
+    &.@{MathId} > a:active:after {
+        background-color: @mathDomainColor;
+        opacity: 0.3;
+    }
 }
 
-ul li div.subway-icon.x7a488390 div.exercise-node {
-    background-image: url('/img/progress-icons/subway-sprites-exercise-math.svg');
+ul li {
+    &.@{MathId} div.color-block, header.topic-header.@{MathId} {
+        background-color: #156278 !important;
+    }
 }
 
-ul li div.subway-icon.x7a488390 div.pipe.completed,
-ul li div.subway-icon.x7a488390 div.pipe.in-progress {
-    background-color: @mathDomainColor;
-}
-
-[data-type="list"] li.x7a488390 > a:active:after {
-    background-color: @mathDomainColor;
-    opacity: 0.3;
-}
-
-ul li.x7a488390 div.color-block, header.topic-header.x7a488390 {
-  background-color: #156278 !important;
-}
-
-.vjs-default-skin.x7a488390 .vjs-volume-level,
-.vjs-default-skin.x7a488390 .vjs-play-progress {
-    background-color: #156278
+.vjs-default-skin.@{MathId} {
+    .vjs-volume-level, .vjs-play-progress {
+        background-color: #156278
+    }
 }
 
 
