@@ -273,10 +273,11 @@ export const refreshLoggedInInfo = (user, editUser, forceRefreshAllInfo) => {
             return resolve();
         }
 
+        var userInfo = user.get("userInfo");
         // Get the user profile info
         APIClient.getUserInfo().then((result) => {
             Util.log("getUserInfo: %o", result);
-            const userInfo = Immutable.fromJS({
+            userInfo = Immutable.fromJS({
                 avatarUrl: result.avatar_url,
                 joined: result.joined,
                 nickname: result.nickname,
@@ -285,7 +286,8 @@ export const refreshLoggedInInfo = (user, editUser, forceRefreshAllInfo) => {
                 badgeCounts: result.badge_counts
             });
 
-            editUser((user) => user.set("userInfo", userInfo));
+            const editUserInfo = editorForPath(editUser, "userInfo");
+            editUserInfo(() => userInfo);
 
             saveUserInfo(userInfo.toJS());
 
@@ -315,8 +317,8 @@ export const refreshLoggedInInfo = (user, editUser, forceRefreshAllInfo) => {
                 });
 
                 // Save to local storage
-                saveStarted(user.get("userInfo"), data.startedEntityIds);
-                saveCompleted(user.get("userInfo"), data.completedEntityIds);
+                saveStarted(userInfo, data.startedEntityIds);
+                saveCompleted(userInfo, data.completedEntityIds);
             }
 
             editUser((user) => user.merge({
@@ -326,10 +328,10 @@ export const refreshLoggedInInfo = (user, editUser, forceRefreshAllInfo) => {
 
             return APIClient.getUserVideos();
         }).then((userVideosResults) => {
-            saveUserVideos(user.get("userInfo"), userVideosResults);
+            saveUserVideos(userInfo, userVideosResults);
             return APIClient.getUserExercises();
         }).then((userExercisesResults) => {
-            saveUserExercises(user.get("userInfo"), userExercisesResults);
+            saveUserExercises(userInfo, userExercisesResults);
             resolve();
         }).catch(() => {
             reject();
