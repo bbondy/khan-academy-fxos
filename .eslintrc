@@ -74,7 +74,7 @@
     "no-with": 2,
     "quotes": [
       2,
-      "single"
+      "double"
     ],
     "semi": [
       0,
