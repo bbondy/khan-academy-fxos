@@ -290,7 +290,7 @@ export const refreshLoggedInInfo = (user, editUser, forceRefreshAllInfo) => {
             saveUserInfo(userInfo.toJS());
 
             var result = loadLocalStorageData(userInfo);
-            if (!forceRefreshAllInfo && result.completedEntityIds) {
+            if (!forceRefreshAllInfo && result.completedEntityIds && result.startedEntityIds) {
                 Util.log("User info only obtained. Not obtaining user data because we have it cached already!");
                 return result;
             }
