@@ -117,7 +117,7 @@ export const getDownloadUrl = (topicTreeNode) => {
     return value;
 };
 
-export const getName = (topicTreeNode)  =>
+export const getName = (topicTreeNode) =>
     getMinifiedPropFromNode(topicTreeNode, "name");
 
 export const isPerseusExercise = (topicTreeNode) =>

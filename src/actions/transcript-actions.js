@@ -7,7 +7,7 @@ export const loadTranscriptIfVideo = (options, editVideo) => (topicTreeNode) => 
         return topicTreeNode;
     }
 
-    editVideo((video) =>
+    editVideo(() =>
         Immutable.fromJS({
             transcript: null,
         }))
@@ -16,7 +16,7 @@ export const loadTranscriptIfVideo = (options, editVideo) => (topicTreeNode) => 
         if (transcript && transcript.length === 0) {
             return;
         }
-        editVideo((video) =>
+        editVideo(() =>
             Immutable.fromJS({
                 transcript,
             }));

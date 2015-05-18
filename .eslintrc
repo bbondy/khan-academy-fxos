@@ -44,6 +44,7 @@
       2
     ],
     "new-cap": 2,
+    "no-alert": 0,
     "no-bitwise": 0,
     "no-caller": 2,
     "no-cond-assign": [
@@ -62,7 +63,7 @@
     "no-new": 0,
     "no-plusplus": 0,
     "no-proto": 2,
-    "no-script-url": 2,
+    "no-script-url": 0,
     "no-sequences": 2,
     "no-shadow": 2,
     "no-undef": 2,

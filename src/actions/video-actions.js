@@ -1,5 +1,6 @@
 import {isVideo, getId, isDownloaded} from "../data/topic-tree-helper";
 import Immutable from "immutable";
+import Storage from "../storage";
 
 export const loadVideoIfDownloadedVideo = (editVideo) => (topicTreeNode) => {
     if (!isVideo(topicTreeNode)) {

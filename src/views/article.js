@@ -25,7 +25,7 @@ const ArticleReadMixin = {
  * Represents a single article, it will load the article dynamically and
  * display it to the user.
  */
-export const ArticleViewer = component(ArticleReadMixin, ({topicTreeNode, tempStore, user}, {editUser}) => {
+export const ArticleViewer = component(ArticleReadMixin, ({topicTreeNode, tempStore}) => {
     Util.log("render article: :%o", topicTreeNode);
     var articleObj = tempStore.getIn([getKey(topicTreeNode)]);
     if (articleObj && articleObj.get("error")) {

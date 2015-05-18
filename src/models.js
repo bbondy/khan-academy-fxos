@@ -391,14 +391,14 @@ export class TopicModel extends TopicTreeBase {
             maxResults = 40;
         }
         var results = [];
-        this._findContentItems(search, results, maxResults);
+        this.findContentItems(search, results, maxResults);
         return results.slice(0, maxResults);
     }
     /**
-     * Recursively calls _findContentItems on all children and adds videos and articles with
+     * Recursively calls findContentItems on all children and adds videos and articles with
      * a matching title to the results array.
      */
-    _findContentItems(search, results, maxResults) {
+    findContentItemsInternal(search, results, maxResults) {
         if (results.length > maxResults) {
             return;
         }
@@ -415,7 +415,7 @@ export class TopicModel extends TopicTreeBase {
         });
 
         _(this.getTopics().models).each((item) => {
-            item._findContentItems(search, results, maxResults);
+            item.findContentItemsInternal(search, results, maxResults);
         });
     }
     /**
@@ -540,21 +540,21 @@ export class ContentList extends TopicTreeCollection {
 }
 
 class UserModel extends BaseModel {
-    _getLocalStorageName(base) {
+    getLocalStorageName(base) {
         return base + "-uid-" + (this.get("userInfo").nickname ||
             this.get("userInfo").username);
     }
-    _completedEntitiesLocalStorageName() {
-        return this._getLocalStorageName("completed");
+    completedEntitiesLocalStorageName() {
+        return this.getLocalStorageName("completed");
     }
-    _startedEntitiesLocalStorageName() {
-        return this._getLocalStorageName("started");
+    startedEntitiesLocalStorageName() {
+        return this.getLocalStorageName("started");
     }
-    _userVideosLocalStorageName() {
-        return this._getLocalStorageName("userVideos");
+    userVideosLocalStorageName() {
+        return this.getLocalStorageName("userVideos");
     }
-    _userExercisesLocalStorageName() {
-        return this._getLocalStorageName("userExercises");
+    userExercisesLocalStorageName() {
+        return this.getLocalStorageName("userExercises");
     }
     init() {
         if (!this.isSignedIn()) {
@@ -565,12 +565,12 @@ class UserModel extends BaseModel {
 
         // If we have cached info, use that, otherwise fall back
         // to refreshing the user info.
-        var userInfo = localStorage.getItem(this._userInfoLocalStorageName);
+        var userInfo = localStorage.getItem(this.userInfoLocalStorageName);
         if (userInfo) {
             this.set("userInfo", JSON.parse(userInfo));
         }
 
-        if (this._loadLocalStorageData()) {
+        if (this.loadLocalStorageData()) {
             Util.log("User info being refreshed from cache");
         } else {
             Util.log("User info being refreshed from server");
@@ -598,54 +598,54 @@ class UserModel extends BaseModel {
     }
     signOut() {
         // Unbind user specific data from the topic tree
-        this._syncStartedToTopicTree(false);
-        this._syncCompletedToTopicTree(false);
-        this._syncUserVideoProgressToTopicTree(false);
-        this._syncUserExerciseProgressToTopicTree(false);
+        this.syncStartedToTopicTree(false);
+        this.syncCompletedToTopicTree(false);
+        this.syncUserVideoProgressToTopicTree(false);
+        this.syncUserExerciseProgressToTopicTree(false);
 
         // Remove userInfo from the model and clear its local storage
         this.unset("userInfo");
-        localStorage.removeItem(this._userInfoLocalStorageName);
+        localStorage.removeItem(this.userInfoLocalStorageName);
 
         return APIClient.signOut();
     }
     isSignedIn() {
         return APIClient.isSignedIn();
     }
-    _loadLocalStorageData() {
+    loadLocalStorageData() {
         // We can't obtain the other local storage values if this is not present!
         if (!this.get("userInfo")) {
             return false;
         }
 
-        var completedEntityIds = localStorage.getItem(this._completedEntitiesLocalStorageName());
+        var completedEntityIds = localStorage.getItem(this.completedEntitiesLocalStorageName());
         if (completedEntityIds) {
             this.set("completedEntityIds", JSON.parse(completedEntityIds));
-            this._syncCompletedToTopicTree(true);
+            this.syncCompletedToTopicTree(true);
         }
-        var startedEntityIds = localStorage.getItem(this._startedEntitiesLocalStorageName());
+        var startedEntityIds = localStorage.getItem(this.startedEntitiesLocalStorageName());
         if (startedEntityIds) {
             this.set("startedEntityIds", JSON.parse(startedEntityIds));
-            this._syncStartedToTopicTree(true);
+            this.syncStartedToTopicTree(true);
         }
-        var userVideos = localStorage.getItem(this._userVideosLocalStorageName());
+        var userVideos = localStorage.getItem(this.userVideosLocalStorageName());
         if (userVideos) {
             userVideos = JSON.parse(userVideos);
             this.set("userVideos", userVideos);
-            this._syncUserVideoProgressToTopicTree(true);
+            this.syncUserVideoProgressToTopicTree(true);
         }
-        var userExercises = localStorage.getItem(this._userExercisesLocalStorageName());
+        var userExercises = localStorage.getItem(this.userExercisesLocalStorageName());
         if (userExercises) {
             userExercises = JSON.parse(userExercises);
             this.set("userExercises", userExercises);
-            this._syncUserExerciseProgressToTopicTree(true);
+            this.syncUserExerciseProgressToTopicTree(true);
         }
         return this.get("completedEntityIds") &&
             this.get("startedEntityIds") &&
             this.get("userVideos") &&
             this.get("userExercises");
     }
-    _syncCompletedToTopicTree(set) {
+    syncCompletedToTopicTree(set) {
         var completedEntities = TopicTree.getContentItemsByIds(this.get("completedEntityIds"));
         _.each(completedEntities, function(contentItem) {
             if (set) {
@@ -660,7 +660,7 @@ class UserModel extends BaseModel {
         Util.log("completed entity Ids: %o", this.get("completedEntityIds"));
         Util.log("completed entities: %o", completedEntities);
     }
-    _syncStartedToTopicTree(set) {
+    syncStartedToTopicTree(set) {
         var startedEntities = TopicTree.getContentItemsByIds(this.get("startedEntityIds"));
         _.each(startedEntities, function(contentItem) {
             if (set) {
@@ -672,7 +672,7 @@ class UserModel extends BaseModel {
         Util.log("started entity Ids: %o", this.get("startedEntityIds"));
         Util.log("started entities: %o", startedEntities);
     }
-    _syncUserVideoProgressToTopicTree(set) {
+    syncUserVideoProgressToTopicTree(set) {
         // Get a list of the Ids we'll be searching for in TopicTree models
         // This is only being done for a fast lookup so we don't need to later
         // search through all o the models
@@ -701,7 +701,7 @@ class UserModel extends BaseModel {
         });
         Util.log("getUserVideos entities: %o", this.get("userVideos"));
     }
-    _syncUserExerciseProgressToTopicTree(set) {
+    syncUserExerciseProgressToTopicTree(set) {
         // Get a list of the Ids we'll be searching for in TopicTree models
         // This is only being done for a fast lookup so we don't need to later
         // search through all o the models
@@ -729,25 +729,25 @@ class UserModel extends BaseModel {
         });
         Util.log("getUserExercises entities: %o", this.get("userExercises"));
     }
-    _saveUserInfo() {
+    saveUserInfo() {
         if (this.get("userInfo")) {
-            localStorage.removeItem(UserModel._userInfoLocalStorageName);
-            localStorage.setItem(UserModel._userInfoLocalStorageName, JSON.stringify(this.get("userInfo")));
+            localStorage.removeItem(UserModel.userInfoLocalStorageName);
+            localStorage.setItem(UserModel.userInfoLocalStorageName, JSON.stringify(this.get("userInfo")));
         }
     }
-    _saveStarted() {
+    saveStarted() {
         if (this.get("startedEntityIds")) {
-            localStorage.removeItem(this._startedEntitiesLocalStorageName());
-            localStorage.setItem(this._startedEntitiesLocalStorageName(), JSON.stringify(this.get("startedEntityIds")));
+            localStorage.removeItem(this.startedEntitiesLocalStorageName());
+            localStorage.setItem(this.startedEntitiesLocalStorageName(), JSON.stringify(this.get("startedEntityIds")));
         }
     }
-    _saveCompleted() {
+    saveCompleted() {
         if (this.get("completedEntityIds")) {
-            localStorage.removeItem(this._completedEntitiesLocalStorageName());
-            localStorage.setItem(this._completedEntitiesLocalStorageName(), JSON.stringify(this.get("completedEntityIds")));
+            localStorage.removeItem(this.completedEntitiesLocalStorageName());
+            localStorage.setItem(this.completedEntitiesLocalStorageName(), JSON.stringify(this.get("completedEntityIds")));
         }
     }
-    _saveUserVideos() {
+    saveUserVideos() {
         var userVideos = this.get("userVideos");
         if (!userVideos) {
             return;
@@ -762,10 +762,10 @@ class UserModel extends BaseModel {
                 }
             };
         });
-        localStorage.removeItem(this._userVideosLocalStorageName());
-        localStorage.setItem(this._userVideosLocalStorageName(), JSON.stringify(userVideos));
+        localStorage.removeItem(this.userVideosLocalStorageName());
+        localStorage.setItem(this.userVideosLocalStorageName(), JSON.stringify(userVideos));
     }
-    _saveUserExercises() {
+    saveUserExercises() {
         var userExercises = this.get("userExercises");
         if (!userExercises) {
             return;
@@ -782,8 +782,8 @@ class UserModel extends BaseModel {
         });
 
         // The extra removeItem calls before the setItem calls help in case local storage is almost full
-        localStorage.removeItem(this._userExercisesLocalStorageName());
-        localStorage.setItem(this._userExercisesLocalStorageName(), JSON.stringify(userExercises));
+        localStorage.removeItem(this.userExercisesLocalStorageName());
+        localStorage.setItem(this.userExercisesLocalStorageName(), JSON.stringify(userExercises));
     }
     refreshLoggedInInfo(forceRefreshAllInfo) {
         return new Promise((resolve, reject) => {
@@ -802,9 +802,9 @@ class UserModel extends BaseModel {
                     points: result.points,
                     badgeCounts: result.badge_counts
                 });
-                this._saveUserInfo();
+                this.saveUserInfo();
 
-                if (!forceRefreshAllInfo && this._loadLocalStorageData()) {
+                if (!forceRefreshAllInfo && this.loadLocalStorageData()) {
                     Util.log("User info only obtained. Not obtaining user data because we have it cached already!");
                     return;
                 }
@@ -828,25 +828,25 @@ class UserModel extends BaseModel {
                 }));
 
                 // Update topic tree models
-                this._syncStartedToTopicTree(true);
-                this._syncCompletedToTopicTree(true);
+                this.syncStartedToTopicTree(true);
+                this.syncCompletedToTopicTree(true);
 
                 // Save to local storage
-                this._saveStarted();
-                this._saveCompleted();
+                this.saveStarted();
+                this.saveCompleted();
 
                 return APIClient.getUserVideos();
             }).then((userVideosResults) => {
                 // The call is needed for the last second watched and points of each watched item.
                 this.set("userVideos", userVideosResults);
-                this._syncUserVideoProgressToTopicTree(true);
-                this._saveUserVideos();
+                this.syncUserVideoProgressToTopicTree(true);
+                this.saveUserVideos();
 
                 return APIClient.getUserExercises();
             }).then((userExercisesResults) => {
                 this.set("userExercises", userExercisesResults);
-                this._syncUserExerciseProgressToTopicTree(true);
-                this._saveUserExercises();
+                this.syncUserExerciseProgressToTopicTree(true);
+                this.saveUserExercises();
                 resolve();
             }).catch(() => {
                 reject();
@@ -865,7 +865,7 @@ class UserModel extends BaseModel {
                 if (index === -1) {
                     this.get("completedEntityIds").push(article.getId());
                 }
-                this._saveCompleted();
+                this.saveCompleted();
                 resolve(result);
             }).catch(() => {
                 reject();
@@ -873,7 +873,7 @@ class UserModel extends BaseModel {
         });
     }
 }
-UserModel._userInfoLocalStorageName = "userInfo-3";
+UserModel.userInfoLocalStorageName = "userInfo-3";
 
 
 // Just really a model to hold temporary app state

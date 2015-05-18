@@ -18,7 +18,7 @@ export const TopicSearch = component(({topicTreeNode, searchValue}, {onTopicSear
         onTopicSearch(topicSearch);
     };
 
-    const onFocus = (event) => {
+    const onFocus = () => {
         // TODO
         /*
         setTimeout(() => {
@@ -29,7 +29,7 @@ export const TopicSearch = component(({topicTreeNode, searchValue}, {onTopicSear
         */
     };
 
-    const onBlur = (event) => {
+    const onBlur = () => {
         // TODO
         /*
         $("html, body").stop(true, true).animate({
@@ -63,7 +63,7 @@ export const TopicSearch = component(({topicTreeNode, searchValue}, {onTopicSear
  * Represents a search result list which is basically just a wrapper around a
  * ContentListViewer for now.
  */
-export const SearchResultsViewer  = component(({options, collection, startedEntityIds, completedEntityIds}, {onClickContentItem}) =>
+export const SearchResultsViewer = component(({options, collection, startedEntityIds, completedEntityIds}, {onClickContentItem}) =>
     <div className="topic-list-container">
         <ContentListViewer topicTreeNodes={collection}
                            options={options}

@@ -8,7 +8,6 @@ import Cache from "./cache";
 import Downloads from "./downloads";
 import Storage from "./storage";
 import {MainView} from "./views/chrome";
-import React from "react";
 import {readOptions, resetOptions} from "./data/app-options";
 import {readTopicTree} from "./data/topic-tree";
 import {resetNavInfo} from "./data/nav-info";
@@ -22,7 +21,7 @@ document.querySelector("body").addEventListener("contextmenu", function(e) {
 });
 
 // App is moving to background
-document.addEventListener("visibilitychange", function(e) {
+document.addEventListener("visibilitychange", function() {
     if (document.hidden) {
         Util.log("visibility changing (hide)");
         // TODO(bbondy): Try to free up resources here for a smaller chance

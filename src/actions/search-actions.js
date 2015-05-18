@@ -3,23 +3,10 @@ import Immutable from "immutable";
 import {eachChildContentNode, eachChildTopicNode, getTitle, getId} from "../data/topic-tree-helper";
 
 /**
- * Initiates a recursive search for the term `search`
- */
-export const findContentItems = (topicTreeNode, search, maxResults) => {
-    if (_.isUndefined(maxResults)) {
-        maxResults = 40;
-    }
-
-    var results = [];
-    _findContentItems(topicTreeNode, search.toLowerCase(), results, maxResults);
-    return Immutable.fromJS(results.slice(0, maxResults));
-};
-
-/**
  * Recursively calls _findContentItems on all children and adds videos and articles with
  * a matching title to the results array.
  */
-const _findContentItems = (topicTreeNode, search, results, maxResults) => {
+const findContentItemsInternal = (topicTreeNode, search, results, maxResults) => {
     if (results.length > maxResults) {
         return;
     }
@@ -37,8 +24,21 @@ const _findContentItems = (topicTreeNode, search, results, maxResults) => {
     });
 
     eachChildTopicNode(topicTreeNode, (childNode) => {
-        _findContentItems(childNode, search, results, maxResults);
+        findContentItemsInternal(childNode, search, results, maxResults);
     });
+};
+
+/**
+ * Initiates a recursive search for the term `search`
+ */
+export const findContentItems = (topicTreeNode, search, maxResults) => {
+    if (_.isUndefined(maxResults)) {
+        maxResults = 40;
+    }
+
+    var results = [];
+    findContentItemsInternal(topicTreeNode, search.toLowerCase(), results, maxResults);
+    return Immutable.fromJS(results.slice(0, maxResults));
 };
 
 /**
@@ -47,7 +47,7 @@ const _findContentItems = (topicTreeNode, search, results, maxResults) => {
  */
 export const onTopicSearch = (navInfo, editNavInfo) => (topicSearch) => {
     if (!topicSearch) {
-        editNavInfo((navInfo) => navInfo.merge({
+        editNavInfo(() => navInfo.merge({
             topicTreeNode: navInfo.get("searchingTopicTreeNode"),
             searchingTopicTreeNode: null,
             searchResults: null,
@@ -60,7 +60,7 @@ export const onTopicSearch = (navInfo, editNavInfo) => (topicSearch) => {
         searchingTopicTreeNode = navInfo.get("topicTreeNode");
     }
     var results = findContentItems(searchingTopicTreeNode, topicSearch);
-    editNavInfo((navInfo) => navInfo.merge({
+    editNavInfo(() => navInfo.merge({
         searchResults: results,
         searchingTopicTreeNode: searchingTopicTreeNode,
     }));

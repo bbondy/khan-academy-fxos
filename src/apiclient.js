@@ -18,12 +18,12 @@ const APIClient = {
         tokenSecret: Util.getParameterByName("oauth_token_secret"),
         oauthVerifier: Util.getParameterByName("oauth_verifier")
     },
-    _localStorageAuthName: "oauth",
+    localStorageAuthName: "oauth",
     /**
      * Load oauth info from local storage.
      */
-    _loadAuth: function(): void {
-        var oauth = localStorage.getItem(this._localStorageAuthName);
+    loadAuth: function(): void {
+        var oauth = localStorage.getItem(this.localStorageAuthName);
         if (oauth) {
             this.oauth = JSON.parse(oauth);
         }
@@ -31,14 +31,14 @@ const APIClient = {
     /**
      * Save oauth info to local storage
      */
-    _saveAuth: function(): any {
-        localStorage.setItem(this._localStorageAuthName, JSON.stringify(this.oauth));
+    saveAuth: function(): any {
+        localStorage.setItem(this.localStorageAuthName, JSON.stringify(this.oauth));
     },
     /**
      * Obtains the locally stored secrets file.
      * TODO: We could just make the secrets file javascript and include the script!
      */
-    _getSecrets: function(): any {
+    getSecrets: function(): any {
         return new Promise((resolve, reject) => {
             // First check if we have the info from the local storage values
             // If so just resolve from that.
@@ -62,12 +62,12 @@ const APIClient = {
     /**
      * Obtains the access token using the request token and oauth verifier.
      */
-    _getAccessToken: function(): any {
+    getAccessToken: function(): any {
         return new Promise((resolve, reject) => {
             $.oauth($.extend({}, this.oauth, {
                 type: "GET",
                 url: this.API_BASE + "/auth/access_token",
-                oauthCallback: this._oauthCallback,
+                oauthCallback: this.oauthCallback,
                 timeout: 15000,
                 success: (data) => {
                     this.oauth.token = Util.getParameterByName("oauth_token", data);
@@ -102,21 +102,21 @@ const APIClient = {
             // If a login is not in progress, then load the auth info
             var oauthVerifier = Util.getParameterByName("oauth_token");
             if (!oauthVerifier) {
-                this._loadAuth();
+                this.loadAuth();
             }
-            this._oauthCallback = window.location.href.split("#")[0].split("?")[0];
+            this.oauthCallback = window.location.href.split("#")[0].split("?")[0];
             if (Util.isFirefoxOS()) {
-                this._oauthCallback = "http://firefoxos.non-existent-domain-asdfg.com/authenticated.html";
+                this.oauthCallback = "http://firefoxos.non-existent-domain-asdfg.com/authenticated.html";
             }
 
-            this._getSecrets().then((keyData) => {
+            this.getSecrets().then((keyData) => {
                 this.oauth.consumerKey = keyData.consumerKey;
                 this.oauth.consumerSecret = keyData.consumerSecret;
 
                 // TODO: Only do access token stuff if we don't have local storage values
                 if (this.oauth.oauthVerifier) {
-                    this._getAccessToken().then(() => {
-                        this._saveAuth();
+                    this.getAccessToken().then(() => {
+                        this.saveAuth();
                         resolve();
                     }).catch(() => {
                         // Even if we failed, we should resolve because this
@@ -145,7 +145,7 @@ const APIClient = {
         // Start the oauth process by redirecting them to the request_token url
         var url = $.getURL($.extend({}, this.oauth, {
             url: this.API_BASE + "/auth/request_token",
-            oauthCallback: this._oauthCallback
+            oauthCallback: this.oauthCallback
         }));
         window.location = url;
     },
@@ -155,14 +155,14 @@ const APIClient = {
     signOut: function() {
         this.oauth.token = "";
         this.oauth.tokenSecret = "";
-        this._saveAuth();
+        this.saveAuth();
     },
     /**
      * Performs an oauth basic API call using the logged in oauth info
      *
      * @return a promise with the results of the API call
      */
-    _basicAPICall: function(url: string, extraParams={}, method:?string, dataType="json"): any {
+    basicAPICall: function(url: string, extraParams={}, method:?string, dataType="json"): any {
         return new Promise((resolve, reject) => {
             if (_.isUndefined(method)) {
                 method = "GET";
@@ -171,7 +171,7 @@ const APIClient = {
             // Add a lang parameter to tell the KA API which langauge we want
             var lang = Util.getLang();
             if (lang) {
-                extraParams["lang"] = lang;
+                extraParams.lang = lang;
             }
 
             for (var p in extraParams) {
@@ -204,13 +204,13 @@ const APIClient = {
         var extraParams = {
             kind: "Video,Article,Exercise"
         };
-        return this._basicAPICall(this.API_V1_BASE + "/user/progress_summary", extraParams);
+        return this.basicAPICall(this.API_V1_BASE + "/user/progress_summary", extraParams);
     },
     /**
      * Obtains basic user profile information.
      */
     getUserInfo: function(): any {
-        return this._basicAPICall(this.API_V1_BASE + "/user");
+        return this.basicAPICall(this.API_V1_BASE + "/user");
     },
     /**
      * Obtains the installed local topic tree.
@@ -226,7 +226,7 @@ const APIClient = {
         }
         filename += jsOnly ? ".min.js" : ".min.json";
         Util.log("Getting installed topic tree from: " + filename);
-        return this._basicAPICall(filename, undefined, undefined, jsOnly ? "text" : "json");
+        return this.basicAPICall(filename, undefined, undefined, jsOnly ? "text" : "json");
     },
     /**
      * Obtains the topic tree from the server.
@@ -234,7 +234,7 @@ const APIClient = {
      * @return a promise with the topic tree
      */
     getTopicTree: function(): any {
-        return this._basicAPICall(this.API_V1_BASE + "/fxos/topictree");
+        return this.basicAPICall(this.API_V1_BASE + "/fxos/topictree");
     },
     /**
      * Obtains a transcript for a video.
@@ -244,7 +244,7 @@ const APIClient = {
      */
     getVideoTranscript: function(youTubeId: string): any {
         var url = this.API_V1_BASE + `/videos/${youTubeId}/transcript`;
-        return this._basicAPICall(url);
+        return this.basicAPICall(url);
     },
     /**
      * Obtains an article
@@ -253,7 +253,7 @@ const APIClient = {
      * @return a promise with the status and other information
      */
     getArticle: function(articleId: string): any {
-        return this._basicAPICall(this.API_V1_BASE + "/articles/" + articleId);
+        return this.basicAPICall(this.API_V1_BASE + "/articles/" + articleId);
     },
     /**
      * Obtains an exercise
@@ -263,12 +263,12 @@ const APIClient = {
      */
     getExerciseByName: function(exerciseName: string): any {
         var url = `${this.API_INTERNAL_BASE}/exercises/${exerciseName}`;
-        return this._basicAPICall(url);
+        return this.basicAPICall(url);
     },
 
     getTaskInfoByExerciseName: function(exerciseName: string): any {
         var url = `${this.API_INTERNAL_BASE}/user/tasks/exercises/${exerciseName}`;
-        return this._basicAPICall(url);
+        return this.basicAPICall(url);
     },
 
     /**
@@ -279,7 +279,7 @@ const APIClient = {
      */
     getMissions: function(exerciseName: string): any {
         var url = `${this.API_INTERNAL_BASE}/user/missions`;
-        return this._basicAPICall(url);
+        return this.basicAPICall(url);
     },
     /**
      * Obtains an exercise
@@ -288,7 +288,7 @@ const APIClient = {
      * @return a promise with the status and other information
      */
     getAssessmentItem: function(assessmentId: string): any {
-        return this._basicAPICall(this.API_V1_BASE + "/assessment_items/" + assessmentId);
+        return this.basicAPICall(this.API_V1_BASE + "/assessment_items/" + assessmentId);
     },
     /**
      * Marks an article as read.
@@ -297,7 +297,7 @@ const APIClient = {
      * @return a promise with the status and other information
      */
     reportArticleRead: function(articleId: string): any {
-        return this._basicAPICall(this.API_V1_BASE + `/user/article/${articleId}/log`, undefined, "POST");
+        return this.basicAPICall(this.API_V1_BASE + `/user/article/${articleId}/log`, undefined, "POST");
     },
     /**
      * Obtains the last second watched for each video the user has watched
@@ -306,7 +306,7 @@ const APIClient = {
      * @return a promise with the results
      */
     getUserVideos: function(): any {
-        return this._basicAPICall(this.API_V1_BASE + "/user/videos");
+        return this.basicAPICall(this.API_V1_BASE + "/user/videos");
     },
     /**
      * Obtains more information on the user exercise
@@ -318,11 +318,11 @@ const APIClient = {
      *   - total_correct: <num>
      */
     getUserExercises: function(): any {
-        return this._basicAPICall(this.API_V1_BASE + "/user/exercises");
+        return this.basicAPICall(this.API_V1_BASE + "/user/exercises");
     },
     getUserExercise: function(exerciseName: string): any {
         var url = `${this.API_V1_BASE}/user/exercises/${exerciseName}`;
-        return this._basicAPICall(url);
+        return this.basicAPICall(url);
     },
     /**
      * Reports progress and completion on a video.
@@ -341,7 +341,7 @@ const APIClient = {
             seconds_watched: secondsWatched.toString(),
             last_second_watched: lastSecondWatched.toString()
         };
-        return this._basicAPICall(this.API_V1_BASE + `/user/videos/${youTubeId}/log`, extraParams, "POST");
+        return this.basicAPICall(this.API_V1_BASE + `/user/videos/${youTubeId}/log`, extraParams, "POST");
     },
 
     reportExerciseProgress: function(exerciseName: string,
@@ -371,7 +371,7 @@ const APIClient = {
             time_taken: secondsTaken,
             user_mission_id: ""
         };
-        return this._basicAPICall(this.API_INTERNAL_BASE + `/user/exercises/${exerciseName}/problems/${problemNumber}/attempt`, extraParams, "POST");
+        return this.basicAPICall(this.API_INTERNAL_BASE + `/user/exercises/${exerciseName}/problems/${problemNumber}/attempt`, extraParams, "POST");
         /* Response:
         {
             "streak": 10,

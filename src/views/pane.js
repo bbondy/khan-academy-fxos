@@ -37,24 +37,24 @@ export const DownloadsViewer = component(({options}, {onClickContentItem}) =>
  */
 export const SettingsViewer = component(({options}, {editOptions}) => {
     const onShowDownloadsChange = (event) => {
-        editOptions((options) =>
-            options.set("showDownloadsOnly", event.target.checked));
+        editOptions((optionsData) =>
+            optionsData.set("showDownloadsOnly", event.target.checked));
     };
     const onShowTranscriptsChange = (event) => {
-        editOptions((options) =>
-            options.set("showTranscripts", event.target.checked));
+        editOptions((optionsData) =>
+            optionsData.set("showTranscripts", event.target.checked));
     };
     const onAutoUpdateTopicTreeChange = (event) => {
-        editOptions((options) =>
-            options.set("autoUpdateTopicTree", event.target.checked));
+        editOptions((optionsData) =>
+            optionsData.set("autoUpdateTopicTree", event.target.checked));
     };
     const onSetPlaybackRateChange = (event) => {
         // Convert a value like: 0, 1, 2, 3 to 50, 100, 150, 200
         var percentage = 50 + event.target.value * 50;
-        editOptions((options) =>
-            options.set("playbackRate", percentage));
+        editOptions((optionsData) =>
+            optionsData.set("playbackRate", percentage));
     };
-    const onReset = (event) => {
+    const onReset = () => {
         if (confirm(l10n.get("confirm-reset"))) {
             editOptions(resetOptions);
         }
@@ -93,7 +93,7 @@ export const SettingsViewer = component(({options}, {editOptions}) => {
         </label>
 
         <div data-l10n-id="set-playback-speed">Set playback speed</div>
-        <label class="icon"></label>
+        <label className="icon"></label>
         <label className="bb-docs">
         <section role="slider">
             <input ref="setPlaybackRate"
@@ -103,7 +103,7 @@ export const SettingsViewer = component(({options}, {editOptions}) => {
                    min="0" max="3"
                    value={(options.get("playbackRate") - 50) / 50}
                    onChange={onSetPlaybackRateChange.bind(this)}></input>
-            <label class="icon">{options.get("playbackRate")}%</label>
+            <label className="icon">{options.get("playbackRate")}%</label>
             <span></span>
         </section>
         </label>
@@ -128,7 +128,7 @@ export const ProfileViewer = component(({userInfo}) => {
         "/img/badges/eclipse-60x60.png",
         "/img/badges/master-challenge-blue-60x60.png"
     ];
-    const titles= [
+    const titles = [
         "Meteorite Badges",
         "Moon Badges",
         "Earth Badges",

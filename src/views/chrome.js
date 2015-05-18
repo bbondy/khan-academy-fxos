@@ -38,9 +38,9 @@ import {isPaneShowing} from "../data/nav-info";
  * In general, when clicked it will take the user to the last view they were
  * at before.
  */
-export const BackButton = component((prop, {onClickBack}) =>
+export const BackButton = component((prop, {onClickBackCb}) =>
     <div>
-        <a className="icon-back-link " href="javascript:void(0)" onClick={onClickBack}>
+        <a className="icon-back-link " href="javascript:void(0)" onClick={onClickBackCb}>
             <span className="icon icon-back">Back</span>
         </a>
     </div>
@@ -65,7 +65,7 @@ export const MenuButton = component(() =>
  * Represents the app header, it contains the back button, the menu button,
  * and a title.
  */
-export const AppHeader = component((props, {onClickBack}) => {
+export const AppHeader = component((props, {onClickBackCb}) => {
     var backButton;
     var topicTreeNode = props.topicTreeNode;
     if (topicTreeNode &&
@@ -76,7 +76,7 @@ export const AppHeader = component((props, {onClickBack}) => {
             isContentList(topicTreeNode) ||
             !!props.searchResults) {
         backButton = <BackButton statics={{
-                                     onClickBack,
+                                     onClickBackCb,
                                  }}
                                  topicTreeNode={topicTreeNode}/>;
     }
@@ -111,7 +111,7 @@ export const AppHeader = component((props, {onClickBack}) => {
         </header>;
 }).jsx;
 
-export const StatusBarViewer = component((props, {onClickCancelDownloadContent}) => {
+export const StatusBarViewer = component(() => {
     if (!TempAppState.get("status")) {
         return <div/>;
     }
@@ -139,12 +139,12 @@ export const Sidebar = component((props, statics) => {
         if (!props.isPaneShowing &&
                 props.topicTreeNode && isContent(props.topicTreeNode)) {
             if (isDownloaded(props.topicTreeNode)) {
-                var text = l10n.get(isVideo(props.topicTreeNode) ? "delete-downloaded-video" : "delete-downloaded-article");
+                let text = l10n.get(isVideo(props.topicTreeNode) ? "delete-downloaded-video" : "delete-downloaded-article");
                 items.push(<li key="delete-downloaded-video" className="hot-item">
                         <a href="#" onClick={statics.onClickDeleteDownloadedContent}>{{text}}</a>
                     </li>);
             } else {
-                var text = l10n.get(isVideo(props.topicTreeNode) ? "download-video" : "download-article");
+                let text = l10n.get(isVideo(props.topicTreeNode) ? "download-video" : "download-article");
                 items.push(<li key="download-video" className="hot-item">
                         <a href="#" className={isVideo(props.topicTreeNode) ? "download-video-link" : "download-article-link"} onClick={statics.onClickDownloadContent}>{{text}}</a>
                     </li>);
@@ -168,7 +168,7 @@ export const Sidebar = component((props, statics) => {
     if (Storage.isEnabled()) {
         if (Downloads.canCancelDownload()) {
             items.push(<li key="cancel-downloading" className="hot-item">
-                    <a href="#" data-l10n-id="cancel-downloading" onClick={statics.onClickCancelDownloadContent}>Cancel Downloading</a>
+                    <a href="#" data-l10n-id="cancel-downloading" onClick={onClickCancelDownloadContent}>Cancel Downloading</a>
                 </li>);
         } else if (!props.isPaneShowing &&
                     props.topicTreeNode && isTopic(props.topicTreeNode)) {
@@ -189,7 +189,7 @@ export const Sidebar = component((props, statics) => {
     // Followed by view pane items
     if (isSignedIn() && !props.isProfileShowing) {
         // User is signed in, add all the signed in options here
-        items.push(<li key="view-profile"><a  data-l10n-id="view-profile" className="view-profile-link" href="#" onClick={statics.onClickProfile}>View Profile</a></li>);
+        items.push(<li key="view-profile"><a data-l10n-id="view-profile" className="view-profile-link" href="#" onClick={statics.onClickProfile}>View Profile</a></li>);
     }
     if (!props.isSettingsShowing) {
         items.push(<li key="view-settings"><a data-l10n-id="view-settings" className="view-settings-link" href="#" onClick={statics.onClickSettings}>View Settings</a></li>);
@@ -293,18 +293,18 @@ export const MainView = component(({navInfo, options, user, tempStore}, {edit}) 
                                    editUser,
                                }}/>;
     } else if (isArticle(navInfo.get("topicTreeNode"))) {
-        control = <ArticleViewer  topicTreeNode={navInfo.get("topicTreeNode")}
-                                  user={user}
-                                  statics={{
-                                   editUser,
-                                  }}
+        control = <ArticleViewer topicTreeNode={navInfo.get("topicTreeNode")}
+                                 user={user}
+                                 statics={{
+                                     editUser,
+                                 }}
                                   tempStore={tempStore}/>;
     } else if (isExercise(navInfo.get("topicTreeNode"))) {
-        control = <ExerciseViewer  topicTreeNode={navInfo.get("topicTreeNode")}
-                                   exerciseStore={tempStore.get("exercise")}
-                                   statics={{
-                                       editExercise,
-                                   }}/>;
+        control = <ExerciseViewer topicTreeNode={navInfo.get("topicTreeNode")}
+                                  exerciseStore={tempStore.get("exercise")}
+                                  statics={{
+                                      editExercise,
+                                  }}/>;
     } else {
         Util.error("Unrecognized content item!");
     }
@@ -334,7 +334,6 @@ export const MainView = component(({navInfo, options, user, tempStore}, {edit}) 
                                onClickDownloadContent: onClickDownloadContent(navInfo.get("topicTreeNode")),
                                onClickViewOnKA: onClickViewOnKA(navInfo.get("topicTreeNode")),
                                onClickShare: onClickShare(navInfo.get("topicTreeNode")),
-                               onClickCancelDownloadContent: onClickCancelDownloadContent,
                                onClickDeleteDownloadedContent: onClickDeleteDownloadedContent(navInfo.get("topicTreeNode")),
                            }}
                            isPaneShowing={isPaneShowing(navInfo)}
@@ -347,7 +346,7 @@ export const MainView = component(({navInfo, options, user, tempStore}, {edit}) 
         {sidebar}
         <section id="main-content" role="region" className="skin-dark">
             <AppHeader statics={{
-                           onClickBack: onClickBack(navInfo.get("topicTreeNode"), navInfo, editNavInfo, editSearch)
+                           onClickBackCb: onClickBack(navInfo.get("topicTreeNode"), navInfo, editNavInfo, editSearch)
                        }}
                        searchResults={navInfo.get("searchResults")}
                        topicTreeNode={navInfo.get("topicTreeNode")}
@@ -360,10 +359,7 @@ export const MainView = component(({navInfo, options, user, tempStore}, {edit}) 
                        />
             {topicSearch}
             {control}
-            <StatusBarViewer
-                statics={{
-                    onClickCancelDownloadContent: onClickCancelDownloadContent
-                }}/>
+            <StatusBarViewer/>
         </section>
     </section>;
 }).jsx;

@@ -108,17 +108,17 @@ export const TopicViewer = component(({topicTreeNode, domainTopicTreeNode, optio
 
                 {
                     // Output the child content items
-                    mapChildContentNodes(topicTreeNode, (topicTreeNode) =>
+                    mapChildContentNodes(topicTreeNode, (childTopicTreeNode) =>
                         <ContentListItem
                             statics={{
                                 onClick: onClickContentItem
                             }}
-                            completed={completedEntityIds.contains(getId(topicTreeNode))}
-                            started={startedEntityIds.contains(getId(topicTreeNode))}
-                            topicTreeNode={topicTreeNode}
+                            completed={completedEntityIds.contains(getId(childTopicTreeNode))}
+                            started={startedEntityIds.contains(getId(childTopicTreeNode))}
+                            topicTreeNode={childTopicTreeNode}
                             options={options}
                             domainTopicTreeNode={domainTopicTreeNode}
-                            key={getKey(topicTreeNode)} />
+                            key={getKey(childTopicTreeNode)} />
                     )
                 }
 

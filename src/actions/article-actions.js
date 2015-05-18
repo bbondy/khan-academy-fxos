@@ -3,11 +3,10 @@ import APIClient from "../apiclient";
 import Immutable from "immutable";
 import {editorForPath} from "../renderer";
 import Storage from "../storage";
-import {isSignedIn} from "../user";
 import Util from "../util";
 
 const setArticleContent = (editArticleContent, result) =>
-    editArticleContent((article) => {
+    editArticleContent(() => {
         return Immutable.fromJS({
             error: !result,
             content: result,
@@ -29,7 +28,7 @@ export const loadIfArticle = (editTempStore) => (topicTreeNode) => {
         APIClient.getArticle(getId(topicTreeNode)).then((result) => {
             Util.log("rendered article from web: ", result);
             setArticleContent(editArticleContent, result);
-        }).catch((e) => {
+        }).catch(() => {
             setArticleContent(editArticleContent);
         });
     }
