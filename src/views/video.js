@@ -42,16 +42,16 @@ const VideoMixin = {
             Util.log("Revoking: " + downloadedUrl);
             window.URL.revokeObjectURL(downloadedUrl);
         }
-        var video = this._getVideoDOMNode();
+        var video = this.getVideoDOMNode();
         if (video) {
-            video.removeEventListener("canplay", this._canPlayHTML5);
-            video.removeEventListener("progress", this._onNetworkProgress);
-            video.removeEventListener("timeupdate", this._onTimeupdateHTML5);
-            video.removeEventListener("play", this._onPlay);
-            video.removeEventListener("pause", this._onPause);
-            video.removeEventListener("stop", this._onStop);
-            video.removeEventListener("ended", this._onEnded);
-            video.removeEventListener("error", this._onError);
+            video.removeEventListener("canplay", this.canPlayHTML5);
+            video.removeEventListener("progress", this.onNetworkProgress);
+            video.removeEventListener("timeupdate", this.onTimeupdateHTML5);
+            video.removeEventListener("play", this.onPlay);
+            video.removeEventListener("pause", this.onPause);
+            video.removeEventListener("stop", this.onStop);
+            video.removeEventListener("ended", this.onEnded);
+            video.removeEventListener("error", this.onError);
 
             // This clears out the video buffer.  Without it playing videos
             // for around 10 minutes in the app causes future videos to never
@@ -66,8 +66,8 @@ const VideoMixin = {
         }
         this.cleanedUp = true;
     },
-    _canPlayHTML5: function() {
-        var video = this._getVideoDOMNode();
+    canPlayHTML5: function() {
+        var video = this.getVideoDOMNode();
         if (video && this.initSecondWatched) {
             video.currentTime = this.initSecondWatched;
             Util.log("set current time to: " + video.currentTime);
@@ -77,12 +77,12 @@ const VideoMixin = {
 
         if (this.props.videoStore.get("showOfflineImage")) {
             this.stopAnimatingPoints(false);
-            this.props.statics.editVideo((video) => video.merge({
+            this.props.statics.editVideo((videoData) => videoData.merge({
                 showOfflineImage: false,
             }));
         }
     },
-    _onPlay: function(e: any) {
+    onPlay: function(e: any) {
         // Update lastWatchedTimeSinceLastUpdate so that we
         // don't count paused time towards secondsWatched
         Util.warn("Video play: %o", e);
@@ -90,17 +90,17 @@ const VideoMixin = {
         this.isPlaying = true;
         this.animatePoints();
     },
-    _onPause: function(e: any) {
+    onPause: function() {
         this.updateSecondsWatched();
         this.isPlaying = false;
         this.stopAnimatingPoints(false);
     },
-    _onStop: function(e: any) {
+    onStop: function() {
         this.updateSecondsWatched();
         this.isPlaying = false;
         this.stopAnimatingPoints(true);
     },
-    _onEnded: function(e: any) {
+    onEnded: function() {
         // If we're full screen, exit out.
         var doc: any = document;
         var cancelFullScreen = doc.mozCancelFullScreen;
@@ -108,29 +108,28 @@ const VideoMixin = {
             cancelFullScreen();
         }
     },
-    _onNetworkProgress: function(e: any) {
+    onNetworkProgress: function() {
         if (!this.isMounted()) {
             return;
         }
-        var video = this._getVideoDOMNode();
+        var video = this.getVideoDOMNode();
         if (video) {
             Util.log("Network state changed: ", video.networkState);
         }
     },
-    _onError: function(e: any) {
+    onError: function(e: any) {
         Util.warn("Video error: %o", e);
-        var video = this._getVideoDOMNode();
+        var video = this.getVideoDOMNode();
         if (!video) {
             return;
         }
 
-        var video = this._getVideoDOMNode();
         if (video && video.networkState === window.HTMLMediaElement.NETWORK_NO_SOURCE) {
             Util.log("Video has no source.", e);
             this.stopAnimatingPoints(false);
             var downloadedUrl = this.props.videoStore.get("downloadedUrl");
             if (!downloadedUrl && !this.cleanedUp) {
-                this.props.statics.editVideo((video) => video.merge({
+                this.props.statics.editVideo((videoData) => videoData.merge({
                     showOfflineImage: true,
                 }));
             }
@@ -160,26 +159,26 @@ const VideoMixin = {
             break;
         }
     },
-    _getVideoDOMNode: function(): any {
+    getVideoDOMNode: function(): any {
         if (!this.videoNode) {
             return null;
         }
         return this.videoNode.get(0);
     },
-    _onTimeupdateHTML5: function(e: any) {
+    onTimeupdateHTML5: function() {
         if (!this.isMounted()) {
             return;
         }
         // Sometimes a 'timeupdate' event will come before a 'play' event when
         // resuming a paused video. We need to get the play event before reporting
         // seconds watched to properly update the secondsWatched though.
-        var video = this._getVideoDOMNode();
+        var video = this.getVideoDOMNode();
         if (video && this.isPlaying) {
             this.reportSecondsWatched(video.currentTime, video.duration);
-            this._onScrollTranscriptTo(video.currentTime);
+            this.onScrollTranscriptTo(video.currentTime);
         }
     },
-    _onScrollTranscriptTo: function(scrollTime: number) {
+    onScrollTranscriptTo: function(scrollTime: number) {
         scrollTime |= scrollTime;
         var node = $("li[data-time='" + scrollTime + "']");
         if (node.length > 0) {
@@ -213,22 +212,22 @@ const VideoMixin = {
         $(videoMountNode).append(this.videoNode);
 
         const videojs = require("../../bower_components/videojs");
-        this.videojs = videojs(this._getVideoDOMNode(), {
+        this.videojs = videojs(this.getVideoDOMNode(), {
                 width: "100%",
                 height: "100%"
         }, () => {
             Util.log("Videojs player is initialized and ready.");
             // Add an event listener to track watched time
-            var video = this._getVideoDOMNode();
+            var video = this.getVideoDOMNode();
             if (video) {
-                video.addEventListener("canplay", this._canPlayHTML5);
-                video.addEventListener("progress", this._onNetworkProgress);
-                video.addEventListener("timeupdate", this._onTimeupdateHTML5);
-                video.addEventListener("play", this._onPlay, true);
-                video.addEventListener("pause", this._onPause, true);
-                video.addEventListener("stop", this._onStop, true);
-                video.addEventListener("ended", this._onEnded, true);
-                video.addEventListener("error", this._onError, true);
+                video.addEventListener("canplay", this.canPlayHTML5);
+                video.addEventListener("progress", this.onNetworkProgress);
+                video.addEventListener("timeupdate", this.onTimeupdateHTML5);
+                video.addEventListener("play", this.onPlay, true);
+                video.addEventListener("pause", this.onPause, true);
+                video.addEventListener("stop", this.onStop, true);
+                video.addEventListener("ended", this.onEnded, true);
+                video.addEventListener("error", this.onError, true);
                 video.defaultPlaybackRate = this.props.options.get("playbackRate") / 100;
                 video.playbackRate = this.props.options.get("playbackRate") / 100;
             }
@@ -277,13 +276,13 @@ const VideoMixin = {
 
     // Reports the seconds watched to the server if it hasn't been reported recently
     // or if the lastSecondWatched is at the end of the video.
-    reportSecondsWatched: function(currentTime: Date, duration: number) {
+    reportSecondsWatched: function(videoCurrentTime: Date, duration: number) {
         if (!isSignedIn()) {
             return;
         }
 
         // Report watched time to the server
-        this.lastSecondWatched = Math.round(currentTime);
+        this.lastSecondWatched = Math.round(videoCurrentTime);
         this.updateSecondsWatched();
         var currentTime = new Date();
         var secondsSinceLastReport = (currentTime.getTime() - this.lastReportedTime.getTime()) / 1000;
@@ -327,7 +326,7 @@ export const VideoInfoBar = component(({earned, available}) =>
 export const VideoViewer = component(VideoMixin, function({videoStore, topicTreeNode, domainTopicTreeNode}) {
     const onClickTranscript = (obj) => {
         var startSecond = obj.get("start_time") / 1000 | 0;
-        var video = this._getVideoDOMNode();
+        var video = this.getVideoDOMNode();
         if (video) {
             video.currentTime = startSecond;
             video.play();
@@ -336,7 +335,7 @@ export const VideoViewer = component(VideoMixin, function({videoStore, topicTree
 
     const onReloadVideo = () => {
         Util.log("Calling video load!");
-        var video = this._getVideoDOMNode();
+        var video = this.getVideoDOMNode();
         if (video) {
             video.load();
         }
