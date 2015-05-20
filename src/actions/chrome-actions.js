@@ -7,6 +7,7 @@ import Notifications from "../notifications";
 import Status from "../status";
 import {signIn, signOut} from "../user";
 import {TempAppState} from "../models";
+import l10n from "../l10n.js"
 
 export const onClickContentItemFromDownloads = (editNavInfo) => (topicTreeNode) =>
     editNavInfo((navInfo) => navInfo.merge({
@@ -91,7 +92,7 @@ export const onClickBack = (topicTreeNode, navInfo, editNavInfo, editSearch) => 
     // If settings or profile or ... is set, then don't show it anymore.
     // This effectively makes the topicTreeNode be in use again.
     if (isPaneShowing(navInfo)) {
-        return editNavInfo((navInfo) => navInfo.merge({
+        return editNavInfo((navInfoData) => navInfoData.merge({
             showDownloads: false,
             showProfile: false,
             showSettings: false,
@@ -105,10 +106,10 @@ export const onClickBack = (topicTreeNode, navInfo, editNavInfo, editSearch) => 
     }
 
     var newStack = navInfo.get("navStack").shift();
-    editNavInfo((navInfo) => navInfo.merge({
+    editNavInfo((navInfoData) => navInfoData.merge({
         navStack: newStack,
         topicTreeNode: newStack.peek(),
-        domainTopicTreeNode: getDomainTopicTreeNode(navInfo, newStack.peek()),
+        domainTopicTreeNode: getDomainTopicTreeNode(navInfoData, newStack.peek()),
     }));
 
     /*

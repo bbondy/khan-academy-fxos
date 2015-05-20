@@ -24,7 +24,7 @@ const Downloads: { contentList: any; init: any; canCancelDownload: any; cancelDo
         // Force always resolve instead of just returning readManifest
         return new Promise((resolve) => {
             this.contentList = new ContentList();
-            this._readManifest().then(() => {
+            this.readManifest().then(() => {
                 resolve();
             }).catch(() => {
                 resolve();
@@ -34,7 +34,7 @@ const Downloads: { contentList: any; init: any; canCancelDownload: any; cancelDo
     /**
      * Writes out the manifest file, which keeps track of downloaded data
      */
-    _writeManifest: function() {
+    writeManifest: function() {
         var contentListIds = this.contentList.models.map(function(model) {
             return model.getId();
         });
@@ -44,7 +44,7 @@ const Downloads: { contentList: any; init: any; canCancelDownload: any; cancelDo
     /**
      * Reads in a manifest file, which keeps track of downloaded data
      */
-    _readManifest: function() {
+    readManifest: function() {
         return new Promise((resolve, reject) => {
             Storage.readText(this.manifestFilename).then((data) => {
                 var contentListIds;
@@ -53,7 +53,7 @@ const Downloads: { contentList: any; init: any; canCancelDownload: any; cancelDo
                 }
                 var contentListModels = models.TopicTree.getContentItemsByIds(contentListIds);
                 _(contentListModels).each((model) => {
-                    this._setDownloaded(model, true);
+                    this.setDownloaded(model, true);
                 });
                 this.contentList = new ContentList(contentListModels);
                 resolve();
@@ -62,9 +62,9 @@ const Downloads: { contentList: any; init: any; canCancelDownload: any; cancelDo
             });
         });
     },
-    _setDownloaded: function(model: any, downloaded: boolean) {
+    setDownloaded: function(model: any, downloaded: boolean) {
         model.setDownloaded(downloaded);
-        while (model = model.getParent()) { // jshint ignore:line
+        while (model = model.getParent()) { // eslint-disable-line
             var downloadCount = model.get("downloadCount");
             if (downloaded) {
                 downloadCount++;
@@ -159,7 +159,7 @@ const Downloads: { contentList: any; init: any; canCancelDownload: any; cancelDo
                     type: contentItem.getContentMimeType()
                 });
                 Storage.writeBlob(filename, blob).then(() => {
-                    this._addDownloadToManifest(contentItem);
+                    this.addDownloadToManifest(contentItem);
                     if (onProgress) {
                         onProgress(downloadNumber + 1, 0);
                     }
@@ -177,10 +177,10 @@ const Downloads: { contentList: any; init: any; canCancelDownload: any; cancelDo
                     models.TempAppState.set("currentDownloadRequest", null);
                     handleContentLoaded(req.response);
                 };
-                req.onabort = (e) => {
+                req.onabort = () => {
                     reject(true);
                 };
-                req.onerror = (e) => {
+                req.onerror = () => {
                     reject(false);
                 };
                 req.onprogress = (e) => {
@@ -216,7 +216,7 @@ const Downloads: { contentList: any; init: any; canCancelDownload: any; cancelDo
         return new Promise((resolve, reject) => {
             var filename = contentItem.getId();
             Storage.delete(filename).then(() => {
-                this._removeDownloadFromManifest(contentItem);
+                this.removeDownloadFromManifest(contentItem);
                 resolve();
             }).catch(() => {
                 reject();
@@ -226,22 +226,22 @@ const Downloads: { contentList: any; init: any; canCancelDownload: any; cancelDo
     /**
      * Adds the specified model to the list of downloaded files
      */
-    _addDownloadToManifest: function(model: any): any {
-        this._setDownloaded(model, true);
+    addDownloadToManifest: function(model: any): any {
+        this.setDownloaded(model, true);
         Util.log("adding model to manifest: ");
         Util.log(model);
         this.contentList.push(model);
-        this._writeManifest();
+        this.writeManifest();
     },
     /**
      * Remove the specified model from the list of downloaded files
      */
-    _removeDownloadFromManifest: function(model: any): any {
-        this._setDownloaded(model, false);
+    removeDownloadFromManifest: function(model: any): any {
+        this.setDownloaded(model, false);
         Util.log("removing model from manifest: ");
         Util.log(model);
         this.contentList.remove(model);
-        this._writeManifest();
+        this.writeManifest();
     },
     manifestFilename: "download-manifest.json"
 };

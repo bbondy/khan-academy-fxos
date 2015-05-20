@@ -2,15 +2,6 @@
 
 "use strict";
 
-// Perseus module uses React directly and uses $._ directly for
-// localization, so we do this as a hack to get it to work
-function perseusPrep(katex, KAS, MathJax) {
-    $._ = function(x) { return x; };
-    window.$_ = function(x) { return x; };
-    window.katex = katex;
-    window.KAS = KAS;
-}
-
 import React from "react";
 import Util from "../util";
 import APIClient from "../apiclient";
@@ -20,6 +11,15 @@ import component from "omniscient";
 import $ from "jquery";
 import {isSignedIn} from "../user";
 import _ from "underscore";
+
+// Perseus module uses React directly and uses $._ directly for
+// localization, so we do this as a hack to get it to work
+function perseusPrep(katex, KAS) {
+    $._ = function(x) { return x; };
+    window.$_ = function(x) { return x; }; // eslint-disable-line
+    window.katex = katex;
+    window.KAS = KAS;
+}
 
 window.Exercises = {
     cluesEnabled: false
@@ -66,13 +66,13 @@ const ExerciseMixin = {
                     level: exerciseInfo && exerciseInfo.exercise_progress && exerciseInfo.exercise_progress.level,
                     mastered: exerciseInfo && exerciseInfo.exercise_progress && exerciseInfo.exercise_progress.mastered,
                     practiced: exerciseInfo && exerciseInfo.exercise_progress && exerciseInfo.exercise_progress.practiced,
-                    problemNumber: exerciseInfo && (exerciseInfo.total_done + 1) || 1,
+                    problemNumber: exerciseInfo && exerciseInfo.total_done + 1 || 1,
                     streak: exerciseInfo && exerciseInfo.streak,
                     taskId: taskInfo.id,
                     taskAttemptHistory: taskInfo.task_attempt_history,
                     longestStreak: exerciseInfo && exerciseInfo.longest_streak
                 });
-            }).catch((e) => {
+            }).catch(() => {
                 reject();
             });
         });
@@ -138,7 +138,7 @@ const ExerciseMixin = {
                         }
                         taskAttemptHistory = taskAttemptHistory.slice(-5);
                         return _.reduce(taskAttemptHistory.toJS(), (total, task) => {
-                            return total + ((task.correct && !task.seen_hint) ? 1 : 0);
+                            return total + (task.correct && !task.seen_hint) ? 1 : 0;
                         }, 0);
                     };
                     // If we have another correct and we already have 4 correct,
@@ -189,16 +189,16 @@ const ExerciseMixin = {
         window.jQuery = $;
 
 
-        var Khan = require("../../khan-exercises/main"),
-            MathJax = require("../../bower_components/MathJax/MathJax.js");
+        var Khan = require("../../khan-exercises/main");
+        require("../../bower_components/MathJax/MathJax.js");
+
         Khan = window.Khan;
-        MathJax = window.MathJax;
         window.KhanUtil = Khan.Util;
 
         const katex = require("katex"),
             KAS = require("../../bower_components/KAS/kas"),
             Perseus = require("../../bower_components/perseus/perseus-3");
-        perseusPrep(katex, KAS, MathJax, Khan.Util);
+        perseusPrep(katex, KAS, Khan.Util);
         Perseus.init({}).then(() => {
             Util.log("Perseus init done %o, %o", Perseus);
             this.ItemRenderer = Perseus.ItemRenderer;

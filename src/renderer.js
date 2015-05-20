@@ -9,7 +9,7 @@ import { writeOptions } from "./data/app-options";
  * not obvious whether they should be passed to Omniscient statics or not.
  */
 
-export class Renderer {
+export class ComponentRenderer {
     constructor(component, target, state) {
         this.component = component;
         this.target = target;

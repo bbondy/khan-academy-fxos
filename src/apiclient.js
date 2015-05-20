@@ -277,7 +277,7 @@ const APIClient = {
      * @param exerciseName The name of the exercise to obtain task information for
      * @return a promise with the task
      */
-    getMissions: function(exerciseName: string): any {
+    getMissions: function(): any {
         var url = `${this.API_INTERNAL_BASE}/user/missions`;
         return this.basicAPICall(url);
     },

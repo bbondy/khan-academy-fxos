@@ -11,7 +11,7 @@ import {MainView} from "./views/chrome";
 import {readOptions, resetOptions} from "./data/app-options";
 import {readTopicTree} from "./data/topic-tree";
 import {resetNavInfo} from "./data/nav-info";
-import {editorForPath, Renderer} from "./renderer";
+import {editorForPath, ComponentRenderer} from "./renderer";
 import Immutable from "immutable";
 import {refreshLoggedInInfo} from "./user";
 
@@ -47,7 +47,7 @@ const initialState = Immutable.fromJS({
     },
 });
 const mountNode = document.getElementById("app");
-const renderer = new Renderer(MainView, mountNode, initialState);
+const renderer = new ComponentRenderer(MainView, mountNode, initialState);
 // Note that we don't wait for the topic tree since it can take
 // relatively long on FxOS devices.
 renderer.render();

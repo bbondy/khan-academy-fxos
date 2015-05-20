@@ -161,7 +161,6 @@ export const reportVideoProgress = (user, topicTreeNode, secondsWatched, lastSec
             // If they've watched some part of the video, and it's not almost the end
             // Otherwise check if we already have video progress for this item and we
             // therefore no longer need it.
-            var lastSecondWatched;
             if (result.last_second_watched > 10 &&
                     duration - result.last_second_watched > 10) {
                 lastSecondWatched = result.last_second_watched;
@@ -214,8 +213,8 @@ export const reportVideoProgress = (user, topicTreeNode, secondsWatched, lastSec
                 },
                 duration: getDuration(topicTreeNode)
             };
-            foundUserVideo["points"] = newPoints;
-            foundUserVideo["last_second_watched"] = lastSecondWatched;
+            foundUserVideo.points = newPoints;
+            foundUserVideo.last_second_watched = lastSecondWatched;
             if (isNew) {
                 userVideos = userVideos.unshift(Immutable.fromJS(foundUserVideo));
                 editUserVideos(() => userVideos);
@@ -291,7 +290,7 @@ export const refreshLoggedInInfo = (user, editUser, forceRefreshAllInfo) => {
 
             saveUserInfo(userInfo.toJS());
 
-            var result = loadLocalStorageData(userInfo);
+            result = loadLocalStorageData(userInfo);
             if (!forceRefreshAllInfo && result.completedEntityIds && result.startedEntityIds) {
                 Util.log("User info only obtained. Not obtaining user data because we have it cached already!");
                 return result;
@@ -321,7 +320,7 @@ export const refreshLoggedInInfo = (user, editUser, forceRefreshAllInfo) => {
                 saveCompleted(userInfo, data.completedEntityIds);
             }
 
-            editUser((user) => user.merge({
+            editUser((userData) => userData.merge({
                 startedEntityIds: data.startedEntityIds,
                 completedEntityIds: data.completedEntityIds,
             }));
