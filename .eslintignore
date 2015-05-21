@@ -1,0 +1,3 @@
+src/__tests__/**/*.js
+src/oauth.js
+src/l10n.js
