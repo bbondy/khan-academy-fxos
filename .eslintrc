@@ -58,14 +58,14 @@
     "no-extra-parens": 2,
     "no-irregular-whitespace": 2,
     "no-iterator": 2,
-    "no-loop-func": 2,
+    "no-loop-func": 0,
     "no-multi-str": 2,
     "no-new": 0,
     "no-plusplus": 0,
     "no-proto": 2,
     "no-script-url": 0,
     "no-sequences": 2,
-    "no-shadow": 2,
+    "no-shadow": 0, // TODO: Eanble when this is fixed: https://github.com/eslint/eslint/issues/2552
     "no-undef": 2,
     "no-unused-vars": 2,
     "no-use-before-define": [

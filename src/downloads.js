@@ -13,6 +13,7 @@ import _ from "underscore";
 import Util from "./util";
 import Storage from "./storage";
 import {ContentList, TempAppState} from "./models";
+import models from "./models";
 import APIClient from "./apiclient";
 
 const Downloads: { contentList: any; init: any; canCancelDownload: any; cancelDownloading: any; download: any; downloadContent: any; downloadTopic: any; deleteContent: any } = {

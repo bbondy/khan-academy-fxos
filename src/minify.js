@@ -65,7 +65,7 @@ const Minify = {
         if (node.download_urls && node.download_urls.mp4 &&
                 node.download_urls.mp4.indexOf(urlPrefix) === 0) {
             node.download_urls.mp4 = node.download_urls.mp4.substring(urlPrefix.length);
-            node.download_urls.mp4 = node.download_urls.mp4.substring(0,  node.download_urls.mp4.length - 4);
+            node.download_urls.mp4 = node.download_urls.mp4.substring(0, node.download_urls.mp4.length - 4);
         }
     },
 
@@ -182,17 +182,17 @@ const Minify = {
      */
     getOutput: function(node: any): string {
         return "window.topictree =" +
-            this._getOutput(node) + ";";
+            this.getOutputInternal(node) + ";";
     },
 
-    _getOutput: function(node: any): string {
+    getOutputInternal: function(node: any): string {
         var output = "{";
 
         for (var p in node) {
             if (p === "c") {
                 output += "c:[";
                 node.c.forEach(function(child) {
-                    output += this._getOutput(child) + ",";
+                    output += this.getOutputInternal(child) + ",";
                 }.bind(this));
                 output = output.substring(0, output.length - 1);
                 output += "],";
@@ -207,7 +207,7 @@ const Minify = {
                         .replace(/\r/g, " ")
                         .replace(/\t/g, " ")
                         // Replace quotes with \"
-                        .replace(/\"/g, "\\\"")  + "\",";
+                        .replace(/\"/g, "\\\"") + "\",";
                 } else {
                     output += p + ":" + node[p] + ",";
                 }

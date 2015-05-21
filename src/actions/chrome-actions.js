@@ -161,6 +161,10 @@ export const onClickViewOnKA = (topicTreeNode) => () => openUrl(getKAUrl(topicTr
 
 export const onClickDeleteDownloadedContent = (topicTreeNode) => () => Downloads.deleteContent(topicTreeNode);
 
+//TODO: impl
+const getChildNotDownloadedCount = () => {
+}
+
 export const onClickDownloadContent = (topicTreeNode) => () => {
     var totalCount = 1;
     if (isTopic(topicTreeNode)) {
@@ -214,11 +218,11 @@ export const onClickDownloadContent = (topicTreeNode) => () => {
     Status.start();
     var message;
     var title;
-    Downloads.download(topicTreeNode, onProgress).then((topicTreeNode, count) => {
-        var title = l10n.get("download-complete");
-        var contentTitle = getTitle(topicTreeNode);
-        if (isContent(topicTreeNode)) {
-            if (isVideo(topicTreeNode)) {
+    Downloads.download(topicTreeNode, onProgress).then((currentTopicTreeNode, count) => {
+        title = l10n.get("download-complete");
+        var contentTitle = getTitle(currentTopicTreeNode);
+        if (isContent(currentTopicTreeNode)) {
+            if (isVideo(currentTopicTreeNode)) {
                 message = l10n.get("video-complete-body", {
                     title: contentTitle
                 });

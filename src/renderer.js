@@ -45,5 +45,5 @@ export class ComponentRenderer {
     }
 }
 
-export const In = (path) => (edit) => (state) => state.updateIn(path, edit);
-export const editorForPath = (edit, path) => _.compose(edit, In(_.isString(path) ? [path] : path));
+export const editUpdateIn = (path) => (edit) => (state) => state.updateIn(path, edit);
+export const editorForPath = (edit, path) => _.compose(edit, editUpdateIn(_.isString(path) ? [path] : path));
