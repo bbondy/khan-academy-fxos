@@ -2,8 +2,6 @@
 
 "use strict";
 
-require("native-promise-only"); // For Jest!
-
 import _ from "underscore";
 import l10n from "./l10n";
 
