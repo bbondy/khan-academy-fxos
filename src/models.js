@@ -880,19 +880,4 @@ class UserModel extends BaseModel {
 }
 UserModel.userInfoLocalStorageName = "userInfo-3";
 
-
-// Just really a model to hold temporary app state
-// that should not persist after it is changed on app
-// restarts.
-// For example we use this for isDownloadingTopic from
-// Downloads so we can easily adjust views based on that state
-// changing.
-export const TempAppState = new BaseModel({
-    defaults: {
-        currentDownloadRequest: null,
-        isTopicDownloading: false,
-        showingStatus: false,
-    }
-});
-
 /*eslint-enable */

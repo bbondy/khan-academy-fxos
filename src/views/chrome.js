@@ -8,7 +8,6 @@ import l10n from "../l10n";
 import classNames from "classnames";
 import Util from "../util";
 import React from "react";
-import {TempAppState} from "../models";
 import {onClickBack, onClickTopic, onClickContentItemFromDownloads, onClickContentItem,
     onClickSignin, onClickSignout, onClickProfile, onClickDownloads, onClickSettings,
     onClickSupport, onClickDownloadContent, onClickViewOnKA, onClickShare,
@@ -111,17 +110,17 @@ export const AppHeader = component((props, {onClickBackCb}) => {
         </header>;
 }).jsx;
 
-export const StatusBarViewer = component(() => {
-    if (!TempAppState.get("status")) {
+export const StatusBarViewer = component(({tempStore}, {onClickCancelDownloadContent}) => {
+    if (!tempStore.get("status")) {
         return <div/>;
     }
     var cancelButton;
-    if (Downloads.canCancelDownload()) {
+    if (Downloads.canCancelDownload(tempStore)) {
         cancelButton = <a className="status-button" href="#" onClick={onClickCancelDownloadContent}>{String.fromCharCode(215)}</a>;
     }
 
     return <div className="status-bar">
-        {TempAppState.get("status")}
+        {tempStore.get("status")}
         {cancelButton}
     </div>;
 }).jsx;
@@ -166,9 +165,9 @@ export const Sidebar = component((props, statics) => {
     }
 
     if (Storage.isEnabled()) {
-        if (Downloads.canCancelDownload()) {
+        if (Downloads.canCancelDownload(props.tempStore)) {
             items.push(<li key="cancel-downloading" className="hot-item">
-                    <a href="#" data-l10n-id="cancel-downloading" onClick={onClickCancelDownloadContent}>Cancel Downloading</a>
+                    <a href="#" data-l10n-id="cancel-downloading" onClick={statics.onClickCancelDownloadContent}>Cancel Downloading</a>
                 </li>);
         } else if (!props.isPaneShowing &&
                     props.topicTreeNode && isTopic(props.topicTreeNode)) {
@@ -331,11 +330,14 @@ export const MainView = component(({navInfo, options, user, tempStore}, {edit}) 
                                onClickDownloads: onClickDownloads(editNavInfo),
                                onClickSettings: onClickSettings(editNavInfo),
                                onClickSupport: onClickSupport,
-                               onClickDownloadContent: onClickDownloadContent(navInfo.get("topicTreeNode")),
+                               onClickDownloadContent: onClickDownloadContent(navInfo.get("topicTreeNode"), tempStore),
                                onClickViewOnKA: onClickViewOnKA(navInfo.get("topicTreeNode")),
                                onClickShare: onClickShare(navInfo.get("topicTreeNode")),
                                onClickDeleteDownloadedContent: onClickDeleteDownloadedContent(navInfo.get("topicTreeNode")),
+                               onClickCancelDownloadContent: onClickCancelDownloadContent(tempStore, editTempStore),
                            }}
+                           tempStore={tempStore}
+                           editTempStore={editTempStore}
                            isPaneShowing={isPaneShowing(navInfo)}
                            isDownloadsShowing={navInfo.get("showDownloads")}
                            isProfileShowing={navInfo.get("showProfile")}
@@ -359,7 +361,9 @@ export const MainView = component(({navInfo, options, user, tempStore}, {edit}) 
                        />
             {topicSearch}
             {control}
-            <StatusBarViewer/>
+            <StatusBarViewer tempStore={tempStore} statics={{
+                onClickCancelDownloadContent: onClickCancelDownloadContent(tempStore, editTempStore),
+            }}/>
         </section>
     </section>;
 }).jsx;

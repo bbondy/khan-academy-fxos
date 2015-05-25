@@ -6,7 +6,6 @@ import { getDomainTopicTreeNode, isPaneShowing } from "../data/nav-info";
 import Notifications from "../notifications";
 import Status from "../status";
 import {signIn, signOut} from "../user";
-import {TempAppState} from "../models";
 import l10n from "../l10n.js"
 
 export const onClickContentItemFromDownloads = (editNavInfo) => (topicTreeNode) =>
@@ -57,11 +56,11 @@ export const openUrl = (url) => {
     }
 };
 export const onClickSupport = () => openUrl("https://khanacademy.zendesk.com/hc/communities/public/topics/200155074-Mobile-Discussions");
-export const onClickCancelDownloadContent = () => {
+export const onClickCancelDownloadContent = (tempStore, editTempStore) => () => {
     if (!confirm(l10n.get("cancel-download-warning"))) {
         return;
     }
-    Downloads.cancelDownloading();
+    Downloads.cancelDownloading(tempStore, editTempStore);
 };
 
 export const onClickProfile = (editNavInfo) => () =>
@@ -165,7 +164,7 @@ export const onClickDeleteDownloadedContent = (topicTreeNode) => () => Downloads
 const getChildNotDownloadedCount = () => {
 }
 
-export const onClickDownloadContent = (topicTreeNode) => () => {
+export const onClickDownloadContent = (topicTreeNode, tempStore) => () => {
     var totalCount = 1;
     if (isTopic(topicTreeNode)) {
         totalCount = getChildNotDownloadedCount(topicTreeNode);
@@ -175,7 +174,7 @@ export const onClickDownloadContent = (topicTreeNode) => () => {
     if (totalCount === 0) {
         alert(l10n.get("already-downloaded"));
         return;
-    } else if (TempAppState.get("isDownloadingTopic")) {
+    } else if (tempStore.get("isDownloadingTopic")) {
         alert(l10n.get("already-downloading"));
         return;
     } else if (Util.isMeteredConnection()) {
@@ -202,7 +201,7 @@ export const onClickDownloadContent = (topicTreeNode) => () => {
 
     var onProgress = (count, currentProgress, cancelling) => {
         if (cancelling) {
-            Status.update(l10n.get("canceling-download"));
+            Status.update(l10n.get("canceling-download"), tempStore, editTempStore);
             return;
         }
         count = Util.numberWithCommas(count);
@@ -212,10 +211,10 @@ export const onClickDownloadContent = (topicTreeNode) => () => {
             totalCountStr: totalCountStr,
             currentProgress: currentProgress
         });
-        Status.update(progressMessage);
+        Status.update(progressMessage, tempStore, editTempStore);
     };
 
-    Status.start();
+    Status.start(editTempStore);
     var message;
     var title;
     Downloads.download(topicTreeNode, onProgress).then((currentTopicTreeNode, count) => {
@@ -241,7 +240,7 @@ export const onClickDownloadContent = (topicTreeNode) => () => {
             });
         }
 
-        Status.stop();
+        Status.stop(editTempStore);
         Notifications.info(title, message, () => {});
     }).catch((isCancel) => {
         if (isCancel) {
@@ -251,7 +250,7 @@ export const onClickDownloadContent = (topicTreeNode) => () => {
             title = l10n.get("download-aborted");
             message = l10n.get("content-items-downloaded-failure");
         }
-        Status.stop();
+        Status.stop(editTempStore);
         Notifications.info(title, message, () => {});
     });
 };

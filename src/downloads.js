@@ -12,7 +12,7 @@
 import _ from "underscore";
 import Util from "./util";
 import Storage from "./storage";
-import {ContentList, TempAppState} from "./models";
+import {ContentList} from "./models";
 import models from "./models";
 import APIClient from "./apiclient";
 
@@ -79,20 +79,20 @@ const Downloads: { contentList: any; init: any; canCancelDownload: any; cancelDo
     /**
      * Returns whether there is a cancellable download in progress.
      */
-    canCancelDownload: function() {
-        return TempAppState.get("isDownloadingTopic") || TempAppState.get("currentDownloadRequest");
+    canCancelDownload: function(tempStore) {
+        return tempStore.get("isDownloadingTopic") || tempStore.get("currentDownloadRequest");
     },
 
     /**
      * Cancels downloading if it's in progress.
      */
-    cancelDownloading: function() {
-        TempAppState.set("isDownloadingTopic", false);
-        var currentRequest = TempAppState.get("currentDownloadRequest");
+    cancelDownloading: function(tempStore, editTempStore) {
+        editTempStore((temp) => temp.set("isDownloadingTopic", false));
+        var currentRequest = tempStore.get("currentDownloadRequest");
         // Cancel the XHR if it exists (it may not, in the case of article downloads).
         if (currentRequest) {
             currentRequest.abort();
-            TempAppState.set("currentDownloadRequest", null);
+            editTempStore((temp) => temp.set("currentDownloadRequest", null));
         }
         if (this.currentProgress) {
             this.currentProgress(undefined, true);
@@ -102,11 +102,11 @@ const Downloads: { contentList: any; init: any; canCancelDownload: any; cancelDo
      * Used to download either a single content item for all content
      * items underneath the specified topic.
      */
-    download: function(model: any, onProgress: any) {
+    download: function(model: any, onProgress: any, editTempStore) {
         if (model.isContent()) {
             return this.downloadContent(model, onProgress, 0);
         } else if (model.isTopic()) {
-            return this.downloadTopic(model, onProgress);
+            return this.downloadTopic(model, onProgress, tempStore);
         }
         return Promise.resolve();
     },
@@ -114,11 +114,11 @@ const Downloads: { contentList: any; init: any; canCancelDownload: any; cancelDo
      * Downloads all content items recursively one at a time for
      * the current topic
      */
-    downloadTopic: function(topic: any, onProgress: any) {
+    downloadTopic: function(topic: any, onProgress: any, editTempStore) {
         return new Promise((resolve, reject) => {
             this.currentProgress = onProgress;
             var downloadedCount = 0;
-            TempAppState.set("isDownloadingTopic", true);
+            editTempStore((temp) => temp.set("isDownloadingTopic", true));
             var predicate = (model) => !model.isDownloaded();
             var seq = topic.enumChildrenGenerator(predicate);
             var downloadOneAtATime = () => {
@@ -136,7 +136,7 @@ const Downloads: { contentList: any; init: any; canCancelDownload: any; cancelDo
                     });
                 } catch (e) {
                     // done, no more items in the generator
-                    TempAppState.set("isDownloadingTopic", false);
+                    editTempStore((temp) => temp.set("isDownloadingTopic", false));
                     resolve(topic, downloadedCount);
                     delete this.currentProgress;
                 }
@@ -175,7 +175,7 @@ const Downloads: { contentList: any; init: any; canCancelDownload: any; cancelDo
                 req.open("GET", url, true);
                 req.responseType = "arraybuffer";
                 req.onload = () => {
-                    models.TempAppState.set("currentDownloadRequest", null);
+                    editTempStore((temp) => temp.set("currentDownloadRequest", null));
                     handleContentLoaded(req.response);
                 };
                 req.onabort = () => {
@@ -189,7 +189,7 @@ const Downloads: { contentList: any; init: any; canCancelDownload: any; cancelDo
                     onProgress(downloadNumber, percent);
                 };
                 req.send();
-                models.TempAppState.set("currentDownloadRequest", req);
+                editTempStore((temp) => temp.set("currentDownloadRequest", req));
             } else if (contentItem.isArticle()) {
                 if (contentItem.get("content")) {
                     // Articles have a content property with the html we want to
