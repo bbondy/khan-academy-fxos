@@ -35,7 +35,7 @@ You need [Nodejs](http://nodejs.org) installed to run the following commands (pl
     cd bower_components/katex
     make
     cd ../../
-    gulp webpack-dev-server&
+    gulp browser-dev-server&
 
 Navigate to http://localhost:8008.  As you make changes webpack will rebundle the sources.
 
@@ -80,7 +80,7 @@ The size is listed in pages (4 KB/page).
 
 ## Branches
 
-There are 2 main branches. One with AMD module loading (requirejs) and one for CommonJS (using browserify) . Master is based on the browserify version but is not currently stable yet.
+There are 2 main branches. One with AMD module loading (requirejs) and one for CommonJS (using webpack) . Master is based on the webpack version but is not currently stable yet.
 
 ## Contribute
 
