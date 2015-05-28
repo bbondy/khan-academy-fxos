@@ -125,52 +125,59 @@ const ExerciseMixin = {
         var attemptNumber = ++this.attemptNumber;
         var isCorrect = score.correct;
         var hintsUsed = this.props.exerciseStore.get("hintsUsed") || 0;
-        APIClient.reportExerciseProgress(getName(this.props.topicTreeNode), this.props.exerciseStore.get("problemNumber"),
-
-            this.randomAssessmentSHA1, this.randomAssessmentId,
-            secondsTaken, hintsUsed, isCorrect,
-            attemptNumber, this.problemTypeName, this.props.exerciseStore.get("taskId")).then(() => {
-                if (isCorrect) {
-                    const getNumSuccessful = (exerciseStore) => {
-                        var taskAttemptHistory = exerciseStore.get("taskAttemptHistory");
-                        if (!taskAttemptHistory) {
-                            return 0;
-                        }
-                        taskAttemptHistory = taskAttemptHistory.slice(-5);
-                        return _.reduce(taskAttemptHistory.toJS(), (total, task) => {
-                            return total + (task.correct && !task.seen_hint) ? 1 : 0;
-                        }, 0);
-                    };
-                    // If we have another correct and we already have 4 correct,
-                    // then show task complete view.
-                    if (this.props.exerciseStore.get("streak") >= 4 &&
-                            hintsUsed === 0 && getNumSuccessful(this.props.exerciseStore) === 4) {
-                        this.props.statics.editExercise((exercise) =>
-                            exercise.merge({
-                                taskComplete: true
-                            })
-                        );
-                        return;
+        APIClient.reportExerciseProgress({
+            exerciseName: getName(this.props.topicTreeNode),
+            problemNumber: this.props.exerciseStore.get("problemNumber"),
+            assessmentSHA1: this.randomAssessmentSHA1,
+            assessmentId: this.randomAssessmentId,
+            secondsTaken: secondsTaken,
+            hintsUsedCount: hintsUsed,
+            isCorrect: isCorrect,
+            attemptNumber: attemptNumber,
+            problemType: this.problemTypeName,
+            taskId: this.props.exerciseStore.get("taskId")
+        }).then(() => {
+            if (isCorrect) {
+                const getNumSuccessful = (exerciseStore) => {
+                    var taskAttemptHistory = exerciseStore.get("taskAttemptHistory");
+                    if (!taskAttemptHistory) {
+                        return 0;
                     }
-                    this.refreshRandomAssessment();
-                } else {
-                    // Refresh attempt info so it shows up as wrong
-                    this.refreshUserExerciseInfo().then((userExerciseInfo) => {
-                        this.props.statics.editExercise((exercise) =>
-                            exercise.merge({
-                                level: userExerciseInfo.level,
-                                mastered: userExerciseInfo.mastered,
-                                practiced: userExerciseInfo.practiced,
-                                problemNumber: userExerciseInfo.problemNumber,
-                                streak: userExerciseInfo.streak,
-                                taskId: userExerciseInfo.taskId,
-                                taskAttemptHistory: userExerciseInfo.taskAttemptHistory || [],
-                                longestStreak: userExerciseInfo.longestStreak
-                            })
-                        );
-                    });
+                    taskAttemptHistory = taskAttemptHistory.slice(-5);
+                    return _.reduce(taskAttemptHistory.toJS(), (total, task) => {
+                        return total + (task.correct && !task.seen_hint) ? 1 : 0;
+                    }, 0);
+                };
+                // If we have another correct and we already have 4 correct,
+                // then show task complete view.
+                if (this.props.exerciseStore.get("streak") >= 4 &&
+                        hintsUsed === 0 && getNumSuccessful(this.props.exerciseStore) === 4) {
+                    this.props.statics.editExercise((exercise) =>
+                        exercise.merge({
+                            taskComplete: true
+                        })
+                    );
+                    return;
                 }
-            });
+                this.refreshRandomAssessment();
+            } else {
+                // Refresh attempt info so it shows up as wrong
+                this.refreshUserExerciseInfo().then((userExerciseInfo) => {
+                    this.props.statics.editExercise((exercise) =>
+                        exercise.merge({
+                            level: userExerciseInfo.level,
+                            mastered: userExerciseInfo.mastered,
+                            practiced: userExerciseInfo.practiced,
+                            problemNumber: userExerciseInfo.problemNumber,
+                            streak: userExerciseInfo.streak,
+                            taskId: userExerciseInfo.taskId,
+                            taskAttemptHistory: userExerciseInfo.taskAttemptHistory || [],
+                            longestStreak: userExerciseInfo.longestStreak
+                        })
+                    );
+                });
+            }
+        });
     },
     componentWillMount: function() {
         if (isPerseusExercise(this.props.topicTreeNode)) {

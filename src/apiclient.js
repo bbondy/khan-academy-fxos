@@ -344,16 +344,9 @@ const APIClient = {
         return this.basicAPICall(this.API_V1_BASE + `/user/videos/${youTubeId}/log`, extraParams, "POST");
     },
 
-    reportExerciseProgress: function(exerciseName: string,
-                                    problemNumber: string,
-                                    assessmentSHA1: string,
-                                    assessmentId: string,
-                                    secondsTaken: number,
-                                    hintsUsedCount: number,
-                                    isCorrect: boolean,
-                                    attemptNumber: number,
-                                    problemType: string,
-                                    taskId: string): any {
+    reportExerciseProgress: function({exerciseName, problemNumber, assessmentSHA1, assessmentId,
+                                    secondsTaken, hintsUsedCount, isCorrect, attemptNumber,
+                                    problemType, taskId}): any {
         var extraParams = {
             casing: "camel",
             sha1: assessmentSHA1,
