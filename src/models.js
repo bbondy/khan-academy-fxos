@@ -584,35 +584,6 @@ class UserModel extends BaseModel {
         this.initialized = true;
         return Promise.resolve();
     }
-    signIn() {
-        return new Promise((resolve, reject) => {
-            APIClient.signIn().then(() => {
-                //this.refreshLoggedInInfo(); <-- Since we currently change the
-                // window.locaiton, we dont' get a callback from this promise.
-                // So there's no point to refreshLoggedInInfo.  Commenting for
-                // extra emphasis.
-
-                // We don't need to wait for the result of the
-                // refreshLoggedInInfo promise, just resolve right away.
-                resolve();
-            }).catch(() => {
-                reject();
-            });
-        });
-    }
-    signOut() {
-        // Unbind user specific data from the topic tree
-        this.syncStartedToTopicTree(false);
-        this.syncCompletedToTopicTree(false);
-        this.syncUserVideoProgressToTopicTree(false);
-        this.syncUserExerciseProgressToTopicTree(false);
-
-        // Remove userInfo from the model and clear its local storage
-        this.unset("userInfo");
-        localStorage.removeItem(this.userInfoLocalStorageName);
-
-        return APIClient.signOut();
-    }
     isSignedIn() {
         return APIClient.isSignedIn();
     }
