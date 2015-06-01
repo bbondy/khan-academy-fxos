@@ -56,16 +56,7 @@ export class TopicTreeBase extends BaseModel {
      * Gets the ID of the topic tree item
      */
     getId() {
-        if (this.isExercise()) {
-            return this.getProgressKey().substring(1);
-        }
         return this.get(Minify.getShortName("id"));
-    }
-    /**
-     * Gets the slug of the topic tree item
-     */
-    getProgressKey() {
-        return this.get(Minify.getShortName("progress_key"));
     }
     /**
      * Gets the slug of the topic tree item
@@ -100,34 +91,16 @@ export class TopicTreeBase extends BaseModel {
         return false;
     }
     /**
-     * Checks if the topic tree item is a video list
-     */
-    isVideoList() {
-        return false;
-    }
-    /**
      * Checks if the topic tree item is a video
      */
     isVideo() {
         return this.getKind() === "Video";
     }
     /**
-     * Checks if the topic tree item is an article list
-     */
-    isArticleList() {
-        return false;
-    }
-    /**
      * Checks if the topic tree item is an article
      */
     isArticle() {
         return this.getKind() === "Article";
-    }
-    /**
-     * Checks if the topic tree item is an article list
-     */
-    isExerciseList() {
-        return false;
     }
     /**
      * Checks if the topic tree item is an article
@@ -140,29 +113,6 @@ export class TopicTreeBase extends BaseModel {
      */
     isContent() {
         return this.isVideo() || this.isArticle() || this.isExercise();
-    }
-    /**
-     * Checks if the topic tree item is a content list
-     */
-    isContentList() {
-        return false;
-    }
-    /**
-     * Obtains the parent domain topic tree item
-     */
-    getParentDomain() {
-        var current = this;
-        while (current && !current.isRootChild()) {
-            current = current.getParent();
-        }
-        return current;
-    }
-    /**
-     * Checks if the topic tree item is a child of the root topic tree item
-     * I.e. a top level subject.
-     */
-    isRootChild() {
-        return this.getParent() && this.getParent().isRoot();
     }
     /**
      * Cehecks if the topic tree item is the root item
@@ -478,31 +428,6 @@ export class ContentModel extends TopicTreeBase {
     getContentMimeType() {
         return this.isVideo ? "video/mp4" : "text/html";
     }
-    isCompleted() {
-        return this.get("completed");
-    }
-    isStarted() {
-        return this.get("started");
-    }
-    getYoutubeId() {
-        return this.get(Minify.getShortName("youtube_id"));
-    }
-    getPoints() {
-        return this.get("points") || 0;
-    }
-    getName() {
-        return this.get(Minify.getShortName("name"));
-    }
-    getKAUrl() {
-        var value = this.get(Minify.getShortName("ka_url"));
-        if (!value) {
-            return null;
-        }
-        if (value.substring(0, 4) !== "http") {
-            value = "http://www.khanacademy.org/video/" + value;
-        }
-        return value;
-    }
     getDownloadUrl() {
         var value = this.get(Minify.getShortName("download_urls"));
         if (!value) {
@@ -513,29 +438,12 @@ export class ContentModel extends TopicTreeBase {
         }
         return value;
     }
-    getDuration() {
-        return this.get(Minify.getShortName("duration"));
-    }
-    getFilename() {
-        return this.get(Minify.getShortName("file_name"));
-    }
-    // A newer perseus style exercise
-    isPerseusExercise() {
-        return !this.get(Minify.getShortName("file_name"));
-    }
-    // An older style exercise pointed to by the khan-exercises submodule
-    isKhanExercisesExercise() {
-        return !!this.get(Minify.getShortName("file_name"));
-    }
 }
 
 export class ContentList extends TopicTreeCollection {
     constructor(models, options={}) {
         options.modelClass = ContentModel;
         super(models, options);
-    }
-    isContentList() {
-        return true;
     }
 }
 
