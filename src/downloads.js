@@ -15,6 +15,122 @@ import Storage from "./storage";
 import {ContentList} from "./models";
 import models from "./models";
 import APIClient from "./apiclient";
+import {getId, getContentMimeType, isVideo, getDownloadUrl, isArticle} from  "./data/topic-tree-helper";
+
+const manifestFilename = "download-manifest.json";
+
+/**
+ * Writes out the manifest file, which keeps track of downloaded content list ids
+ */
+const writeDownloadsManifest = (contentListIds) => {
+    let jsonManifest = JSON.stringify(contentListIds);
+    return Storage.writeText(manifestFilename, jsonManifest);
+};
+/**
+ * Reads in a manifest file, which keeps track of downloaded data
+ */
+const readDownloadsManifest = () => {
+    return new Promise((resolve, reject) => {
+        Storage.readText(manifestFilename).then((data) => {
+            let contentListIds = data && JSON.parse(data) || undefined;
+            resolve(contentListIds);
+        }).catch(() => {
+            reject();
+        });
+    });
+};
+
+/**
+ * Downloads the file at the specified URL and stores it to the
+ * specified filename.
+ */
+const downloadContent = (contentItem, onProgress, downloadNumber) => {
+    return new Promise((resolve, reject) => {
+        if (onProgress) {
+            onProgress(downloadNumber, 0);
+        }
+
+        var filename = getId(contentItem);
+        var handleContentLoaded = (contentData) => {
+            var blob = new window.Blob([contentData], {
+                type: getContentMimeType(contentItem)
+            });
+            Storage.writeBlob(filename, blob).then(() => {
+                if (onProgress) {
+                    onProgress(downloadNumber + 1, 0);
+                }
+                resolve(contentItem, 1);
+            }).catch(() => {
+                reject();
+            });
+        };
+        if (isVideo(contentItem)) {
+            var url = getDownloadUrl(contentItem);
+            var req = new XMLHttpRequest({mozSystem: true});
+            req.open("GET", url, true);
+            req.responseType = "arraybuffer";
+            req.onload = () => {
+                editTempStore((temp) => temp.set("currentDownloadRequest", null));
+                handleContentLoaded(req.response);
+            };
+            req.onabort = () => {
+                reject(true);
+            };
+            req.onerror = () => {
+                reject(false);
+            };
+            req.onprogress = (e) => {
+                var percent = Math.floor(e.loaded * 100 / e.total);
+                onProgress(downloadNumber, percent);
+            };
+            req.send();
+            editTempStore((temp) => temp.set("currentDownloadRequest", req));
+        } else if (isArticle(contentItem)) {
+            if (contentItem.get("content")) {
+                // Articles have a content property with the html we want to
+                // download already. It's not loaded in by the topic tree but
+                // when the article is actually loaded.
+                handleContentLoaded(contentItem.get("content"));
+            } else {
+                // Sometimes articles are downloaded before they are viewed,
+                // so try to download it here.
+                APIClient.getArticle(getId(contentItem)).then((result) => {
+                    contentItem.set("content", result.translated_html_content);
+                    handleContentLoaded(contentItem.get("content"));
+                }).catch(() => {
+                    return reject().promise();
+                });
+            }
+        }
+    });
+};
+
+/**
+ * Used to download either a single content item for all content
+ * items underneath the specified topic.
+ */
+const download = (model, onProgress) => {
+    if (model.isContent()) {
+        return downloadContent(model, onProgress, 0);
+    } else if (model.isTopic()) {
+        return downloadTopic(model, onProgress, tempStore);
+    }
+    return Promise.resolve();
+};
+
+
+
+/*
+ * TODO: worth it to sync to loaded topic tree?
+var contentListModels = models.TopicTree.getContentItemsByIds(contentListIds);
+  _(contentListModels).each((model) => {
+    this.setDownloaded(model, true);
+  });
+ */
+
+// After downloadContent should addDownloadToManifest(contentItem);
+
+
 
 const Downloads: { contentList: any; init: any; canCancelDownload: any; cancelDownloading: any; download: any; downloadContent: any; downloadTopic: any; deleteContent: any } = {
     contentList: null,
@@ -157,7 +273,7 @@ const Downloads: { contentList: any; init: any; canCancelDownload: any; cancelDo
             var filename = contentItem.getId();
             var handleContentLoaded = (contentData) => {
                 var blob = new window.Blob([contentData], {
-                    type: contentItem.getContentMimeType()
+                    type: getContentMimeType(contentItem)
                 });
                 Storage.writeBlob(filename, blob).then(() => {
                     this.addDownloadToManifest(contentItem);
@@ -169,8 +285,8 @@ const Downloads: { contentList: any; init: any; canCancelDownload: any; cancelDo
                     reject();
                 });
             };
-            if (contentItem.isVideo()) {
-                var url = contentItem.getDownloadUrl();
+            if (isVideo(contentItem)) {
+                var url = getDownloadUrl(contentItem);
                 var req = new XMLHttpRequest({mozSystem: true});
                 req.open("GET", url, true);
                 req.responseType = "arraybuffer";
@@ -190,7 +306,7 @@ const Downloads: { contentList: any; init: any; canCancelDownload: any; cancelDo
                 };
                 req.send();
                 editTempStore((temp) => temp.set("currentDownloadRequest", req));
-            } else if (contentItem.isArticle()) {
+            } else if (isArticle(contentItem)) {
                 if (contentItem.get("content")) {
                     // Articles have a content property with the html we want to
                     // download already. It's not loaded in by the topic tree but
