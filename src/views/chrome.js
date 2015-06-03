@@ -110,13 +110,13 @@ export const AppHeader = component((props, {onClickBackCb}) => {
         </header>;
 }).jsx;
 
-export const StatusBarViewer = component(({tempStore}, {onClickCancelDownloadContent}) => {
+export const StatusBarViewer = component(({tempStore}, {onClickCancelDownloadContentCB}) => {
     if (!tempStore.get("status")) {
         return <div/>;
     }
     var cancelButton;
     if (Downloads.canCancelDownload(tempStore)) {
-        cancelButton = <a className="status-button" href="#" onClick={onClickCancelDownloadContent}>{String.fromCharCode(215)}</a>;
+        cancelButton = <a className="status-button" href="#" onClick={onClickCancelDownloadContentCB}>{String.fromCharCode(215)}</a>;
     }
 
     return <div className="status-bar">
@@ -167,7 +167,7 @@ export const Sidebar = component((props, statics) => {
     if (Storage.isEnabled()) {
         if (Downloads.canCancelDownload(props.tempStore)) {
             items.push(<li key="cancel-downloading" className="hot-item">
-                    <a href="#" data-l10n-id="cancel-downloading" onClick={statics.onClickCancelDownloadContent}>Cancel Downloading</a>
+                    <a href="#" data-l10n-id="cancel-downloading" onClick={statics.onClickCancelDownloadContentCB}>Cancel Downloading</a>
                 </li>);
         } else if (!props.isPaneShowing &&
                     props.topicTreeNode && isTopic(props.topicTreeNode)) {
@@ -330,11 +330,11 @@ export const MainView = component(({navInfo, options, user, tempStore}, {edit}) 
                                onClickDownloads: onClickDownloads(editNavInfo),
                                onClickSettings: onClickSettings(editNavInfo),
                                onClickSupport: onClickSupport,
-                               onClickDownloadContent: onClickDownloadContent(navInfo.get("topicTreeNode"), tempStore),
+                               onClickDownloadContent: onClickDownloadContent(navInfo.get("topicTreeNode"), tempStore, editTempStore),
                                onClickViewOnKA: onClickViewOnKA(navInfo.get("topicTreeNode")),
                                onClickShare: onClickShare(navInfo.get("topicTreeNode")),
                                onClickDeleteDownloadedContent: onClickDeleteDownloadedContent(navInfo.get("topicTreeNode")),
-                               onClickCancelDownloadContent: onClickCancelDownloadContent(tempStore, editTempStore),
+                               onClickCancelDownloadContentCB: onClickCancelDownloadContent(tempStore, editTempStore),
                            }}
                            tempStore={tempStore}
                            editTempStore={editTempStore}
@@ -362,7 +362,7 @@ export const MainView = component(({navInfo, options, user, tempStore}, {edit}) 
             {topicSearch}
             {control}
             <StatusBarViewer tempStore={tempStore} statics={{
-                onClickCancelDownloadContent: onClickCancelDownloadContent(tempStore, editTempStore),
+                onClickCancelDownloadContentCB: onClickCancelDownloadContent(tempStore, editTempStore),
             }}/>
         </section>
     </section>;

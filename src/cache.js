@@ -14,7 +14,7 @@
 
 import Util from "./util";
 import {AppOptions, TopicTree} from "./models";
-import {refreshLoggedInInfo} from "./user"
+import {refreshLoggedInInfo} from "./user";
 
 const TEN_MINUTES = 1000 * 60 * 10;
 const Cache = {

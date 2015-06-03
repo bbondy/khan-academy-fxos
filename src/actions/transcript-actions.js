@@ -10,7 +10,7 @@ export const loadTranscriptIfVideo = (options, editVideo) => (topicTreeNode) => 
     editVideo(() =>
         Immutable.fromJS({
             transcript: null,
-        }))
+        }));
 
     APIClient.getVideoTranscript(getYoutubeId(topicTreeNode)).then((transcript) => {
         if (transcript && transcript.length === 0) {

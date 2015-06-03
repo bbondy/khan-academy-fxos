@@ -1,12 +1,12 @@
 import Downloads from "../downloads";
 import {getKAUrl, isTopic, getTitle, isContent, isVideo} from "../data/topic-tree-helper";
 import {onTopicSearch} from "../actions/search-actions.js";
-import Util from "../util"
+import Util from "../util";
 import { getDomainTopicTreeNode, isPaneShowing } from "../data/nav-info";
 import Notifications from "../notifications";
 import Status from "../status";
 import {signIn, signOut} from "../user";
-import l10n from "../l10n.js"
+import l10n from "../l10n.js";
 
 export const onClickContentItemFromDownloads = (editNavInfo) => (topicTreeNode) =>
     editNavInfo((navInfo) => navInfo.merge({
@@ -162,9 +162,9 @@ export const onClickDeleteDownloadedContent = (topicTreeNode) => () => Downloads
 
 //TODO: impl
 const getChildNotDownloadedCount = () => {
-}
+};
 
-export const onClickDownloadContent = (topicTreeNode, tempStore) => () => {
+export const onClickDownloadContent = (topicTreeNode, tempStore, editTempStore) => () => {
     var totalCount = 1;
     if (isTopic(topicTreeNode)) {
         totalCount = getChildNotDownloadedCount(topicTreeNode);
