@@ -15,21 +15,21 @@ import Storage from "./storage";
 import {ContentList} from "./models";
 import models from "./models";
 import APIClient from "./apiclient";
-import {getId, getContentMimeType, isVideo, getDownloadUrl, isArticle} from  "./data/topic-tree-helper";
+import {getId, getContentMimeType, isVideo, getDownloadUrl, isArticle} from "./data/topic-tree-helper";
 
 const manifestFilename = "download-manifest.json";
 
 /**
  * Writes out the manifest file, which keeps track of downloaded content list ids
  */
-const writeDownloadsManifest = (contentListIds) => {
+export const writeDownloadsManifest = (contentListIds) => {
     let jsonManifest = JSON.stringify(contentListIds);
     return Storage.writeText(manifestFilename, jsonManifest);
 };
 /**
  * Reads in a manifest file, which keeps track of downloaded data
  */
-const readDownloadsManifest = () => {
+export const readDownloadsManifest = () => {
     return new Promise((resolve, reject) => {
         Storage.readText(manifestFilename).then((data) => {
             let contentListIds = data && JSON.parse(data) || undefined;
@@ -44,7 +44,7 @@ const readDownloadsManifest = () => {
  * Downloads the file at the specified URL and stores it to the
  * specified filename.
  */
-const downloadContent = (contentItem, onProgress, downloadNumber) => {
+export const downloadContent = (contentItem, onProgress, downloadNumber, editTempStore) => {
     return new Promise((resolve, reject) => {
         if (onProgress) {
             onProgress(downloadNumber, 0);
@@ -106,12 +106,42 @@ const downloadContent = (contentItem, onProgress, downloadNumber) => {
 };
 
 /**
- * Used to download either a single content item for all content
- * items underneath the specified topic.
+ * Downloads all content items recursively one at a time for
+ * the current topic
  */
-const download = (model, onProgress) => {
-    if (model.isContent()) {
-        return downloadContent(model, onProgress, 0);
+export const downloadTopic = function(topic: any, onProgress: any, editTempStore) {
+    return new Promise((resolve, reject) => {
+        var downloadedCount = 0;
+        editTempStore((temp) => temp.set("isDownloadingTopic", true));
+        var predicate = (model) => !model.isDownloaded();
+        var seq = topic.enumChildrenGenerator(predicate);
+        var downloadOneAtATime = () => {
+            try {
+                var contentItem = seq.next().value;
+                // Allow at most one download at a time.
+                downloadContent(contentItem, onProgress, downloadedCount).then(() => {
+                    downloadedCount++;
+                    setTimeout(downloadOneAtATime, 1000);
+                }).catch((isCancel) => {
+                    reject(isCancel);
+                });
+            } catch (e) {
+                // done, no more items in the generator
+                editTempStore((temp) => temp.set("isDownloadingTopic", false));
+                resolve(topic, downloadedCount);
+            }
+        };
+        downloadOneAtATime();
+    });
+};
+
+/**
+* Used to download either a single content item for all content
+* items underneath the specified topic.
+*/
+export const download = (model, onProgress, tempStore, editTempStore) => {
+if (model.isContent()) {
+        return downloadContent(model, onProgress, 0, editTempStore);
     } else if (model.isTopic()) {
         return downloadTopic(model, onProgress, tempStore);
     }
@@ -218,7 +248,7 @@ const Downloads: { contentList: any; init: any; canCancelDownload: any; cancelDo
      * Used to download either a single content item for all content
      * items underneath the specified topic.
      */
-    download: function(model: any, onProgress: any, editTempStore) {
+    download: function(model: any, onProgress: any, tempStore) {
         if (model.isContent()) {
             return this.downloadContent(model, onProgress, 0);
         } else if (model.isTopic()) {
@@ -264,7 +294,7 @@ const Downloads: { contentList: any; init: any; canCancelDownload: any; cancelDo
      * Downloads the file at the specified URL and stores it to the
      * specified filename.
      */
-    downloadContent: function(contentItem: any, onProgress: any, downloadNumber: any) {
+    downloadContent: function(contentItem: any, onProgress: any, downloadNumber: any, editTempStore) {
         return new Promise((resolve, reject) => {
             if (onProgress) {
                 onProgress(downloadNumber, 0);
