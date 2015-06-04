@@ -54,7 +54,6 @@
     "webpack-dev-server": "^1.7.0"
   },
   "jest": {
-    "scriptPreprocessor": "<rootDir>/src/preprocessor.js",
     "unmockedModulePathPatterns": [
       "node_modules/react",
       "node_modules/jquery",

@@ -135,14 +135,12 @@ gulp.task("package", function () {
 // Runs Jest tests
 gulp.task("test", function() {
      return gulp.src("__tests__").pipe(jest({
-        scriptPreprocessor: "./src/preprocessor.js",
         unmockedModulePathPatterns: [
             "node_modules/react"
         ],
         testDirectoryName: "js",
         testPathIgnorePatterns: [
-            "node_modules",
-            "src/preprocessor.js"
+            "node_modules"
         ],
         moduleFileExtensions: [
             "js",
