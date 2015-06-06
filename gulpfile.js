@@ -21,6 +21,9 @@ var gulp = require("gulp"),
     webpackConfig = require("./webpack.config.js"),
     WebpackDevServer = require("webpack-dev-server");
 
+var defaultPort = 8008;
+var port = process.env.PORT || defaultPort;
+
 // Lint Task
 // Uses jsxcs, then strips Flow types and uses jshint.
 // Has no output.
@@ -92,16 +95,12 @@ gulp.task("webpack", function(callback) {
         if(err) {
             throw new gutil.PluginError("webpack", err);
         }
-        // Log filenames packed:
-        //gutil.log("[webpack]", stats.toString({
-            // output options
-        //}));
         callback();
     });
 });
 
-// Starts a webpack dev-server on port 8008
-// localhost:8008 can be used instead for development.
+// Starts a webpack dev-server
+// localhost:<port>can be used instead for development.
 // The bundle.js file will not be written out and will be served from memory.
 gulp.task("server", function(callback) {
     var myConfig = Object.create(webpackConfig);
@@ -112,12 +111,12 @@ gulp.task("server", function(callback) {
         stats: {
             colors: true
         }
-    }).listen(8008, "localhost", function(err) {
+    }).listen(port, "localhost", function(err) {
         if (err) {
             throw new gutil.PluginError("webpack-dev-server", err);
         }
         // Server listening
-        gutil.log("[webpack-dev-server]", "http://localhost:8008/webpack-dev-server/index.html");
+        gutil.log("[webpack-dev-server]", "http://localhost:" + port + "/webpack-dev-server/index.html");
         // keep the server alive or continue?
         // callback();
     });
