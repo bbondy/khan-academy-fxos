@@ -12,6 +12,7 @@ var gulp = require("gulp"),
     jsxcs = require("gulp-jsxcs"),
     jest = require("gulp-jest"),
     transform = require("vinyl-transform"),
+    del = require("del"),
     fs = require("fs"),
     es = require("event-stream"),
     JSONStream = require("JSONStream"),
@@ -162,4 +163,12 @@ gulp.task("watch", function() {
 // Maybe because of my code layout or otheriwse, needto figure it out before enabling by default.
 gulp.task("default", function(cb) {
     runSequence(["lint", "less", "webpack"], "package", cb);
+});
+
+gulp.task("clean", function(cb) {
+    del(["build", "dist", "node_modules"], cb);
+});
+
+gulp.task("clobber", function(cb) {
+    del(["build", "dist"], cb);
 });
