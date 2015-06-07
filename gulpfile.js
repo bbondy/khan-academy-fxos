@@ -3,32 +3,20 @@ var gulp = require("gulp"),
     sourcemaps = require('gulp-sourcemaps'),
     eslint = require('gulp-eslint');
     less = require("gulp-less"),
-    concat = require("gulp-concat"),
-    uglify = require("gulp-uglify"),
     path = require("path"),
     shell = require("gulp-shell"),
-    rename = require("gulp-rename"),
     react = require("gulp-react"),
-    jsxcs = require("gulp-jsxcs"),
     jest = require("gulp-jest"),
-    transform = require("vinyl-transform"),
     del = require("del"),
-    fs = require("fs"),
-    es = require("event-stream"),
-    JSONStream = require("JSONStream"),
     runSequence = require("run-sequence"),
-    _ = require("underscore"),
     webpack = require("webpack"),
     webpackConfig = require("./webpack.config.js"),
     WebpackDevServer = require("webpack-dev-server");
 
-var defaultPort = 8008;
 var host = process.env.HOST || 'localhost';
 var port = process.env.PORT || 8008;
 
-// Lint Task
-// Uses jsxcs, then strips Flow types and uses jshint.
-// Has no output.
+// Lint Task w/ eslint
 gulp.task("lint", function() {
     return gulp.src(['./src/**/*.js'])
     .pipe(eslint())
@@ -49,20 +37,6 @@ gulp.task("less", function () {
         }))
     .pipe(sourcemaps.write())
     .pipe(gulp.dest("./build/css"));
-});
-
-// The react task should not normally be needed.
-// This is only present if the errors from webpack and you
-// want to only try running react.
-// Puts output in the ./build folder
-gulp.task("react", function() {
-    return gulp.src(["./src/**/*.js"])
-        .pipe(react({
-            harmony: true,
-            // Skip Flow type annotations!
-            stripTypes: true
-        }))
-        .pipe(gulp.dest("./build"));
 });
 
 // Copy minify.js to the build folder and strip out Flow typechecks
