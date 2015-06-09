@@ -110,6 +110,7 @@ gulp.task("package", function () {
 // Runs Jest tests
 gulp.task("test", function() {
      return gulp.src("__tests__").pipe(jest({
+        scriptPreprocessor: "<rootDir>/node_modules/babel-jest",
         unmockedModulePathPatterns: [
             "node_modules/react"
         ],
