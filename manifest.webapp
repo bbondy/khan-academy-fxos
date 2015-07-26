@@ -15,17 +15,53 @@
     "*"
   ],
   "locales": {
-    "en": {
+    "bn": {
       "name": "Khan Academy",
-      "description": "Khan Academy allows you to learn almost anything for free"
+      "description": "খান অ্যাকাডেমি থেকে আপনি বিনামূল্যে প্রায় সব কিছুই শিখতেই পারবেন"
+    },
+    "eo": {
+      "name": "Khan Academy",
+      "description": "Khan Academy permesas vin lerni preskaŭ ĉion senkoste",
+      "permissions": {
+        "desktop-notification": {
+          "description": "Atentigo por elŝutitaj filmetoj"
+        },
+        "systemXHR": {
+          "description": "Komuniki kun la API-ojn de Khan Academy"
+        },
+        "device-storage:videos": {
+          "description": "Konservado de filmetoj"
+        },
+        "device-storage:sdcard": {
+          "description" : "Konservado de listo de temoj"
+        }
+      }
+    },
+    "es": {
+      "name": "Khan Academy",
+      "description": "Khan Academy te permite aprender casi todo gratis."
     },
     "fr": {
       "name": "Khan Academy",
       "description": "Khan Academy vous permet de presque tout apprendre gratuitement"
     },
-    "es": {
+    "it": {
       "name": "Khan Academy",
-      "description": "Khan Academy te permite aprender casi todo gratis."
+      "description": "Khan Academy ti permette di imparare quasi tutto gratuitamente",
+      "permissions": {
+        "desktop-notification": {
+          "description": "Notifiche per i video scaricati"
+        },
+        "systemXHR": {
+          "description": "Comunicazione con le API di Khan Academy"
+        },
+        "device-storage:videos": {
+          "description": "Salvataggio dei video"
+        },
+        "device-storage:sdcard": {
+          "description" : "Salvataggio dell'albero degli argomenti"
+        }
+      }
     },
     "pt": {
       "name": "Khan Academy",
@@ -34,10 +70,6 @@
     "tr": {
       "name": "Khan Academy",
       "description": "Khan Academy  hemen hemen her şeyi ücretsiz öğrenmek için olanak sağlar"
-    },
-    "bn": {
-      "name": "Khan Academy",
-      "description": "খান অ্যাকাডেমি থেকে আপনি বিনামূল্যে প্রায় সব কিছুই শিখতেই পারবেন"
     }
   },
   "default_locale": "en",
