@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.org/bbondy/khan-academy-fxos.svg?branch=master)](https://travis-ci.org/bbondy/khan-academy-fxos)
 
 Khan Academy Firefox OS app
-=============================
+============================
 
 Khan Academy's Firefox OS app source is [Mozilla Public License Version 2.0](https://www.mozilla.org/MPL/2.0/) licensed.
 
